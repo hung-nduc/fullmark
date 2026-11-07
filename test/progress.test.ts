@@ -59,7 +59,19 @@ describe("the progress line", () => {
       writeFileSync(join(dir, name), JSON.stringify(resultsOf(attempt)));
     }
     const t = terminal(dir);
-    const opts = { quiz: "quiz.md", output: null, grades: null, json: false, web: false, name: null, plain: false };
+    const opts = {
+      quiz: "quiz.md",
+      output: null,
+      grades: null,
+      json: false,
+      web: false,
+      name: null,
+      timeout: null,
+      open: false,
+      port: null,
+      version: "1.0.0-test",
+      plain: false,
+    };
     await runGrade(["r1.json", "r2.json"], opts, t.io);
     expect(t.raw).toEqual(["\r[1/2] r1.json", CLEAR, "\r[2/2] r2.json", CLEAR]);
   });

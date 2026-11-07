@@ -90,7 +90,7 @@ export type PageOptions = {
 };
 
 /** A lone `<p>…</p>` loses its paragraph, so a choice is not set apart from its marker. */
-const unwrap = (html: string): string => {
+export const unwrap = (html: string): string => {
   const m = /^<p>([\s\S]*)<\/p>\n?$/.exec(html);
   return m && !(m[1] ?? "").includes("<p>") ? (m[1] ?? "") : html;
 };

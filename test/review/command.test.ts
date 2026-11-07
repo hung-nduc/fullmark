@@ -2,8 +2,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { localIso, type ReviewOptions, runReview } from "../../src/cli/review";
+import { type ReviewOptions, runReview } from "../../src/cli/review";
 import type { ServeIo } from "../../src/cli/serve";
+import { localIso } from "../../src/cli/time";
 import { reviewCounts } from "../../src/core/review/counts";
 import { readReview } from "../../src/core/review/read";
 import type { Judged } from "../../src/core/review/reasons";

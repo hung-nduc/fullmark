@@ -135,8 +135,14 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("-o, --output <out>", "the report file; with several results files, a folder")
     .option("--grades <file>", "fold a filled-in grades file into the report (one results file only)")
     .option("--json", "write *-report.json and a *-grades.json template instead of Markdown, and print JSON")
-    .option("--web", "grade by hand in a form (not available yet)")
-    .option("--name <name>", "with --web: the human grader's name (not available yet)")
+    .option("--web", "grade by hand in a form on 127.0.0.1, then write the grades file and the report")
+    .option("--name <name>", "with --web: the human grader's name (default: the form asks)")
+    .option("--open", "with --web: open the form in the browser")
+    .option(
+      "--timeout <seconds>",
+      "with --web: give up after this long without Save grades (default 1800; 0 waits forever)",
+    )
+    .option("--port <n>", "with --web: the port on 127.0.0.1 (default: a free one)")
     .option("--plain", "no progress line, even in a terminal")
     .action(
       async (
@@ -148,6 +154,9 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
           json?: boolean;
           web?: boolean;
           name?: string;
+          open?: boolean;
+          timeout?: string;
+          port?: string;
           plain?: boolean;
         },
       ) => {
@@ -158,6 +167,10 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
           json: Boolean(options.json),
           web: Boolean(options.web),
           name: options.name ?? null,
+          timeout: options.timeout ?? null,
+          open: Boolean(options.open),
+          port: options.port ?? null,
+          version: VERSION,
           plain: Boolean(options.plain) || noColor(),
         };
         outcome.exit = await (await import("./grade")).runGrade(results, opts, io);

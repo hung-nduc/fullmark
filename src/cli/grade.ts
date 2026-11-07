@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { answerProblem, attemptOf, parseResults } from "../core/attempt";
+import { type Attempt, answerProblem, attemptOf, parseResults } from "../core/attempt";
 import { grade } from "../core/grade";
 import { en, vi } from "../core/i18n";
 import type { Quiz } from "../core/ir";
@@ -13,6 +13,7 @@ import { expandInputs } from "./files";
 import type { Io } from "./ids";
 import { loadQuiz } from "./load";
 import { readFailure, shownPath } from "./paths";
+import type { ServeIo } from "./serve";
 
 export type GradeOptions = {
   quiz: string | null;
@@ -21,6 +22,11 @@ export type GradeOptions = {
   json: boolean;
   web: boolean;
   name: string | null;
+  /** `--web`: seconds as given (null: 1800), the port as given (null: a free one), `--open`, and the version */
+  timeout: string | null;
+  open: boolean;
+  port: string | null;
+  version: string;
   plain: boolean;
 };
 
@@ -37,7 +43,8 @@ type FileResult =
   | { status: "problems"; file: string; message: string; problems: string[] }
   | { status: "error"; file: string; message: string };
 
-const NOT_YET = "is not available yet: the grading form arrives with a later release";
+/** `Io`, and what `--web` takes beyond it: the clock, the opener, Ctrl+C and the timer, which tests control. */
+export type GradeIo = ServeIo;
 
 /** The exit code that is worse: usage (2) over problems (1) over done (0). */
 function worst(a: ExitCode, b: ExitCode): ExitCode {
@@ -59,16 +66,16 @@ const isFile = (path: string): boolean => existsSync(path) && !statSync(path).is
 
 const readText = (path: string): string => readFileSync(path).toString("utf8");
 
-async function gradeOne(
+/** The results file read, checked against the quiz and its version, and its answers against their questions. */
+export function readAttempt(
   results: string,
   quiz: Quiz,
   quizHash: string,
   quizFile: string,
-  gradesFile: GradesFile | null,
-  opts: GradeOptions,
-  several: boolean,
   io: Io,
-): Promise<FileResult> {
+):
+  | { status: "ok"; read: Extract<ReturnType<typeof parseResults>, { ok: true }>; attempt: Attempt }
+  | Extract<FileResult, { status: "problems" | "error" }> {
   let text: string;
   try {
     text = readText(resolve(io.cwd, results));
@@ -93,6 +100,22 @@ async function gradeOne(
   if (shape.length > 0) {
     return { status: "problems", file: results, message: "answers that do not fit their questions", problems: shape };
   }
+  return { status: "ok", read, attempt };
+}
+
+async function gradeOne(
+  results: string,
+  quiz: Quiz,
+  quizHash: string,
+  quizFile: string,
+  gradesFile: GradesFile | null,
+  opts: GradeOptions,
+  several: boolean,
+  io: GradeIo,
+): Promise<FileResult> {
+  const got = readAttempt(results, quiz, quizHash, quizFile, io);
+  if (got.status !== "ok") return got;
+  const { read, attempt } = got;
 
   let gradesApplied: AppliedGrades | null = null;
   if (gradesFile) {
@@ -147,17 +170,9 @@ async function gradeOne(
 /**
  * `quiz grade RESULTS... --quiz FILE` (COMMANDS.md). Re-grades each attempt with the shared grader and writes a
  * report; with `--json` also a grades template, and with `--grades` folds a filled-in file in. Every results file is
- * attempted; the exit code is the worst one. `--web` and `--name` are not available yet.
+ * attempted; the exit code is the worst one. `--web` serves a form instead (`grade-web.ts`).
  */
-export async function runGrade(patterns: readonly string[], opts: GradeOptions, io: Io): Promise<ExitCode> {
-  if (opts.web) {
-    fail(io, opts.json, `--web ${NOT_YET}`);
-    return EXIT.usage;
-  }
-  if (opts.name !== null) {
-    fail(io, opts.json, `--name ${NOT_YET} (it names the grader of --web)`);
-    return EXIT.usage;
-  }
+export async function runGrade(patterns: readonly string[], opts: GradeOptions, io: GradeIo): Promise<ExitCode> {
   if (opts.quiz === null) {
     fail(
       io,
@@ -168,6 +183,18 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
   }
   const inputs = expandInputs(patterns, io.cwd);
   const several = inputs.files.length + inputs.errors.length > 1;
+  if (opts.web && several) {
+    fail(io, opts.json, "--web takes one results file: it grades one attempt");
+    return EXIT.usage;
+  }
+  if (opts.web && opts.grades !== null) {
+    fail(io, opts.json, "--grades with --web is not available yet");
+    return EXIT.usage;
+  }
+  if (opts.name !== null && !opts.web) {
+    fail(io, opts.json, "--name names the grader of --web");
+    return EXIT.usage;
+  }
   if (opts.grades !== null && several) {
     fail(io, opts.json, "--grades takes one results file: it grades one attempt");
     return EXIT.usage;
@@ -241,6 +268,27 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
       return EXIT.problems;
     }
     gradesFile = read.file;
+  }
+
+  if (opts.web) {
+    // one results file (several were refused above); an unusable input is a failure in its place
+    const item = inputs.items[0];
+    if (item === undefined || "error" in item) {
+      if (item !== undefined && "error" in item)
+        emit({ status: "error", file: item.error.input, message: item.error.message });
+      return EXIT.usage;
+    }
+    const got = readAttempt(item.file, loaded.quiz, loaded.hash, shownPath(opts.quiz, io.cwd), io);
+    if (got.status !== "ok") {
+      emit(got);
+      return got.status === "error" ? EXIT.usage : EXIT.problems;
+    }
+    const { runGradeWeb } = await import("./grade-web");
+    return runGradeWeb(
+      { results: item.file, quiz: loaded.quiz, hash: loaded.hash, quizFile: shownPath(opts.quiz, io.cwd), ...got },
+      opts,
+      io,
+    );
   }
 
   let exit: ExitCode = EXIT.done;

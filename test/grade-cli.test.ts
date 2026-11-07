@@ -45,6 +45,10 @@ const OPTS: GradeOptions = {
   json: false,
   web: false,
   name: null,
+  timeout: null,
+  open: false,
+  port: null,
+  version: "1.0.0-test",
   plain: false,
 };
 
@@ -176,12 +180,18 @@ describe("quiz grade", () => {
     t.done();
   });
 
-  it("--web and --name exit 2: not available yet", async () => {
+  it("--name without --web, --grades with --web, and several files with --web exit 2", async () => {
     const t = setup();
     const c = capture(t.dir);
-    expect(await runGrade(["a.json"], { ...OPTS, web: true }, c.io)).toBe(2);
-    expect(c.err.join("\n")).toContain("not available yet");
-    expect(await runGrade(["a.json"], { ...OPTS, name: "Hung" }, capture(t.dir).io)).toBe(2);
+    expect(await runGrade(["a.json"], { ...OPTS, name: "Hung" }, c.io)).toBe(2);
+    expect(c.err.join("\n")).toContain("--name names the grader of --web");
+    const g = capture(t.dir);
+    expect(await runGrade(["a.json"], { ...OPTS, web: true, grades: "g.json" }, g.io)).toBe(2);
+    expect(g.err.join("\n")).toContain("--grades with --web is not available yet");
+    writeFileSync(join(t.dir, "b.json"), results(t.dir));
+    const s = capture(t.dir);
+    expect(await runGrade(["a.json", "b.json"], { ...OPTS, web: true }, s.io)).toBe(2);
+    expect(s.err.join("\n")).toContain("--web takes one results file");
     t.done();
   });
 

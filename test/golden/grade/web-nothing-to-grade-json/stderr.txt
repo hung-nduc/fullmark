@@ -1,0 +1,1 @@
+nothing to grade: no essay or code question was answered; quiz grade results.json --quiz medical/quiz.md writes the report

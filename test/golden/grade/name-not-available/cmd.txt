@@ -1,6 +1,0 @@
-grade
-results.json
---quiz
-medical/quiz.md
---name
-Lan
