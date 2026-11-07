@@ -15,8 +15,29 @@ export default defineConfig({
   fullyParallel: true,
   reporter: [["list"]],
   projects: [
-    { name: "chromium", use: { browserName: "chromium" } },
+    // the page budget test measures the page, not the machine (G97): it runs first, alone (Firefox's after Chromium's),
+    // and every other project depends on it
+    { name: "budget-chromium", testMatch: "**/budget.spec.ts", use: { browserName: "chromium" } },
+    {
+      name: "budget-firefox",
+      testMatch: "**/budget.spec.ts",
+      timeout: 60_000,
+      dependencies: ["budget-chromium"],
+      use: { browserName: "firefox" },
+    },
+    {
+      name: "chromium",
+      testIgnore: "**/budget.spec.ts",
+      dependencies: ["budget-chromium", "budget-firefox"],
+      use: { browserName: "chromium" },
+    },
     // axe is slow in Firefox under parallel load: it gets 60 s a test; no retries
-    { name: "firefox", timeout: 60_000, use: { browserName: "firefox" } },
+    {
+      name: "firefox",
+      testIgnore: "**/budget.spec.ts",
+      timeout: 60_000,
+      dependencies: ["budget-chromium", "budget-firefox"],
+      use: { browserName: "firefox" },
+    },
   ],
 });
