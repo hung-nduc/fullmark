@@ -298,6 +298,21 @@ test("a vi quiz has the form in vi", async ({ page }) => {
   await expect(page.locator("article[data-qid=add] .fm-grade-badge")).toHaveText("Chờ chấm");
   await value(page, "defs").fill("0,5");
   await expect(ctl(page, "defs").locator(".fm-ctl-group")).toHaveAttribute("data-state", "set");
+  // every number a button writes into a slot has the decimal comma: the full-mark box, then + and −
+  await ctl(page, "derive").locator("[data-act=full]").click();
+  await expect(value(page, "derive")).toHaveValue("1,5");
+  await ctl(page, "derive").locator("[data-act=less]").click();
+  await expect(value(page, "derive")).toHaveValue("1,25");
+  await ctl(page, "derive").locator("[data-act=more]").click();
+  await expect(value(page, "derive")).toHaveValue("1,5");
+  await ctl(page, "interp").locator("[data-act=more]").click();
+  await expect(value(page, "interp")).toHaveValue("1");
+  await ctl(page, "interp").locator("[data-act=less]").click();
+  await expect(value(page, "interp")).toHaveValue("0,75");
+  // a banded question's first + starts at the middle of the scale
+  await next(page);
+  await ctl(page, "TR").locator("[data-act=more]").click();
+  await expect(value(page, "TR")).toHaveValue("4,5");
 });
 
 test("passes axe in light and dark, with the Finish dialog open", async ({ page }) => {

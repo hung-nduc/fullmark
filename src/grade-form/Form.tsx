@@ -137,7 +137,7 @@ function Control({
         data-act="full"
         data-full={value !== null && value >= spec.max ? "" : undefined}
         aria-label={r.full(what, n(spec.max))}
-        onClick={() => state.setRaw(item.id, crit, String(spec.max))}
+        onClick={() => state.setRaw(item.id, crit, n(spec.max))}
       >
         {n(spec.max)}
       </button>

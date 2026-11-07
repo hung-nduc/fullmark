@@ -1,5 +1,6 @@
 import { computed, signal } from "@preact/signals";
 import { type GradeMessages, gradeEn, gradeVi } from "../core/i18n/grade";
+import { num } from "../page/results";
 import type { GradeData, GradeItem } from "./data";
 import { acceptedValue, type Evaluated, emptyFill, entryOf, evaluate, type Fill, pressed, specOf } from "./logic";
 
@@ -105,8 +106,14 @@ export function createGradeState(data: GradeData) {
       if (next === null) return;
       patch(id, (f) =>
         crit === null
-          ? { ...f, score: String(next) }
-          : { ...f, cells: { ...f.cells, [crit]: { ...(f.cells[crit] as Fill["cells"][string]), raw: String(next) } } },
+          ? { ...f, score: num(next, data.uiLang) }
+          : {
+              ...f,
+              cells: {
+                ...f.cells,
+                [crit]: { ...(f.cells[crit] as Fill["cells"][string]), raw: num(next, data.uiLang) },
+              },
+            },
       );
     },
     /** every score, verdict, note and text of the question */
