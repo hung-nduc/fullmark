@@ -231,7 +231,15 @@ export function RubricBox({ grade, c }: { grade: PageGradeDetail; c: Ctx }) {
       </ul>
       <RubricTotal
         label={banded ? t.boxOverall : holistic ? t.boxScore : t.boxTotal}
-        how={banded ? t.boxMean : holistic ? t.boxGiven : t.boxSum}
+        how={
+          banded
+            ? grade.mean !== null && grade.round !== null && scale !== null && grade.band !== null
+              ? t.boxMean(n(grade.mean), grade.round, n(scale.step), n(grade.band))
+              : ""
+            : holistic
+              ? t.boxGiven
+              : t.boxSum
+        }
         wide={holistic}
         slot={total}
       />

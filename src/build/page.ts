@@ -9,6 +9,7 @@ import { en, type Messages, vi } from "../core/i18n";
 import type { Question, Quiz, Rubric, Section } from "../core/ir";
 import { encodeKey, toBase64 } from "../core/keyblob";
 import { planFor } from "../core/plan";
+import { meanBand } from "../core/rubric/arith";
 import type { AppliedGrades } from "../core/rubric/grades";
 import { resolveRubric } from "../core/rubric/model";
 import { themeCss } from "../core/themes";
@@ -360,6 +361,14 @@ function gradesOf(applied: AppliedGrades, quiz: Quiz, md: Md): PageGrades {
         step: rubric && rubric.mode !== "banded" ? rubric.step : null,
         scale:
           rubric?.mode === "banded" ? { min: rubric.scale.min, max: rubric.scale.max, step: rubric.scale.step } : null,
+        mean:
+          rubric?.mode === "banded"
+            ? meanBand(
+                d.criteria.map((c) => c.band ?? 0),
+                d.criteria.map((c) => c.weight ?? 1),
+              )
+            : null,
+        round: rubric?.mode === "banded" ? rubric.round : null,
         grader: d.graded_by,
         criteria: d.criteria.map((c) => ({
           html: unwrap(md.block(c.text)),

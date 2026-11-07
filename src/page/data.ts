@@ -100,6 +100,9 @@ export type PageGradeDetail = {
   step: number | null;
   /** banded: the whole scale; else null */
   scale: { min: number; max: number; step: number } | null;
+  /** banded: the mean of the bands before rounding, and the rule that rounded it (the core's, never worked out in the page); else null */
+  mean: number | null;
+  round: "nearest-step" | "down" | "ielts" | null;
   grader: PageGrader;
   criteria: PageGradedCriterion[];
   justification: string | null;

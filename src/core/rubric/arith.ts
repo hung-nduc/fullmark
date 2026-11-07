@@ -78,6 +78,21 @@ export function overallBand(
   return unscaled(clamped, d);
 }
 
+/**
+ * The weighted mean of the bands, before any rounding, to four decimals (halves up): "6.25" for the bands 6, 6.5, 6.5
+ * and 6. The overall band is `overallBand`'s; this is the number the box shows beside it.
+ */
+export function meanBand(bands: readonly number[], weights: readonly number[]): number {
+  const d = decimalsAmong(0.5, ...bands);
+  const dw = decimalsAmong(...weights);
+  const w = weights.map((x) => scaled(x, dw));
+  const b = bands.map((x) => scaled(x, d));
+  const num = w.reduce((sum, wi, i) => sum + wi * (b[i] ?? 0n), 0n);
+  const den = w.reduce((sum, wi) => sum + wi, 0n);
+  if (den === 0n) return 0;
+  return Number(halfUp(10000n * num, den * 10n ** BigInt(d))) / 10000;
+}
+
 /** `points × band / scale.max`, to two decimals, halves up (TECHNICAL_DESIGN.md, section 6). */
 export function bandPoints(points: number, band: number, scaleMax: number): number {
   if (!(scaleMax > 0)) return points;

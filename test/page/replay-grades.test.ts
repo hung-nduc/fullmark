@@ -85,9 +85,7 @@ describe("grades on a replay page", () => {
     expect(add).toContain("Why this score · optional Solid derivation; the interpretation is the weak part.");
     expect(add).toContain("To improve · optional Say why the result matters.");
     const code = card(html, "code");
-    expect(text(code)).toContain(
-      "Is short and clear 0.5 of 1 point 0.5 / 1 x + x works, but 2 * x is the usual form.",
-    );
+    expect(text(code)).toContain("Is short and clear 0.5 of 1 point 0.5 / 1 x + x works, but 2 * x is the usual form.");
     expect(text(code)).toContain("Total the sum of the criteria 1.5 of 2 points");
     expect(code).not.toContain("<table");
   });
@@ -112,10 +110,10 @@ describe("grades on a replay page", () => {
     const ielts = text(card(html, "ielts"));
     expect(ielts).toContain("A band per criterion bands 0 to 9, step 0.5 Graded by Claude Opus 5.5 (agent)");
     expect(ielts).toContain("Task Response band 6 of 9 6 / 9 Room to improve here.");
-    expect(ielts).toContain("Overall band the mean of the bands, rounded band 6.5 of 9 6.5 / 9");
+    expect(ielts).toContain("Overall band mean 6.25, IELTS rounding to 6.5 band 6.5 of 9 6.5 / 9");
     const banded = text(card(html, "banded"));
     expect(banded).toContain("bands 0 to 6, step 1");
-    expect(banded).toContain("Style band 6 of 6 6 / 6 Overall band");
+    expect(banded).toContain("Style band 6 of 6 6 / 6 Overall band mean 5.33, rounded down to 5");
   });
 
   it("shows a holistic box: a verdict slot per bullet, no verdict where none is given, the score", () => {

@@ -198,7 +198,12 @@ export const en = {
     boxOverall: "Overall band",
     boxScore: "Score",
     boxSum: "the sum of the criteria",
-    boxMean: "the mean of the bands, rounded",
+    boxMean: (mean: string, round: "nearest-step" | "down" | "ielts", step: string, band: string) =>
+      round === "ielts"
+        ? `mean ${mean}, IELTS rounding to ${band}`
+        : round === "down"
+          ? `mean ${mean}, rounded down to ${band}`
+          : `mean ${mean}, rounded to the nearest ${step} to ${band}`,
     boxGiven: "the score given",
     boxVerdictNote: "verdict, not scored",
     boxNoVerdict: "No verdict",

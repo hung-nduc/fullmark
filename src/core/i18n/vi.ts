@@ -196,7 +196,12 @@ export const vi = {
     boxOverall: "Band tổng",
     boxScore: "Điểm",
     boxSum: "tổng các tiêu chí",
-    boxMean: "trung bình các band, làm tròn",
+    boxMean: (mean: string, round: "nearest-step" | "down" | "ielts", step: string, band: string) =>
+      round === "ielts"
+        ? `trung bình ${mean}, làm tròn theo IELTS thành ${band}`
+        : round === "down"
+          ? `trung bình ${mean}, làm tròn xuống thành ${band}`
+          : `trung bình ${mean}, làm tròn đến ${step} gần nhất thành ${band}`,
     boxGiven: "điểm đã cho",
     boxVerdictNote: "đánh giá, không tính điểm",
     boxNoVerdict: "Chưa đánh giá",

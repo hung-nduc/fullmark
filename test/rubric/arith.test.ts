@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canonicalHash, canonicalJson } from "../../src/core/canonical";
-import { bandPoints, decimalsOf, isMultiple, overallBand, sumMarks } from "../../src/core/rubric/arith";
+import { bandPoints, decimalsOf, isMultiple, meanBand, overallBand, sumMarks } from "../../src/core/rubric/arith";
 import { resolveRubric, rubricHash } from "../../src/core/rubric/model";
 import { PRESET_NAMES, PRESETS } from "../../src/core/rubric/presets";
 import { quizOf } from "../helpers/grading";
@@ -184,5 +184,13 @@ describe("canonical JSON and the rubric hash", () => {
       rubricHash(rubricOf(base.replace("Define it (1", "Define it (0.5").replace("Use it (1", "Use it (1.5"))),
     ).not.toBe(h);
     expect(rubricHash(rubricOf("rubric:\n  - Define it\n  - Use it"))).not.toBe(h);
+  });
+});
+
+describe("meanBand", () => {
+  it("is the exact weighted mean, to four decimals", () => {
+    expect(meanBand([6, 6.5, 6.5, 6], [1, 1, 1, 1])).toBe(6.25);
+    expect(meanBand([5, 6], [1, 2])).toBe(5.6667);
+    expect(meanBand([7], [1])).toBe(7);
   });
 });
