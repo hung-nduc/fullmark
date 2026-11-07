@@ -9,7 +9,7 @@
 
 ## Score
 
-**1 of 1 points (100%)**
+**1 of 1 point (100%)**
 
 24 points are waiting for a grader and are not in the score
 

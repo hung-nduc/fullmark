@@ -24,7 +24,8 @@ export const en = {
     unitSecond: "s",
     timedOut: "the time limit ran out",
     score: "Score",
-    scoreLine: (earned: string, points: string, percent: string) => `${earned} of ${points} points (${percent}%)`,
+    scoreLine: (earned: string, points: string, percent: string) =>
+      `${earned} of ${points} ${points === "1" ? "point" : "points"} (${percent}%)`,
     pendingLine: (points: string) => `${points} points are waiting for a grader and are not in the score`,
     goalLine: (mark: number, reached: boolean, pending: boolean) =>
       `Goal ${mark}%: ${reached ? "reached" : "not reached yet"}${pending ? "*" : ""}`,
