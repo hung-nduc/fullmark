@@ -237,10 +237,10 @@ describe("grades on a replay page", () => {
   it("in Vietnamese the box uses the catalog, with a decimal comma", () => {
     const { html } = pageOf((g) => g, "vi", "vi");
     const add = text(card(html, "add"));
-    expect(add).toContain("Điểm cho từng tiêu chí bước 0,25 Chấm bởi Claude Opus 5.5 (agent) 24 thg 10 2026");
+    expect(add).toContain("Điểm cho từng tiêu chí bước 0,25 Chấm bởi Claude Opus 5.5 (AI) 24 thg 10 2026");
     expect(add).toContain("1,25 trên 1,5 điểm");
     expect(add).toContain("Tổng tổng các tiêu chí 2,25 trên 3 điểm 2,25 / 3");
-    expect(add).toContain("Lý do cho điểm này · không bắt buộc");
+    expect(add).toContain("Vì sao cho điểm này · không bắt buộc");
     expect(add).not.toContain("Graded by");
     expect(text(card(html, "holistic"))).toContain("Đạt một phần");
   });
