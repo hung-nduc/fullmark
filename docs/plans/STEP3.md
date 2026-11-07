@@ -29,7 +29,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
-| 3p G98, the grading form on a phone | brief approved (2026-11-07), with G100; handed to Sonnet | |
+| 3p G98, the grading form on a phone | built, waiting for review | `3ee9d79`..`72301ac`, then the screens and this row |
 | 3r fullmark's own marking from the form (G83) | outline, after 3p (G100) | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
