@@ -487,6 +487,8 @@ One component shows a question's rubric and its grade: read-only after Submit an
 - **The total section** has the card fill and a 2 px rule over it. The label is in `accent` ("Total", "Overall band", "Score") over a muted line saying how the total is made; its slot is "2.25 / 3".
 - **The note** is muted text in the read-only box, and an empty one is left out. In the form it is a sunken, rounded field.
 - **Code** is drawn as points per criterion.
+- **On a phone** (under 520 px) each section stacks: the name, then the slot at the column's full width, then the note; the head's two sides stack, the type and step over who and when. The box is a list (`<ul>` of sections; the head and the total sit outside it) in a group named by its type. Each slot says its value in words to assistive technology ("1.25 of 1.5 points", "band 6.5 of 9", "verdict: met", "no verdict") and the visible "/" is hidden from it. The editable box stacks the same way, with 44 px controls.
+- **The words** come from the page's catalogs, en and vi. In vi every word count says "chữ" ("71 chữ, từ 120 đến 300"), on the page and in the report.
 - **The card's badge** is the result badge.
 
 The editable box, its controls and their states are in COMMANDS.md (`quiz grade`, "The form").

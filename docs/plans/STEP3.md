@@ -26,7 +26,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3l G50, G56, 3k's fixes, `quiz review --since` | done, reviewed, gaps decided (2026-11-05) | `54214a5`..`4140cf6`, review |
 | 3m G63, G64, the stacked sidebar with the materials, and the phone | done, reviewed, gaps decided (2026-11-05) | `182beb3`..`0a68e2d`, review |
 | 3n G68, G69 | done, reviewed (2026-11-06), no gaps | `d0e44e4`..`be1629f`, review |
-| 3o the rubric box in the replay, G84, G90 | brief approved (2026-11-07), with G89 and G90; handed to Sonnet | |
+| 3o the rubric box in the replay, G84, G90 | built, waiting for review (2026-11-07); screens in `docs/screens/3o/` | `73d3194`, `3f30635`, `fd8383a`, and the commit after them (`git log 9938a86..HEAD`) |
 | 3f `grade --web` at 1280 px | brief approved (2026-11-07), with G87, G88 and G91; starts after 3o's review | |
 | 3p the grading form on a phone, G83, G75 | outline; G75 waits for its board | |
 | 3h `brief --web` | waits for its boards (3v) | |
