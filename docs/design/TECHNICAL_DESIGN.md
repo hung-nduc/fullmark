@@ -484,11 +484,11 @@ One component shows a question's rubric and its grade: read-only after Submit an
 - **The head** has the card fill, is 52 px tall and has a 2 px `line-strong` rule under it, matching the rule over the total. There is no word "Rubric". Left, two lines: the type in bold `hint` ("Points per criterion", "A band per criterion", "One score"), the size and weight of the total's label, and the step under it, muted ("step 0.25"; "bands 0 to 9, step 0.5"). Right, two lines: who graded over when ("Graded by Claude (agent)" over "21 Oct 2026"; in the form, "Graded by you" over "saved at Finish").
 - **A section** has the name on the left and a slot on the right, in a 262 px column (284 px for verdicts) of the same width in both forms; the note runs under both, across the section. There is no "up to" line: the slot carries the maximum.
 - **The read-only slot** shows "1.25 / 1.5", centred as a whole, in the results map's colours: full `ok` on `ok-wash`, part a 2 px `warn` edge, none `bad` on `bad-wash`. A band stays neutral. A verdict is one slot of the same size with only the given verdict in it ("Met", "Partly", "Missed", in the result colours), or "No verdict", muted and dashed.
-- **The total section** has the card fill and a 2 px rule over it. The label is in `accent` ("Total", "Overall band", "Score") over a muted line saying how the total is made; its slot is "2.25 / 3".
+- **The total section** has the card fill and a 2 px rule over it. The label is in `accent` ("Total", "Overall band", "Score") over a muted line saying how the total is made; its slot is "2.25 / 3". For a banded rubric that line gives the mean and the rule, worked out by the core and never in the page: "mean 6.25, IELTS rounding to 6.5", "mean 6.25, rounded to the nearest 0.5 to 6.5", "mean 6.25, rounded down to 6".
 - **The note** is muted text in the read-only box, and an empty one is left out. In the form it is a sunken, rounded field.
 - **Code** is drawn as points per criterion.
 - **On a phone** (under 520 px) each section stacks: the name, then the slot at the column's full width, then the note; the head's two sides stack, the type and step over who and when. The box is a list (`<ul>` of sections; the head and the total sit outside it) in a group named by its type. Each slot says its value in words to assistive technology ("1.25 of 1.5 points", "band 6.5 of 9", "verdict: met", "no verdict") and the visible "/" is hidden from it. The editable box stacks the same way, with 44 px controls.
-- **The words** come from the page's catalogs, en and vi. In vi every word count says "chữ" ("71 chữ, từ 120 đến 300"), on the page and in the report.
+- **The words** come from the page's catalogs, en and vi. In vi every word count says "chữ" ("71 chữ, từ 120 đến 300"), on the page and in the report. The box and the form share one set of words, GradeVi's where it has one: "Vì sao cho điểm này", "Cần cải thiện"; the verdicts "Đạt", "Đạt một phần", "Chưa đạt"; an AI grader is "Chấm bởi NAME (AI)".
 - **The card's badge** is the result badge.
 
 The editable box, its controls and their states are in COMMANDS.md (`quiz grade`, "The form").
@@ -770,7 +770,7 @@ A plain Markdown export for pandoc (and so Word and Typst, maths included) is in
 
 ## 9. Languages
 
-English and Vietnamese from v1, for what a learner sees. Every string a page, report or form shows goes through a message catalog from the first commit, because adding a catalog to finished code means finding every hard-coded string again.
+English and Vietnamese from v1, for what a learner sees. Every string a page, report or form shows goes through a message catalog from the first commit, because adding a catalog to finished code means finding every hard-coded string again. In en a count of one is singular wherever it is written, on the page, in the report and in the forms: "1 of 1 point", "1 point".
 
 ### Two keys in the quiz: what it is written in, and its interface
 
