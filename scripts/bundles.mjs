@@ -55,3 +55,6 @@ export const RELOAD_BUNDLE = { ...PAGE_BUNDLE };
  * memory carries. It is the whole form, so it has no page runtime and no server module with it.
  */
 export const REVIEW_BUNDLE = { ...PAGE_BUNDLE };
+
+/** The grading form (`dist/grade.js`): its own IIFE beside `dist/review.js`, carried only by the page `quiz grade --web` builds. */
+export const GRADE_BUNDLE = { ...PAGE_BUNDLE };

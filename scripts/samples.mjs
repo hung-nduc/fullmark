@@ -84,6 +84,10 @@ const SERVED = [
     try: "quiz review --since: the form opens with only the questions that are new or changed since your review: the status line starts 'Asked again: 3 questions new or changed since your review of ...', and Judged, the bar and the counts cover those three. The changed Fix shows 'Your verdict on ...' with its reason and your note, and 'What changed since': a line diff with - lines in red and + lines in green. The changed Keep shows its verdict and 'Changed since; a Keep does not store the earlier text'. The new question has neither. In the sidebar the other questions are muted with a dashed border and cannot be selected, and N skips them. Keep the rest and the Finish dialog count the three only. Finish merges into the same file: every other entry stays as it was, and quiz check no longer warns. Run it again with no change: it prints 'nothing new or changed since your review of ...' and exits 0. A missing review file, or --out naming another file, exits 2.",
   },
   {
+    command: "node dist/cli.js grade samples/grade/results.json --quiz samples/grade/quiz.md --web --open",
+    try: "quiz grade --web: the grading form opens in your browser (samples/grade holds the essay fixture's attempt, an essay of each rubric mode and a code answer, and no grades file). Grade the five questions: the slot [erase | - | value | +] / [max] takes a typed value, the buttons (from empty, + gives the full marks and - the step below; an empty band starts at the middle) and the full-mark box; the verdicts are a radio group. A mark below the maximum needs a note, a one-score grade needs its reason, and a half-graded question says so; Finish lists what is missing and writes nothing until it is fixed. Q opens the sidebar, N goes to the next question not graded. Finish asks your name, Save grades writes samples/grade/results-grades.json (kind: human) and results-report.md, and the command prints both and exits 0. Then quiz replay samples/grade/results.json --quiz samples/grade/quiz.md shows your grades in the rubric box. Run the command again: it exits 2, since the grades file now holds grades (G87). Ctrl+C instead of Save grades prints interrupted and exits 2, leaving the folder as it was.",
+  },
+  {
     command: "node dist/cli.js brief samples/brief-tui --tui",
     try: "quiz brief --tui: asks every question in the terminal, in two steps (Quiz 1/2 style progress), with each question's help and each choice's hint. Purpose and scope start empty; a scope under four words is asked again with the example. The summary lists every answer and marks the defaults; pick Change on any line to go back (change the purpose and the defaults that follow it are refilled), then Write brief.yaml: samples/brief-tui/brief.yaml and an empty content/ are written. Ctrl+C at any step writes nothing and exits 2. Run it again: it exits 2 because brief.yaml exists. Pre-fill with flags (--scope \"...\" --language vi) and the form opens with them, in Vietnamese; the same answers through flags (quiz brief samples/brief-flags --purpose ... --scope ...) write the same bytes. With stdin from /dev/null it exits 2: --tui needs a terminal.",
   },
@@ -117,6 +121,11 @@ copyFileSync(join("examples", "survey", "quiz.md"), join(OUT, "watch", "second.m
 // the folder the `review --since` samples are tried in: a copy, so editing it never touches examples/
 mkdirSync(join(OUT, "since"), { recursive: true });
 copyFileSync(join("examples", "rust", "quiz.md"), join(OUT, "since", "quiz.md"));
+
+// the folder `grade --web` is tried in: the essay fixture's quiz and results, without the grades file beside them
+mkdirSync(join(OUT, "grade"), { recursive: true });
+copyFileSync(join("test", "fixtures", "replay", "essay.md"), join(OUT, "grade", "quiz.md"));
+copyFileSync(join("test", "fixtures", "replay", "essay-results.json"), join(OUT, "grade", "results.json"));
 
 const built = [];
 for (const s of sources) {

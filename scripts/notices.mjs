@@ -9,7 +9,15 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
-import { CLI_BUNDLE, CLI_EXTERNAL, PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "./bundles.mjs";
+import {
+  CLI_BUNDLE,
+  CLI_EXTERNAL,
+  GRADE_BUNDLE,
+  PAGE_BUNDLE,
+  RELOAD_BUNDLE,
+  REVIEW_BUNDLE,
+  SERVE_BUNDLE,
+} from "./bundles.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 
@@ -71,6 +79,8 @@ async function bundled() {
   const reload = await build({ ...RELOAD_BUNDLE, ...shared, entryPoints: [join(root, "src/serve/reload.ts")] });
   // the review form is a page of its own, built in memory by `quiz review`: its packages are the page's too
   const review = await build({ ...REVIEW_BUNDLE, ...shared, entryPoints: [join(root, "src/review/main.tsx")] });
+  // and so is the grading form of `quiz grade --web`
+  const gradeForm = await build({ ...GRADE_BUNDLE, ...shared, entryPoints: [join(root, "src/grade-form/main.tsx")] });
   const cli = await build({
     ...CLI_BUNDLE,
     ...shared,
@@ -84,6 +94,7 @@ async function bundled() {
       ...packagesOf(serve.metafile),
       ...packagesOf(reload.metafile),
       ...packagesOf(review.metafile),
+      ...packagesOf(gradeForm.metafile),
     ]),
   };
 }

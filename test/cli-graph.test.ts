@@ -95,6 +95,20 @@ describe("what each command loads", () => {
     for (const marker of CLACK) expect(text, marker).not.toContain(marker);
   });
 
+  it("grade --web is a chunk of its own with the page builder and the server, and the form is not in it (dist/grade.js)", () => {
+    const web = chunkWith("// src/cli/grade-web.ts");
+    const text = textOf(closure(web));
+    for (const marker of [...BUILD_ONLY, ...SERVE_ONLY]) expect(text, marker).toContain(marker);
+    expect(text).not.toContain("// src/grade-form/");
+    expect(text).not.toContain("// src/core/i18n/grade.ts");
+    // `grade` without --web reaches it by a dynamic import only: it loads neither the server nor the form
+    expect(closure(entry("main"))).not.toContain(web);
+    expect(closure(entry("grade"))).not.toContain(web);
+    expect(closure(entry("check"))).not.toContain(web);
+    expect(readFileSync(join(dist, entry("grade")), "utf8")).toContain(`import("./${web}")`);
+    for (const marker of CLACK) expect(text, marker).not.toContain(marker);
+  });
+
   it("the build and replay commands never load the server", () => {
     for (const name of ["build", "replay-command"]) {
       const text = textOf(closure(entry(name)));

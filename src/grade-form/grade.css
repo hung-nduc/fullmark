@@ -1,0 +1,478 @@
+/* The grading form (docs/mockup/boards/Grade*.dc.html, RubricC's grade side): the page's own look, plus what only the form has. */
+@layer components {
+  .fm-grade .fm-review-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .fm-grade-attempt {
+    font-size: 0.82em;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .fm-grade .fm-body[data-side="open"] {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
+
+  .fm-grade .fm-status-seg + .fm-status-seg {
+    margin-left: 18px;
+  }
+
+  .fm-grade-card {
+    margin-top: 24px;
+  }
+
+  .fm-grade-card-head {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+
+  .fm-grade-badge {
+    padding: 2px 10px;
+    font-size: 0.92em;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--card);
+    border: 1px dashed var(--line-strong);
+    border-radius: 999px;
+  }
+
+  .fm-grade-badge[data-condition="half"] {
+    color: var(--info);
+    border: 1px solid var(--info);
+  }
+
+  .fm-grade-badge[data-condition="note"] {
+    color: var(--bad);
+    border: 1px solid var(--bad);
+  }
+
+  .fm-grade-badge[data-condition="done"] {
+    color: var(--ok);
+    background: var(--ok-wash);
+    border: 1px solid var(--ok);
+  }
+
+  .fm-grade-prompt {
+    margin: 10px 0 16px;
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+
+  .fm-grade-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .fm-grade-answer-head {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+
+  .fm-grade-answer-head h2 {
+    margin: 0;
+    font-size: 0.95em;
+  }
+
+  .fm-grade-count {
+    font-size: 0.85em;
+    color: var(--muted);
+  }
+
+  .fm-grade-answer-text {
+    box-sizing: border-box;
+    max-height: 420px;
+    padding: 14px 16px;
+    margin: 8px 0 12px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    background: var(--sunken);
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+  }
+
+  .fm-grade-answer-text[data-code] {
+    font-family: var(--mono);
+    font-size: 0.9em;
+  }
+
+  .fm-grade-sample summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .fm-grade-blank {
+    color: var(--muted);
+  }
+
+  .fm-grade-criteria {
+    padding-left: 20px;
+  }
+
+  .fm-grade-clear {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+
+  .fm-grade-clear .fm-button {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .fm-grade-foot {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 14px;
+    margin-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* the editable box: the read-only box's pieces with the controls added */
+  .fm-box-edit .fm-box-sec {
+    gap: 10px;
+  }
+
+  .fm-ctl {
+    position: relative;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .fm-ctl-group {
+    display: flex;
+    box-sizing: border-box;
+    align-items: stretch;
+    height: 44px;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--box-r);
+  }
+
+  .fm-ctl-group[data-state="set"] {
+    border: 2px solid var(--accent);
+  }
+
+  .fm-ctl-group[data-state="bad"] {
+    border: 2px solid var(--bad);
+  }
+
+  .fm-ctl button {
+    font: inherit;
+    color: var(--text);
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+  }
+
+  .fm-ctl button.fm-ctl-erase,
+  .fm-ctl button.fm-ctl-step {
+    width: 36px;
+    padding: 0;
+    font-size: 1.2em;
+    border-right: 1px solid var(--line);
+  }
+
+  .fm-ctl-erase[aria-disabled="true"] {
+    color: var(--line);
+    cursor: default;
+  }
+
+  .fm-ctl button:disabled {
+    color: var(--line);
+    cursor: default;
+  }
+
+  .fm-ctl-value {
+    box-sizing: border-box;
+    width: 64px;
+    min-width: 0;
+    padding: 0 4px;
+    font: inherit;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    background: transparent;
+    border: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fm-ctl-of {
+    color: var(--muted);
+  }
+
+  .fm-ctl-max,
+  .fm-ctl-calc-value {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    height: 44px;
+    padding: 0 8px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--box-r);
+  }
+
+  .fm-ctl-max[data-full] {
+    color: var(--ok);
+    background: var(--ok-wash);
+    border: 2px solid var(--ok);
+  }
+
+  .fm-ctl-max[data-static] {
+    cursor: default;
+  }
+
+  .fm-ctl-calc-value {
+    min-width: 120px;
+  }
+
+  .fm-ctl-calc-value[data-res="none"] {
+    color: var(--muted);
+  }
+
+  .fm-ctl-error {
+    position: absolute;
+    top: 46px;
+    right: 0;
+    font-size: 0.8em;
+    color: var(--bad);
+  }
+
+  .fm-ctl-verdicts {
+    display: flex;
+    gap: 0;
+    justify-content: stretch;
+    height: 44px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--box-r);
+  }
+
+  .fm-ctl.fm-ctl-verdicts > button {
+    flex: 1;
+    border-left: 1px solid var(--line);
+  }
+
+  .fm-ctl.fm-ctl-verdicts > button.fm-ctl-erase {
+    flex: none;
+    border-left: 0;
+  }
+
+  .fm-ctl-verdict[aria-checked="true"][data-verdict="met"] {
+    color: var(--ok);
+    background: var(--ok-wash);
+  }
+
+  .fm-ctl-verdict[aria-checked="true"][data-verdict="partly"] {
+    color: var(--warn);
+    background: var(--card);
+    box-shadow: inset 0 0 0 2px var(--warn);
+  }
+
+  .fm-ctl-verdict[aria-checked="true"][data-verdict="missed"] {
+    color: var(--bad);
+    background: var(--bad-wash);
+  }
+
+  .fm-note-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fm-note-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    font: inherit;
+    color: var(--text);
+    resize: vertical;
+    background: var(--sunken);
+    border: 1px solid var(--card-line);
+    border-radius: var(--box-r);
+  }
+
+  .fm-note-input[data-missing] {
+    border: 2px solid var(--bad);
+  }
+
+  .fm-note-missing {
+    font-size: 0.82em;
+    color: var(--bad);
+  }
+
+  /* the sidebar */
+  .fm-grade-side-body {
+    flex: 1;
+    padding: 12px 14px;
+    overflow: auto;
+  }
+
+  .fm-grade-group {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin: 10px 0 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+  }
+
+  .fm-grade-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .fm-grade-list li + li {
+    margin-top: 6px;
+  }
+
+  .fm-grade-row {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    padding: 8px 12px;
+    font: inherit;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 8px;
+  }
+
+  .fm-grade-row[data-condition="done"] {
+    background: var(--ok-wash);
+    border-color: var(--ok);
+  }
+
+  .fm-grade-row[data-condition="note"] .fm-grade-mark {
+    color: var(--bad);
+  }
+
+  .fm-grade-row[data-blank] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    color: var(--muted);
+    border-style: dashed;
+  }
+
+  .fm-grade-row[aria-current="true"] {
+    border: 2px solid var(--text);
+  }
+
+  .fm-grade-row-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fm-grade-row-sub {
+    font-size: 0.8em;
+    color: var(--muted);
+  }
+
+  .fm-grade-row-score {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fm-grade-auto {
+    padding: 8px 12px;
+    font-size: 0.88em;
+    color: var(--muted);
+  }
+
+  .fm-grade-keys {
+    font-size: 0.8em;
+    color: var(--muted);
+  }
+
+  .fm-grade-keys kbd {
+    padding: 0 5px;
+    font: inherit;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+  }
+
+  /* Finish and the saved card */
+  .fm-grade-dialog {
+    width: min(32.5rem, calc(100vw - 32px));
+    max-width: none;
+    padding: 24px 26px;
+  }
+
+  .fm-grade-dialog p {
+    margin: 0 0 10px;
+  }
+
+  .fm-grade-dialog-note {
+    font-size: 0.9em;
+    color: var(--muted);
+  }
+
+  .fm-grade-dialog .fm-dialog-actions {
+    margin-top: 16px;
+  }
+
+  .fm-grade-problems {
+    padding-left: 20px;
+  }
+
+  .fm-grade-name {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 600;
+  }
+
+  .fm-grade-name input {
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--text);
+    background: var(--sunken);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+  }
+
+  .fm-grade-name .fm-grade-dialog-note {
+    font-weight: 400;
+  }
+
+  .fm-grade-error {
+    color: var(--bad);
+  }
+
+  .fm-grade-saved {
+    margin-top: 40px;
+  }
+
+  .fm-grade-saved-title {
+    margin-top: 0;
+    color: var(--ok);
+  }
+}

@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { build } from "esbuild";
-import { PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "./bundles.mjs";
+import { GRADE_BUNDLE, PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "./bundles.mjs";
 import { minifyCss } from "./minify-css.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -41,6 +41,19 @@ await build({
 writeFileSync(
   join(root, "dist/review.css"),
   `${minifyCss(readFileSync(join(root, "src/review/review.css"), "utf8"))}
+`,
+);
+
+// The grading form of `quiz grade --web`: its code and the styles it adds to the page's own.
+await build({
+  ...GRADE_BUNDLE,
+  entryPoints: [join(root, "src/grade-form/main.tsx")],
+  outfile: join(root, "dist/grade.js"),
+  logLevel: "warning",
+});
+writeFileSync(
+  join(root, "dist/grade.css"),
+  `${minifyCss(readFileSync(join(root, "src/grade-form/grade.css"), "utf8"))}
 `,
 );
 

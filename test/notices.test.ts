@@ -4,7 +4,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { build } from "esbuild";
 import { describe, expect, it } from "vitest";
-import { PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "../scripts/bundles.mjs";
+import { GRADE_BUNDLE, PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "../scripts/bundles.mjs";
 import { ALLOWED, generate, problems } from "../scripts/notices.mjs";
 import { ACKNOWLEDGEMENTS, NOTICE_PACKAGES } from "../src/build/notices-data";
 
@@ -139,12 +139,22 @@ describe("the page runtime", () => {
       outdir: join(root, "dist-notices"),
       logLevel: "error",
     });
+    // and the grading form (dist/grade.js) of `quiz grade --web`
+    const gradeForm = await build({
+      ...GRADE_BUNDLE,
+      entryPoints: [join(root, "src/grade-form/main.tsx")],
+      write: false,
+      metafile: true,
+      outdir: join(root, "dist-notices"),
+      logLevel: "error",
+    });
     const named = new Set<string>();
     for (const input of [
       ...Object.keys(built.metafile.inputs),
       ...Object.keys(served.metafile.inputs),
       ...Object.keys(reload.metafile.inputs),
       ...Object.keys(review.metafile.inputs),
+      ...Object.keys(gradeForm.metafile.inputs),
     ]) {
       const at = input.lastIndexOf("node_modules/");
       if (at < 0) continue;

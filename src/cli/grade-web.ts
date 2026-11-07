@@ -75,6 +75,15 @@ export function isEmptyTemplate(json: unknown): boolean {
   return true;
 }
 
+/** `value` with its keys in the order of `like` (the template's), at every level; keys `like` lacks follow. */
+function inOrderOf(value: unknown, like: unknown): unknown {
+  if (!isRecord(value) || !isRecord(like)) return value;
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(like)) if (key in value) out[key] = inOrderOf(value[key], like[key]);
+  for (const key of Object.keys(value)) if (!(key in out)) out[key] = value[key];
+  return out;
+}
+
 /** What a submit holds once read and checked: the grades file to write, and the arithmetic the validator did. */
 export type GradesSubmit = { file: Record<string, unknown>; applied: AppliedGrades };
 
@@ -92,6 +101,8 @@ export function gradesSubmitReader(ctx: {
   resultsJson: unknown;
   name: string | null;
   now: () => Date;
+  /** the grades template, whose key order the file keeps (the form's data comes back with its keys sorted) */
+  template?: { grades: Record<string, unknown> };
 }): (body: unknown) => SubmitRead<GradesSubmit> {
   const results = resultsHash(ctx.resultsJson);
   return (body) => {
@@ -111,7 +122,7 @@ export function gradesSubmitReader(ctx: {
       version: GRADES_VERSION,
       results_hash: results,
       grader: { kind: "human", name, at: localIso(ctx.now()) },
-      grades: doc.grades,
+      grades: ctx.template ? inOrderOf(doc.grades, ctx.template.grades) : doc.grades,
     };
     // the same reader and validator as `quiz grade --grades`
     const read = parseGrades(JSON.stringify(file));
@@ -241,6 +252,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
         resultsJson: p.read.json,
         name: opts.name === null ? null : opts.name.trim() === "" ? null : opts.name.trim(),
         now: clock,
+        template,
       }),
       ...(io.setTimer ? { setTimer: io.setTimer } : {}),
       async onSubmit(_id, { file, applied }) {

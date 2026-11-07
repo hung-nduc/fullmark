@@ -1,16 +1,16 @@
 import { computed, signal } from "@preact/signals";
 import type { FontId } from "../core/fonts";
 import { type Choice, shownTheme } from "../core/themes";
+import type { PageData } from "../page/data";
 import { DEFAULT_SIZE, stepSize } from "../page/look";
 import type { Look } from "../page/store";
-import type { ReviewData } from "./data";
 
 /**
  * The form's look: the page's `Look` (theme, font, text size, the menu) without the page's store and its storage. The
  * quiz's look is the start (its `theme`, `font`, `look: locked`); a choice lasts while the form is open. A learner's
  * size is kept under `locked` too, as on the page.
  */
-export function createFormLook(data: ReviewData["page"]): Look {
+export function createFormLook(data: Pick<PageData, "theme" | "look" | "font" | "fonts">): Look {
   const quiz: Choice = data.theme ?? "auto";
   const locked = data.look === "locked";
   const quizFont: FontId = data.font ?? "system";
