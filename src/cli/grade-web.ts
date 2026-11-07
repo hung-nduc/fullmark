@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { buildGradeForm } from "../build/grade-form";
 import { languagesUsed, loadHighlighter } from "../build/highlight";
+import type { Asset } from "../build/render";
 import { katexTools } from "../build/tex";
 import type { Attempt, parseResults } from "../core/attempt";
 import { FONT_CHOICES, type FontsChoice } from "../core/fonts";
@@ -35,6 +36,8 @@ export type Prepared = {
   results: string;
   quiz: Quiz;
   hash: string;
+  /** the quiz's images, as `loadQuiz` read them: an image in a prompt or a sample answer shows in the form */
+  assets: readonly Asset[];
   /** the quiz file as shown */
   quizFile: string;
   read: Extract<ReturnType<typeof parseResults>, { ok: true }>;
@@ -215,7 +218,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   const page = buildGradeForm({
     quiz,
     hash,
-    assets: [],
+    assets: p.assets,
     attempt,
     graded,
     template,

@@ -508,3 +508,27 @@ test("the saved card closes the sidebar, centres the card and sets the score lin
   await expect(card.locator("h2 svg")).toHaveCount(1);
   await server.end();
 });
+
+test("an image in a prompt and in a sample answer shows in the form", async ({ page }) => {
+  const dir = folder();
+  copyFileSync(join(root, "examples", "calculus", "assets", "cubic.png"), join(dir, "cubic.png"));
+  const source = readFileSync(join(dir, "quiz.md"), "utf8")
+    .replace(
+      "## Describe the process. {type=essay id=add points=3 tags=writing}",
+      "## Describe the process. {type=essay id=add points=3 tags=writing}\n\n![A cubic curve](cubic.png)",
+    )
+    .replace("sample_answer: |\n  Define", "sample_answer: |\n  ![The sample curve](cubic.png)\n\n  Define");
+  writeFileSync(join(dir, "quiz.md"), source);
+  const results = JSON.parse(readFileSync(join(dir, "results.json"), "utf8"));
+  results.quizHash = quizHash(source, [{ path: "cubic.png", bytes: readFileSync(join(dir, "cubic.png")) }]);
+  writeFileSync(join(dir, "results.json"), JSON.stringify(results));
+  const server = await web(dir);
+  const seen = watch(page);
+  await open(page, server);
+  const shown = async (alt: string) =>
+    page.getByRole("img", { name: alt }).evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
+  await expect.poll(() => shown("A cubic curve")).toBe(true);
+  await page.locator("[data-action=sample]").click();
+  await expect.poll(() => shown("The sample curve")).toBe(true);
+  expect(seen.problems).toEqual([]);
+});

@@ -285,7 +285,14 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
     }
     const { runGradeWeb } = await import("./grade-web");
     return runGradeWeb(
-      { results: item.file, quiz: loaded.quiz, hash: loaded.hash, quizFile: shownPath(opts.quiz, io.cwd), ...got },
+      {
+        results: item.file,
+        quiz: loaded.quiz,
+        hash: loaded.hash,
+        assets: loaded.assets,
+        quizFile: shownPath(opts.quiz, io.cwd),
+        ...got,
+      },
       opts,
       io,
     );
