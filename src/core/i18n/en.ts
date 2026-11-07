@@ -204,7 +204,7 @@ export const en = {
     boxNoVerdict: "No verdict",
     boxOptional: "optional",
     boxRequiredOne: "required for one score",
-    boxPoints: (n: string, of: string) => `${n} of ${of} points`,
+    boxPoints: (n: string, of: string) => `${n} of ${of} ${of === "1" ? "point" : "points"}`,
     boxBand: (n: string, of: string) => `band ${n} of ${of}`,
     boxVerdictIs: (verdict: string) => `verdict: ${verdict}`,
     boxNoVerdictIs: "no verdict",

@@ -80,13 +80,13 @@ describe("grades on a replay page", () => {
     expect(add).toContain(
       "Derive the result 1.25 of 1.5 points 1.25 / 1.5 Skips the zero initial-conditions assumption.",
     );
-    expect(add).toContain("Interpret it 0.5 of 1 points 0.5 / 1 Does not link the result to stability.");
+    expect(add).toContain("Interpret it 0.5 of 1 point 0.5 / 1 Does not link the result to stability.");
     expect(add).toContain("Total the sum of the criteria 2.25 of 3 points 2.25 / 3");
     expect(add).toContain("Why this score · optional Solid derivation; the interpretation is the weak part.");
     expect(add).toContain("To improve · optional Say why the result matters.");
     const code = card(html, "code");
     expect(text(code)).toContain(
-      "Is short and clear 0.5 of 1 points 0.5 / 1 x + x works, but 2 * x is the usual form.",
+      "Is short and clear 0.5 of 1 point 0.5 / 1 x + x works, but 2 * x is the usual form.",
     );
     expect(text(code)).toContain("Total the sum of the criteria 1.5 of 2 points");
     expect(code).not.toContain("<table");
