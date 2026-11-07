@@ -432,6 +432,10 @@ test("the sidebar draws the states as icons, tints the rows, folds its groups an
   expect(await tint("add")).not.toBe(await tint("banded"));
   expect(await tint("ielts")).not.toBe(await tint("banded"));
   expect(await tint("ielts")).not.toBe(await tint("add"));
+  // the close button's icon has a size (a flex child can shrink to nothing)
+  expect(
+    ((await side.locator("[data-action=close-sidebar] svg").boundingBox()) as { width: number }).width,
+  ).toBeGreaterThan(12);
   // the groups, with their counts, and the legend
   await expect(side.locator("[data-group=grade]")).toContainText("To grade");
   await expect(side.locator("[data-group=grade]")).toContainText("1 of 4 graded");

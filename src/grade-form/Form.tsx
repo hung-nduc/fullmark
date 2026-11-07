@@ -851,7 +851,15 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
           </span>
         </div>
         <p class="fm-grade-keys">
-          <kbd>N</kbd> {r.keyNext} · <kbd>Q</kbd> {r.keyQuestions} · <kbd>Esc</kbd> {r.keyClose}
+          <span>
+            <kbd>N</kbd> {r.keyNext}
+          </span>
+          <span>
+            <kbd>Q</kbd> {r.keyQuestions}
+          </span>
+          <span>
+            <kbd>Esc</kbd> {r.keyClose}
+          </span>
         </p>
       </div>
     </aside>

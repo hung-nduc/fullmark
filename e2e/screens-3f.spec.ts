@@ -20,7 +20,10 @@ test.afterEach(() => {
   for (const s of served.splice(0)) s.child.kill("SIGKILL");
 });
 
-async function open(page: Page, extra: string[] = [], ...args: string[]): Promise<void> {
+/** `--blank-code` (the screens' own flag, not the CLI's) leaves the code answer blank, so the "Not answered" group shows. */
+async function open(page: Page, extra: string[] = [], ...rest: string[]): Promise<void> {
+  const blank = rest.includes("--blank-code");
+  const args = rest.filter((a) => a !== "--blank-code");
   const dir = mkdtempSync(join(tmpdir(), "fm-screens-"));
   mkdirSync(join(dir, ".git"));
   const source = readFileSync(join(INPUT, "quiz.md"), "utf8").replace(
@@ -29,6 +32,7 @@ async function open(page: Page, extra: string[] = [], ...args: string[]): Promis
   );
   writeFileSync(join(dir, "quiz.md"), source);
   const results = JSON.parse(readFileSync(join(INPUT, "results.json"), "utf8"));
+  if (blank) results.state.answers.code = null;
   results.quizHash = quizHash(source, []);
   writeFileSync(join(dir, "results.json"), JSON.stringify(results));
   const server = await serveProcess(dir, ["grade", "results.json", "--quiz", "quiz.md", "--web", ...args]);
@@ -48,7 +52,7 @@ async function someOfAdditive(page: Page): Promise<void> {
 }
 
 test("Grade: an additive question half graded, light, sidebar open", async ({ page }) => {
-  await open(page);
+  await open(page, [], "--blank-code");
   await someOfAdditive(page);
   await page.screenshot({ path: out("1-grade") });
 });
@@ -73,11 +77,26 @@ test("GradeCode: a code answer, white, sidebar closed", async ({ page }) => {
   await page.screenshot({ path: out("3-grade-code-white") });
 });
 
-test("GradeFinish, GradeBlocked, GradeDone", async ({ page }) => {
-  await open(page);
+/** The IELTS essay fully graded, every band with a note. */
+async function allOfIelts(page: Page): Promise<void> {
+  await page.locator("[data-row=ielts]").click();
+  for (const [crit, band] of [
+    ["TR", "6"],
+    ["CC", "6.5"],
+    ["LR", "6"],
+    ["GRA", "7"],
+  ] as const) {
+    await value(page, crit).fill(band);
+    await note(page, crit).fill("Room to improve here.");
+  }
+}
+
+test("GradeFinish and GradeDone", async ({ page }) => {
+  await open(page, [], "--blank-code");
   await value(page, "defs").fill("0.5");
   await value(page, "derive").fill("1.5");
   await value(page, "interp").fill("1");
+  await allOfIelts(page);
   await page.locator("[data-action=finish]").click();
   await page.locator("dialog[open] [data-field=name]").waitFor();
   await page.screenshot({ path: out("4-grade-finish") });
@@ -88,7 +107,9 @@ test("GradeFinish, GradeBlocked, GradeDone", async ({ page }) => {
 });
 
 test("GradeBlocked: a lost mark with no note", async ({ page }) => {
-  await open(page);
+  await open(page, [], "--blank-code");
+  await allOfIelts(page);
+  await page.locator("[data-row=add]").click();
   await value(page, "defs").fill("0.5");
   await value(page, "derive").fill("1");
   await value(page, "interp").fill("1");
@@ -112,4 +133,11 @@ test("RubricC's grade side: each mode's box", async ({ page }) => {
   await page.locator("[data-ctl=score] input").fill("3");
   await page.locator('[data-crit="names-the-nyquist-rate"] [data-verdict=met]').click();
   await page.locator("article[data-qid=holistic]").screenshot({ path: out("9-box-holistic") });
+});
+
+test("G96: the sample answer opened beside the answer", async ({ page }) => {
+  await open(page);
+  await someOfAdditive(page);
+  await page.locator("[data-action=sample]").click();
+  await page.screenshot({ path: out("10-sample-open") });
 });

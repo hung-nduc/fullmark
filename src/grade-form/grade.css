@@ -82,7 +82,15 @@
   }
 
   .fm-grade-sample-button {
+    flex: none;
+    min-height: 36px;
+    padding: 0 10px;
     margin-left: auto;
+    font-size: 0.9em;
+  }
+
+  .fm-grade-answer-head h2 {
+    white-space: nowrap;
   }
 
   /* a criterion's name wraps between words, and breaks inside one only when the word alone is wider than the line */
@@ -569,7 +577,14 @@
     border-radius: 50%;
   }
 
+  .fm-grade-side .fm-svg {
+    flex: none;
+  }
+
   .fm-grade-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
     margin: 0;
     font-size: 0.75em;
     color: var(--muted);
