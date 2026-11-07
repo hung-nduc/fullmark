@@ -29,8 +29,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
-| 3p G98, the grading form on a phone | done, reviewed (2026-11-07); G101 for the owner | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
-| 3r fullmark's own marking from the form (G83) | outline, after 3p (G100) | |
+| 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
+| 3r G101, then fullmark's own marking from the form (G83) | brief drafted (2026-11-07), for the owner | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
@@ -48,7 +48,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 ### Next steps, in order
 
-1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is **built and reviewed** ("Slice 3f2", its Review): G98 and G99 decided as recommended. **3f is done.** **3p's brief is approved** ("Slice 3p", at the end), with G100 (in a frame, the owner's choice); **3p is built and reviewed** ("Slice 3p", its Review): G101 waits for the owner; then 3r. **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
+1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is **built and reviewed** ("Slice 3f2", its Review): G98 and G99 decided as recommended. **3f is done.** **3p's brief is approved** ("Slice 3p", at the end), with G100 (in a frame, the owner's choice); **3p is built and reviewed** ("Slice 3p", its Review): G101 decided as recommended. **3r's brief is drafted** ("Slice 3r", at the end), waiting for the owner's approval. **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
 
 ### Open proposals carried over from step 2
 
@@ -320,7 +320,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 - The replay page is read-only for the grader: Retry missed is hidden there, since that attempt is not the grader's.
 - The form's bundle and budget stay as they are.
 
-**G101. What is left between the form and the boards after 3p** (raised in 3p's review). Small differences remain:
+**G101. What is left between the form and the boards after 3p** (raised in 3p's review). **Decided by the owner on 2026-11-07, as recommended**; 3r builds it as its first tasks. Small differences remain:
 - the card's state badge is a plain outlined pill; the boards give each state its icon and wash ("Half graded · 2 of 3" with the clock icon on a dashed wash), wide and on a phone;
 - the card's head reads "Question 2 · Essay · 3 points", where the boards write "Question 21 · 3 points · essay";
 - the saved card is 720 px wide with its top at 139 px, where GradeDone draws 768 px at 160 px;
@@ -1200,4 +1200,56 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 - the foot bar's names "Previous question", "Next question" ("Câu trước", "Câu sau") and "Chấm: TITLE";
 - the sidebar's keys shown on a phone, as Review's are.
 
-**For the owner:** G101, with a recommendation. Then **3r** (G83 in a frame, as G100 has it).
+**Decided by the owner on 2026-11-07:** G101, as recommended; it is 3r's first tasks.
+
+## Slice 3r: G101, then fullmark's own marking from the form
+
+**Drafted on 2026-11-07, for the owner's approval.** G101's differences first, then G83 as G100 decides it: the attempt's replay, served beside the form and shown in a frame in the form's main column. Built from GradeFinish, GradeDone and RubricPhone for G101, and from ResultsReplay (`Results.dc.html`, mode `replay`) and RubricC's left column for the replay in the frame.
+
+### Read first
+
+- COMMANDS.md: `quiz grade`, "The form" (the "fullmark's own marking" bullet); `quiz replay`.
+- TECHNICAL_DESIGN.md: section 7, foundations 4 and 9; section 8, the results map and its filter.
+- This plan: "Rules for every slice", G83, G100, G101, 3p's Review.
+- The boards: GradeFinish, GradeDone, RubricPhone (G101); Results (mode `replay`), RubricC's left column.
+- Code: `src/cli/grade-web.ts`, `src/build/grade-form.ts`, `src/grade-form/` (all); `src/cli/replay.ts` and `src/cli/replay-command.ts` (how a replay page is built); `src/build/page.ts` (`buildPage`, its CSP); `src/page/data.ts` (`PageReplay`), `src/page/App.tsx` (the replay's opening and Retry missed), `src/page/ResultsCard.tsx`, `src/page/map.ts` (the filter); `src/serve/server.ts` (`pages`, under the token); `e2e/grade.spec.ts`, `e2e/grade-phone.spec.ts`, `e2e/replay-grades.spec.ts`; `test/cli-graph.test.ts`.
+
+### Decided for this slice
+
+- **G101, as the boards draw it:**
+  - each card state's badge with its icon and wash, wide and on a phone;
+  - the card's head as "Question 21 · 3 points · essay";
+  - the saved card 768 px wide at 160 px from the top;
+  - the amber dot beside a required note;
+  - the sidebar's keys in the monospace font with the thicker lower edge.
+  The sidebar stays 300 px.
+- **The second page (G100).**
+  - `quiz grade --web` builds the attempt's replay as `quiz replay RESULTS --quiz FILE` builds it, with no grades (the grades are being made), and the server holds it beside the form at `/<token>/marked`. It carries no server code (foundation 9).
+  - `PageReplay` gains `grader: true` for this page only. With it the page opens on the Missed filter, offers no **Retry missed**, and stores nothing in the browser. A page from `quiz replay` or `build` never sets it.
+  - The essays and code in it show as pending, as in a replay without grades.
+- **In the form.**
+  - The "Scored by fullmark" row is chosen like a question row (the current-row edge, `aria-current`).
+  - The form's main column then shows the second page in a frame, filling the column, with a title naming it ("Marked by fullmark: N questions") for assistive technology.
+  - Choosing a question row brings the card back. The frame is made once and kept, so the replay keeps its scroll and filter, and the form never unloads (nothing typed is lost).
+  - The form's CSP gains `frame-src 'self'`. The second page's CSP is `buildPage`'s.
+  - On a phone the row works the same, and the sidebar closes as it does for a question.
+  - The keys stay as they are: `N` skips the row.
+- **Not changed:** the submit, the grades file, the report, `quiz replay`'s own page, and `build`'s page apart from the bundle (the new flag's code).
+
+### Tasks
+
+1. **G101** (one or more commits), each item with a check in `e2e/grade.spec.ts` or `e2e/grade-phone.spec.ts` where it can be measured.
+2. **The second page** (one commit): `PageReplay.grader` and its three effects in the page, unit-tested. The replay built and served at `/marked`, tested through `serveProcess`: it loads under the token, its CSP has no `connect-src`, and it is refused without the token. Every build golden that changes with the bundle, counted and explained.
+3. **The frame** (one commit): the row, the frame, the CSP. Playwright, wide and at 390 px:
+   - the row opens the replay on Missed, with no Retry missed;
+   - a question row brings the card back with its typed values intact;
+   - the replay's filter is kept when the row is chosen again;
+   - Save grades still works after the row was used;
+   - axe in light and dark with the frame shown.
+4. **Screens and the docs** (one commit): `docs/screens/3r/` (G101's states beside their boards; the frame wide and on a phone); G100 into COMMANDS.md ("fullmark's own marking"); the slice table's 3r row.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox, the budget test included. The "Scored by fullmark" row shows the attempt's replay inside the form, on Missed, and nothing typed is lost. A `build` page carries no server code and is byte-identical with and without the server features. Every screen set beside its board, each difference listed. Report as the rules say, every golden that changed counted and explained.
+
+### Review
