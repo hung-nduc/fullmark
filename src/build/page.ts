@@ -357,7 +357,9 @@ function gradesOf(applied: AppliedGrades, quiz: Quiz, md: Md): PageGrades {
         points: d.points,
         earned: d.earned,
         band: d.band,
-        scaleMax: rubric?.mode === "banded" ? rubric.scale.max : null,
+        step: rubric && rubric.mode !== "banded" ? rubric.step : null,
+        scale:
+          rubric?.mode === "banded" ? { min: rubric.scale.min, max: rubric.scale.max, step: rubric.scale.step } : null,
         grader: d.graded_by,
         criteria: d.criteria.map((c) => ({
           html: unwrap(md.block(c.text)),

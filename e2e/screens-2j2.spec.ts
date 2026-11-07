@@ -38,7 +38,7 @@ function replayOf(extra: string[], name: string, uiLang = "en"): string {
 }
 
 const shot = async (page: Page, name: string, full = true) => {
-  await expect(page.locator(".fm-grade-table").first()).toBeVisible();
+  await expect(page.locator(".fm-box").first()).toBeVisible();
   await page.screenshot({ path: out(name), fullPage: full });
 };
 
@@ -56,7 +56,7 @@ test("the graded replay on a phone", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(replayOf([], "phone"));
   await page.locator('article[data-qid="add"]').scrollIntoViewIfNeeded();
-  await page.locator('article[data-qid="add"] .fm-grade').scrollIntoViewIfNeeded();
+  await page.locator('article[data-qid="add"] .fm-box').scrollIntoViewIfNeeded();
   await shot(page, "4-graded-phone", false);
 });
 

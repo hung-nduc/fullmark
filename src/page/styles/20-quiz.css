@@ -408,155 +408,205 @@
     color: var(--muted);
   }
 
-  /* the grades of an essay or code answer on a replay: the board's criterion table under the learner's answer */
-  .fm-grade {
+  /* the rubric box of a graded essay or code answer (TECHNICAL_DESIGN.md, section 6): the RubricC board's replay side */
+  .fm-box {
+    --box-r: min(8px, var(--card-radius));
     display: flex;
     flex-direction: column;
-    gap: 8px;
     margin-top: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--card-line);
+    border-radius: var(--box-r);
   }
 
-  .fm-grade-scroll {
-    overflow-x: auto;
-  }
-
-  .fm-grade-table {
-    width: 100%;
-    font-size: 0.9em;
-    border-collapse: collapse;
-    border-style: hidden;
-  }
-
-  .fm-grade-table th,
-  .fm-grade-table td {
-    padding: 8px 12px;
-    text-align: left;
-    vertical-align: top;
-    border-top: 1px solid var(--line-strong);
-    border-left: 1px solid var(--line);
-  }
-
-  .fm-grade-table th {
-    padding: 6px 12px;
-    color: var(--muted);
-    font-size: 0.85em;
-    font-weight: 700;
-    border-top: 0;
+  .fm-box-head {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    min-height: 52px;
+    padding: 8px 14px;
+    margin-bottom: -1px;
+    line-height: 1.3;
+    background: var(--card);
     border-bottom: 2px solid var(--line-strong);
   }
 
-  .fm-grade-table .fm-grade-num {
-    width: 80px;
-    font-variant-numeric: tabular-nums;
+  .fm-box-side {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .fm-box-who {
+    align-items: flex-end;
     text-align: right;
   }
 
-  .fm-grade-table td.fm-grade-num {
+  .fm-box-type {
     font-weight: 700;
+    color: var(--hint);
   }
 
-  .fm-grade-name {
+  .fm-box-by {
+    font-size: 0.85em;
     font-weight: 600;
   }
 
-  .fm-grade-note {
+  .fm-box-sub {
+    font-size: 0.82em;
     color: var(--muted);
   }
 
-  /* on a phone each criterion is a small block: its name, its marks, its note. The table keeps its roles in the markup,
-     so assistive technology still reads a table; the header row is clipped, not removed, so its names stay readable */
-  @media (max-width: 519px) {
-    .fm-grade-table,
-    .fm-grade-table tbody {
-      display: block;
-    }
-
-    .fm-grade-table thead {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-    }
-
-    .fm-grade-table tr {
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: 0.3em;
-      padding: 8px 0;
-      border-top: 1px solid var(--line-strong);
-    }
-
-    .fm-grade-table td {
-      padding: 0;
-      border: 0;
-    }
-
-    .fm-grade-table td.fm-grade-name,
-    .fm-grade-table td.fm-grade-note {
-      flex: 0 0 100%;
-    }
-
-    .fm-grade-table td.fm-grade-num {
-      width: auto;
-      text-align: left;
-    }
-
-    .fm-grade-table td.fm-grade-num + td.fm-grade-num::before {
-      content: "/ ";
-    }
-
-    .fm-grade-table td[data-label]::before {
-      content: attr(data-label) " ";
-    }
-
-    /* an empty note keeps its cell (the row stays four cells to a screen reader) but takes no height */
-    .fm-grade-table td:empty {
-      flex: 0 0 100%;
-      height: 0;
-    }
-
-    .fm-grade-note {
-      margin-top: 2px;
-      overflow-wrap: anywhere;
-    }
-  }
-
-  .fm-grade-band {
+  .fm-box-list {
+    padding: 0;
     margin: 0;
-    font-weight: 700;
+    list-style: none;
   }
 
-  /* the grader's feedback: one panel, as the explanation's (TECHNICAL_DESIGN.md, section 8, "Answer panels") */
-  .fm-feedback {
+  .fm-box-sec {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 12px 16px;
-    background: color-mix(in srgb, var(--accent) 8%, var(--card));
-    border-left: 3px solid var(--accent);
-    border-radius: 0 8px 8px 0;
+    gap: 8px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--card-line);
   }
 
-  .fm-feedback-part {
-    margin: 0;
+  .fm-box-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 262px;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .fm-box-row[data-wide] {
+    grid-template-columns: minmax(0, 1fr) 284px;
+  }
+
+  .fm-box-name {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.35;
     overflow-wrap: anywhere;
   }
 
-  .fm-feedback-label {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--accent);
-    font-size: 0.72em;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .fm-box-title {
+    font-weight: 600;
   }
 
-  .fm-grader {
+  .fm-box-note {
     margin: 0;
+    font-size: 0.92em;
     color: var(--muted);
-    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+
+  .fm-box-total {
+    padding: 12px 14px;
+    background: var(--card);
+    border-top: 2px solid var(--line-strong);
+  }
+
+  .fm-box-total .fm-box-label {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .fm-box-label-line {
+    font-size: 0.92em;
+    font-weight: 600;
+  }
+
+  .fm-box-tag {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* the slot: full on ok-wash, part a 2 px warn edge, none on bad-wash (the results map's colours); a band is neutral */
+  .fm-slot {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    font-size: 1.1em;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: var(--box-r);
+  }
+
+  .fm-slot-in {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .fm-slot-of {
+    font-weight: 400;
+    color: var(--muted);
+    white-space: pre;
+  }
+
+  .fm-slot[data-res="full"] {
+    background: var(--ok-wash);
+    border: 2px solid var(--ok);
+  }
+
+  .fm-slot[data-res="part"] {
+    border: 2px solid var(--warn);
+  }
+
+  .fm-slot[data-res="none"] {
+    background: var(--bad-wash);
+    border: 2px solid var(--bad);
+  }
+
+  .fm-slot[data-verdict] {
+    font-size: 0.95em;
+  }
+
+  .fm-slot[data-verdict][data-res="full"] {
+    color: var(--ok);
+  }
+
+  .fm-slot[data-verdict][data-res="part"] {
+    color: var(--warn);
+  }
+
+  .fm-slot[data-verdict][data-res="none"] {
+    color: var(--bad);
+  }
+
+  .fm-slot[data-res="no"] {
+    font-size: 0.92em;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px dashed var(--card-line);
+  }
+
+  /* on a phone each section stacks (the name, the slot at full width, the note) and the head's two sides stack (G89) */
+  @media (max-width: 519px) {
+    .fm-box-head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      padding: 10px 14px;
+    }
+
+    .fm-box-who {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .fm-box-row,
+    .fm-box-row[data-wide] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
   }
 
   .fm-sample {

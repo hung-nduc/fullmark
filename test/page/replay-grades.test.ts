@@ -72,39 +72,70 @@ describe("grades on a replay page", () => {
     expect(html).toContain('data-pending="0"');
   });
 
-  it("shows an additive table: each criterion's awarded and maximum points and note, and the grader's line", () => {
+  it("shows an additive box: the head, each criterion's slot and note, the total, the grader and the date", () => {
     const { html } = pageOf((g) => g);
     const add = text(card(html, "add"));
-    expect(add).toContain("Criterion Awarded Max Note");
-    expect(add).toContain("Define the terms 0.5 0.5");
-    expect(add).toContain("Derive the result 1.25 1.5 Skips the zero initial-conditions assumption.");
-    expect(add).toContain("Interpret it 0.5 1 Does not link the result to stability.");
-    expect(add).toContain("Graded by Claude Opus 5.5 · 24 Oct 2026 · 2.25 / 3 points");
-    expect(add).toContain("Solid derivation; the interpretation is the weak part.");
-    const code = text(card(html, "code"));
-    expect(code).toContain("Is short and clear 0.5 1 x + x works, but 2 * x is the usual form.");
-    expect(code).toContain("Graded by Claude Opus 5.5 · 24 Oct 2026 · 1.5 / 2 points");
+    expect(add).toContain("Points per criterion step 0.25 Graded by Claude Opus 5.5 (agent) 24 Oct 2026");
+    expect(add).toContain("Define the terms 0.5 of 0.5 points");
+    expect(add).toContain(
+      "Derive the result 1.25 of 1.5 points 1.25 / 1.5 Skips the zero initial-conditions assumption.",
+    );
+    expect(add).toContain("Interpret it 0.5 of 1 points 0.5 / 1 Does not link the result to stability.");
+    expect(add).toContain("Total the sum of the criteria 2.25 of 3 points 2.25 / 3");
+    expect(add).toContain("Why this score · optional Solid derivation; the interpretation is the weak part.");
+    expect(add).toContain("To improve · optional Say why the result matters.");
+    const code = card(html, "code");
+    expect(text(code)).toContain(
+      "Is short and clear 0.5 of 1 points 0.5 / 1 x + x works, but 2 * x is the usual form.",
+    );
+    expect(text(code)).toContain("Total the sum of the criteria 1.5 of 2 points");
+    expect(code).not.toContain("<table");
   });
 
-  it("shows a banded table: the band per criterion, the overall band and the points", () => {
+  it("colours a slot by result: full, part, none; a band is neutral", () => {
+    const { html } = pageOf((g) => {
+      const c = (g.grades.add as { criteria: Record<string, { score: number }> }).criteria;
+      (c.interp as { score: number }).score = 0;
+    });
+    const add = card(html, "add");
+    expect(add.match(/data-res="(\w+)"/g)).toEqual([
+      'data-res="full"',
+      'data-res="part"',
+      'data-res="none"',
+      'data-res="part"',
+    ]);
+    expect(card(html, "ielts").match(/data-res="band"/g)).toHaveLength(5);
+  });
+
+  it("shows a banded box: the band per criterion over the scale, the overall band, the scale in the head", () => {
     const { html } = pageOf((g) => g);
     const ielts = text(card(html, "ielts"));
-    expect(ielts).toContain("Criterion Band Note");
-    expect(ielts).toContain("Task Response 6 Room to improve here.");
-    expect(ielts).toContain("Overall band 6.5 of 9");
-    expect(ielts).toMatch(/Graded by Claude Opus 5\.5 · 24 Oct 2026 · [\d.]+ \/ 9 points/);
+    expect(ielts).toContain("A band per criterion bands 0 to 9, step 0.5 Graded by Claude Opus 5.5 (agent)");
+    expect(ielts).toContain("Task Response band 6 of 9 6 / 9 Room to improve here.");
+    expect(ielts).toContain("Overall band the mean of the bands, rounded band 6.5 of 9 6.5 / 9");
+    const banded = text(card(html, "banded"));
+    expect(banded).toContain("bands 0 to 6, step 1");
+    expect(banded).toContain("Style band 6 of 6 6 / 6 Overall band");
   });
 
-  it("shows a holistic grade: the verdicts, the grader's words, the score", () => {
-    const { html, state } = pageOf((g) => g);
-    const holistic = text(card(html, "holistic"));
-    const detail = state.replay.value?.grades?.details.find((d) => d.id === "holistic");
-    expect(holistic).toContain("Graded by");
-    expect(holistic).toContain(`${detail?.earned} / 4 points`);
-    for (const c of detail?.criteria ?? []) expect(c.verdict === null || holistic.includes("met")).toBe(true);
+  it("shows a holistic box: a verdict slot per bullet, no verdict where none is given, the score", () => {
+    const { html } = pageOf((g) => {
+      const b = (g.grades.holistic as { bullets: Record<string, { verdict?: string }> }).bullets;
+      delete (b["explains-how-to-avoid-it"] as { verdict?: string }).verdict;
+    });
+    const raw = card(html, "holistic");
+    const holistic = text(raw);
+    expect(holistic).toContain("One score Graded by Claude Opus 5.5 (agent) 24 Oct 2026");
+    expect(holistic).toContain("Names the Nyquist rate verdict, not scored verdict: Met Met");
+    expect(holistic).toContain("Gives an example verdict, not scored verdict: Partly Partly");
+    expect(holistic).toContain("Explains how to avoid it verdict, not scored no verdict No verdict");
+    expect(holistic).toContain("Score the score given 3 of 4 points 3 / 4");
+    expect(holistic).toContain("Why this score · required for one score");
+    expect(raw.match(/data-res="no"/g)).toHaveLength(1);
+    expect(raw).toMatch(/data-wide[ >]/);
   });
 
-  it("a grades file without a date shows the grader's line without one", () => {
+  it("a grades file without a date shows the head's grader without one", () => {
     const { html } = pageOf(
       (g) => {
         delete g.grader.at;
@@ -113,37 +144,63 @@ describe("grades on a replay page", () => {
       "nodate",
     );
     const add = text(card(html, "add"));
-    expect(add).toContain("Graded by Claude Opus 5.5 · 2.25 / 3 points");
-    expect(add).not.toContain("2026 ·");
+    expect(add).toContain("Graded by Claude Opus 5.5 (agent) Define the terms");
+    expect(add).not.toContain("2026");
   });
 
-  it("puts the grader's two parts in one feedback panel, one part when only one is given, none when neither", () => {
-    const both = card(pageOf((g) => g, "en", "fb-both").html, "add");
-    expect(both.match(/class="fm-feedback"/g)).toHaveLength(1);
-    expect(both).toContain(
-      '<p class="fm-feedback-part"><strong class="fm-feedback-label">Why this score<span class="fm-sr">:</span></strong>',
-    );
-    expect(both).toContain(
-      '<p class="fm-feedback-part"><strong class="fm-feedback-label">To improve<span class="fm-sr">:</span></strong>',
-    );
-    expect(both.indexOf("fm-feedback")).toBeLessThan(both.indexOf("data-grader"));
-    const edit =
-      (keep: "justification" | "improvement" | null): Edit =>
+  it("a human grader has no (agent) after the name", () => {
+    const { html } = pageOf(
       (g) => {
-        const one = g.grades.add as Record<string, unknown>;
-        if (keep !== "justification") one.justification = null;
-        if (keep !== "improvement") one.improvement = null;
-      };
-    const first = card(pageOf(edit("justification"), "en", "fb-one").html, "add");
-    expect(first.match(/fm-feedback-part/g)).toHaveLength(1);
-    expect(first).toContain("Why this score");
-    expect(first).not.toContain("To improve");
-    const second = card(pageOf(edit("improvement"), "en", "fb-two").html, "add");
-    expect(second.match(/fm-feedback-part/g)).toHaveLength(1);
-    expect(second).toContain("To improve");
-    const none = card(pageOf(edit(null), "en", "fb-none").html, "add");
-    expect(none).not.toContain("fm-feedback");
-    expect(none).toContain("data-grader");
+        (g.grader as { kind: string }).kind = "human";
+      },
+      "en",
+      "human",
+    );
+    const add = text(card(html, "add"));
+    expect(add).toContain("Graded by Claude Opus 5.5 24 Oct 2026");
+    expect(add).not.toContain("(agent)");
+  });
+
+  it("leaves out an empty or missing note, and each of the grader's two texts when it is not given", () => {
+    const add = card(
+      pageOf(
+        (g) => {
+          const one = g.grades.add as Record<string, unknown>;
+          one.improvement = null;
+        },
+        "en",
+        "notes",
+      ).html,
+      "add",
+    );
+    // three criteria, one with no note: two notes, plus "Why this score"
+    expect(add.match(/fm-box-note/g)).toHaveLength(3);
+    expect(add).toContain("Why this score");
+    expect(add).not.toContain("To improve");
+    const none = card(
+      pageOf(
+        (g) => {
+          const one = g.grades.add as Record<string, unknown>;
+          one.justification = null;
+          one.improvement = null;
+        },
+        "en",
+        "no-texts",
+      ).html,
+      "add",
+    );
+    expect(none).not.toContain("Why this score");
+    expect(none).toContain("fm-box-total");
+  });
+
+  it("is a list of sections, with the head and the total outside it, and names every slot in words", () => {
+    const add = card(pageOf((g) => g).html, "add");
+    expect(add.match(/<ul class="fm-box-list">/g)).toHaveLength(1);
+    expect(add.match(/<li class="fm-box-sec">/g)).toHaveLength(3);
+    expect(add.indexOf("fm-box-head")).toBeLessThan(add.indexOf("fm-box-list"));
+    expect(add.indexOf("fm-box-list")).toBeLessThan(add.indexOf("fm-box-total"));
+    expect(add).toContain('<span class="fm-sr">1.25 of 1.5 points</span><span class="fm-slot-in" aria-hidden="true">');
+    expect(add).toContain('role="group" aria-labelledby=');
   });
 
   it("without grades the essays and code stay pending, with no table", () => {
@@ -155,8 +212,7 @@ describe("grades on a replay page", () => {
       "holistic",
       "code",
     ]);
-    expect(html).not.toContain("fm-grade-table");
-    expect(html).not.toContain("data-grader");
+    expect(html).not.toContain("fm-box");
     expect(html).toContain("data-pending-note");
   });
 
@@ -180,11 +236,14 @@ describe("grades on a replay page", () => {
     expect(JSON.stringify(a.page)).toBe(JSON.stringify(b.page));
   });
 
-  it("in Vietnamese the table and the line use the catalog", () => {
+  it("in Vietnamese the box uses the catalog, with a decimal comma", () => {
     const { html } = pageOf((g) => g, "vi", "vi");
     const add = text(card(html, "add"));
-    expect(add).toContain("Tiêu chí Được Tối đa Ghi chú");
-    expect(add).toContain("Chấm bởi Claude Opus 5.5 · 24 thg 10 2026 · 2,25 trên 3 điểm");
+    expect(add).toContain("Điểm cho từng tiêu chí bước 0,25 Chấm bởi Claude Opus 5.5 (agent) 24 thg 10 2026");
+    expect(add).toContain("1,25 trên 1,5 điểm");
+    expect(add).toContain("Tổng tổng các tiêu chí 2,25 trên 3 điểm 2,25 / 3");
+    expect(add).toContain("Lý do cho điểm này · không bắt buộc");
     expect(add).not.toContain("Graded by");
+    expect(text(card(html, "holistic"))).toContain("Đạt một phần");
   });
 });

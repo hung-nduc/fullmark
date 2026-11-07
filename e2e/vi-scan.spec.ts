@@ -112,10 +112,10 @@ test("no English chrome in a vi replay page, with grades and with a retry left i
   const look = async (step: string) => seen.push([step, await onScreen(page)]);
 
   await expect(page.locator("[data-replay-banner]")).toBeVisible();
-  await expect(page.locator(".fm-grade-table").first()).toBeVisible();
+  await expect(page.locator(".fm-box").first()).toBeVisible();
   await look("the replay");
   expect(seen[0]?.[1]).toContain("Chấm bởi");
-  expect(seen[0]?.[1]).toContain("Tiêu chí");
+  expect(seen[0]?.[1]).toContain("Điểm cho từng tiêu chí");
   await page.locator("[data-action=retry-missed]").click();
   await look("the Retry missed dialog");
   await page.locator("[data-action=confirm-retry]").click();

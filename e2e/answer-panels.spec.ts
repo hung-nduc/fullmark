@@ -3,7 +3,7 @@ import { THEME_NAMES } from "../src/core/themes";
 import { noViolations, replayOf } from "./helpers";
 
 /**
- * The explanation and feedback panels, and the phone's criterion table (STEP2.md, slice 2j3; TECHNICAL_DESIGN.md,
+ * The explanation panel, the rubric box's frame, and the box on a phone (3o) (STEP2.md, slice 2j3; TECHNICAL_DESIGN.md,
  * section 8, row "Answer panels"). The fixture is the replay of the `essay` quiz with its grades, built with `extra`
  * front matter lines (the lines change the hash, so the results and grades files are re-keyed to it).
  */
@@ -17,7 +17,7 @@ const style = (page: import("@playwright/test").Page, selector: string, props: s
     }, props);
 
 for (const theme of THEME_NAMES) {
-  test(`the explanation and the feedback panels in ${theme}: bar, wash, labels, and axe`, async ({ page }) => {
+  test(`the explanation panel and the rubric box in ${theme}: bar, fills, rules, and axe`, async ({ page }) => {
     await page.goto(replayOf([`theme: ${theme}`], `p-${theme}`));
     const explanation = await style(page, ".fm-explanation", [
       "border-left-width",
@@ -35,116 +35,81 @@ for (const theme of THEME_NAMES) {
       "padding-top": "12px",
       "padding-left": "16px",
     });
-    const bars = await page.evaluate(() => {
-      const c = (sel: string) => getComputedStyle(document.querySelector(sel) as Element);
+    // the grader's words are no longer a panel: the box holds them (TECHNICAL_DESIGN.md, section 6, "The rubric box")
+    await expect(page.locator(".fm-feedback")).toHaveCount(0);
+    const box = await page.evaluate(() => {
+      const c = (sel: string) => getComputedStyle(document.querySelector(`article[data-qid="add"] ${sel}`) as Element);
       return {
-        info: c(".fm-explanation").borderLeftColor,
-        accent: c(".fm-feedback").borderLeftColor,
-        chip: c(".fm-explanation-label").backgroundColor,
-        labelColour: c(".fm-feedback-label").color,
-        wash: c(".fm-feedback").backgroundColor,
-        washInfo: c(".fm-explanation").backgroundColor,
+        fill: c(".fm-box").backgroundColor,
+        head: c(".fm-box-head").backgroundColor,
+        total: c(".fm-box-total").backgroundColor,
+        rule: c(".fm-box-head").borderBottomWidth,
+        totalRule: c(".fm-box-total").borderTopWidth,
+        radius: c(".fm-box").borderTopLeftRadius,
+        card: getComputedStyle(document.documentElement).getPropertyValue("--card-radius"),
+        type: c(".fm-box-type").color,
+        hint: getComputedStyle(document.documentElement).getPropertyValue("--hint"),
+        slot: c(".fm-slot").height,
       };
     });
-    expect(bars.info).toBe(bars.chip);
-    expect(bars.accent).toBe(bars.labelColour);
-    expect(bars.wash).not.toBe(bars.washInfo);
-    const label = await style(page, ".fm-feedback-label", [
-      "font-size",
-      "font-weight",
-      "letter-spacing",
-      "text-transform",
-      "display",
-    ]);
-    expect(label["font-weight"]).toBe("700");
-    expect(label["text-transform"]).toBe("uppercase");
-    expect(label.display).toBe("block");
-    const px = parseFloat(label["letter-spacing"] as string);
-    const size = parseFloat(label["font-size"] as string);
-    expect(px / size).toBeCloseTo(0.06, 2);
-    const parts = page.locator('article[data-qid="add"] .fm-feedback-part');
-    await expect(parts).toHaveCount(2);
-    await expect(parts.first()).toContainText("Why this score");
-    await expect(page.locator('article[data-qid="add"] [data-grader]')).toBeVisible();
+    // the surface fill and the card fill are one colour in the white theme only
+    if (theme !== "white") expect(box.fill).not.toBe(box.head);
+    expect(box.head).toBe(box.total);
+    expect(box.rule).toBe("2px");
+    expect(box.totalRule).toBe("2px");
+    expect(box.slot).toBe("44px");
+    // 8 px, or the card's own radius when that is smaller (the white theme's 4 px)
+    expect(parseFloat(box.radius)).toBe(Math.min(8, parseFloat(box.card)));
+    const sections = page.locator('article[data-qid="add"] .fm-box-sec');
+    await expect(sections).toHaveCount(5);
+    await expect(sections.nth(3)).toContainText("Why this score");
     await noViolations(page);
   });
 }
 
-/** A row as drawn: each cell's generated text ("/ ", "Band ") and its own, joined by spaces. */
-const drawn = async (row: import("@playwright/test").Locator): Promise<string> =>
-  (
-    await row.locator("td").evaluateAll((tds) =>
-      tds.map((td) => {
-        // Chromium gives `"Band "`, Firefox the list as written, `"Band" " "`: join every quoted string
-        const before = getComputedStyle(td, "::before").content;
-        const made = [...before.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => m[1]).join("");
-        return `${made}${td.textContent ?? ""}`;
-      }),
-    )
-  )
-    .join(" ")
-    .replaceAll(/\s+/g, " ")
-    .trim();
-
-test.describe("the criterion table on a 390 px phone", () => {
+test.describe("the rubric box on a 390 px phone", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test("each criterion is a block, nothing is cut or scrolls sideways, and it is still a table", async ({ page }) => {
+  test("each section stacks, nothing is cut or scrolls sideways, and the slots are named in words", async ({
+    page,
+  }) => {
     await page.goto(replayOf([], "phone"));
     const add = page.locator('article[data-qid="add"]');
     await add.scrollIntoViewIfNeeded();
-    // nothing wider than the card; the page does not scroll sideways; the table's own box does not scroll
     const wide = await page.evaluate(() => {
       const box = document.querySelector('article[data-qid="add"]')?.getBoundingClientRect();
-      const over = [...document.querySelectorAll("article[data-qid] .fm-grade *")].filter(
+      const over = [...document.querySelectorAll("article[data-qid] .fm-box *")].filter(
         (el) => el.getBoundingClientRect().right > (box?.right ?? 0) + 0.5,
       );
-      const scroller = document.querySelector('article[data-qid="add"] .fm-grade-scroll') as HTMLElement;
+      return { page: document.documentElement.scrollWidth > window.innerWidth, over: over.map((el) => el.className) };
+    });
+    expect(wide).toEqual({ page: false, over: [] });
+    // the head's two sides stack; a section is a name, then the slot at the column's full width, then the note
+    const parts = await add.locator(".fm-box").evaluate((box) => {
+      const r = (sel: string, from: Element = box) => (from.querySelector(sel) as Element).getBoundingClientRect();
+      const li = box.querySelectorAll("li")[1] as Element;
       return {
-        page: document.documentElement.scrollWidth > window.innerWidth,
-        over: over.map((el) => el.className || el.tagName),
-        scroller: scroller.scrollWidth > scroller.clientWidth,
+        type: r(".fm-box-type"),
+        by: r(".fm-box-by"),
+        name: r(".fm-box-title", li),
+        slot: r(".fm-slot", li),
+        note: r(".fm-box-note", li),
+        sec: li.getBoundingClientRect(),
       };
     });
-    expect(wide).toEqual({ page: false, over: [], scroller: false });
-    // the header row is clipped, and a row is a block: name, then marks, then note, one under the other
-    const rows = add.locator(".fm-grade-table tbody tr");
-    const derive = rows.nth(1);
-    const boxes = await derive.locator("td").evaluateAll((tds) =>
-      tds.map((td) => {
-        const r = td.getBoundingClientRect();
-        return { top: Math.round(r.top), left: Math.round(r.left), visible: r.width > 0 && r.height > 0 };
-      }),
-    );
-    expect(boxes.every((b) => b.visible)).toBe(true);
-    const [name, awarded, max, note] = boxes as [
-      (typeof boxes)[0],
-      (typeof boxes)[0],
-      (typeof boxes)[0],
-      (typeof boxes)[0],
-    ];
-    expect(awarded.top).toBeGreaterThan(name.top);
-    expect(max.top).toBe(awarded.top);
-    expect(max.left).toBeGreaterThan(awarded.left);
-    expect(note.top).toBeGreaterThan(awarded.top);
-    await expect(derive).toContainText("Derive the result");
-    expect(await drawn(derive)).toBe("Derive the result 1.25 / 1.5 Skips the zero initial-conditions assumption.");
-    expect(
-      await page.locator('article[data-qid="add"] thead').evaluate((el) => el.getBoundingClientRect().width),
-    ).toBeLessThanOrEqual(1);
-    // banded: "Band 6"; holistic: the verdict
+    expect(parts.by.top).toBeGreaterThan(parts.type.bottom - 1);
+    expect(parts.slot.top).toBeGreaterThan(parts.name.bottom - 1);
+    expect(parts.note.top).toBeGreaterThan(parts.slot.bottom - 1);
+    // full width: the section's padding is 14 px each side
+    expect(Math.round(parts.slot.width)).toBe(Math.round(parts.sec.width - 28));
+    // each slot says its value in words; the "/" is hidden from assistive technology
+    await expect(add.locator(".fm-box-sec").nth(1).locator(".fm-slot .fm-sr")).toHaveText("1.25 of 1.5 points");
+    await expect(add.locator(".fm-slot-in").first()).toHaveAttribute("aria-hidden", "true");
+    await expect(add.getByRole("group", { name: "Points per criterion" })).toHaveCount(1);
+    await expect(add.getByRole("listitem")).toHaveCount(3);
     const ielts = page.locator('article[data-qid="ielts"]');
-    expect(await drawn(ielts.locator("tbody tr").first())).toMatch(/^Task Response Band 6\b/);
-    expect(await drawn(page.locator('article[data-qid="holistic"] tbody tr').first())).toMatch(
-      /\S+ (Met|Partly met|Missed)$/,
-    );
-    // still a table to assistive technology
-    const table = add.getByRole("table");
-    await expect(table).toHaveCount(1);
-    await expect(table.getByRole("columnheader")).toHaveText(["Criterion", "Awarded", "Max", "Note"]);
-    await expect(table.getByRole("row")).toHaveCount(4);
-    await expect(table.getByRole("cell")).toHaveCount(12);
-    await expect(table.getByRole("cell", { name: "Define the terms" })).toBeVisible();
+    await expect(ielts.locator(".fm-slot .fm-sr").first()).toHaveText("band 6 of 9");
+    await expect(page.locator('article[data-qid="holistic"] .fm-slot .fm-sr').first()).toHaveText("verdict: Met");
     await noViolations(page);
   });
 });

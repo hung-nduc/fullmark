@@ -42,58 +42,60 @@ const lines = async (page: Page, selector: string): Promise<string> =>
   (await page.locator(selector).innerText()).replaceAll(/\s+/g, " ");
 
 test.describe("grades on a replay page", () => {
-  test("each graded answer shows its table and grader's line, and the score counts them", async ({ page }) => {
+  test("each graded answer shows its rubric box, and the score counts them", async ({ page }) => {
     const seen = watch(page);
     await page.goto(replay("graded", (g) => g).url);
     const add = page.locator('article[data-qid="add"]');
-    await expect(add.locator(".fm-grade-table tbody tr")).toHaveCount(3);
-    expect(await lines(page, 'article[data-qid="add"] .fm-grade-table')).toContain(
-      "Derive the result 1.25 1.5 Skips the zero initial-conditions assumption.",
+    await expect(add.locator(".fm-box-sec")).toHaveCount(5);
+    await expect(add.locator("table")).toHaveCount(0);
+    expect(await lines(page, 'article[data-qid="add"] .fm-box')).toContain(
+      "Derive the result 1.25 of 1.5 points 1.25 / 1.5 Skips the zero initial-conditions assumption.",
     );
-    await expect(add.locator("[data-grader]")).toHaveText("Graded by Claude Opus 5.5 · 24 Oct 2026 · 2.25 / 3 points");
+    await expect(add.locator(".fm-box-head")).toHaveText(
+      /Points per criterion\s*step 0\.25\s*Graded by Claude Opus 5\.5 \(agent\)\s*24 Oct 2026/,
+    );
     await expect(add.locator(".fm-result")).toHaveAttribute("data-status", "partial");
     const ielts = page.locator('article[data-qid="ielts"]');
-    await expect(ielts.locator(".fm-grade-band")).toHaveText("Overall band 6.5 of 9");
-    expect(await lines(page, 'article[data-qid="ielts"] .fm-grade-table')).toContain("Task Response 6");
+    expect(await lines(page, 'article[data-qid="ielts"] .fm-box-total')).toContain("Overall band");
+    await expect(ielts.locator(".fm-box-total .fm-slot")).toContainText("6.5 / 9");
+    expect(await lines(page, 'article[data-qid="ielts"] .fm-box')).toContain("Task Response band 6 of 9 6 / 9");
     const code = page.locator('article[data-qid="code"]');
-    await expect(code.locator("[data-grader]")).toContainText("1.5 / 2 points");
+    await expect(code.locator(".fm-box-total .fm-slot")).toContainText("1.5 / 2");
     // the score includes them, as `quiz grade` has it (no asterisk, no waiting note)
     const total = page.locator(".fm-total");
     await expect(total).toHaveAttribute("data-earned", "19.25");
     await expect(total).toHaveAttribute("data-points", "25");
     await expect(page.locator(".fm-pending-note")).toHaveCount(0);
     await expect(page.locator("[data-replay-banner]")).toContainText("grades from the report of 24 Oct");
-    await expect(page.locator("main, .fm-main").first().locator(".fm-grade")).toHaveCount(5);
+    await expect(page.locator("main, .fm-main").first().locator(".fm-box")).toHaveCount(5);
     await noViolations(page);
     expect(seen.problems).toEqual([]);
     expect(seen.requests).toEqual([]);
   });
 
-  test("a grades file without a date shows the grader's line without one", async ({ page }) => {
+  test("a grades file without a date shows the head without one", async ({ page }) => {
     await page.goto(
       replay("nodate", (g) => {
         delete g.grader.at;
       }).url,
     );
-    await expect(page.locator('article[data-qid="add"] [data-grader]')).toHaveText(
-      "Graded by Claude Opus 5.5 · 2.25 / 3 points",
-    );
+    await expect(page.locator('article[data-qid="add"] .fm-box-who')).toHaveText("Graded by Claude Opus 5.5 (agent)");
     await expect(page.locator("[data-replay-banner]")).toContainText("grades from the report");
   });
 
   test("without a grades file the answers stay pending, as before", async ({ page }) => {
     await page.goto(replay("pending", null).url);
-    await expect(page.locator(".fm-grade")).toHaveCount(0);
+    await expect(page.locator(".fm-box")).toHaveCount(0);
     await expect(page.locator('article[data-qid="add"] .fm-result')).toHaveAttribute("data-status", "pending");
     await expect(page.locator(".fm-pending-note")).toHaveCount(1);
     await expect(page.locator("[data-replay-banner]")).toContainText("grades pending");
   });
 
-  test("on a phone the table scrolls in its own box and the page does not scroll sideways", async ({ page }) => {
+  test("on a phone the page does not scroll sideways", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(replay("phone", (g) => g).url);
     const wide = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     expect(wide).toBe(false);
-    await expect(page.locator('article[data-qid="add"] .fm-grade-table')).toBeVisible();
+    await expect(page.locator('article[data-qid="add"] .fm-box')).toBeVisible();
   });
 });

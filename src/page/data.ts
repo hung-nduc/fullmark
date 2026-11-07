@@ -94,9 +94,12 @@ export type PageGradeDetail = {
   mode: "holistic" | "additive" | "banded";
   points: number;
   earned: number;
-  /** banded: the overall band, and the scale's top (`earned` is its points); else null */
+  /** banded: the overall band (`earned` is its points); else null */
   band: number | null;
-  scaleMax: number | null;
+  /** additive and holistic: the rubric's `step`, null when it has none; banded: null (the scale has its own) */
+  step: number | null;
+  /** banded: the whole scale; else null */
+  scale: { min: number; max: number; step: number } | null;
   grader: PageGrader;
   criteria: PageGradedCriterion[];
   justification: string | null;

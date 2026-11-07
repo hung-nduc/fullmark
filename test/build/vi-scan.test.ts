@@ -85,7 +85,7 @@ describe("the vi scan", () => {
       expect(text).toContain("Xem lại");
       if (graded) {
         expect(text).toContain("Chấm bởi");
-        expect(text).toContain("Tiêu chí");
+        expect(text).toContain("Điểm cho từng tiêu chí");
       }
       // the grader's own words (notes, justification) are the author's, like the quiz: they may be English
       const words = graded ? readFileSync(join(dir, "essay-results-grades.json"), "utf8").toLowerCase() : "";

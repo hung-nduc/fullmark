@@ -3,12 +3,12 @@ import { readAnswer } from "../../core/attempt/answers";
 import { countWords } from "../../core/grade/normalise";
 import type { PageCriterion, PageQuestion } from "../data";
 import { num } from "../results";
-import { GradeTable } from "./Graded";
+import { RubricBox } from "./RubricBox";
 import { type Ctx, Html } from "./shared";
 
 /** The model answer, under the learner's own, after Submit (HTML from the key blob, like an explanation). */
 function Grade({ c }: { c: Ctx }) {
-  return c.grade === undefined ? null : <GradeTable grade={c.grade} c={c} />;
+  return c.grade === undefined ? null : <RubricBox grade={c.grade} c={c} />;
 }
 
 function Sample({ c, id }: { c: Ctx; id: string }) {
