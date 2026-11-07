@@ -12,6 +12,8 @@ export function createGradeState(data: GradeData) {
   const fills = signal<Record<string, Fill>>(Object.fromEntries(data.items.map((i) => [i.id, emptyFill(i)])));
   const current = signal<string>((data.items[0] ?? data.unanswered[0])?.id ?? "");
   const sidebar = signal(true);
+  /** the sidebar groups the grader has folded (`grade`, `blank`, `auto`) */
+  const fold = signal<Record<string, boolean>>({});
   const dialog = signal<"none" | "finish">("none");
   const name = signal(data.name ?? "");
   const sending = signal(false);
@@ -65,6 +67,7 @@ export function createGradeState(data: GradeData) {
     fills,
     current,
     sidebar,
+    fold,
     dialog,
     name,
     sending,

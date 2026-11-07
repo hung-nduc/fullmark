@@ -342,47 +342,84 @@
 
   /* the sidebar */
   .fm-grade-side-body {
+    display: flex;
     flex: 1;
-    padding: 12px 14px;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 18px;
     overflow: auto;
   }
 
+  .fm-grade-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* a group's head folds the group: chevron, name, count (the Grade board's groupHeadBtn) */
   .fm-grade-group {
     display: flex;
-    justify-content: space-between;
-    padding: 8px 12px;
-    margin: 10px 0 6px;
-    font-size: 0.9em;
+    gap: 8px;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    padding: 0 10px;
+    font: inherit;
+    font-size: 0.85em;
     font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
     background: var(--surface);
-    border: 1px solid var(--card-line);
+    border: 1px solid var(--line);
     border-radius: 8px;
   }
 
+  .fm-grade-group .fm-svg {
+    flex: none;
+    color: var(--muted);
+    transform: rotate(-90deg);
+  }
+
+  .fm-grade-group .fm-svg[data-open] {
+    transform: none;
+  }
+
+  .fm-grade-group-name {
+    flex: 1;
+  }
+
+  .fm-grade-group-count {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
   .fm-grade-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     padding: 0;
     margin: 0;
     list-style: none;
   }
 
-  .fm-grade-list li + li {
-    margin-top: 6px;
-  }
-
   .fm-grade-row {
-    display: grid;
-    grid-template-columns: 18px minmax(0, 1fr) auto;
+    display: flex;
     gap: 8px;
     align-items: center;
+    box-sizing: border-box;
     width: 100%;
-    padding: 8px 12px;
+    min-height: 48px;
+    padding: 4px 10px 4px 6px;
     font: inherit;
+    font-size: 0.9em;
     color: var(--text);
     text-align: left;
     cursor: pointer;
     background: var(--card);
-    border: 1px solid var(--card-line);
-    border-radius: 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
   }
 
   .fm-grade-row[data-condition="done"] {
@@ -390,14 +427,44 @@
     border-color: var(--ok);
   }
 
+  .fm-grade-row[data-condition="half"],
+  .fm-grade-row[data-condition="note"] {
+    background: var(--bad-wash);
+    border-color: var(--bad);
+  }
+
+  /* the state's icon, in a fixed 20 px cell so every row's text lines up */
+  .fm-grade-mark {
+    display: flex;
+    flex: 0 0 20px;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .fm-grade-row[data-condition="done"] .fm-grade-mark {
+    color: var(--ok);
+  }
+
+  .fm-grade-row[data-condition="half"] .fm-grade-mark,
   .fm-grade-row[data-condition="note"] .fm-grade-mark {
     color: var(--bad);
   }
 
+  .fm-ring-track {
+    opacity: 0.3;
+  }
+
+  /* an unanswered question: dashed and muted, with the text at the same indent as the others */
   .fm-grade-row[data-blank] {
-    grid-template-columns: minmax(0, 1fr) auto;
+    justify-content: space-between;
+    min-height: 40px;
+    padding: 0 10px 0 34px;
     color: var(--muted);
+    background: var(--surface);
     border-style: dashed;
+    border-color: var(--line-strong);
   }
 
   .fm-grade-row[aria-current="true"] {
@@ -406,7 +473,18 @@
 
   .fm-grade-row-text {
     display: flex;
+    flex: 1;
     flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+  }
+
+  .fm-grade-row-name {
+    font-weight: 600;
+  }
+
+  .fm-grade-row[data-blank] .fm-grade-row-name {
+    font-weight: 400;
   }
 
   .fm-grade-row-sub {
@@ -419,14 +497,81 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .fm-grade-row[data-blank] .fm-grade-row-score {
+    font-weight: 400;
+  }
+
+  /* fullmark's own marking: a graded row that is not a button */
   .fm-grade-auto {
-    padding: 8px 12px;
-    font-size: 0.88em;
+    cursor: default;
+  }
+
+  .fm-grade-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    padding-top: 8px;
+    font-size: 0.75em;
     color: var(--muted);
+    border-top: 1px solid var(--line);
+  }
+
+  .fm-grade-legend > span {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .fm-grade-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+  }
+
+  .fm-grade-key[data-key="done"] {
+    color: var(--ok);
+    background: var(--ok-wash);
+    border-color: var(--ok);
+  }
+
+  .fm-grade-key[data-key="note"] {
+    color: var(--bad);
+    background: var(--bad-wash);
+    border-color: var(--bad);
+  }
+
+  .fm-grade-key[data-key="half"] {
+    color: var(--bad);
+    background: none;
+    border: 0;
+  }
+
+  .fm-grade-key[data-key="current"] {
+    border: 2px solid var(--text);
+  }
+
+  .fm-grade-key[data-key="required"] {
+    background: none;
+    border: 0;
+  }
+
+  .fm-grade-key[data-key="required"] i {
+    width: 7px;
+    height: 7px;
+    background: var(--warn);
+    border-radius: 50%;
   }
 
   .fm-grade-keys {
-    font-size: 0.8em;
+    margin: 0;
+    font-size: 0.75em;
     color: var(--muted);
   }
 

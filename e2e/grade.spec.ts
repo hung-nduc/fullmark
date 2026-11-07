@@ -257,7 +257,8 @@ test("the sidebar lists what to grade, the unanswered and fullmark's line; Q, N 
   await expect(side).toContainText("To grade");
   await expect(side.locator("[data-row]")).toHaveCount(5);
   await expect(side).toContainText("Not answered");
-  await expect(page.locator("[data-auto]")).toContainText("The other 1 question is marked by fullmark");
+  await expect(page.locator("[data-auto]")).toContainText("1 question");
+  await expect(page.locator("[data-auto]")).toContainText("marked on submit");
   await side.locator("[data-row=code]").click();
   await expect(page.locator("article[data-qid=code]")).toContainText("No answer · 0 / 2");
   await expect(page.locator("article[data-qid=code] [data-action=clear]")).toHaveCount(0);
@@ -383,4 +384,59 @@ test("the answer and the box span the card; the sample opens beside the answer o
       }).length,
   );
   expect(broken).toBe(0);
+});
+
+test("the sidebar draws the states as icons, tints the rows, folds its groups and has a legend", async ({ page }) => {
+  const dir = folder();
+  const results = JSON.parse(readFileSync(join(dir, "results.json"), "utf8"));
+  results.state.answers.code = null;
+  writeFileSync(join(dir, "results.json"), JSON.stringify(results));
+  const server = await web(dir);
+  await open(page, server);
+  const side = page.locator(".fm-grade-side");
+  const row = (id: string) => side.locator(`[data-row=${id}]`);
+  // a graded row, a half-graded one (one criterion given) and a row with a lost mark and no note
+  await value(page, "defs").fill("0.5");
+  await value(page, "derive").fill("1.5");
+  await value(page, "interp").fill("1");
+  await next(page);
+  await value(page, "TR").fill("6");
+  await expect(row("add")).toHaveAttribute("data-condition", "done");
+  await expect(row("ielts")).toHaveAttribute("data-condition", "half");
+  const half = await row("ielts").locator(".fm-grade-mark").innerHTML();
+  for (const crit of ["CC", "LR", "GRA"]) await value(page, crit).fill("6");
+  await expect(row("ielts")).toHaveAttribute("data-condition", "note");
+  // the marks are SVG, never a text glyph, and each state's is its own
+  for (const id of ["add", "ielts"]) {
+    await expect(row(id).locator(".fm-grade-mark svg")).toHaveCount(1);
+    await expect(row(id).locator(".fm-grade-mark")).toHaveText("");
+  }
+  expect(await row("ielts").locator(".fm-grade-mark").innerHTML()).not.toBe(half);
+  await expect(row("banded").locator(".fm-grade-mark svg")).toHaveCount(0);
+  const tint = (id: string) => row(id).evaluate((e) => getComputedStyle(e).backgroundColor);
+  expect(await tint("add")).not.toBe(await tint("banded"));
+  expect(await tint("ielts")).not.toBe(await tint("banded"));
+  expect(await tint("ielts")).not.toBe(await tint("add"));
+  // the groups, with their counts, and the legend
+  await expect(side.locator("[data-group=grade]")).toContainText("To grade");
+  await expect(side.locator("[data-group=grade]")).toContainText("1 of 4 graded");
+  await expect(side.locator("[data-group=blank]")).toContainText("Not answered");
+  await expect(side.locator("[data-group=auto]")).toContainText("Scored by fullmark");
+  await expect(side.locator("[data-group=auto]")).toContainText("1 / 1");
+  await expect(row("code")).toContainText("0 / 2");
+  await expect(side.locator("[data-legend]")).toContainText("Graded");
+  await expect(side.locator("[data-legend]")).toContainText("Half graded");
+  await expect(side.locator("[data-legend]")).toContainText("Needs a note");
+  await expect(side.locator("[data-legend]")).toContainText("Not graded");
+  await expect(side.locator("[data-legend]")).toContainText("current");
+  await expect(side.locator("[data-legend]")).toContainText("required");
+  // a group folds under its head
+  const head = side.locator("[data-group=grade]");
+  await expect(head).toHaveAttribute("aria-expanded", "true");
+  await head.click();
+  await expect(head).toHaveAttribute("aria-expanded", "false");
+  await expect(row("add")).toHaveCount(0);
+  await expect(side.locator("[data-group=blank]")).toBeVisible();
+  await head.click();
+  await expect(row("add")).toBeVisible();
 });

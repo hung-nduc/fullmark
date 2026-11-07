@@ -635,6 +635,72 @@ function Bar({ state, store, t }: { state: GradeState; store: LookStore; t: Page
   );
 }
 
+const svg = {
+  class: "fm-svg",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+} as const;
+const CheckIcon = ({ size = 14 }: { size?: number }) => (
+  <svg {...svg} aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" stroke-width="3">
+    <path d="M5 12.5l4.5 4.5L19 7" />
+  </svg>
+);
+const BangIcon = () => (
+  <svg {...svg} aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" stroke-width="3">
+    <path d="M12 5v9M12 19v.01" />
+  </svg>
+);
+/** Half graded: a ring with one fixed arc (about a third), "started", never a half and never a spinner (Grade board). */
+const RingIcon = ({ size = 16 }: { size?: number }) => (
+  <svg {...svg} aria-hidden="true" width={size} height={size} viewBox="0 0 16 16" stroke-width="2.5">
+    <circle cx="8" cy="8" r="6" class="fm-ring-track" />
+    <circle cx="8" cy="8" r="6" pathLength="100" stroke-dasharray="30 100" transform="rotate(-90 8 8)" />
+  </svg>
+);
+const ChevronIcon = ({ open }: { open: boolean }) => (
+  <svg
+    {...svg}
+    aria-hidden="true"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    stroke-width="3"
+    data-open={open ? "" : undefined}
+  >
+    <path d="M7 9l5 6 5-6" />
+  </svg>
+);
+const CloseIcon = () => (
+  <svg {...svg} aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" stroke-width="2">
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);
+
+const stateIcon = (c: "none" | "half" | "note" | "done") =>
+  c === "done" ? <CheckIcon /> : c === "half" ? <RingIcon /> : c === "note" ? <BangIcon /> : null;
+
+/** A sidebar group's head: a button with its chevron, its name and its count; it folds the group under it. */
+function GroupHead({ state, id, name, count }: { state: GradeState; id: string; name: string; count: string }) {
+  const open = !state.fold.value[id];
+  return (
+    <button
+      type="button"
+      class="fm-grade-group"
+      data-group={id}
+      aria-expanded={open}
+      onClick={() => {
+        state.fold.value = { ...state.fold.value, [id]: open };
+      }}
+    >
+      <ChevronIcon open={open} />
+      <span class="fm-grade-group-name">{name}</span>
+      <span class="fm-grade-group-count">{count}</span>
+    </button>
+  );
+}
+
 function Side({ state, t }: { state: GradeState; t: PageT }) {
   const { r, data } = state;
   const lang = data.uiLang;
@@ -643,8 +709,8 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
     i.mode === "banded" && i.scale
       ? (t.boxBands(n(i.scale.min), n(i.scale.max), n(i.scale.step)).split(",")[0] ?? "")
       : (i.mode === "holistic" ? t.boxHolistic : t.boxAdditive).toLowerCase();
-  const mark = { none: "", half: "◐", note: "!", done: "✓" } as const;
   const gradedCount = data.items.filter((i) => state.evaluated.value[i.id]?.condition === "done").length;
+  const fold = state.fold.value;
   return (
     <aside class="fm-side fm-grade-side" aria-label={r.questions}>
       <div class="fm-side-head">
@@ -659,86 +725,131 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
             state.sidebar.value = false;
           }}
         >
-          ×
+          <CloseIcon />
         </button>
       </div>
       <div class="fm-grade-side-body">
-        <div class="fm-grade-group">
-          <span>{r.toGrade}</span>
-          <span>{r.gradedOf(gradedCount, data.items.length).replace(/^[^0-9]*/, "")}</span>
-        </div>
-        <ul class="fm-grade-list">
-          {data.items.map((i) => {
-            const ev = state.evaluated.value[i.id];
-            const c = ev?.condition ?? "none";
-            return (
-              <li key={i.id}>
-                <button
-                  type="button"
-                  class="fm-grade-row"
-                  data-row={i.id}
-                  data-condition={c}
-                  aria-current={state.current.value === i.id ? "true" : undefined}
-                  onClick={() => {
-                    state.current.value = i.id;
-                  }}
-                >
-                  <span class="fm-grade-mark" aria-hidden="true">
-                    {mark[c]}
-                  </span>
-                  <span class="fm-grade-row-text">
-                    <span class="fm-grade-row-name">{r.qn(i.number)}</span>
-                    <span class="fm-grade-row-sub">
-                      {kindOf(r, i)} · {modeOf(i)}
-                    </span>
-                  </span>
-                  <span class="fm-grade-row-score">
-                    {ev?.total ? n(ev.total.earned) : r.none} / {n(i.points)}
-                  </span>
-                  <span class="fm-sr">{r.states[c]}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-        {data.unanswered.length > 0 ? (
-          <>
-            <div class="fm-grade-group">
-              <span>{r.notAnswered}</span>
-              <span>{data.unanswered.length}</span>
-            </div>
+        <nav class="fm-grade-section" aria-label={r.toGrade}>
+          <GroupHead state={state} id="grade" name={r.toGrade} count={r.gradedShort(gradedCount, data.items.length)} />
+          {fold.grade ? null : (
             <ul class="fm-grade-list">
-              {data.unanswered.map((i) => (
-                <li key={i.id}>
-                  <button
-                    type="button"
-                    class="fm-grade-row"
-                    data-blank
-                    data-row={i.id}
-                    aria-current={state.current.value === i.id ? "true" : undefined}
-                    onClick={() => {
-                      state.current.value = i.id;
-                    }}
-                  >
-                    <span class="fm-grade-row-text">
-                      <span class="fm-grade-row-name">{r.qnKind(i.number, kindOf(r, i))}</span>
-                    </span>
-                    <span class="fm-grade-row-score">0 / {n(i.points)}</span>
-                  </button>
-                </li>
-              ))}
+              {data.items.map((i) => {
+                const ev = state.evaluated.value[i.id];
+                const c = ev?.condition ?? "none";
+                return (
+                  <li key={i.id}>
+                    <button
+                      type="button"
+                      class="fm-grade-row"
+                      data-row={i.id}
+                      data-condition={c}
+                      aria-current={state.current.value === i.id ? "true" : undefined}
+                      onClick={() => {
+                        state.current.value = i.id;
+                      }}
+                    >
+                      <span class="fm-grade-mark" aria-hidden="true">
+                        {stateIcon(c)}
+                      </span>
+                      <span class="fm-grade-row-text">
+                        <span class="fm-grade-row-name">{r.qn(i.number)}</span>
+                        <span class="fm-grade-row-sub">
+                          {kindOf(r, i)} · {modeOf(i)}
+                        </span>
+                      </span>
+                      <span class="fm-grade-row-score">
+                        {ev?.total ? n(ev.total.earned) : r.none} / {n(i.points)}
+                      </span>
+                      <span class="fm-sr">{r.states[c]}</span>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
-          </>
+          )}
+        </nav>
+        {data.unanswered.length > 0 ? (
+          <div class="fm-grade-section">
+            <GroupHead state={state} id="blank" name={r.notAnswered} count={String(data.unanswered.length)} />
+            {fold.blank ? null : (
+              <ul class="fm-grade-list">
+                {data.unanswered.map((i) => (
+                  <li key={i.id}>
+                    <button
+                      type="button"
+                      class="fm-grade-row"
+                      data-blank
+                      data-row={i.id}
+                      aria-current={state.current.value === i.id ? "true" : undefined}
+                      onClick={() => {
+                        state.current.value = i.id;
+                      }}
+                    >
+                      <span class="fm-grade-row-name">{r.qnKind(i.number, kindOf(r, i))}</span>
+                      <span class="fm-grade-row-score">0 / {n(i.points)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         ) : null}
-        <div class="fm-grade-group">
-          <span>{r.autoHead}</span>
+        <div class="fm-grade-section">
+          <GroupHead
+            state={state}
+            id="auto"
+            name={r.autoHead}
+            count={`${n(data.auto.earned)} / ${n(data.auto.points)}`}
+          />
+          {fold.auto ? null : (
+            <div class="fm-grade-row fm-grade-auto" data-auto data-condition="done">
+              <span class="fm-grade-mark" aria-hidden="true">
+                <CheckIcon />
+              </span>
+              <span class="fm-grade-row-text">
+                <span class="fm-grade-row-name">{r.autoTitle(data.auto.count)}</span>
+                <span class="fm-grade-row-sub">{r.autoSub}</span>
+              </span>
+              <span class="fm-grade-row-score">
+                {n(data.auto.earned)} / {n(data.auto.points)}
+              </span>
+            </div>
+          )}
+        </div>
+        <div class="fm-grade-legend" data-legend>
           <span>
-            {n(data.auto.earned)} / {n(data.auto.points)}
+            <span class="fm-grade-key" data-key="done">
+              <CheckIcon size={10} />
+            </span>
+            {r.states.done}
+          </span>
+          <span>
+            <span class="fm-grade-key" data-key="half">
+              <RingIcon />
+            </span>
+            {r.states.half}
+          </span>
+          <span>
+            <span class="fm-grade-key" data-key="note">
+              <BangIcon />
+            </span>
+            {r.states.note}
+          </span>
+          <span>
+            <span class="fm-grade-key" data-key="none" />
+            {r.states.none}
+          </span>
+          <span>
+            <span class="fm-grade-key" data-key="current" />
+            {r.current}
+          </span>
+          <span>
+            <span class="fm-grade-key" data-key="required">
+              <i />
+            </span>
+            {r.required}
           </span>
         </div>
-        <p class="fm-grade-auto" data-auto>
-          {r.autoLine(data.auto.count, n(data.auto.earned), n(data.auto.points))}
-        </p>
         <p class="fm-grade-keys">
           <kbd>N</kbd> {r.keyNext} · <kbd>Q</kbd> {r.keyQuestions} · <kbd>Esc</kbd> {r.keyClose}
         </p>
