@@ -532,3 +532,23 @@ test("an image in a prompt and in a sample answer shows in the form", async ({ p
   await expect.poll(() => shown("The sample curve")).toBe(true);
   expect(seen.problems).toEqual([]);
 });
+
+test("the note's placeholder is Note (optional), and says required once a mark is lost, in en and vi", async ({
+  page,
+}) => {
+  for (const [extra, optional, required] of [
+    [[], "Note (optional)", "Note (required: a mark was lost)"],
+    [["ui_lang: vi"], "Ghi chú (không bắt buộc)", "Ghi chú (bắt buộc: bị trừ điểm)"],
+  ] as const) {
+    const server = await web(folder([...extra]));
+    await open(page, server);
+    await expect(note(page, "defs")).toHaveAttribute("placeholder", optional);
+    await expect(note(page, "defs")).toHaveAttribute("aria-label", optional);
+    await ctl(page, "defs").locator("[data-act=full]").click();
+    await expect(note(page, "defs")).toHaveAttribute("placeholder", optional);
+    await value(page, "defs").fill("0.25");
+    await expect(note(page, "defs")).toHaveAttribute("placeholder", required);
+    await note(page, "defs").fill("x");
+    await expect(note(page, "defs")).toHaveAttribute("placeholder", required);
+  }
+});
