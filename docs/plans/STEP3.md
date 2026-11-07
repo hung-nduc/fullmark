@@ -28,7 +28,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3n G68, G69 | done, reviewed (2026-11-06), no gaps | `d0e44e4`..`be1629f`, review |
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
 | 3f `grade --web` at 1280 px | built, reviewed (2026-11-07); G96 and G97 decided (2026-11-07); 7 fixes in 3f2 | `2246a37`..`0e44c3d`, review |
-| 3f2 3f's fixes, G96, G97 | brief approved (2026-11-07); handed to Sonnet | |
+| 3f2 3f's fixes, G96, G97 | built, waiting for review | `c81833f`..`2097b5e`, then the row |
 | 3p the grading form on a phone, G83, G75 | outline; G75 waits for its board | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
