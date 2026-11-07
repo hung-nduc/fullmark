@@ -29,13 +29,13 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
-| 3p G98, the grading form on a phone | built, waiting for review | `3ee9d79`..`72301ac`, then the screens and this row |
+| 3p G98, the grading form on a phone | done, reviewed (2026-11-07); G101 for the owner | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r fullmark's own marking from the form (G83) | outline, after 3p (G100) | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
-Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); every gap, G1 to G100, is in "Gaps", in number order.
+Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); every gap, G1 to G101, is in "Gaps", in number order.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox; Vitest 2059 of 2059, the 2 startup tests, Playwright and axe. What step 3 inherits:
 
@@ -48,7 +48,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 ### Next steps, in order
 
-1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is **built and reviewed** ("Slice 3f2", its Review): G98 and G99 decided as recommended. **3f is done.** **3p's brief is approved** ("Slice 3p", at the end), with G100 as recommended, and handed to Sonnet: G98, then the phone; G83 moves to a new 3r (G100). **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
+1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is **built and reviewed** ("Slice 3f2", its Review): G98 and G99 decided as recommended. **3f is done.** **3p's brief is approved** ("Slice 3p", at the end), with G100 (in a frame, the owner's choice); **3p is built and reviewed** ("Slice 3p", its Review): G101 waits for the owner; then 3r. **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
 
 ### Open proposals carried over from step 2
 
@@ -319,6 +319,15 @@ The design docs left these open, or a slice's review found them. Each needs the 
 - The form's CSP gains `frame-src 'self'`.
 - The replay page is read-only for the grader: Retry missed is hidden there, since that attempt is not the grader's.
 - The form's bundle and budget stay as they are.
+
+**G101. What is left between the form and the boards after 3p** (raised in 3p's review). Small differences remain:
+- the card's state badge is a plain outlined pill; the boards give each state its icon and wash ("Half graded · 2 of 3" with the clock icon on a dashed wash), wide and on a phone;
+- the card's head reads "Question 2 · Essay · 3 points", where the boards write "Question 21 · 3 points · essay";
+- the saved card is 720 px wide with its top at 139 px, where GradeDone draws 768 px at 160 px;
+- a required note has no amber dot beside it (the legend has one);
+- the sidebar's keys are in the body font, where the boards draw them in the monospace font with a thicker lower edge.
+
+**Recommend:** all as the boards draw them, as 3r's first tasks (3r works in the same form). The sidebar stays 300 px, as COMMANDS.md says (the boards draw 320 px; the design doc wins).
 
 ## Slices
 
@@ -1161,3 +1170,34 @@ Built by Sonnet in three commits, `d0e44e4`..`be1629f`, from the brief alone; re
 `npm run check` passes in Chromium and Firefox, the budget test included. Every screen set beside its board, each difference listed. Report as the rules say, every golden that changed counted and explained.
 
 ### Review
+
+**Reviewed by Opus on 2026-11-07.** Built by Sonnet in `3ee9d79`..`1a422e4` (G98 and the phone share one commit, since both live in the same files), with one review fix, `c7ce6b3`. No golden changed; `build`'s page is unchanged.
+
+**Checked.** `npm run check` passes: the 2 startup tests alone; Vitest 2740 of 2740 (113 files); the typecheck, Biome and knip; Playwright 507 passed, 341 skipped (the opt-in screens specs and named platform skips), none failed, in Chromium and Firefox. The budget test, alone and first, measured 380 ms in Chromium and 671 ms in Firefox. `dist/grade.js` 32 166 bytes gzipped (31 249 before); `dist/page.js` unchanged.
+
+**By hand at 390 × 844, with touch** (a copy of `samples/grade/`, `--web --json --name "Hand Test"`): the compact bar, the open answer and closed sample, the box stacked; full marks tapped on each criterion, then **Finish** on the foot bar and **Save grades**; the saved card; the command exits 0 and writes `results-grades.json` with `{"kind":"human","name":"Hand Test"}` and a local `at`, and the report. `quiz grade --grades` reads the file back.
+
+**Against the boards.** G98 is done:
+- the card 862 px at the default size;
+- the icon on **Questions**;
+- the key row on one line;
+- the dialog 150 px from the top;
+- the file chips;
+- the level heads;
+- the amber edge, then red once Finish was tried;
+- the kinds in the fullmark row.
+
+The phone matches RubricPhone in the bar, the stacking, the box's head and sections, the 44 px slot with its "/" and maximum, the foot bar and the full-screen sidebar with its back link. What is left is G101.
+
+**Fixed in the review** (`c7ce6b3`): `7-phone-additive-box.png` was the same image as `6-phone-additive-top.png`: the screens spec scrolled to the box's viewport offset after the box was already in view, so it scrolled back to the top. It now scrolls by that offset, and screens 7 and 8 were taken again.
+
+**Done differently, accepted:**
+- the card's width in rem, so it follows the text size;
+- no foot bar after Save;
+- the box stacked across the phone's whole range (below 760 px), not only below 520;
+- the dialog 64 px from the top on a phone;
+- the kinds' words: en "choice", "fill-in", "numeric", "ordering", "matching", "scale"; vi "trắc nghiệm", "điền", "số", "sắp xếp", "ghép cặp", "thang đo", the first three GradeVi's;
+- the foot bar's names "Previous question", "Next question" ("Câu trước", "Câu sau") and "Chấm: TITLE";
+- the sidebar's keys shown on a phone, as Review's are.
+
+**For the owner:** G101, with a recommendation. Then **3r** (G83 in a frame, as G100 has it).
