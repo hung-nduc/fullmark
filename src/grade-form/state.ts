@@ -13,6 +13,10 @@ export function createGradeState(data: GradeData) {
   const fills = signal<Record<string, Fill>>(Object.fromEntries(data.items.map((i) => [i.id, emptyFill(i)])));
   const current = signal<string>((data.items[0] ?? data.unanswered[0])?.id ?? "");
   const sidebar = signal(true);
+  /** below 760 px (the page's `PHONE_QUERY`): the compact bar, the stacked card, the foot bar, the full-screen sidebar */
+  const phone = signal(false);
+  /** Finish was tried while some grade was unfinished: the notes still missing turn red (the Grade board's `err`) */
+  const tried = signal(false);
   /** the sidebar groups the grader has folded (`grade`, `blank`, `auto`) */
   const fold = signal<Record<string, boolean>>({});
   const dialog = signal<"none" | "finish">("none");
@@ -61,6 +65,12 @@ export function createGradeState(data: GradeData) {
     return null;
   };
 
+  /** Opens the Finish dialog; with grades unfinished it also marks that Finish was tried. */
+  const openFinish = (): void => {
+    if (data.items.some((i) => (evaluated.value[i.id]?.problems ?? []).length > 0)) tried.value = true;
+    dialog.value = "finish";
+  };
+
   return {
     data,
     r,
@@ -68,6 +78,9 @@ export function createGradeState(data: GradeData) {
     fills,
     current,
     sidebar,
+    phone,
+    tried,
+    openFinish,
     fold,
     dialog,
     name,

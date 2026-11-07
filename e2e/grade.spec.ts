@@ -556,3 +556,63 @@ test("the note's placeholder is Note (optional), and says required once a mark i
     await expect(note(page, "defs")).toHaveAttribute("placeholder", required);
   }
 });
+
+test("G98: the card's width, the sidebar icon, the key row, the dialog's place, the chips, the heads, the amber note", async ({
+  page,
+}) => {
+  const dir = folder();
+  const results = JSON.parse(readFileSync(join(dir, "results.json"), "utf8"));
+  results.state.answers.code = null;
+  writeFileSync(join(dir, "results.json"), JSON.stringify(results));
+  const server = await web(dir);
+  await open(page, server);
+  const box = async (sel: string) =>
+    (await page.locator(sel).first().boundingBox()) as { x: number; y: number; width: number; height: number };
+  // the card is about 862 px wide with the sidebar open, and the sidebar stays 300 px
+  expect(Math.abs((await box("article[data-qid=add]")).width - 862)).toBeLessThan(2);
+  expect((await box(".fm-grade-side")).width).toBe(300);
+  // the Questions button has the sidebar's icon beside its name
+  await expect(page.locator("[data-action=sidebar] svg")).toHaveCount(1);
+  await expect(page.locator("[data-action=sidebar]")).toHaveText("Questions");
+  // the key row is on one line, inside the sidebar
+  const keys = await page
+    .locator(".fm-grade-keys > span")
+    .evaluateAll((els) =>
+      els.map((e) => ({ y: Math.round(e.getBoundingClientRect().y), r: e.getBoundingClientRect().right })),
+    );
+  expect(new Set(keys.map((k) => k.y)).size).toBe(1);
+  const sideRight = (await box(".fm-grade-side")).x + 300;
+  for (const k of keys) expect(k.r).toBeLessThanOrEqual(sideRight - 8);
+  // fullmark's row names the kinds it holds
+  await expect(page.locator("[data-auto]")).toContainText("marked on submit · choice");
+  // an empty required note has the amber dashed edge; red and solid once Finish was tried
+  await value(page, "defs").fill("0.5");
+  await value(page, "derive").fill("1");
+  await value(page, "interp").fill("1");
+  const edge = () => note(page, "derive").evaluate((e) => getComputedStyle(e).borderTopStyle);
+  expect(await edge()).toBe("dashed");
+  await finish(page).click();
+  const dialog = page.locator("dialog[open]");
+  // the dialog hangs about 150 px from the top
+  expect(Math.abs((await box("dialog[open]")).y - 150)).toBeLessThan(4);
+  await dialog.locator("[data-action=dialog-back]").click();
+  await expect(note(page, "derive")).toHaveAttribute("data-missing", "tried");
+  expect(await edge()).toBe("solid");
+  // the open sample's head is level with the answer's
+  await note(page, "derive").fill("Lost a mark.");
+  await page.locator("[data-action=sample]").click();
+  const heads = await page
+    .locator(".fm-grade-answer-head h2")
+    .evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().y)));
+  expect(heads).toHaveLength(2);
+  expect(heads[0]).toBe(heads[1]);
+  // the saved card's file names are chips with no colon
+  await finish(page).click();
+  await page.locator("dialog[open] [data-field=name]").fill("Lan");
+  await page.locator("dialog[open] [data-action=save]").click();
+  const files = page.locator(".fm-grade-files li");
+  await expect(files.first()).toHaveText("results-grades.json your grades (kind: human)");
+  const chip = files.first().locator("code");
+  expect(await chip.evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+  await server.end();
+});

@@ -18,6 +18,11 @@
     grid-template-columns: minmax(0, 1fr) 300px;
   }
 
+  /* the card is about 862 px wide (50.7rem of 17 px), as the Grade boards draw it; the page's cap (48.25rem) is for `build`'s page alone (G98) */
+  .fm-grade .fm-body .fm-main > * {
+    width: min(50.7rem, calc(100% - 32px));
+  }
+
   .fm-grade .fm-status-seg + .fm-status-seg {
     margin-left: 18px;
   }
@@ -83,7 +88,7 @@
 
   .fm-grade-sample-button {
     flex: none;
-    min-height: 36px;
+    height: 36px;
     padding: 0 10px;
     margin-left: auto;
     font-size: 0.9em;
@@ -100,10 +105,12 @@
     hyphens: none;
   }
 
+  /* both heads as tall as the sample button, so the sample's sits level with the answer's (G98) */
   .fm-grade-answer-head {
     display: flex;
     gap: 10px;
-    align-items: baseline;
+    align-items: center;
+    min-height: 36px;
   }
 
   .fm-grade-answer-head h2 {
@@ -339,7 +346,12 @@
     border-radius: var(--box-r);
   }
 
+  /* a note the validator will ask for: amber and dashed while empty, red once Finish was tried (the Grade board's noteCss) */
   .fm-note-input[data-missing] {
+    border: 1px dashed var(--warn);
+  }
+
+  .fm-note-input[data-missing="tried"] {
     border: 2px solid var(--bad);
   }
 
@@ -583,25 +595,28 @@
 
   .fm-grade-keys {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
+    flex-wrap: nowrap;
+    gap: 4px 6px;
+    white-space: nowrap;
     margin: 0;
-    font-size: 0.75em;
+    font-size: 0.72em;
     color: var(--muted);
   }
 
   .fm-grade-keys kbd {
-    padding: 0 5px;
+    padding: 0 3px;
     font: inherit;
     border: 1px solid var(--line-strong);
     border-radius: 4px;
   }
 
   /* Finish and the saved card */
+  /* the dialog hangs about 150 px from the top (the Grade boards' `padding-top: 150px`), not centred (G98) */
   .fm-grade-dialog {
     width: min(32.5rem, calc(100vw - 32px));
     max-width: none;
     padding: 24px 26px;
+    margin: 150px auto auto;
   }
 
   .fm-grade-dialog p {
@@ -665,9 +680,289 @@
     color: var(--ok);
   }
 
+  /* the file names in grey chips, as the board's `inlineCode` (G98) */
+  .fm-grade-files code {
+    padding: 1px 6px;
+    font-family: var(--mono);
+    font-size: 0.9em;
+    background: var(--sunken);
+    border-radius: 4px;
+  }
+
   .fm-grade-saved-score {
     font-size: 1.1em;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+  }
+
+  /* the foot bar and the answer's folds belong to the phone only */
+  .fm-footbar {
+    display: none;
+  }
+
+  .fm-flip {
+    display: flex;
+    transform: scaleX(-1);
+  }
+
+  /*
+   * The phone, below 760 px (G79; the RubricPhone board, which wins over GradePhone on the box): the compact top bar is the
+   * page's (`25-sidebar.css`); the card stacks the answer, the sample and the box; the foot bar holds the way on; the
+   * sidebar is the page's full-screen one.
+   */
+  @media (max-width: 759px) {
+    .fm-grade .fm-body[data-side="open"] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fm-phone-head {
+      display: flex;
+      flex: 1 1 5em;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .fm-phone-head .fm-title {
+      flex: none;
+      margin: 0;
+      font-size: 1.05em;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .fm-phone-head .fm-phone-line {
+      flex: none;
+    }
+
+    .fm-grade .fm-body .fm-main > * {
+      width: calc(100% - 32px);
+    }
+
+    .fm-grade .fm-main {
+      padding-bottom: 96px;
+    }
+
+    .fm-grade-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .fm-grade-card-head {
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 0.8em;
+    }
+
+    .fm-grade-prompt {
+      margin: 0;
+      font-size: 1.05em;
+    }
+
+    /* the answer open and the sample closed: a `details` each, in the sunken box */
+    .fm-grade-fold {
+      padding: 10px 14px;
+      font-size: 0.95em;
+      background: var(--sunken);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .fm-grade-fold summary {
+      min-height: 28px;
+      font-size: 0.9em;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .fm-grade-fold-text {
+      margin: 6px 0 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .fm-grade-fold-text[data-code] {
+      font-family: var(--mono);
+      font-size: 0.9em;
+    }
+
+    /* the box: the head's two sides and each section stacked; the page's rule stacks them under 520 px, here under 760 */
+    .fm-grade .fm-box {
+      margin-top: 0;
+    }
+
+    .fm-grade .fm-box-head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      padding: 10px 14px;
+    }
+
+    .fm-grade .fm-box-who {
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .fm-grade .fm-box-row,
+    .fm-grade .fm-box-row[data-wide] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    /* the slot: [erase | − | value | +] over the width, then "/" and the full-mark box 56 px wide; every part 44 px tall */
+    .fm-grade .fm-ctl {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto 56px;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .fm-grade .fm-ctl-group {
+      display: grid;
+      grid-template-columns: 44px 44px minmax(0, 1fr) 44px;
+      border: 2px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl-group[data-state="set"] {
+      border-color: var(--accent);
+    }
+
+    .fm-grade .fm-ctl-group[data-state="bad"] {
+      border-color: var(--bad);
+    }
+
+    .fm-grade .fm-ctl button.fm-ctl-erase,
+    .fm-grade .fm-ctl button.fm-ctl-step {
+      width: auto;
+      min-width: 44px;
+      height: 100%;
+    }
+
+    .fm-grade .fm-ctl button.fm-ctl-erase {
+      background: var(--surface);
+      border-right: 2px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl-group[data-state="set"] .fm-ctl-erase {
+      border-right-color: var(--accent);
+    }
+
+    .fm-grade .fm-ctl-value {
+      width: 100%;
+      font-size: 1.1em;
+    }
+
+    .fm-grade .fm-ctl-max,
+    .fm-grade .fm-ctl-calc-value {
+      min-width: 0;
+      width: 100%;
+      padding: 0;
+      border: 2px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl-max[data-full] {
+      border-color: var(--ok);
+    }
+
+    .fm-grade .fm-ctl-max[data-static] {
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl-calc-value {
+      border: 1px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl-error {
+      position: static;
+      grid-column: 1 / -1;
+    }
+
+    /* the verdicts: [erase | Met | Partly | Missed] over the full width */
+    .fm-grade .fm-ctl.fm-ctl-verdicts {
+      display: grid;
+      grid-template-columns: 44px repeat(3, minmax(0, 1fr));
+      width: 100%;
+      border: 2px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl.fm-ctl-verdicts > button {
+      min-width: 0;
+      height: 100%;
+      font-size: 0.9em;
+      border-left: 2px solid var(--line-strong);
+    }
+
+    .fm-grade .fm-ctl.fm-ctl-verdicts > button.fm-ctl-erase {
+      background: var(--surface);
+      border-right: 0;
+    }
+
+    .fm-grade .fm-note-input {
+      min-height: 56px;
+      padding: 8px 12px;
+      font-size: 0.92em;
+    }
+
+    .fm-grade .fm-note-missing {
+      font-weight: 700;
+    }
+
+    .fm-grade-rubric .fm-grade-clear {
+      margin-top: 12px;
+    }
+
+    .fm-grade-clear .fm-button {
+      justify-content: center;
+      width: 100%;
+      font-size: 0.9em;
+    }
+
+    /* the foot bar: ← Previous, Finish, Next →, docked at the foot of the screen, the arrows 44 px */
+    .fm-footbar {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 44px;
+      gap: 8px;
+      padding: 10px 16px 14px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+    }
+
+    .fm-footbar[data-covered] {
+      display: none;
+    }
+
+    .fm-footbar .fm-button {
+      min-width: 0;
+      height: 44px;
+      padding: 0;
+    }
+
+    .fm-footbar .fm-button:disabled {
+      color: var(--line-strong);
+      cursor: default;
+    }
+
+    /* the sidebar takes the screen: no close button, the back link is the way out */
+    .fm-grade-side[data-phone] .fm-grade-side-body {
+      padding: 16px;
+    }
+
+    .fm-grade-dialog {
+      padding: 20px 18px;
+      margin-top: 64px;
+    }
+
+    .fm-grade-saved {
+      margin-top: 16px;
+    }
   }
 }

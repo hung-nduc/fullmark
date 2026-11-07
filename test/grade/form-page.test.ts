@@ -62,7 +62,7 @@ describe("the grading form's page", () => {
     ]);
     expect(data.unanswered).toEqual([]);
     expect(data.name).toBe("Lan");
-    expect(data.auto).toEqual({ count: 1, earned: 1, points: 1 });
+    expect(data.auto).toEqual({ count: 1, earned: 1, points: 1, kinds: ["choice"] });
     expect(data.base).toEqual({ earned: 1, points: 1 });
     expect(data.items[0]?.criteria.map((c) => [c.id, c.max])).toEqual([
       ["defs", 0.5],
@@ -73,5 +73,55 @@ describe("the grading form's page", () => {
     expect(data.items[1]?.round).toBe("ielts");
     expect(data.items[4]?.language).toBe("python");
     expect(data.items[0]?.sampleHtml).toContain("Define the terms");
+  });
+});
+
+describe("the kinds fullmark marks (G98)", () => {
+  it("names each kind once, in the order of the sidebar's row, from the questions not left to the grader", () => {
+    const dir = resolve(import.meta.dirname, "..", "golden", "build", "all-types", "input");
+    const all = loadQuiz(join(dir, "quiz.md"));
+    const q = all.quiz as NonNullable<typeof all.quiz>;
+    const ids = q.sections.flatMap((sec) => sec.questions.map((x) => x.id));
+    const results = {
+      format: "fullmark-results",
+      version: 2,
+      quizHash: all.hash ?? "",
+      plan: { source: "full", questions: ids },
+      state: {
+        answers: { e1: { text: "An answer." }, k1: { code: "x", language: "python" } },
+        startedAt: "2026-10-23T16:02:00",
+        submittedAt: "2026-10-23T16:30:00",
+        timeUsed: 60,
+        sectionTime: {},
+        flagged: [],
+        checked: [],
+        timedOut: false,
+      },
+      phase: "submitted",
+    };
+    const r = parseResults(JSON.stringify(results));
+    if (!r.ok) throw new Error(r.message);
+    const a = attemptOf(r.results);
+    const g = grade(q, a);
+    const html = buildGradeForm({
+      quiz: q,
+      hash: all.hash ?? "",
+      assets: [],
+      attempt: a,
+      graded: g,
+      template: gradesTemplate(q, g, r.json) as { grades: Record<string, Record<string, unknown>> },
+      name: null,
+      files: { grades: "g.json", report: "r.md" },
+      script,
+      css: "",
+      gradeCss: "",
+      builtAt: "2026-11-07T10:00:00.000Z",
+      version: "1.0.0-test",
+    });
+    const d = JSON.parse(
+      /<script type="application\/json" id="fm-data">([\s\S]*?)<\/script>/.exec(html)?.[1] ?? "",
+    ) as GradeData;
+    expect(d.items.map((i) => i.id)).toEqual(["e1", "k1"]);
+    expect(d.auto.kinds).toEqual(["choice", "fillin", "numeric", "ordering", "matching", "scale"]);
   });
 });

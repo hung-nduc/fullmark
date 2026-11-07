@@ -1,6 +1,12 @@
 import type { RoundRule } from "../core/rubric/arith";
 import type { PageData } from "../page/data";
 
+/** The kinds of question fullmark marks, as the sidebar's "Scored by fullmark" row names them (G98). */
+export type AutoKind = "choice" | "fillin" | "numeric" | "ordering" | "matching" | "scale";
+
+/** The order the kinds are named in. */
+export const AUTO_KINDS: readonly AutoKind[] = ["choice", "fillin", "numeric", "ordering", "matching", "scale"];
+
 /** One criterion (or, for a holistic rubric, one bullet) as the form draws it. */
 export type GradeCriterion = {
   id: string;
@@ -58,8 +64,8 @@ export type GradeData = {
   items: GradeItem[];
   /** essays and code left blank: nothing to grade, 0 of their points */
   unanswered: GradeItem[];
-  /** the questions fullmark marks (all the rest): how many, and what they scored */
-  auto: { count: number; earned: number; points: number };
+  /** the questions fullmark marks (all the rest): how many, what they scored, and the kinds they are (in `AUTO_KINDS`' order) */
+  auto: { count: number; earned: number; points: number; kinds: AutoKind[] };
   /** the points the score counts before any grade: fullmark's marks and the unanswered, scored */
   base: { earned: number; points: number };
   /** the two files written, as the saved card names them */

@@ -7,7 +7,7 @@ import type { Question, Quiz } from "../core/ir";
 import { toBase64 } from "../core/keyblob";
 import { resolveRubric } from "../core/rubric/model";
 import { themeCss } from "../core/themes";
-import type { GradeCriterion, GradeData, GradeItem } from "../grade-form/data";
+import { AUTO_KINDS, type AutoKind, type GradeCriterion, type GradeData, type GradeItem } from "../grade-form/data";
 import { fontDataUri } from "./fonts";
 import type { Highlight } from "./highlight";
 import { escapeAttr, sampleHtml, scriptJson, unwrap } from "./page";
@@ -86,6 +86,20 @@ export function gradeDataOf(o: GradeFormOptions, md: ReturnType<typeof createRen
     else if (g.status === "unanswered") unanswered.push(itemOf(q, i + 1));
   });
   // the template lists them in the plan's order, which is the order here
+  const taken = new Set([...items, ...unanswered].map((i) => i.id));
+  const kindOf = (q: Question): AutoKind =>
+    q.type === "single" || q.type === "multi" || q.type === "truefalse"
+      ? "choice"
+      : q.type === "short" || q.type === "blanks" || q.type === "fields"
+        ? "fillin"
+        : q.type === "numeric" || q.type === "ordering" || q.type === "matching" || q.type === "scale"
+          ? q.type
+          : "choice";
+  const present = new Set<AutoKind>();
+  for (const g of o.graded.questions) {
+    const q = byId.get(g.id);
+    if (q && !taken.has(g.id)) present.add(kindOf(q));
+  }
   const blankPoints = unanswered.reduce((sum, u) => sum + u.points, 0);
   const total = o.graded.total;
   const at = o.attempt.state.submittedAt ?? o.attempt.state.startedAt;
@@ -109,6 +123,7 @@ export function gradeDataOf(o: GradeFormOptions, md: ReturnType<typeof createRen
       count: o.graded.questions.length - items.length - unanswered.length,
       earned: total.earned,
       points: Math.round((total.points - blankPoints) * 100) / 100,
+      kinds: AUTO_KINDS.filter((k) => present.has(k)),
     },
     base: { earned: total.earned, points: total.points },
     files: o.files,

@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { en, vi } from "../core/i18n";
 import type { GradeMessages } from "../core/i18n/grade";
 import { AppearanceButton, AppearanceMenu, type LookStore } from "../page/Appearance";
+import { Icon } from "../page/icons";
 import { RubricHead, RubricRow, RubricTotal, resOf } from "../page/questions/RubricBox";
 import { Html } from "../page/questions/shared";
 import { dayOf } from "../page/replay";
@@ -221,6 +222,7 @@ function NoteField({
   required,
   value,
   missing,
+  tried,
   id,
   onInput,
 }: {
@@ -228,6 +230,7 @@ function NoteField({
   required: boolean;
   value: string;
   missing: string | null;
+  tried: boolean;
   id: string;
   onInput: (v: string) => void;
 }) {
@@ -243,7 +246,7 @@ function NoteField({
         aria-describedby={missing !== null ? `${id}-req` : undefined}
         placeholder={label}
         data-required={required ? "" : undefined}
-        data-missing={missing !== null ? "" : undefined}
+        data-missing={missing !== null ? (tried ? "tried" : "") : undefined}
         value={value}
         onInput={(e) => onInput((e.currentTarget as HTMLTextAreaElement).value)}
       />
@@ -320,6 +323,7 @@ function Box({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT 
                   required={lost}
                   value={cell?.note ?? ""}
                   missing={missing ? r.noteMissing : null}
+                  tried={state.tried.value}
                   onInput={(text) => state.setNote(item.id, c.id, text)}
                 />
               )}
@@ -362,6 +366,7 @@ function Box({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT 
           required={whyRequired}
           value={fill.why}
           missing={whyRequired && fill.why.trim() === "" ? r.whyMissing : null}
+          tried={state.tried.value}
           onInput={(text) => state.setText(item.id, "why", text)}
         />
       </div>
@@ -375,6 +380,7 @@ function Box({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT 
           required={false}
           value={fill.improve}
           missing={null}
+          tried={false}
           onInput={(text) => state.setText(item.id, "improve", text)}
         />
       </div>
@@ -388,9 +394,36 @@ const kindOf = (r: GradeMessages, item: GradeItem): string => (item.type === "es
 const pointsOf = (state: GradeState, item: GradeItem): string =>
   state.r.points(num(item.points, state.data.uiLang), item.points === 1);
 
+/** On a phone (G79): the answer open and the sample closed, each a `details` (RubricPhone), stacked. */
+function PhoneAnswer({ state, item }: { state: GradeState; item: GradeItem }) {
+  const { r } = state;
+  const count = item.count === null ? "" : item.type === "essay" ? r.words(item.count) : r.lines(item.count);
+  return (
+    <>
+      <details class="fm-grade-fold" data-fold="answer" open>
+        <summary>{count === "" ? r.answer : `${r.answer} · ${count}`}</summary>
+        {item.type === "code" ? (
+          <pre class="fm-grade-fold-text" data-code lang={item.language ?? undefined}>
+            {item.answer}
+          </pre>
+        ) : (
+          <div class="fm-grade-fold-text">{item.answer}</div>
+        )}
+      </details>
+      {item.sampleHtml === null ? null : (
+        <details class="fm-grade-fold" data-fold="sample">
+          <summary>{r.sample}</summary>
+          <Html html={item.sampleHtml} class="fm-grade-fold-text" />
+        </details>
+      )}
+    </>
+  );
+}
+
 function Answer({ state, item }: { state: GradeState; item: GradeItem }) {
   const { r } = state;
   const [showSample, setShowSample] = useState(false);
+  if (state.phone.value) return <PhoneAnswer state={state} item={item} />;
   const hasSample = item.sampleHtml !== null;
   const open = hasSample && showSample;
   const toggle = hasSample ? (
@@ -484,26 +517,28 @@ function Card({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT
           </button>
         </div>
       </div>
-      <footer class="fm-grade-foot">
-        <button
-          type="button"
-          class="fm-button"
-          data-action="prev"
-          disabled={prev === undefined}
-          onClick={() => prev && go(prev.id)}
-        >
-          ← {r.prev}
-        </button>
-        <button
-          type="button"
-          class="fm-button"
-          data-action="next"
-          disabled={next === undefined}
-          onClick={() => next && go(next.id)}
-        >
-          {r.next} →
-        </button>
-      </footer>
+      {state.phone.value ? null : (
+        <footer class="fm-grade-foot">
+          <button
+            type="button"
+            class="fm-button"
+            data-action="prev"
+            disabled={prev === undefined}
+            onClick={() => prev && go(prev.id)}
+          >
+            ← {r.prev}
+          </button>
+          <button
+            type="button"
+            class="fm-button"
+            data-action="next"
+            disabled={next === undefined}
+            onClick={() => next && go(next.id)}
+          >
+            {r.next} →
+          </button>
+        </footer>
+      )}
     </article>
   );
 }
@@ -536,28 +571,32 @@ function BlankCard({ state, item }: { state: GradeState; item: GradeItem }) {
         </ul>
       ) : null}
       <Sample state={state} item={item} />
-      <footer class="fm-grade-foot">
-        <button
-          type="button"
-          class="fm-button"
-          disabled={prev === undefined}
-          onClick={() => {
-            if (prev) state.current.value = prev.id;
-          }}
-        >
-          ← {r.prev}
-        </button>
-        <button
-          type="button"
-          class="fm-button"
-          disabled={next === undefined}
-          onClick={() => {
-            if (next) state.current.value = next.id;
-          }}
-        >
-          {r.next} →
-        </button>
-      </footer>
+      {state.phone.value ? null : (
+        <footer class="fm-grade-foot">
+          <button
+            type="button"
+            class="fm-button"
+            data-action="prev"
+            disabled={prev === undefined}
+            onClick={() => {
+              if (prev) state.current.value = prev.id;
+            }}
+          >
+            ← {r.prev}
+          </button>
+          <button
+            type="button"
+            class="fm-button"
+            data-action="next"
+            disabled={next === undefined}
+            onClick={() => {
+              if (next) state.current.value = next.id;
+            }}
+          >
+            {r.next} →
+          </button>
+        </footer>
+      )}
     </article>
   );
 }
@@ -584,53 +623,69 @@ function Bar({ state, store, t }: { state: GradeState; store: LookStore; t: Page
   const totals = state.totals.value;
   const done = state.saved.value !== null;
   const pct = totals.score.points > 0 ? Math.round((100 * totals.score.earned) / totals.score.points) : 0;
+  const phone = state.phone.value;
+  const here = state.all.find((q) => q.id === state.current.value);
   return (
-    <header class="fm-dock" data-dock ref={dock}>
+    <header class="fm-dock" data-dock data-phone={phone ? "true" : undefined} ref={dock}>
       <div class="fm-topbar">
-        <h1 class="fm-title">
-          <span class="fm-review-label">{r.label}</span> {data.title}
-          {date === null ? null : <span class="fm-grade-attempt"> {r.attemptOf(date)}</span>}
-        </h1>
+        {phone ? (
+          <div class="fm-phone-head">
+            <h1 class="fm-title">{r.phoneTitle(data.title)}</h1>
+            <span class="fm-phone-line" data-compact>
+              {r.gradedOf(totals.graded, data.items.length)}
+              {here === undefined ? "" : ` · ${r.qn(here.number)}`}
+            </span>
+          </div>
+        ) : (
+          <h1 class="fm-title">
+            <span class="fm-review-label">{r.label}</span> {data.title}
+            {date === null ? null : <span class="fm-grade-attempt"> {r.attemptOf(date)}</span>}
+          </h1>
+        )}
         <div class="fm-topbar-actions">
           <button
             type="button"
-            class="fm-button fm-side-button"
+            class={phone ? "fm-button fm-icon-button fm-side-button" : "fm-button fm-side-button"}
             data-action="sidebar"
             aria-expanded={state.sidebar.value}
             aria-keyshortcuts="Q"
+            aria-label={phone ? r.questions : undefined}
             title={r.sideTitle}
             onClick={() => {
               state.sidebar.value = !state.sidebar.value;
             }}
           >
-            {r.questions}
+            <Icon name="panel" size={18} />
+            {phone ? null : r.questions}
           </button>
-          {store.look.locked ? null : <AppearanceButton t={t} store={store} />}
-          <button
-            type="button"
-            class="fm-button fm-primary"
-            data-action="finish"
-            disabled={done}
-            onClick={() => {
-              state.dialog.value = "finish";
-            }}
-          >
-            {r.finish}
-          </button>
+          {store.look.locked && !phone ? null : <AppearanceButton t={t} store={store} />}
+          {phone ? null : (
+            <button
+              type="button"
+              class="fm-button fm-primary"
+              data-action="finish"
+              disabled={done}
+              onClick={state.openFinish}
+            >
+              {r.finish}
+            </button>
+          )}
         </div>
       </div>
-      <ul class="fm-status" aria-label={t.statusLabel}>
-        <li class="fm-status-seg" data-seg="graded">
-          {r.gradedOf(totals.graded, data.items.length)}
-        </li>
-        <li class="fm-status-seg" data-seg="given">
-          {r.given(num(totals.given.earned, lang), num(totals.given.points, lang))}
-        </li>
-        <li class="fm-status-seg" data-seg="score">
-          {r.scoreSoFar(num(totals.score.earned, lang), num(totals.score.points, lang), pct)}
-        </li>
-      </ul>
-      {store.look.locked ? null : <AppearanceMenu t={t} store={store} />}
+      {phone ? null : (
+        <ul class="fm-status" aria-label={t.statusLabel}>
+          <li class="fm-status-seg" data-seg="graded">
+            {r.gradedOf(totals.graded, data.items.length)}
+          </li>
+          <li class="fm-status-seg" data-seg="given">
+            {r.given(num(totals.given.earned, lang), num(totals.given.points, lang))}
+          </li>
+          <li class="fm-status-seg" data-seg="score">
+            {r.scoreSoFar(num(totals.score.earned, lang), num(totals.score.points, lang), pct)}
+          </li>
+        </ul>
+      )}
+      {store.look.locked && !phone ? null : <AppearanceMenu t={t} store={store} />}
     </header>
   );
 }
@@ -711,23 +766,53 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
       : (i.mode === "holistic" ? t.boxHolistic : t.boxAdditive).toLowerCase();
   const gradedCount = data.items.filter((i) => state.evaluated.value[i.id]?.condition === "done").length;
   const fold = state.fold.value;
+  const phone = state.phone.value;
+  /** a row's click: the question opens; on a phone the sidebar covers the screen, so it closes first */
+  const open = (id: string): void => {
+    state.current.value = id;
+    if (phone) state.sidebar.value = false;
+  };
+  const sub = (kinds: readonly (keyof typeof r.autoKinds)[]): string =>
+    kinds.length === 0 ? r.autoSub : `${r.autoSub} · ${kinds.map((k) => r.autoKinds[k]).join(", ")}`;
   return (
-    <aside class="fm-side fm-grade-side" aria-label={r.questions}>
-      <div class="fm-side-head">
-        <h2 class="fm-side-title">{r.questions}</h2>
-        <button
-          type="button"
-          class="fm-button fm-side-close"
-          data-action="close-sidebar"
-          aria-label={r.closeSide}
-          title={r.closeSide}
-          onClick={() => {
-            state.sidebar.value = false;
-          }}
-        >
-          <CloseIcon />
-        </button>
-      </div>
+    <aside class="fm-side fm-grade-side" aria-label={r.questions} data-phone={phone ? "" : undefined}>
+      {phone ? (
+        <>
+          <div class="fm-back-row">
+            <button
+              type="button"
+              class="fm-back"
+              data-action="close-sidebar"
+              onClick={() => {
+                state.sidebar.value = false;
+                document.querySelector<HTMLElement>("[data-action=sidebar]")?.focus();
+              }}
+            >
+              <Icon name="back" size={18} stroke={2.2} />
+              {t.backToQuestion(state.all.find((q) => q.id === state.current.value)?.number ?? 1)}
+            </button>
+          </div>
+          <div class="fm-side-head">
+            <h2 class="fm-side-title">{r.questions}</h2>
+          </div>
+        </>
+      ) : (
+        <div class="fm-side-head">
+          <h2 class="fm-side-title">{r.questions}</h2>
+          <button
+            type="button"
+            class="fm-button fm-side-close"
+            data-action="close-sidebar"
+            aria-label={r.closeSide}
+            title={r.closeSide}
+            onClick={() => {
+              state.sidebar.value = false;
+            }}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+      )}
       <div class="fm-grade-side-body">
         <nav class="fm-grade-section" aria-label={r.toGrade}>
           <GroupHead state={state} id="grade" name={r.toGrade} count={r.gradedShort(gradedCount, data.items.length)} />
@@ -744,9 +829,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
                       data-row={i.id}
                       data-condition={c}
                       aria-current={state.current.value === i.id ? "true" : undefined}
-                      onClick={() => {
-                        state.current.value = i.id;
-                      }}
+                      onClick={() => open(i.id)}
                     >
                       <span class="fm-grade-mark" aria-hidden="true">
                         {stateIcon(c)}
@@ -781,9 +864,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
                       data-blank
                       data-row={i.id}
                       aria-current={state.current.value === i.id ? "true" : undefined}
-                      onClick={() => {
-                        state.current.value = i.id;
-                      }}
+                      onClick={() => open(i.id)}
                     >
                       <span class="fm-grade-row-name">{r.qnKind(i.number, kindOf(r, i))}</span>
                       <span class="fm-grade-row-score">0 / {n(i.points)}</span>
@@ -808,7 +889,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
               </span>
               <span class="fm-grade-row-text">
                 <span class="fm-grade-row-name">{r.autoTitle(data.auto.count)}</span>
-                <span class="fm-grade-row-sub">{r.autoSub}</span>
+                <span class="fm-grade-row-sub">{sub(data.auto.kinds)}</span>
               </span>
               <span class="fm-grade-row-score">
                 {n(data.auto.earned)} / {n(data.auto.points)}
@@ -1028,14 +1109,56 @@ function SavedCard({ state }: { state: GradeState }) {
       <p>{r.doneGraded(s.graded, s.name, s.pending.map((i) => r.qn(i.number)).join(", "))}</p>
       <ul class="fm-grade-files">
         <li>
-          <code>{data.files.grades}</code>: {r.gradesFile}
+          <code>{data.files.grades}</code> {r.gradesFile}
         </li>
         <li>
-          <code>{data.files.report}</code>: {r.reportFile}
+          <code>{data.files.report}</code> {r.reportFile}
         </li>
       </ul>
       <p class="fm-grade-dialog-note">{r.closed}</p>
     </section>
+  );
+}
+
+/** On a phone: ← Previous, Finish and Next → docked at the foot of the screen (RubricPhone's foot bar, G79). */
+function Footbar({ state, covered }: { state: GradeState; covered: boolean }) {
+  const { r } = state;
+  const idx = state.all.findIndex((q) => q.id === state.current.value);
+  const prev = state.all[idx - 1];
+  const next = state.all[idx + 1];
+  const go = (id: string | undefined): void => {
+    if (id !== undefined) state.current.value = id;
+  };
+  return (
+    <div class="fm-footbar" data-footbar data-covered={covered ? "true" : undefined}>
+      <button
+        type="button"
+        class="fm-button fm-icon-button"
+        data-action="prev"
+        aria-label={r.prevName}
+        title={r.prevName}
+        disabled={prev === undefined}
+        onClick={() => go(prev?.id)}
+      >
+        <Icon name="back" size={18} />
+      </button>
+      <button type="button" class="fm-button fm-primary" data-action="finish" onClick={state.openFinish}>
+        {r.finish}
+      </button>
+      <button
+        type="button"
+        class="fm-button fm-icon-button"
+        data-action="next"
+        aria-label={r.nextName}
+        title={r.nextName}
+        disabled={next === undefined}
+        onClick={() => go(next?.id)}
+      >
+        <span class="fm-flip">
+          <Icon name="back" size={18} />
+        </span>
+      </button>
+    </div>
   );
 }
 
@@ -1056,11 +1179,19 @@ export function Form({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [state.current.value, done]);
+  const phone = state.phone.value;
+  // on a phone an open sidebar takes the screen: what is under it is not there (as Review's)
+  const covered = phone && state.sidebar.value && !done;
   return (
-    <div class="fm-quiz fm-grade" data-quiz={data.quizId} data-phase={done ? "saved" : "grading"}>
+    <div
+      class="fm-quiz fm-grade"
+      data-quiz={data.quizId}
+      data-phase={done ? "saved" : "grading"}
+      data-phone={phone ? "true" : undefined}
+    >
       <Bar state={state} store={store} t={t} />
       <div class="fm-body" data-side={state.sidebar.value && !done ? "open" : "closed"}>
-        <main class="fm-main" lang={data.uiLang}>
+        <main class="fm-main" lang={data.uiLang} data-covered={covered ? "true" : undefined}>
           {done ? (
             <SavedCard state={state} />
           ) : item === undefined ? null : isBlank ? (
@@ -1071,6 +1202,7 @@ export function Form({
         </main>
         {state.sidebar.value && !done ? <Side state={state} t={t} /> : null}
       </div>
+      {phone && !done ? <Footbar state={state} covered={covered} /> : null}
       <Dialog state={state} />
     </div>
   );
