@@ -440,3 +440,34 @@ test("the sidebar draws the states as icons, tints the rows, folds its groups an
   await head.click();
   await expect(row("add")).toBeVisible();
 });
+
+test("the dialogs' buttons are at the right, and Go back is outlined in the blocked one", async ({ page }) => {
+  const server = await web(folder());
+  await open(page, server);
+  const atRight = async (dialog: ReturnType<Page["locator"]>) => {
+    const box = (await dialog.boundingBox()) as { x: number; width: number };
+    const buttons = dialog.locator(".fm-dialog-actions button");
+    const last = (await buttons.last().boundingBox()) as { x: number; width: number };
+    const first = (await buttons.first().boundingBox()) as { x: number; width: number };
+    // the last button ends at the dialog's right padding; the first is nearer the right than the left edge
+    expect(box.x + box.width - (last.x + last.width)).toBeLessThan(40);
+    expect(first.x - box.x).toBeGreaterThan(box.width / 3);
+  };
+  // blocked: a half-graded question
+  await value(page, "defs").fill("0.5");
+  await finish(page).click();
+  const blocked = page.locator("dialog[open][data-grade-dialog=blocked]");
+  await expect(blocked).toContainText("Some grades are not finished");
+  await atRight(blocked);
+  await expect(blocked.locator("[data-action=dialog-back]")).not.toHaveClass(/fm-primary/);
+  await expect(blocked.locator("[data-action=dialog-back]")).toBeFocused();
+  await blocked.locator("[data-action=dialog-back]").click();
+  // finish: Go back and Save grades, the second the primary
+  await value(page, "derive").fill("1.5");
+  await value(page, "interp").fill("1");
+  await finish(page).click();
+  const ok = page.locator("dialog[open][data-grade-dialog=finish]");
+  await atRight(ok);
+  await expect(ok.locator("[data-action=dialog-back]")).not.toHaveClass(/fm-primary/);
+  await expect(ok.locator("[data-action=save]")).toHaveClass(/fm-primary/);
+});

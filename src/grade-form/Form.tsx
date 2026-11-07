@@ -946,13 +946,7 @@ function Dialog({ state }: { state: GradeState }) {
             ))}
           </ul>
           <div class="fm-dialog-actions">
-            <button
-              type="button"
-              class="fm-button fm-primary"
-              data-action="dialog-back"
-              autofocus
-              onClick={() => close()}
-            >
+            <button type="button" class="fm-button" data-action="dialog-back" autofocus onClick={() => close()}>
               {r.goBack}
             </button>
           </div>
