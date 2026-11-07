@@ -27,7 +27,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3m G63, G64, the stacked sidebar with the materials, and the phone | done, reviewed, gaps decided (2026-11-05) | `182beb3`..`0a68e2d`, review |
 | 3n G68, G69 | done, reviewed (2026-11-06), no gaps | `d0e44e4`..`be1629f`, review |
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
-| 3f `grade --web` at 1280 px | brief approved (2026-11-07), with G87, G88 and G91, and G92, G93, G95 from 3o's review as its first tasks; next | |
+| 3f `grade --web` at 1280 px | built, waiting for review (G92, G93, G95, the command, the form, samples line, COMMANDS.md) | `2246a37`..`HEAD` |
 | 3p the grading form on a phone, G83, G75 | outline; G75 waits for its board | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
