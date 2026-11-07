@@ -1013,8 +1013,10 @@ function SavedCard({ state }: { state: GradeState }) {
   const pct = s.points > 0 ? Math.round((100 * s.earned) / s.points) : 0;
   return (
     <section class="fm-question fm-grade-saved" role="status" data-grade-saved>
-      <h2 class="fm-grade-saved-title">✓ {r.saved}</h2>
-      <p>{r.doneScore(n(s.earned), n(s.points), pct)}</p>
+      <h2 class="fm-grade-saved-title">
+        <CheckIcon size={22} /> {r.saved}
+      </h2>
+      <p class="fm-grade-saved-score">{r.doneScore(n(s.earned), n(s.points), pct)}</p>
       <p>{r.doneGraded(s.graded, s.name, s.pending.map((i) => r.qn(i.number)).join(", "))}</p>
       <ul class="fm-grade-files">
         <li>
@@ -1049,7 +1051,7 @@ export function Form({
   return (
     <div class="fm-quiz fm-grade" data-quiz={data.quizId} data-phase={done ? "saved" : "grading"}>
       <Bar state={state} store={store} t={t} />
-      <div class="fm-body" data-side={state.sidebar.value ? "open" : "closed"}>
+      <div class="fm-body" data-side={state.sidebar.value && !done ? "open" : "closed"}>
         <main class="fm-main" lang={data.uiLang}>
           {done ? (
             <SavedCard state={state} />
@@ -1059,7 +1061,7 @@ export function Form({
             <Card key={item.id} state={state} item={item} t={t} />
           )}
         </main>
-        {state.sidebar.value ? <Side state={state} t={t} /> : null}
+        {state.sidebar.value && !done ? <Side state={state} t={t} /> : null}
       </div>
       <Dialog state={state} />
     </div>

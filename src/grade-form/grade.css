@@ -635,12 +635,24 @@
     color: var(--bad);
   }
 
+  /* the saved card: the sidebar closed, the card centred (GradeDone) */
   .fm-grade-saved {
-    margin-top: 40px;
+    max-width: 720px;
+    margin: 40px auto 0;
   }
 
   .fm-grade-saved-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
     margin-top: 0;
+    font-size: 1.2em;
     color: var(--ok);
+  }
+
+  .fm-grade-saved-score {
+    font-size: 1.1em;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 }

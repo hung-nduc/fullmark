@@ -471,3 +471,25 @@ test("the dialogs' buttons are at the right, and Go back is outlined in the bloc
   await expect(ok.locator("[data-action=dialog-back]")).not.toHaveClass(/fm-primary/);
   await expect(ok.locator("[data-action=save]")).toHaveClass(/fm-primary/);
 });
+
+test("the saved card closes the sidebar, centres the card and sets the score line in bold", async ({ page }) => {
+  const server = await web(folder(), "--name", "Lan");
+  await open(page, server);
+  await expect(page.locator(".fm-grade-side")).toBeVisible();
+  await gradeAll(page);
+  await finish(page).click();
+  await page.locator("dialog[open] [data-action=save]").click();
+  const card = page.locator("[data-grade-saved]");
+  await expect(card).toContainText("Grades saved");
+  await expect(page.locator(".fm-grade-side")).toHaveCount(0);
+  await expect(page.locator(".fm-body")).toHaveAttribute("data-side", "closed");
+  // centred in the page
+  const box = (await card.boundingBox()) as { x: number; width: number };
+  const view = page.viewportSize() as { width: number };
+  expect(Math.abs(box.x + box.width / 2 - view.width / 2)).toBeLessThan(24);
+  // the score line is bold; the title's tick is an SVG
+  const weight = await card.locator(".fm-grade-saved-score").evaluate((e) => Number(getComputedStyle(e).fontWeight));
+  expect(weight).toBeGreaterThanOrEqual(700);
+  await expect(card.locator("h2 svg")).toHaveCount(1);
+  await server.end();
+});
