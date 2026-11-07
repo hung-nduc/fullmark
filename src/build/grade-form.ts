@@ -7,12 +7,15 @@ import type { Question, Quiz } from "../core/ir";
 import { toBase64 } from "../core/keyblob";
 import { resolveRubric } from "../core/rubric/model";
 import { themeCss } from "../core/themes";
-import { AUTO_KINDS, type AutoKind, type GradeCriterion, type GradeData, type GradeItem } from "../grade-form/data";
+import type { AutoKind, GradeCriterion, GradeData, GradeItem } from "../grade-form/data";
 import { fontDataUri } from "./fonts";
 import type { Highlight } from "./highlight";
 import { escapeAttr, sampleHtml, scriptJson, unwrap } from "./page";
 import { type Asset, createRenderer } from "./render";
 import type { MathTools } from "./tex";
+
+/** The order the kinds are named in, as the sidebar's "Scored by fullmark" row lists them (G98). */
+const AUTO_KINDS: readonly AutoKind[] = ["choice", "fillin", "numeric", "ordering", "matching", "scale"];
 
 export type GradeFormOptions = {
   quiz: Quiz;

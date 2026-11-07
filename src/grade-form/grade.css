@@ -764,22 +764,25 @@
 
     /* the answer open and the sample closed: a `details` each, in the sunken box */
     .fm-grade-fold {
-      padding: 10px 14px;
+      padding: 0 14px;
       font-size: 0.95em;
       background: var(--sunken);
       border: 1px solid var(--line);
       border-radius: 8px;
     }
 
+    /* the summary is the target: 44 px tall */
     .fm-grade-fold summary {
-      min-height: 28px;
+      box-sizing: border-box;
+      min-height: 44px;
+      padding: 10px 0;
       font-size: 0.9em;
       font-weight: 700;
       cursor: pointer;
     }
 
     .fm-grade-fold-text {
-      margin: 6px 0 0;
+      margin: 0 0 12px;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
@@ -819,18 +822,23 @@
       align-items: center;
     }
 
+    /* the board's 2 px edge is a ring drawn over the box's edge, so every button inside is the full 44 px tall */
     .fm-grade .fm-ctl-group {
       display: grid;
       grid-template-columns: 44px 44px minmax(0, 1fr) 44px;
-      border: 2px solid var(--line-strong);
+      border: 0;
+      outline: 2px solid var(--line-strong);
+      outline-offset: -2px;
     }
 
     .fm-grade .fm-ctl-group[data-state="set"] {
-      border-color: var(--accent);
+      border: 0;
+      outline-color: var(--accent);
     }
 
     .fm-grade .fm-ctl-group[data-state="bad"] {
-      border-color: var(--bad);
+      border: 0;
+      outline-color: var(--bad);
     }
 
     .fm-grade .fm-ctl button.fm-ctl-erase,
@@ -886,7 +894,9 @@
       display: grid;
       grid-template-columns: 44px repeat(3, minmax(0, 1fr));
       width: 100%;
-      border: 2px solid var(--line-strong);
+      border: 0;
+      outline: 2px solid var(--line-strong);
+      outline-offset: -2px;
     }
 
     .fm-grade .fm-ctl.fm-ctl-verdicts > button {
@@ -954,6 +964,11 @@
     /* the sidebar takes the screen: no close button, the back link is the way out */
     .fm-grade-side[data-phone] .fm-grade-side-body {
       padding: 16px;
+    }
+
+    .fm-grade-side[data-phone] .fm-grade-group,
+    .fm-grade-side[data-phone] .fm-grade-row {
+      min-height: 44px;
     }
 
     .fm-grade-dialog {
