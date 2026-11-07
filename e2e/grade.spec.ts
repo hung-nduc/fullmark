@@ -340,3 +340,47 @@ test("a second --web on the same results exits 2 (G87)", async () => {
   void copyFileSync;
   void withName;
 });
+
+test("the answer and the box span the card; the sample opens beside the answer on a button (G96)", async ({ page }) => {
+  const server = await web(folder());
+  await open(page, server);
+  const card = page.locator("article[data-qid=add]");
+  const answer = card.locator(".fm-grade-answer-text").first();
+  const box = card.locator(".fm-box");
+  const wide = async (l: typeof box): Promise<{ x: number; y: number; width: number; height: number }> =>
+    (await l.boundingBox()) as { x: number; y: number; width: number; height: number };
+  // the answer across the card, the box across the card under it
+  const a = await wide(answer);
+  const b = await wide(box);
+  expect(Math.abs(a.width - b.width)).toBeLessThan(2);
+  expect(b.y).toBeGreaterThan(a.y + a.height);
+  // the sample starts hidden, with a button that says so
+  await expect(card.locator(".fm-grade-sample-text")).toHaveCount(0);
+  const button = card.locator("[data-action=sample]");
+  await expect(button).toHaveText("Show the sample answer");
+  await button.click();
+  const sample = card.locator(".fm-grade-sample-text");
+  await expect(sample).toContainText("Define the terms, derive the result");
+  const half = await wide(answer);
+  const s = await wide(sample);
+  expect(Math.abs(half.width - s.width)).toBeLessThan(2);
+  expect(s.x).toBeGreaterThan(half.x + half.width);
+  expect(Math.abs(half.y - s.y)).toBeLessThan(2);
+  await expect(button).toHaveText("Hide the sample answer");
+  await button.click();
+  await expect(sample).toHaveCount(0);
+  await expect(button).toHaveText("Show the sample answer");
+  // a question with no sample answer has no button
+  await page.locator(".fm-grade-side [data-row=ielts]").click();
+  await expect(page.locator("article[data-qid=ielts]")).toBeVisible();
+  await expect(page.locator("[data-action=sample]")).toHaveCount(0);
+  // no criterion name breaks inside a word: no name's lines are wider than its box, and none has a break the text lacks
+  const broken = await page.evaluate(
+    () =>
+      [...document.querySelectorAll(".fm-box-title")].filter((el) => {
+        const name = el.closest(".fm-box-name") as HTMLElement;
+        return getComputedStyle(name).overflowWrap === "anywhere" || el.scrollWidth > el.clientWidth + 1;
+      }).length,
+  );
+  expect(broken).toBe(0);
+});

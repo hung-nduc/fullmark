@@ -67,11 +67,29 @@
     font-weight: 600;
   }
 
-  .fm-grade-cols {
+  /* the answer across the card; with the sample open, the two side by side, half the card each (G96) */
+  .fm-grade-answer {
     display: grid;
-    grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
-    gap: 22px;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 22px;
+    row-gap: 8px;
     align-items: start;
+    margin-bottom: 22px;
+  }
+
+  .fm-grade-answer[data-sample="open"] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .fm-grade-sample-button {
+    margin-left: auto;
+  }
+
+  /* a criterion's name wraps between words, and breaks inside one only when the word alone is wider than the line */
+  .fm-grade-rubric .fm-box-name {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
   }
 
   .fm-grade-answer-head {
@@ -94,7 +112,7 @@
     box-sizing: border-box;
     max-height: 420px;
     padding: 14px 16px;
-    margin: 8px 0 12px;
+    margin: 0;
     overflow: auto;
     white-space: pre-wrap;
     overflow-wrap: anywhere;

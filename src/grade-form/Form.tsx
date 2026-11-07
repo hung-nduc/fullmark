@@ -1,5 +1,5 @@
 import type { ComponentChildren } from "preact";
-import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { en, vi } from "../core/i18n";
 import type { GradeMessages } from "../core/i18n/grade";
 import { AppearanceButton, AppearanceMenu, type LookStore } from "../page/Appearance";
@@ -390,14 +390,35 @@ const pointsOf = (state: GradeState, item: GradeItem): string =>
 
 function Answer({ state, item }: { state: GradeState; item: GradeItem }) {
   const { r } = state;
+  const [showSample, setShowSample] = useState(false);
+  const hasSample = item.sampleHtml !== null;
+  const open = hasSample && showSample;
+  const toggle = hasSample ? (
+    <button
+      type="button"
+      class="fm-button fm-grade-sample-button"
+      data-action="sample"
+      aria-pressed={open}
+      onClick={() => setShowSample(!open)}
+    >
+      {open ? r.hideSample : r.showSample}
+    </button>
+  ) : null;
   return (
-    <div class="fm-grade-answer">
+    <div class="fm-grade-answer" data-sample={open ? "open" : "closed"}>
       <div class="fm-grade-answer-head">
         <h2>{r.answer}</h2>
         <span class="fm-grade-count">
           {item.count === null ? "" : item.type === "essay" ? r.words(item.count) : r.lines(item.count)}
         </span>
+        {open ? null : toggle}
       </div>
+      {open ? (
+        <div class="fm-grade-answer-head fm-grade-sample-head">
+          <h2>{r.sample}</h2>
+          {toggle}
+        </div>
+      ) : null}
       {item.type === "code" ? (
         <pre class="fm-grade-answer-text" {...reachable} data-code lang={item.language ?? undefined}>
           {item.answer}
@@ -407,7 +428,11 @@ function Answer({ state, item }: { state: GradeState; item: GradeItem }) {
           {item.answer}
         </div>
       )}
-      <Sample state={state} item={item} />
+      {open ? (
+        <section class="fm-grade-answer-text fm-grade-sample-text" {...reachable} aria-label={r.sample}>
+          <Html html={item.sampleHtml as string} />
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -450,15 +475,13 @@ function Card({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT
         </span>
       </header>
       <Html html={item.promptHtml} class="fm-grade-prompt" />
-      <div class="fm-grade-cols">
-        <Answer state={state} item={item} />
-        <div class="fm-grade-rubric">
-          <Box state={state} item={item} t={t} />
-          <div class="fm-grade-clear">
-            <button type="button" class="fm-button" data-action="clear" onClick={() => state.clear(item.id)}>
-              <TrashIcon /> {r.clearQuestion}
-            </button>
-          </div>
+      <Answer state={state} item={item} />
+      <div class="fm-grade-rubric">
+        <Box state={state} item={item} t={t} />
+        <div class="fm-grade-clear">
+          <button type="button" class="fm-button" data-action="clear" onClick={() => state.clear(item.id)}>
+            <TrashIcon /> {r.clearQuestion}
+          </button>
         </div>
       </div>
       <footer class="fm-grade-foot">
