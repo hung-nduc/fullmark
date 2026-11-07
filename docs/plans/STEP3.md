@@ -311,10 +311,12 @@ The design docs left these open, or a slice's review found them. Each needs the 
 
 **G99. The form's vi words for the answer and the sample** (raised in 3f2's review). **Decided by the owner on 2026-11-07, as recommended**; nothing to build; it is in COMMANDS.md (`quiz grade`, "The form", Words). 3f2 wrote "Hiện đáp án mẫu" and "Ẩn đáp án mẫu" for the sample button, built from the catalog's "Đáp án mẫu". GradeVi writes "Bài làm" for the answer and "Bài mẫu" for the sample, where the page's catalog says "Câu trả lời" and "Đáp án mẫu". **Recommend:** the page's words in the form too ("Câu trả lời", "Đáp án mẫu", so "Hiện đáp án mẫu" and "Ẩn đáp án mẫu" stay), so a grader and a learner see the same words; GradeVi's are a board's draft. Nothing to build.
 
-**G100. Where fullmark's own marking is drawn, and in which slice** (raised writing 3p's brief). **Decided by the owner on 2026-11-07, as recommended**; 3r builds it, and COMMANDS.md gets it then. G83 decides that the "Scored by fullmark" row opens a read-only view inside the form, drawn with the replay's question cards and its All · Missed filter. Those cards are the page's (`src/page/`, 57.8 KB gzipped); the form is its own bundle (`dist/grade.js`, 31 KB), and the two together would pass the form's 60 KB budget. The page also expects its own store, which the form does not have. With 3p's phone and G98 together, the slice would not fit one Sonnet session either. **Recommend:**
+**G100. Where fullmark's own marking is drawn, and in which slice** (raised writing 3p's brief). **Decided by the owner on 2026-11-07**: in a frame inside the form. 3r builds it, and COMMANDS.md gets it then. G83 decides that the "Scored by fullmark" row opens a read-only view inside the form, drawn with the replay's question cards and its All · Missed filter. Those cards are the page's (`src/page/`, 57.8 KB gzipped); the form is its own bundle (`dist/grade.js`, 31 KB), and the two together would pass the form's 60 KB budget. So the form doesn't draw them, the server serves them. Decided:
 - G83 is a slice of its own, **3r**, after 3p.
-- The server serves a second page beside the form: the attempt's replay, as `quiz replay` builds it, opening on Missed, at `/marked`, with no server code in it.
-- The row opens it in a new tab, so the form keeps what the grader has typed. Inside the form, a link would lose that state, and a frame needs `frame-src` and a second scroll.
+- The `quiz grade --web` server serves a second page beside the form: the attempt's replay, as `quiz replay` builds it, opening on Missed, at `/marked`, with no server code in it.
+- The "Scored by fullmark" row is chosen like a question row. The form's main column then shows that page in a frame; the form's top bar and sidebar stay.
+- The form never unloads, so nothing the grader typed is lost.
+- The form's CSP gains `frame-src 'self'`.
 - The replay page is read-only for the grader: Retry missed is hidden there, since that attempt is not the grader's.
 - The form's bundle and budget stay as they are.
 
