@@ -27,7 +27,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 | 3m G63, G64, the stacked sidebar with the materials, and the phone | done, reviewed, gaps decided (2026-11-05) | `182beb3`..`0a68e2d`, review |
 | 3n G68, G69 | done, reviewed (2026-11-06), no gaps | `d0e44e4`..`be1629f`, review |
 | 3o the rubric box in the replay, G84, G90 | done, reviewed, gaps decided (2026-11-07) | `73d3194`..`bb1cfe4`, `8554eef`, review |
-| 3f `grade --web` at 1280 px | built, reviewed (2026-11-07); G96 decided, G97 for the owner; 7 fixes for 3f2 | `2246a37`..`0e44c3d`, review |
+| 3f `grade --web` at 1280 px | built, reviewed (2026-11-07); G96 and G97 decided (2026-11-07); 7 fixes in 3f2 | `2246a37`..`0e44c3d`, review |
+| 3f2 3f's fixes, G96, G97 | brief approved (2026-11-07); handed to Sonnet | |
 | 3p the grading form on a phone, G83, G75 | outline; G75 waits for its board | |
 | 3q the replay's answer panel and badge (G94) | outline; after 3f | |
 | 3h `brief --web` | waits for its boards (3v) | |
@@ -46,7 +47,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 ### Next steps, in order
 
-1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 and 7 fixes wait for a **3f2** round. **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
+1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: every slice left (3e, 3f, 3h) waits for them. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (the images wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is approved and handed to Sonnet. **3p** (the phone, G83, and G75 once decided) stays an outline. Then the `brief --web` boards the same way.
 
 ### Open proposals carried over from step 2
 
@@ -293,7 +294,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 
 **G96. The form's layout: the answer, then the box under it** (raised by the owner in 3f's review). **Decided by the owner on 2026-11-07**, and written into COMMANDS.md (`quiz grade`, "The form"). 3f built the answer (46%) beside the box (54%), as COMMANDS.md then said; at 1280 px that leaves the box about 400 px, and a criterion's name breaks inside a word ("Grammatic / al"). Decided: the answer across the card, the rubric box across the card under it, as the earlier boards drew it; the sample answer starts hidden, and a **Show the sample answer** button opens it beside the answer, side by side, half the card each (**Hide the sample answer** closes it); no button when there is no sample. The box then has the card's width, as RubricC draws it.
 
-**G97. The page budget test in Firefox under load** (raised in 3f's review). `e2e/budget.spec.ts:53` fails in Firefox in a full `npm run check`: 1097 and 1147 ms (3f's run and the reviewer's) against the 1000 ms limit. Run alone it passes (671 ms). **The cause is shown, and it is not 3f:** the Firefox project run in full at 3o's commit (`43ae9f1`) fails the same way, 1211 then 1006 ms, against 1243 then 1018 ms at 3f; 3o's own full check passed by a few milliseconds. The test measures the page under the load of seven other workers. **Recommend:** the budget test runs alone, as the startup tests do in Vitest: a Playwright project of its own that runs first with one worker (the other projects depend on it), so it measures the page and not the machine. The limit stays 1000 ms. First task of 3f's fixes.
+**G97. The page budget test in Firefox under load** (raised in 3f's review). **Decided by the owner on 2026-11-07, as recommended**; 3f2 builds it. `e2e/budget.spec.ts:53` fails in Firefox in a full `npm run check`: 1097 and 1147 ms (3f's run and the reviewer's) against the 1000 ms limit. Run alone it passes (671 ms). **The cause is shown, and it is not 3f:** the Firefox project run in full at 3o's commit (`43ae9f1`) fails the same way, 1211 then 1006 ms, against 1243 then 1018 ms at 3f; 3o's own full check passed by a few milliseconds. The test measures the page under the load of seven other workers. **Recommend:** the budget test runs alone, as the startup tests do in Vitest: a Playwright project of its own that runs first with one worker (the other projects depend on it), so it measures the page and not the machine. The limit stays 1000 ms. First task of 3f's fixes.
 
 ## Slices
 
@@ -1042,4 +1043,34 @@ Built by Sonnet in three commits, `d0e44e4`..`be1629f`, from the brief alone; re
 
 **Not tried by hand yet:** `quiz grade --web --open` on the samples, which waits for the fixes.
 
-**For the owner:** G96 is decided. G97, with a recommendation. The 7 fixes above and G97 would be **3f2**, one Sonnet round, before 3p.
+**Decided by the owner on 2026-11-07:** G96, and G97 as recommended. The 7 fixes and G97 are **3f2**, before 3p.
+
+## Slice 3f2: 3f's fixes, G96 and G97
+
+**Approved by the owner on 2026-11-07.** 3f's review found seven differences from the boards and two bugs; G96 changes the form's layout and G97 the budget test. One Sonnet round, before 3p.
+
+### Read first
+
+- COMMANDS.md: `quiz grade`, "The form" (G96's layout and the sample button are in it now).
+- This plan: "Rules for every slice", G96, G97, 3f's brief and its Review (the numbered list "To fix").
+- The boards: GradeFinish (the sidebar, the dialog), GradeBlocked, GradeDone, RubricC's right column (`docs/mockup/boards/`, the images in `docs/mockup/images/`).
+- Code: `src/grade-form/` (all), `src/cli/grade-web.ts`, `src/cli/review.ts` (how it passes `loaded.assets`), `src/review/review.css` (`fm-dialog-actions`), `src/review/Side.tsx` (Review's sidebar, the model for the icons and groups), `e2e/grade.spec.ts`, `e2e/screens-3f.spec.ts`, `e2e/budget.spec.ts`, `playwright.config.ts`.
+
+### Tasks
+
+1. **G97** (one commit): the budget test in a Playwright project of its own that runs first with one worker; the other projects depend on it; the limit stays 1000 ms. Then `npm run check` must pass in both browsers with no budget failure; say the times it measured.
+2. **G96** (one commit): the answer across the card, the rubric box across the card under it; the sample hidden, **Show the sample answer** over the answer opening it beside the answer (half the card each), **Hide the sample answer** closing it, no button without a sample; en and vi words in `src/core/i18n/grade.ts` (vi from GradeVi where it has one, else say what you wrote). A long criterion name never breaks inside a word. e2e: the button, both states, a question with no sample.
+3. **The fixes** (one commit each, an e2e or unit test with each):
+   - the sidebar from GradeFinish: the state icons (SVG, not text glyphs), the legend, the collapsible groups with their chevrons and counts, the row tints, the "Not answered" group, the "Scored by fullmark" row as the boards draw it (still not a link: 3p opens it);
+   - the dialogs' buttons at the right; **Go back** outlined in **Some grades are not finished**;
+   - the saved card: the sidebar closed, the card centred, the score line bold, as GradeDone;
+   - every number written into a slot through `num` (vi "0,5");
+   - the quiz's assets passed to the form, with a test that an image in a prompt shows;
+   - the note placeholder "Note (optional)", and "Note (required: a mark was lost)" once a mark is lost, en and vi.
+4. **Screens and the row** (one commit): `docs/screens/3f/` taken again (each state 3f took, plus the sample open), the 3f2 row in the slice table.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox, the budget test included. The screens match GradeFinish, GradeBlocked, GradeDone and RubricC's right column, each difference listed. Report as the rules say, every golden that changed counted and explained.
+
+### Review
