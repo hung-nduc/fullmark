@@ -6,7 +6,7 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slice's full brief here, commits it, and hands it to **one Sonnet subagent**; Sonnet implements and commits on branch `1.0` (never pushes) and reports; Opus reviews and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` and become the next brief's first tasks. Commit after every round. A slice is sized to fit one Sonnet session (about 150k tokens), and its brief names exactly what to read.
+As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent**; the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews, pushes after the review, and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` and become the next brief's first tasks. Commit after every round. A slice is sized to fit one implementing agent's session (about 150k tokens), and its brief names exactly what to read. Which model plays each role is the owner's choice and may change; the reviews name who built and reviewed each slice.
 
 ### Where it stands
 
@@ -38,18 +38,21 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): Opus writes a slic
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); every gap, G1 to G101, is in "Gaps", in number order.
 
-Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox; Vitest 2059 of 2059, the 2 startup tests, Playwright and axe. What step 3 inherits:
+Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
-- **The attach point is built:** `src/page/events.ts` emits `ready`, `progress` (on every autosave) and `submit`; `src/page/main.tsx` exposes it as `window.fullmark.events`. Nothing listens yet.
-- **`PageData.focus`** (`src/page/data.ts`) already ticks the start screen's Focus mode box; `build` never sets it. `serve --focus` sets it.
-- **`buildPage(quizzes[], options)`** (`src/build/page.ts`) writes the page and its CSP (no `connect-src`). The served copy needs a second script hash and `connect-src 'self'`.
-- **Stubs that say "not available yet"**, to be replaced: `check --review` (`src/cli/check.ts`), `grade --web` and `--name` (`src/cli/grade.ts`, `src/cli/main.ts`), `build --watch`, `--serve`, `--port` (`src/cli/build.ts`, `src/cli/main.ts`). *Still stubs after 3e:* `grade --web` and `--name` (3f), `brief --web` (3h).
-- **`brief.yaml` is read with no defaults** ([archive/STEP1.md](archive/STEP1.md), item 1 of 1f): every key is required; the defaults belong to `quiz brief`, which writes them. `src/core/rules/brief-read.ts` and `BriefSchema` in `src/core/ir.ts` are the reader.
-- **Templates:** only `templates/blank/` exists; the other six built-in names (`calculus`, `rust`, `ielts`, `medical`, `exam`, `survey`) exist as `examples/`.
+**Still stubs**, each refused as "not available yet": `brief --web` (3h; `src/cli/brief.ts`) and `grade --web --grades` (3p2, G75; `src/cli/grade.ts`).
 
 ### Next steps, in order
 
-1. **The form boards on the Design canvas** (3v, G7), as 2v did for the page: of the slices that waited for them, only 3h still does. The `review` boards are done: reviewed, G38 to G47 decided and in COMMANDS.md, the sources copied into `docs/mockup/boards/`. Their images are in `docs/mockup/images/Review*.png` (the owner's export, scaled to board size). 3e is cut in three (3e the file and the checks, 3k the form, 3l `--since` and the phone), and **3e is built and reviewed** ("Slice 3e", its Review): G50 and G51 decided (3l's and 3k's first tasks). **3k is built and reviewed** ("Slice 3k", its Review, at the end): G56 and G57 decided as recommended. **3l's brief is approved** ("Slice 3l", at the end), with G58 to G62 decided as recommended, and handed to Sonnet; the stacked sidebar and the phone moved to a new 3m (G58), whose brief follows 3l's review. **3l is built and reviewed** ("Slice 3l", its Review): G63 and G64 decided as recommended; **3m's brief is approved** ("Slice 3m", at the end), with G65 to G67 decided as recommended; **3m is built and reviewed** ("Slice 3m", its Review), which closes the `review` boards; G68 and G69 decided as recommended, and made a slice of their own, **3n** ("Slice 3n", at the end), **built and reviewed**, with no new gap. **The `grade --web` boards are reviewed** ("Gaps", the paragraph before G70; the owner's answers in [DEV_RESPONSE.md](DEV_RESPONSE.md)): G70 to G86 decided but G75, which waits for a mockup; the rubric is G86's box, drawn on RubricC. The sources are in `docs/mockup/boards/` (images of GradeFinish, GradeBlocked, GradeDone, RubricC, RubricPhone and RubricPhoneReplay exported; the other Grade boards' images still wait for the owner's export) and the decisions in COMMANDS.md (`quiz grade`, "The form") and TECHNICAL_DESIGN.md (section 6, "The rubric box"). The work is cut in three: **3o** (the read-only box in the replay, and "chữ") and **3f** (the form at 1280 px) have their briefs approved, with G87 to G91 decided as recommended; **3o is built and reviewed** ("Slice 3o", its Review): G92 to G95 decided as recommended; G92, G93 and G95 are 3f's first tasks, and G94 is a new slice, 3q, after 3f. **3f is built and reviewed** ("Slice 3f", its Review): G96 decided by the owner (the answer, then the box under it); G97 decided as recommended; **3f2** (G96, G97 and the 7 fixes) is **built and reviewed** ("Slice 3f2", its Review): G98 and G99 decided as recommended. **3f is done.** **3p's brief is approved** ("Slice 3p", at the end), with G100 (in a frame, the owner's choice); **3p is built and reviewed** ("Slice 3p", its Review): G101 decided as recommended. **3r's brief is drafted** ("Slice 3r", at the end), waiting for the owner's approval. **3q** can be briefed (3f is done); **3p2** (G75) waits for the owner's review of the GradeAI board. Then the `brief --web` boards the same way, for 3h.
+How each slice got here is in its own **Review**; the table above is the summary.
+
+1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is drafted ("Slice 3r", at the end) and waits for the owner's approval; then an implementing agent builds it and the planner reviews it.
+2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
+3. **3p2** (`grade --web --grades`, G75): waits for the owner's review of the GradeAI board.
+4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
+5. **3z**, acceptance.
+
+The owner's export of the other Grade boards' images (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) is still due; it blocks no slice.
 
 ### Open proposals carried over from step 2
 
@@ -67,7 +70,7 @@ The one-shot server and everything on it, plus the authoring commands that need 
 
 ## Rules for every slice
 
-Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slice"), including item 73's rule on environmental failures: a failure is environmental only when its cause is shown, and a golden is never reverted to hide a difference. Commits end with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`; never push. Added for step 3:
+Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slice"), including item 73's rule on environmental failures: a failure is environmental only when its cause is shown, and a golden is never reverted to hide a difference. Commits end with the `Co-Authored-By` line of the model that made them; the implementing agent never pushes. Added for step 3:
 
 - **No real network in unit tests.** The server binds 127.0.0.1 on port `0` in tests and is driven with `fetch`; the page side is tested in Playwright against a served page. No test waits on a real timeout: the clock and the timeout are injected.
 - **Every served command is tested as a subprocess**: started with `--json`, its `listening` line read, the page or form driven by Playwright or by a POST, then the exit code, the second JSON line and the written file compared with a golden. A helper for this lives in `e2e/helpers.ts` (3a) and every later slice uses it.
