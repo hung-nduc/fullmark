@@ -434,7 +434,7 @@ The tool writes the template with every criterion's id, text and maximum (or sca
 }
 ```
 
-**Grader identity.** `grader` is required. `kind` is `ai` or `human`, and `name` is required (for an AI, also `model`). A question can carry its own `grader`, for example when one essay is re-graded by hand. A human grade made over an AI grade records `reviewed` with the AI grader. The identity is a declaration: the tool cannot verify which model wrote a file.
+**Grader identity.** `grader` is required. `kind` is `ai` or `human`, and `name` is required (for an AI, also `model`). A question can carry its own `grader`, for example when one essay is re-graded by hand, or when several AIs grade one attempt, each its own questions (the hard essays to one model, the easier questions to another: which grades which is the orchestrator's choice, and fullmark only records it). A question's grader is its own `grader`, else the file's; the replay's and the form's box heads, the sidebar and the report name it. `AGENTS.md` says: grade only the questions you were given and leave the rest `null`; if the file already has a `grader`, put yours on each question you fill. A human grade made over an AI grade (`grade --web --grades`) has the human as the file's `grader` and records `reviewed` on each question, naming the grader that question was pre-filled from. Merging several grades files, and comparing two graders on the same questions, are not in v1. The identity is a declaration: the tool cannot verify which model wrote a file.
 
 **Validation** (exit 1, nothing written). Every problem is listed, except that a question's scores are checked only once its fixed values (mode, points, maximums, weights, scale) match the template:
 
