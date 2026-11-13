@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { buildGradeForm } from "../build/grade-form";
 import { languagesUsed, loadHighlighter } from "../build/highlight";
+import { buildPage } from "../build/page";
 import type { Asset } from "../build/render";
 import { katexTools } from "../build/tex";
 import type { Attempt, parseResults } from "../core/attempt";
@@ -38,6 +39,8 @@ export type Prepared = {
   hash: string;
   /** the quiz's images, as `loadQuiz` read them: an image in a prompt or a sample answer shows in the form */
   assets: readonly Asset[];
+  /** the materials sheets, as `loadQuiz` read them: the second page shows them as `quiz replay`'s does */
+  sheets: readonly { path: string; name: string; source: string }[];
   /** the quiz file as shown */
   quizFile: string;
   read: Extract<ReturnType<typeof parseResults>, { ok: true }>;
@@ -202,8 +205,9 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   };
   const script = read("grade.js");
   const pageCss = read("page.css");
+  const pageJs = read("page.js");
   const gradeCss = read("grade.css");
-  if (script === null || pageCss === null || gradeCss === null) {
+  if (script === null || pageCss === null || gradeCss === null || pageJs === null) {
     fail(io, opts.json, "the page runtime is missing next to the program: run `npm run build`");
     return EXIT.usage;
   }
@@ -234,6 +238,31 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
     fonts,
   });
 
+  // G100: the attempt's replay, as `quiz replay` builds it with no grades, for the form's frame. It is `buildPage`'s page,
+  // with no server module, so it holds no server code; `grader` makes it read-only for the grader (`PageReplay.grader`)
+  const resultsText = readFileSync(resultsPath, "utf8");
+  const marked = buildPage(
+    [
+      {
+        quiz,
+        hash,
+        assets: p.assets,
+        sheets: p.sheets,
+        replay: { results: resultsText, name: basename(resultsPath), attempt, applied: null, grader: true },
+      },
+    ],
+    {
+      runtime: pageJs,
+      css: pageCss,
+      builtAt: clock().toISOString(),
+      version: opts.version,
+      math: katexTools(),
+      highlight,
+      fonts,
+      given: { profile: null, fonts: null, uiLang: null, strict: false },
+    },
+  );
+
   const quizId = quiz.frontMatter.id;
   const m = (quiz.frontMatter.uiLang === "vi" ? vi : en).report;
   const asked = gradable(quiz, graded).length;
@@ -242,7 +271,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   let server: Awaited<ReturnType<typeof startServer<GradesSubmit>>>;
   try {
     server = await startServer<GradesSubmit>({
-      pages: { "": page },
+      pages: { "": page, marked },
       quizIds: { [quizId]: hash },
       predicate: (accepted) => accepted.has(quizId),
       timeoutMs: timeout * 1000,

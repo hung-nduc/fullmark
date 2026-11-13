@@ -18,6 +18,7 @@ import {
   lookKey,
   quizPrefix,
   readLook,
+  readOnly,
   readSaved,
   replayAttemptKey,
   type Saved,
@@ -322,12 +323,15 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
   /** the section of every question, per quiz */
   const sectionOf = new Map<string, Map<string, string>>();
   // under `serve --autosave` the file is the one copy of the attempt: the browser's storage is not used
-  const saver: Saver | null =
+  // the frame of `quiz grade --web` (`PageReplay.grader`) reads the look the form shares and writes nothing
+  const grader = data.quizzes.some((q) => q.replay?.grader === true);
+  const stored: Saver | null =
     deps.storage && data.autosave !== true
       ? saverOver(deps.storage, () => {
           for (const state of quizzes.values()) state.blocked.value = true;
         })
       : null;
+  const saver: Saver | null = stored !== null && grader ? readOnly(stored) : stored;
 
   for (const page of data.quizzes) {
     const ids = page.sections.flatMap((s) => s.questions.map((q) => q.id));
@@ -546,6 +550,8 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
     state.sectionSeconds.value = { ...attempt.state.sectionTime };
     state.elapsed.value = attempt.state.timeUsed;
     grading(state, attempt);
+    // the grader's frame opens on what fullmark marked wrong
+    if (replay.grader === true) state.filter.value = "missed";
   }
 
   // the server module (when the page has one) says whether it could hand the submit over
@@ -717,6 +723,7 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
         const page = state.page;
         // a replay page opens on its file, whatever is stored, and touches no key but its own: a Retry missed
         // saved under its `:replay:` key is offered back through the resume banner
+        if (page.replay?.grader === true) continue;
         if (page.replay !== undefined) {
           const own = saver.get(replayAttemptKey(page));
           const kept = readSaved(own, page);

@@ -43,6 +43,8 @@ export type ReplayData = {
   attempt: Attempt;
   /** the grades for essay and code answers, checked; null: pending */
   applied: AppliedGrades | null;
+  /** `quiz grade --web`'s second page (`PageReplay.grader`): read-only for the grader */
+  grader?: true;
 };
 
 /** One quiz to put on a page: the IR the check passed, its hash, and the files it refers to. */
@@ -335,6 +337,7 @@ export function pageQuizOf(
             results: replay.results,
             name: replay.name,
             grades: replay.applied === null ? null : gradesOf(replay.applied, quiz, md),
+            ...(replay.grader === true ? { grader: true as const } : {}),
           },
         }
       : {}),

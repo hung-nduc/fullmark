@@ -69,6 +69,11 @@ export type PageReplay = {
   name: string;
   /** the grades for essay and code answers, when the replay has any */
   grades: PageGrades | null;
+  /**
+   * `quiz grade --web` shows fullmark's own marking in a frame of its form: the page opens on the Missed filter, offers
+   * no Retry missed (the attempt is not the grader's) and writes nothing to the browser. Absent everywhere else.
+   */
+  grader?: true;
 };
 
 /** Who graded, as the grades file says (`model` only for an AI). */

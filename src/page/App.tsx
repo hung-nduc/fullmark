@@ -666,6 +666,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
                   onNew={() => store.newAttempt(page.id)}
                   onRetry={() => store.retry(page.id)}
                   replaying={state.replay.value !== null}
+                  grader={state.replay.value?.grader === true}
                   served={store.served}
                   delivery={state.delivery.value}
                 />

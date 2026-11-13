@@ -70,6 +70,7 @@ export function ResultsCard({
   onNew,
   onRetry,
   replaying = false,
+  grader = false,
   served = false,
   delivery = "waiting",
 }: {
@@ -81,6 +82,8 @@ export function ResultsCard({
   onRetry(): void;
   /** a replay (`quiz replay`) has no Start screen to go back to: no New attempt */
   replaying?: boolean;
+  /** `quiz grade --web`'s frame (`PageReplay.grader`): the attempt is not the reader's, so no Retry missed */
+  grader?: boolean;
   /** a served page: once the server has the results, **Sent** takes the place of Download results (not a button) */
   served?: boolean;
   delivery?: "waiting" | "sent" | "failed";
@@ -172,16 +175,18 @@ export function ResultsCard({
       ) : null}
       <div class="fm-actions">
         {missed > 0 ? (
-          <button
-            type="button"
-            class="fm-button fm-primary"
-            data-action="retry-missed"
-            title={t.retryMissedHint}
-            onClick={() => dialog.current?.showModal()}
-          >
-            <Icon name="retry" size={18} />
-            {t.retryMissed(missed)}
-          </button>
+          grader ? null : (
+            <button
+              type="button"
+              class="fm-button fm-primary"
+              data-action="retry-missed"
+              title={t.retryMissedHint}
+              onClick={() => dialog.current?.showModal()}
+            >
+              <Icon name="retry" size={18} />
+              {t.retryMissed(missed)}
+            </button>
+          )
         ) : hasScore ? (
           <p class="fm-nothing-missed" data-nothing-missed>
             {t.nothingMissed}

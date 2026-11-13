@@ -28,7 +28,7 @@ function setup() {
   // the page runtime: stand-ins, since the unit test reads the served page's data block and never runs it
   const runtime = join(dir, "runtime");
   mkdirSync(runtime);
-  for (const f of ["grade.js", "page.css", "grade.css"]) writeFileSync(join(runtime, f), `/* ${f} */`);
+  for (const f of ["grade.js", "page.js", "page.css", "grade.css"]) writeFileSync(join(runtime, f), `/* ${f} */`);
   const out: string[] = [];
   const err: string[] = [];
   const opened: string[] = [];

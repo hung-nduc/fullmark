@@ -682,3 +682,30 @@ test("G101: each state's badge has its icon and wash, the head, the saved card, 
   expect(Math.abs(box.y - 160)).toBeLessThan(2);
   await server.end();
 });
+
+test("G100: the attempt's replay is served at /marked under the token, with no server code and no connect-src", async () => {
+  const server = await web(folder(), "--name", "Lan");
+  const base = server.url;
+  const reply = await fetch(`${base}marked`);
+  expect(reply.status).toBe(200);
+  expect(reply.headers.get("content-type")).toContain("text/html");
+  const html = await reply.text();
+  // buildPage's CSP: no connect-src, no server module (foundation 9)
+  const csp = /http-equiv="Content-Security-Policy" content="([^"]*)"/.exec(html)?.[1] ?? "";
+  expect(csp).toContain("default-src 'none'");
+  expect(csp).not.toContain("connect-src");
+  expect(csp).not.toContain("frame-src");
+  expect(html).not.toContain("fullmark.events");
+  expect(html).not.toContain("./submit");
+  // the replay of this attempt, opened for the grader, with no grades (the essays and code are pending)
+  expect(html).toContain('"replay":{');
+  expect(html).toContain('"grader":true');
+  expect(html).toContain('"grades":null');
+  // without the token it is refused, as every path is
+  const origin = new URL(base).origin;
+  expect((await fetch(`${origin}/wrong/marked`)).status).toBe(403);
+  expect((await fetch(`${origin}/marked`)).status).toBe(403);
+  // the form carries no copy of it, and the build's own page is not the form's
+  const form = await (await fetch(base)).text();
+  expect(form).not.toContain('"grader":true');
+});
