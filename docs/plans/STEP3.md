@@ -94,7 +94,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 - **The card's foot:** while unchanged, an `info` line on the left, "Claude's grade, as given. Change anything; its lit box puts Claude's back."; once changed, **✦ Back to Claude's grade** in its place, for the whole question. **Clear this question** stays on the right.
 - **The sidebar:** an unchanged question is a graded row (✓) with "Claude's grade" under its name; an adjusted one keeps the graded row's colours with ✎ and "adjusted by you" in `accent`. The legend gains **Adjusted**.
 
-**Recommend** (the redraw): as drawn, with the file written as above. Open in the thread: whether a row's box restores the note with the score (as drawn) or the score alone.
+**Recommend** (the redraw): as drawn, with the file written as above. A row's box restores the score and the note together, as drawn (the owner's choice, 2026-11-13); the rest of G75 waits for the owner's review of the board.
 
 ## Slices
 
