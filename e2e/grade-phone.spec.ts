@@ -309,3 +309,25 @@ test("a vi quiz has the phone's words in vi", async ({ page }) => {
   await press(page, toggle(page));
   await expect(side(page).locator("[data-action=close-sidebar]")).toContainText("Quay lại câu 2");
 });
+
+test("G101: the badge has its icon and wash and the head reads points before the kind, on a phone", async ({
+  page,
+}) => {
+  await open(page);
+  const badge = page.locator("article[data-qid=add] .fm-grade-badge");
+  await expect(page.locator("article[data-qid=add] .fm-grade-meta")).toHaveText(/^Question \d+ · 3 points · essay$/);
+  await expect(badge.locator("svg")).toHaveCount(1);
+  const wash = await badge.evaluate((e) => getComputedStyle(e).backgroundColor);
+  expect(wash).not.toBe("rgba(0, 0, 0, 0)");
+  await press(page, ctl(page, "defs").locator("[data-act=full]"));
+  await expect(badge).toContainText("Half graded");
+  expect(await badge.evaluate((e) => getComputedStyle(e).borderTopStyle)).toBe("dashed");
+  // one line, inside the card, nothing sideways
+  const height = (await badge.boundingBox())?.height ?? 99;
+  expect(height).toBeLessThan(30);
+  await noSideways(page);
+  // the amber dot beside a note the validator will ask for
+  await value(page, "derive").fill("1");
+  await expect(page.locator('[data-crit="derive"] .fm-note-dot')).toBeVisible();
+  await noSideways(page);
+});

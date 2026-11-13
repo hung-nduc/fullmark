@@ -236,20 +236,25 @@ function NoteField({
 }) {
   return (
     <div class="fm-note-field">
-      <textarea
-        id={id}
-        class="fm-note-input"
-        rows={2}
-        aria-label={label}
-        aria-required={required ? "true" : undefined}
-        aria-invalid={missing !== null ? "true" : undefined}
-        aria-describedby={missing !== null ? `${id}-req` : undefined}
-        placeholder={label}
-        data-required={required ? "" : undefined}
-        data-missing={missing !== null ? (tried ? "tried" : "") : undefined}
-        value={value}
-        onInput={(e) => onInput((e.currentTarget as HTMLTextAreaElement).value)}
-      />
+      <div class="fm-note-row">
+        <textarea
+          id={id}
+          class="fm-note-input"
+          rows={2}
+          aria-label={label}
+          aria-required={required ? "true" : undefined}
+          aria-invalid={missing !== null ? "true" : undefined}
+          aria-describedby={missing !== null ? `${id}-req` : undefined}
+          placeholder={label}
+          data-required={required ? "" : undefined}
+          data-missing={missing !== null ? (tried ? "tried" : "") : undefined}
+          value={value}
+          onInput={(e) => onInput((e.currentTarget as HTMLTextAreaElement).value)}
+        />
+        {required ? (
+          <span class="fm-note-dot" aria-hidden="true" data-tried={missing !== null && tried ? "" : undefined} />
+        ) : null}
+      </div>
       {missing !== null ? (
         <span class="fm-note-missing" id={`${id}-req`}>
           {missing}
@@ -388,6 +393,33 @@ function Box({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT 
   );
 }
 
+/** The card badge's icon (RubricPhone's `ICON`): a clock for waiting and half graded, a mark for a note, a tick for graded. */
+const BADGE_ICONS: Record<string, string> = {
+  none: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  half: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  blank: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  note: "M12 7v6M12 17v.01",
+  done: "M5 12.5l4.5 4.5L19 7",
+};
+function BadgeIcon({ condition }: { condition: string }) {
+  return (
+    <svg
+      class="fm-svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d={BADGE_ICONS[condition]} />
+    </svg>
+  );
+}
+
 // -- the card ---------------------------------------------------------------------------------------------------------
 
 const kindOf = (r: GradeMessages, item: GradeItem): string => (item.type === "essay" ? r.essay : r.code);
@@ -498,8 +530,9 @@ function Card({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT
       aria-label={r.qn(item.number)}
     >
       <header class="fm-grade-card-head">
-        <span class="fm-grade-meta">{r.head(item.number, kindOf(r, item), pointsOf(state, item))}</span>
+        <span class="fm-grade-meta">{r.head(item.number, pointsOf(state, item), kindOf(r, item))}</span>
         <span class="fm-grade-badge" data-condition={condition}>
+          <BadgeIcon condition={condition} />
           {r.badge[condition]}
           {condition === "half" && ev ? ` · ${r.halfOf(ev.given, ev.of)}` : ""}
           {condition === "done" && ev?.total
@@ -553,8 +586,9 @@ function BlankCard({ state, item }: { state: GradeState; item: GradeItem }) {
   return (
     <article class="fm-question fm-grade-card" data-qid={item.id} data-blank aria-label={r.qn(item.number)}>
       <header class="fm-grade-card-head">
-        <span class="fm-grade-meta">{r.head(item.number, kindOf(r, item), pointsOf(state, item))}</span>
+        <span class="fm-grade-meta">{r.head(item.number, pointsOf(state, item), kindOf(r, item))}</span>
         <span class="fm-grade-badge" data-condition="blank">
+          <BadgeIcon condition="blank" />
           {r.noAnswer(num(item.points, lang))}
         </span>
       </header>

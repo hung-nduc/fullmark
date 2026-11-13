@@ -40,30 +40,39 @@
     color: var(--muted);
   }
 
+  /* the state's badge: an icon and a wash for each state (RubricPhone's `badge`, G101) */
   .fm-grade-badge {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
     padding: 2px 10px;
     font-size: 0.92em;
-    font-weight: 600;
-    color: var(--text);
-    background: var(--card);
-    border: 1px dashed var(--line-strong);
+    font-weight: 700;
+    color: var(--info);
+    white-space: nowrap;
+    background: var(--info-wash);
+    border: 1px solid transparent;
     border-radius: 999px;
   }
 
   .fm-grade-badge[data-condition="half"] {
-    color: var(--info);
-    border: 1px solid var(--info);
+    border: 1px dashed var(--info);
+  }
+
+  .fm-grade-badge[data-condition="blank"] {
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px dashed var(--line-strong);
   }
 
   .fm-grade-badge[data-condition="note"] {
     color: var(--bad);
-    border: 1px solid var(--bad);
+    background: var(--bad-wash);
   }
 
   .fm-grade-badge[data-condition="done"] {
     color: var(--ok);
     background: var(--ok-wash);
-    border: 1px solid var(--ok);
   }
 
   .fm-grade-prompt {
@@ -334,6 +343,26 @@
     gap: 4px;
   }
 
+  /* the amber dot beside a note the validator will ask for; red once Finish was tried (the Grade board's `noteDot`) */
+  .fm-note-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .fm-note-dot {
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    margin-top: 14px;
+    background: var(--warn);
+    border-radius: 50%;
+  }
+
+  .fm-note-dot[data-tried] {
+    background: var(--bad);
+  }
+
   .fm-note-input {
     box-sizing: border-box;
     width: 100%;
@@ -344,6 +373,11 @@
     background: var(--sunken);
     border: 1px solid var(--card-line);
     border-radius: var(--box-r);
+  }
+
+  .fm-note-row .fm-note-input {
+    flex: 1;
+    min-width: 0;
   }
 
   /* a note the validator will ask for: amber and dashed while empty, red once Finish was tried (the Grade board's noteCss) */
@@ -603,10 +637,15 @@
     color: var(--muted);
   }
 
+  /* a key: the monospace font, the thicker lower edge (the Grade board's `kbd`, G101) */
   .fm-grade-keys kbd {
-    padding: 0 3px;
-    font: inherit;
+    padding: 0 5px;
+    font-family: var(--mono);
+    font-size: 0.95em;
+    color: var(--text);
+    background: var(--card);
     border: 1px solid var(--line-strong);
+    border-bottom-width: 2px;
     border-radius: 4px;
   }
 
@@ -666,9 +705,10 @@
   }
 
   /* the saved card: the sidebar closed, the card centred (GradeDone) */
+  /* 768 px wide, its top 160 px down (GradeDone; the dock's height is measured into --dock-h) */
   .fm-grade-saved {
-    max-width: 720px;
-    margin: 40px auto 0;
+    max-width: 768px;
+    margin: calc(160px - var(--dock-h, 99px)) auto 0;
   }
 
   .fm-grade-saved-title {

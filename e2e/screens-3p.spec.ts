@@ -100,7 +100,9 @@ test("phone: an additive question, half graded (RubricPhone, additive)", async (
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: out("6-phone-additive-top") });
   // the box's top under the sticky bar: scroll by its offset from the viewport, not to it
-  await page.evaluate(() => window.scrollBy(0, (document.querySelector(".fm-box")?.getBoundingClientRect().top ?? 0) - 72));
+  await page.evaluate(() =>
+    window.scrollBy(0, (document.querySelector(".fm-box")?.getBoundingClientRect().top ?? 0) - 72),
+  );
   await page.screenshot({ path: out("7-phone-additive-box") });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.screenshot({ path: out("8-phone-additive-foot") });

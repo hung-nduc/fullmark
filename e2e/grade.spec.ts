@@ -616,3 +616,69 @@ test("G98: the card's width, the sidebar icon, the key row, the dialog's place, 
   expect(await chip.evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
   await server.end();
 });
+
+test("G101: each state's badge has its icon and wash, the head, the saved card, the amber dot and the keys", async ({
+  page,
+}) => {
+  const server = await web(folder(), "--name", "Lan");
+  await open(page, server);
+  const badge = page.locator("article[data-qid=add] .fm-grade-badge");
+  const look = () =>
+    badge.evaluate((e) => ({
+      icons: e.querySelectorAll("svg").length,
+      wash: getComputedStyle(e).backgroundColor,
+      edge: getComputedStyle(e).borderTopStyle,
+      radius: getComputedStyle(e).borderTopLeftRadius,
+    }));
+  // the head reads "Question 2 · 3 points · essay"
+  await expect(page.locator("article[data-qid=add] .fm-grade-meta")).toHaveText(/^Question \d+ · 3 points · essay$/);
+  const none = await look();
+  expect(none.icons).toBe(1);
+  expect(none.wash).not.toBe("rgba(0, 0, 0, 0)");
+  expect(parseFloat(none.radius)).toBeGreaterThan(100);
+  await ctl(page, "defs").locator("[data-act=full]").click();
+  const half = await look();
+  await expect(badge).toContainText("Half graded · 1 of 3");
+  expect(half.icons).toBe(1);
+  expect(half.edge).toBe("dashed");
+  // a lost mark with no note: the badge says so, in the red wash, with the dot beside the note
+  await value(page, "derive").fill("1");
+  await value(page, "interp").fill("0.5");
+  await expect(badge).toHaveText("Needs a note");
+  const bad = await look();
+  expect(bad.icons).toBe(1);
+  expect(bad.wash).not.toBe(none.wash);
+  const dot = page.locator('[data-crit="derive"] .fm-note-dot');
+  await expect(dot).toBeVisible();
+  const dotBox = (await dot.boundingBox()) as { width: number; height: number; x: number };
+  const areaBox = (await note(page, "derive").boundingBox()) as { x: number; width: number };
+  expect(Math.round(dotBox.width)).toBe(7);
+  expect(dotBox.x).toBeGreaterThanOrEqual(areaBox.x + areaBox.width);
+  expect(await dot.evaluate((e) => getComputedStyle(e).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(page.locator('[data-crit="defs"] .fm-note-dot')).toHaveCount(0);
+  await note(page, "derive").fill("Lost a mark.");
+  await note(page, "interp").fill("Lost a mark too.");
+  await expect(badge).toContainText("Graded");
+  const done = await look();
+  expect(done.icons).toBe(1);
+  expect(done.wash).not.toBe(bad.wash);
+  // the keys are in the monospace font with a thicker lower edge
+  const kbd = await page
+    .locator(".fm-grade-keys kbd")
+    .first()
+    .evaluate((e) => {
+      const s = getComputedStyle(e);
+      return { mono: s.fontFamily, bottom: s.borderBottomWidth, top: s.borderTopWidth };
+    });
+  expect(kbd.mono.toLowerCase()).toContain("mono");
+  expect(parseFloat(kbd.bottom)).toBeGreaterThan(parseFloat(kbd.top));
+  // the saved card is 768 px wide, its top 160 px down
+  await finish(page).click();
+  await page.locator("dialog[open] [data-action=save]").click();
+  const card = page.locator("[data-grade-saved]");
+  await expect(card).toContainText("Grades saved");
+  const box = (await card.boundingBox()) as { y: number; width: number };
+  expect(Math.round(box.width)).toBe(768);
+  expect(Math.abs(box.y - 160)).toBeLessThan(2);
+  await server.end();
+});
