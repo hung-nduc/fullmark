@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>grade --web over Claude's grades</title>
+    <title>grade --web over AI grades</title>
     <script src="./support.js"></script>
   </head>
   <body>
@@ -44,9 +44,10 @@
             <span style="{{statusSep}}">{{statusScore}}</span>
             <!-- G75: where the grades came from, once, for the whole sitting -->
             <span style="{{statusAi}}">
-              <!-- the sparkle is the mark for "Claude's" everywhere: here, on every Claude box, on Back to Claude's grade -->
+              <!-- the sparkle is the mark for "the AI's" everywhere. The pill says how far the review has gone; who graded each
+                   question is in its box head, and the pill's tooltip lists the graders -->
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg>
-              Pre-filled from Claude Opus 5.5's grades
+              <span title="{{statusAiTip}}">{{statusAiText}}</span>
             </span>
           </div>
         </header>
@@ -193,7 +194,7 @@
                       <span style="font-weight: 600; font-size: 0.92em">{{x.label}} <span style="{{x.tagStyle}}">· {{x.tag}}</span></span>
                       <!-- the same Claude box, small: lit while the text is Claude's, a press puts Claude's text back -->
                       <button onClick="{{x.aiRestore}}" aria-label="{{x.aiLabel}}" title="{{x.aiLabel}}" aria-pressed="{{x.aiPressed}}" style="{{x.aiStyle}}">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg><span>Claude's</span>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg><span>AI's</span>
                       </button>
                     </div>
                     <textarea rows="2" aria-label="{{x.label}}" aria-required="{{x.req}}" onInput="{{x.onInput}}" style="{{x.area}}" value="{{x.value}}"></textarea>
@@ -204,12 +205,12 @@
               <!-- The card's foot: G75's line or Undo on the left, Clear this question on the right. -->
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
                 <sc-if value="{{q.unchanged}}" hint-placeholder-val="{{ true }}">
-                  <span style="{{acceptLine}}">Claude's grade, as given. Change anything; its lit box puts Claude's back.</span>
+                  <span style="{{acceptLine}}">{{q.acceptText}}</span>
                 </sc-if>
                 <sc-if value="{{q.adjusted}}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{q.undo}}" style="{{footBtn}}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg>
-                    Back to Claude's grade
+                    Back to the AI's grade
                   </button>
                 </sc-if>
                 <button onClick="{{q.clearAll}}" aria-label="{{q.clearAllLabel}}" style="{{footBtn}}">
@@ -275,7 +276,7 @@
     <script
       type="text/x-dc"
       data-dc-script
-      data-props='{"theme":{"editor":"enum","options":["light","dark","oled","white","paper"],"default":"light"},"font":{"editor":"enum","options":["system","sans","serif","readable"],"default":"system"},"q":{"editor":"enum","options":["additive","banded","holistic","code"],"default":"additive"},"start":{"editor":"enum","options":["unchanged","adjusted"],"default":"adjusted"},"$preview":{"width":1280,"height":1500}}'
+      data-props='{"theme":{"editor":"enum","options":["light","dark","oled","white","paper"],"default":"light"},"font":{"editor":"enum","options":["system","sans","serif","readable"],"default":"system"},"q":{"editor":"enum","options":["additive","banded","holistic","code"],"default":"additive"},"start":{"editor":"enum","options":["unchanged","adjusted"],"default":"adjusted"},"graders":{"editor":"enum","options":["one","two"],"default":"two"},"$preview":{"width":1280,"height":1500}}'
     >
       class Component extends DCLogic {
         renderVals() {
@@ -336,6 +337,10 @@
           ADJ.q30.c.clear = 1;
           var pickQ = { additive: "q21", banded: "q24", holistic: "q27", code: "q30" }[this.props.q || "additive"];
           var startAdj = (this.props.start || "adjusted") === "adjusted";
+          // G102: one AI graded everything, or two split the questions (Sonnet the shorter ones, Opus the essays that need judgement)
+          var OPUS = { name: "Claude Opus 5.5", short: "Opus" }, SONNET = { name: "Claude Sonnet 5.5", short: "Sonnet" };
+          var two = (this.props.graders || "two") === "two";
+          var GR = { q21: two ? SONNET : OPUS, q24: OPUS, q27: OPUS, q30: two ? SONNET : OPUS };
           var G = s.g || (function () { var g = clone(AI); if (startAdj) g[pickQ] = clone(ADJ[pickQ]); return g; })();
           var TY = s.ty || {};
           var curId = s.cur || pickQ;
@@ -381,7 +386,7 @@
           };
           var chip = function (on, text, what, restore, kind) {
             return { aiText: text, aiPressed: on ? "true" : "false", aiStyle: aiChip(on, kind || "score"),
-              aiLabel: on ? what + ": Claude's, in use" : "Back to Claude's " + what + (text ? ": " + text : ""),
+              aiLabel: on ? what + ": the AI's, in use" : "Back to the AI's " + what + (text ? ": " + text : ""),
               aiRestore: on ? function () {} : restore };
           };
 
@@ -422,7 +427,7 @@
                 maxStyle: "display: flex; align-items: center; justify-content: center; box-sizing: border-box; height: 44px; border-radius: " + inner + "px; font-weight: 700; font-variant-numeric: tabular-nums; border: 2px solid " + (fullT ? t.ok : t.lineStrong) + "; background: " + (fullT ? t.okWash : t.card) + "; color: " + (fullT ? t.ok : t.muted) };
               var tOn = score === aScore;
               c.foot.aiText = dec(aScore);
-              c.foot.aiLabel = tOn ? "Claude's total, as given" : "Claude's total was " + dec(aScore);
+              c.foot.aiLabel = tOn ? "The AI's total, as given" : "The AI's total was " + dec(aScore);
               // display only: dashed where the rows' boxes are solid, since a total follows its rows
               c.foot.aiStyle = aiChip(tOn, "score") + "; cursor: default; border-style: " + (tOn ? "solid" : "dashed");
             } else {
@@ -468,7 +473,11 @@
             // G75: unchanged or adjusted, against Claude's grade for this question
             var adjusted = !same(g, a);
             c.adjusted = adjusted; c.unchanged = !adjusted;
-            c.by1 = adjusted ? "Claude (agent), adjusted by you" : "Graded by Claude (agent)";
+            // G102: each question names its own grader, as the file records it (a question's own grader, else the file's)
+            var who = GR[q.id];
+            c.by1 = adjusted ? who.name + " (AI), adjusted by you" : "Graded by " + who.name + " (AI)";
+            c.acceptText = who.short + "'s grade, as given. Change anything; its lit box puts it back.";
+            c.who = who;
             c.by2 = adjusted ? "saved at Finish" : "5 Nov 2026 · unchanged";
             c.by2Style = "font-size: 0.8em; color: " + t.muted;
             c.undo = function () { put(function (gg, ty) { gg[q.id] = clone(AI[q.id]); Object.keys(ty).forEach(function (k) { if (k.indexOf(q.id + ".") === 0) delete ty[k]; }); }); };
@@ -503,10 +512,10 @@
             var pts = st === "done" ? (q.mode === "banded" ? dec(r2((q.points * b.score) / 9)) : dec(b.score)) : "–";
             return {
               title: "Question " + q.n, go: function () { self.setState({ cur: q.id }); }, current: on ? "true" : "false",
-              sub: st === "done" ? (adj ? "adjusted by you" : "Claude's grade") : st === "bad" ? "needs a note" : st === "half" ? "half graded" : "not graded",
+              sub: st === "done" ? (adj ? "adjusted by you" : b.who.short + "'s grade") : st === "bad" ? "needs a note" : st === "half" ? "half graded" : "not graded",
               subStyle: "font-size: 0.8em; color: " + (adj ? t.accent : t.muted) + "; font-weight: " + (adj ? 600 : 400),
               score: pts + " / " + (q.mode === "banded" ? "9" : q.points),
-              label: "Question " + q.n + ": " + (adj ? "adjusted" : st === "done" ? "Claude's grade, unchanged" : st),
+              label: "Question " + q.n + ": " + (adj ? "adjusted" : st === "done" ? b.who.name + "'s grade, unchanged" : st),
               glyph: adj ? "✎" : GLYPH[st],
               glyphStyle: "flex: 0 0 18px; text-align: center; font-weight: 700; color: " + (adj ? t.accent : col),
               style: "font: inherit; font-size: 0.9em; width: 100%; min-height: 48px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 8px; border-radius: " + inner + "px; cursor: pointer; text-align: left; color: " + t.text + "; background: " + wash + "; border: " + (on ? "2px solid " + t.text : "1px solid " + (st === "none" ? t.line : col))
@@ -523,6 +532,8 @@
             statusGraded: "Graded " + gradedN + " of " + Q.length,
             statusGiven: dec(givenPts) + " of " + gradedPts + " points given",
             statusScore: "Score so far " + dec(soFarE) + " / " + soFarP + " (" + Math.round((soFarE / soFarP) * 100) + "%)",
+            statusAiText: (function () { var adjN = Q.filter(function (q) { return built[q.id].adjustedState; }).length; return "Pre-filled · " + (Q.length - adjN) + " as given, " + adjN + " adjusted"; })(),
+            statusAiTip: (function () { var n = {}; Q.forEach(function (q) { n[GR[q.id].name] = (n[GR[q.id].name] || 0) + 1; }); return "Pre-filled from " + Object.keys(n).map(function (k) { return k + " (" + n[k] + ")"; }).join(" and "); })(),
             gradedCount: gradedN + " of " + Q.length + " graded",
             rootStyle: "position: relative; width: 1280px; height: 1500px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: " + t.bg + "; color: " + t.text + "; font-family: " + font + "; font-size: 17px; line-height: 1.55",
             topBar: "display: flex; flex-direction: column; gap: 8px; padding: 12px 28px 12px; background: " + t.card + "; border-bottom: 1px solid " + border,
