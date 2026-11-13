@@ -803,7 +803,14 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
   const phone = state.phone.value;
   /** a row's click: the question opens; on a phone the sidebar covers the screen, so it closes first */
   const open = (id: string): void => {
+    // the same question again after the frame: the card comes back, so `marked` goes down with no change of `current`
+    state.marked.value = false;
     state.current.value = id;
+    if (phone) state.sidebar.value = false;
+  };
+  /** the "Scored by fullmark" row, chosen as a question row is (G100) */
+  const openMarked = (): void => {
+    state.marked.value = true;
     if (phone) state.sidebar.value = false;
   };
   const sub = (kinds: readonly (keyof typeof r.autoKinds)[]): string =>
@@ -862,7 +869,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
                       class="fm-grade-row"
                       data-row={i.id}
                       data-condition={c}
-                      aria-current={state.current.value === i.id ? "true" : undefined}
+                      aria-current={state.current.value === i.id && !state.marked.value ? "true" : undefined}
                       onClick={() => open(i.id)}
                     >
                       <span class="fm-grade-mark" aria-hidden="true">
@@ -897,7 +904,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
                       class="fm-grade-row"
                       data-blank
                       data-row={i.id}
-                      aria-current={state.current.value === i.id ? "true" : undefined}
+                      aria-current={state.current.value === i.id && !state.marked.value ? "true" : undefined}
                       onClick={() => open(i.id)}
                     >
                       <span class="fm-grade-row-name">{r.qnKind(i.number, kindOf(r, i))}</span>
@@ -917,7 +924,14 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
             count={`${n(data.auto.earned)} / ${n(data.auto.points)}`}
           />
           {fold.auto ? null : (
-            <div class="fm-grade-row fm-grade-auto" data-auto data-condition="done">
+            <button
+              type="button"
+              class="fm-grade-row fm-grade-auto"
+              data-auto
+              data-condition="done"
+              aria-current={state.marked.value ? "true" : undefined}
+              onClick={openMarked}
+            >
               <span class="fm-grade-mark" aria-hidden="true">
                 <CheckIcon />
               </span>
@@ -928,7 +942,7 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
               <span class="fm-grade-row-score">
                 {n(data.auto.earned)} / {n(data.auto.points)}
               </span>
-            </div>
+            </button>
           )}
         </div>
         <div class="fm-grade-legend" data-legend>
@@ -1212,7 +1226,11 @@ export function Form({
   // a question opened by the sidebar or the keys starts at the top of its card
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [state.current.value, done]);
+  }, [state.current.value, done, state.marked.value]);
+  // the frame is made the first time the row is chosen and kept (hidden) after, so the replay keeps its scroll and filter
+  const made = useRef(false);
+  const marked = state.marked.value && !done;
+  if (marked) made.current = true;
   const phone = state.phone.value;
   // on a phone an open sidebar takes the screen: what is under it is not there (as Review's)
   const covered = phone && state.sidebar.value && !done;
@@ -1225,10 +1243,25 @@ export function Form({
     >
       <Bar state={state} store={store} t={t} />
       <div class="fm-body" data-side={state.sidebar.value && !done ? "open" : "closed"}>
-        <main class="fm-main" lang={data.uiLang} data-covered={covered ? "true" : undefined}>
+        <main
+          class="fm-main"
+          lang={data.uiLang}
+          data-covered={covered ? "true" : undefined}
+          data-marked={marked ? "" : undefined}
+          aria-label={marked ? state.r.autoHead : undefined}
+        >
+          {made.current ? (
+            <iframe
+              class="fm-grade-frame"
+              data-frame="marked"
+              src="./marked"
+              title={state.r.markedTitle(data.auto.count)}
+              hidden={!marked}
+            />
+          ) : null}
           {done ? (
             <SavedCard state={state} />
-          ) : item === undefined ? null : isBlank ? (
+          ) : marked || item === undefined ? null : isBlank ? (
             <BlankCard key={item.id} state={state} item={item} />
           ) : (
             <Card key={item.id} state={state} item={item} t={t} />

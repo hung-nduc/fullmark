@@ -12,6 +12,8 @@ export function createGradeState(data: GradeData) {
   const all = [...data.items, ...data.unanswered].sort((a, b) => a.number - b.number);
   const fills = signal<Record<string, Fill>>(Object.fromEntries(data.items.map((i) => [i.id, emptyFill(i)])));
   const current = signal<string>((data.items[0] ?? data.unanswered[0])?.id ?? "");
+  /** the "Scored by fullmark" row is chosen: the main column shows fullmark's own marking in a frame (G100) */
+  const marked = signal(false);
   const sidebar = signal(true);
   /** below 760 px (the page's `PHONE_QUERY`): the compact bar, the stacked card, the foot bar, the full-screen sidebar */
   const phone = signal(false);
@@ -24,6 +26,11 @@ export function createGradeState(data: GradeData) {
   const sending = signal(false);
   const error = signal<string | null>(null);
   const saved = signal<Saved | null>(null);
+
+  // any other way to a question (a row, `N`, Previous and Next, a link in the Finish dialog) brings the card back
+  current.subscribe(() => {
+    marked.value = false;
+  });
 
   const patch = (id: string, change: (fill: Fill) => Fill): void => {
     const fill = fills.value[id];
@@ -77,6 +84,7 @@ export function createGradeState(data: GradeData) {
     all,
     fills,
     current,
+    marked,
     sidebar,
     phone,
     tried,

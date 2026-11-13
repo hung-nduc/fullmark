@@ -170,6 +170,7 @@ export function buildGradeForm(o: GradeFormOptions): string {
     "base-uri 'none'",
     "form-action 'none'",
     "connect-src 'self'",
+    "frame-src 'self'",
   ].join("; ");
   return [
     "<!doctype html>",

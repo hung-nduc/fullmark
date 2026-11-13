@@ -709,3 +709,137 @@ test("G100: the attempt's replay is served at /marked under the token, with no s
   const form = await (await fetch(base)).text();
   expect(form).not.toContain('"grader":true');
 });
+
+// -- G100: fullmark's own marking in a frame ------------------------------------------------------------------------
+
+const autoRow = (page: Page) => page.locator("[data-auto]");
+const frameOf = (page: Page) => page.frameLocator("iframe[data-frame=marked]");
+
+test("G100: the Scored by fullmark row shows the replay in a frame, on Missed, with no Retry missed", async ({
+  page,
+}) => {
+  const server = await web(folder(), "--name", "Lan");
+  const seen = watch(page);
+  await open(page, server);
+  // no frame until the row is chosen; the row is a button, chosen like a question row
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await expect(page.locator("[data-row=add]")).toHaveAttribute("aria-current", "true");
+  await autoRow(page).click();
+  await expect(autoRow(page)).toHaveAttribute("aria-current", "true");
+  await expect(page.locator("[data-row=add]")).not.toHaveAttribute("aria-current", "true");
+  const iframe = page.locator("iframe[data-frame=marked]");
+  await expect(iframe).toBeVisible();
+  await expect(iframe).toHaveAttribute("title", /^Marked by fullmark: \d+ questions?$/);
+  // it fills the main column, under the dock; the form's bar and sidebar stay
+  const col = (await page.locator(".fm-main").boundingBox()) as { x: number; width: number };
+  const box = (await iframe.boundingBox()) as { x: number; width: number; y: number; height: number };
+  expect(Math.abs(box.width - col.width)).toBeLessThan(2);
+  expect(Math.abs(box.x - col.x)).toBeLessThan(2);
+  await expect(page.locator(".fm-dock")).toBeVisible();
+  await expect(page.locator(".fm-grade-side")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeLessThanOrEqual(940);
+  // the replay: on Missed, no Retry missed, essays and code pending
+  const frame = frameOf(page);
+  await expect(frame.locator("[data-results]")).toBeVisible();
+  await expect(frame.locator("[data-filter=missed]")).toHaveAttribute("aria-pressed", "true");
+  await expect(frame.locator("[data-filter=all]")).toHaveAttribute("aria-pressed", "false");
+  await expect(frame.locator("[data-action=retry-missed]")).toHaveCount(0);
+  await expect(frame.locator("[data-pending-note]")).toBeVisible();
+  // nothing is stored in the browser, and nothing but the form's own requests leaves
+  const keys = await page.evaluate(() => Object.keys(localStorage));
+  expect(keys).toEqual([]);
+  expect(seen.problems).toEqual([]);
+  expect(seen.requests.filter((u) => !u.startsWith(new URL(server.url).origin))).toEqual([]);
+});
+
+test("G100: a question row brings the card back with what was typed, and the frame keeps its filter and scroll", async ({
+  page,
+}) => {
+  const server = await web(folder(), "--name", "Lan");
+  await open(page, server);
+  await value(page, "defs").fill("0.25");
+  await note(page, "defs").fill("Half a definition.");
+  await autoRow(page).click();
+  const frame = frameOf(page);
+  await expect(frame.locator("[data-filter=missed]")).toHaveAttribute("aria-pressed", "true");
+  await frame.locator("[data-filter=all]").click();
+  await expect(frame.locator("[data-filter=all]")).toHaveAttribute("aria-pressed", "true");
+  const inner = page.frames().find((f) => f.url().endsWith("/marked"));
+  expect(inner).toBeDefined();
+  await inner?.evaluate(() => {
+    (window as unknown as { __kept: number }).__kept = 7;
+    window.scrollTo(0, 200);
+  });
+  const scrolled = (await inner?.evaluate(() => window.scrollY)) as number;
+  // a question row: the card is back, the typed values intact, the frame hidden
+  await page.locator("[data-row=add]").click();
+  await expect(page.locator("article[data-qid=add]")).toBeVisible();
+  await expect(value(page, "defs")).toHaveValue("0.25");
+  await expect(note(page, "defs")).toHaveValue("Half a definition.");
+  await expect(page.locator("iframe[data-frame=marked]")).toBeHidden();
+  await expect(autoRow(page)).not.toHaveAttribute("aria-current", "true");
+  // the row again: the same document, the same filter, the same scroll
+  await autoRow(page).click();
+  await expect(page.locator("iframe[data-frame=marked]")).toBeVisible();
+  await expect(frame.locator("[data-filter=all]")).toHaveAttribute("aria-pressed", "true");
+  expect(await inner?.evaluate(() => (window as unknown as { __kept: number }).__kept)).toBe(7);
+  expect(await inner?.evaluate(() => window.scrollY)).toBe(scrolled);
+  // another question's row, and N, also bring the card back
+  await page.locator("[data-row=ielts]").click();
+  await expect(page.locator("article[data-qid=ielts]")).toBeVisible();
+  await autoRow(page).click();
+  await page.locator("body").click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press("n");
+  await expect(page.locator("iframe[data-frame=marked]")).toBeHidden();
+  await expect(page.locator("article.fm-grade-card")).toBeVisible();
+  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+});
+
+test("G100: Save grades still works after the row was used", async ({ page }) => {
+  const dir = folder();
+  const server = await web(dir, "--name", "Lan");
+  await open(page, server);
+  await autoRow(page).click();
+  await expect(frameOf(page).locator("[data-results]")).toBeVisible();
+  await page.locator("[data-row=add]").click();
+  await ctl(page, "defs").locator("[data-act=full]").click();
+  await ctl(page, "derive").locator("[data-act=full]").click();
+  await ctl(page, "interp").locator("[data-act=full]").click();
+  await autoRow(page).click();
+  await page.locator("[data-row=add]").click();
+  await finish(page).click();
+  await page.locator("dialog[open] [data-action=save]").click();
+  await expect(page.locator("[data-grade-saved]")).toContainText("Grades saved");
+  await expect(page.locator("iframe[data-frame=marked]")).toBeHidden();
+  const end = await server.end();
+  expect(end.code).toBe(0);
+  const file = JSON.parse(readFileSync(join(dir, "results-grades.json"), "utf8"));
+  expect(file.grades.add.score ?? file.grades.add.criteria).toBeDefined();
+});
+
+test("G100: Save grades from the frame itself (Finish while it is shown)", async ({ page }) => {
+  const dir = folder();
+  const server = await web(dir, "--name", "Lan");
+  await open(page, server);
+  await ctl(page, "defs").locator("[data-act=full]").click();
+  await ctl(page, "derive").locator("[data-act=full]").click();
+  await ctl(page, "interp").locator("[data-act=full]").click();
+  await autoRow(page).click();
+  await finish(page).click();
+  await page.locator("dialog[open] [data-action=save]").click();
+  await expect(page.locator("[data-grade-saved]")).toContainText("Grades saved");
+  await expect(page.locator("[data-grade-saved]")).toBeVisible();
+  await expect(page.locator("iframe[data-frame=marked]")).toBeHidden();
+  await server.end();
+});
+
+test("G100: passes axe in light and dark with the frame shown", async ({ page }) => {
+  const server = await web(folder());
+  await open(page, server);
+  await autoRow(page).click();
+  await expect(frameOf(page).locator("[data-results]")).toBeVisible();
+  for (const scheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await noViolations(page);
+  }
+});

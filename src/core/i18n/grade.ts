@@ -28,6 +28,8 @@ export const gradeEn = {
     scale: "scale",
   },
   autoTitle: (n: number) => `${n} ${plural(n, "question", "questions")}`,
+  /** the frame's title, for assistive technology (the "Scored by fullmark" row opens it) */
+  markedTitle: (n: number) => `Marked by fullmark: ${n} ${plural(n, "question", "questions")}`,
   essay: "Essay",
   code: "Code",
   points: (n: string, one: boolean) => `${n} ${one ? "point" : "points"}`,
@@ -137,6 +139,7 @@ export const gradeVi: GradeMessages = {
     scale: "thang đo",
   },
   autoTitle: (n) => `${n} câu`,
+  markedTitle: (n) => `Fullmark đã chấm: ${n} câu`,
   essay: "Tự luận",
   code: "Lập trình",
   points: (n) => `${n} điểm`,

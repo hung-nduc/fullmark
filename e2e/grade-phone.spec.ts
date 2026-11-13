@@ -331,3 +331,51 @@ test("G101: the badge has its icon and wash and the head reads points before the
   await expect(page.locator('[data-crit="derive"] .fm-note-dot')).toBeVisible();
   await noSideways(page);
 });
+
+test("G100: on a phone the Scored by fullmark row closes the sidebar and shows the replay in a frame", async ({
+  page,
+}) => {
+  await open(page, folder(), "--name", "Lan");
+  await value(page, "defs").fill("0.25");
+  await press(page, toggle(page));
+  await expect(side(page)).toBeVisible();
+  await press(page, page.locator("[data-auto]"));
+  await expect(side(page)).toHaveCount(0);
+  const iframe = page.locator("iframe[data-frame=marked]");
+  await expect(iframe).toBeVisible();
+  const frame = page.frameLocator("iframe[data-frame=marked]");
+  await expect(frame.locator("[data-results]")).toBeVisible();
+  await expect(frame.locator("[data-filter=missed]")).toHaveAttribute("aria-pressed", "true");
+  await expect(frame.locator("[data-action=retry-missed]")).toHaveCount(0);
+  // the frame fills the column between the bar and the foot bar, and nothing scrolls sideways
+  const box = (await iframe.boundingBox()) as { x: number; width: number; y: number; height: number };
+  expect(Math.round(box.width)).toBe(390);
+  const dockBottom = (await page.locator(".fm-dock").boundingBox()) as { y: number; height: number };
+  expect(Math.abs(box.y - (dockBottom.y + dockBottom.height))).toBeLessThan(2);
+  const footTop = ((await foot(page).boundingBox()) as { y: number }).y;
+  expect(box.y + box.height).toBeLessThanOrEqual(footTop + 1);
+  await noSideways(page);
+  // a question's row brings the card back, with the typed value
+  await press(page, toggle(page));
+  await press(page, side(page).locator("[data-row=add]"));
+  await expect(page.locator("article[data-qid=add]")).toBeVisible();
+  await expect(iframe).toBeHidden();
+  await expect(value(page, "defs")).toHaveValue("0.25");
+  // axe, light and dark, with the frame shown again
+  await press(page, toggle(page));
+  await press(page, page.locator("[data-auto]"));
+  await expect(frame.locator("[data-results]")).toBeVisible();
+  for (const scheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await noViolations(page);
+  }
+  // Save grades still works after the row was used
+  await press(page, toggle(page));
+  await press(page, side(page).locator("[data-row=add]"));
+  await press(page, ctl(page, "defs").locator("[data-act=full]"));
+  await press(page, ctl(page, "derive").locator("[data-act=full]"));
+  await press(page, ctl(page, "interp").locator("[data-act=full]"));
+  await press(page, foot(page).locator("[data-action=finish]"));
+  await press(page, page.locator("dialog[open] [data-action=save]"));
+  await expect(page.locator("[data-grade-saved]")).toContainText("Grades saved");
+});

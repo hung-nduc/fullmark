@@ -31,6 +31,24 @@
     margin-top: 24px;
   }
 
+  /* fullmark's own marking: the replay in a frame filling the main column under the dock (G100) */
+  .fm-grade .fm-body .fm-main > .fm-grade-frame {
+    display: block;
+    width: 100%;
+    height: calc(100vh - var(--dock-h, 99px));
+    margin: 0;
+    background: var(--bg);
+    border: 0;
+  }
+
+  .fm-grade .fm-body .fm-main > .fm-grade-frame[hidden] {
+    display: none;
+  }
+
+  .fm-grade .fm-main[data-marked] {
+    padding-bottom: 0;
+  }
+
   .fm-grade-card-head {
     display: flex;
     gap: 12px;
@@ -555,9 +573,10 @@
     font-weight: 400;
   }
 
-  /* fullmark's own marking: a graded row that is not a button */
+  /* fullmark's own marking: a graded row, chosen like a question row (G100) */
   .fm-grade-auto {
-    cursor: default;
+    text-align: left;
+    cursor: pointer;
   }
 
   .fm-grade-legend {
@@ -753,6 +772,11 @@
   @media (max-width: 759px) {
     .fm-grade .fm-body[data-side="open"] {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* the foot bar (69 px) stays under the frame */
+    .fm-grade .fm-body .fm-main > .fm-grade-frame {
+      height: calc(100dvh - var(--dock-h, 99px) - 69px);
     }
 
     .fm-phone-head {
