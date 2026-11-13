@@ -48,7 +48,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is drafted ("Slice 3r", at the end) and waits for the owner's approval; then an implementing agent builds it and the planner reviews it.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
-3. **3p2** (`grade --web --grades`, G75): waits for the owner's review of the GradeAI board. GradeAI is back on the canvas (2026-11-13, in the "Forms: quiz grade --web" row, with Grade, which it imports and whose Tweaks switch `prefill`); its rubric predates G86, so RubricC's box stands for the rubric and GradeAI for the band, the card's state, **Undo my changes** and the status line.
+3. **3p2** (`grade --web --grades`, G75): waits for the owner's review of the GradeAI board. GradeAI is redrawn in the rubric box and back on the canvas (2026-11-13, in the "Forms: quiz grade --web" row; interactive, with Tweaks for the rubric type and for unchanged or adjusted); G75 says what it draws.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -84,7 +84,17 @@ The design docs left these open, or a slice's review found them. Each needs the 
 
 **Open:**
 
-**G75. Claude's grades pre-filled** (raised drafting the boards). **Open: the owner asks for a mockup example first** (DEV_RESPONSE.md). Until a board draws it and it is decided, `--web` with `--grades` is refused as not available yet (3f), and the rest of `--web` is built without it. With `--grades` from an AI, every value, note and text is in place and the question counts as graded. A band on each card names the grader and the date and says "Accept it as it is, or change any cell"; the state reads **AI grade, unchanged** or **Adjusted**, and an adjusted card has **Undo my changes**, which puts the AI's values back. The status line adds "Pre-filled from Claude Opus 5.5's grades". **Recommend:** as drawn; the file written has `grader: {kind: "human", name}` and `reviewed` naming the AI grader once, at the top, for every question, changed or not, since the human saw each before saving (COMMANDS.md, `--web`); no question carries its own `grader`. A `--grades` file from a human pre-fills the same way, with "Pre-filled from NAME's grades".
+**G75. Claude's grades pre-filled** (raised drafting the boards). **Open: the owner asks for a mockup example first** (DEV_RESPONSE.md). **Redrawn on 2026-11-13** in the design language decided since (G86's box, G96's layout, G98 and G101), since the first GradeAI was drawn on the old form; the text below is the first draft, and **the redraw** (after it) is what the board now shows. Until a board draws it and it is decided, `--web` with `--grades` is refused as not available yet (3f), and the rest of `--web` is built without it. With `--grades` from an AI, every value, note and text is in place and the question counts as graded. A band on each card names the grader and the date and says "Accept it as it is, or change any cell"; the state reads **AI grade, unchanged** or **Adjusted**, and an adjusted card has **Undo my changes**, which puts the AI's values back. The status line adds "Pre-filled from Claude Opus 5.5's grades". **Recommend:** as drawn; the file written has `grader: {kind: "human", name}` and `reviewed` naming the AI grader once, at the top, for every question, changed or not, since the human saw each before saving (COMMANDS.md, `--web`); no question carries its own `grader`. A `--grades` file from a human pre-fills the same way, with "Pre-filled from NAME's grades".
+
+**The redraw** (GradeAI, 2026-11-13). Where the first draft put a band on each card, the redraw uses the places the box already has:
+- **The status line** ends with a pill in the `info` colours: "Pre-filled from Claude Opus 5.5's grades".
+- **The box head's right side**, which reads "Graded by you / saved at Finish" in the form, reads "Graded by Claude (agent) / 5 Nov 2026 · unchanged" while the question is as Claude left it, and "Claude (agent), adjusted by you / saved at Finish" after any change.
+- **The card's badge** is the result, as on RubricC once a question is graded ("Partly right · 2.5 / 3"), since every pre-filled question is graded; "AI grade, unchanged" and "Adjusted" move to the box head and the sidebar.
+- **What Claude gave stays in sight:** under a changed score or verdict, a muted "Claude gave 1.5" (or "Claude said Missed"); under the total, "Claude's total 2.5"; under a changed note or text, "Claude wrote: …". *New in the redraw.*
+- **The card's foot:** while unchanged, an `info` line on the left, "Claude's grade. Accept it as it is, or change any score or note."; once changed, **Undo my changes** (the undo icon) in its place, which puts Claude's values back for this question. **Clear this question** stays on the right.
+- **The sidebar:** an unchanged question is a graded row (✓) with "Claude's grade" under its name; an adjusted one keeps the graded row's colours with ✎ and "adjusted by you" in `accent`. The legend gains **Adjusted**.
+
+**Recommend** (the redraw): as drawn, with the file written as above. The "Claude gave" lines are the redraw's own addition, for the owner to keep or drop.
 
 ## Slices
 

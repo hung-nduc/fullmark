@@ -255,20 +255,13 @@
       "x": 1360,
       "y": 2820
     },
-    "Grade.dc.html": {
-      "h": 940,
-      "w": 1280,
-      "x": 5440,
-      "y": 14522,
-      "is_interactive": true,
-      "title": "The grade form the other Grade boards import (Tweaks: prefill none or ai). Its rubric predates G86 (RubricC wins)"
-    },
     "GradeAI.dc.html": {
-      "h": 940,
+      "h": 1500,
       "w": 1280,
       "x": 4080,
       "y": 14522,
-      "title": "G75, open: Claude's grades pre-filled (holistic, paper). Back for the owner's review; its rubric predates G86 (RubricC wins)"
+      "is_interactive": true,
+      "title": "G75, interactive: grade --web over Claude's grades, in the rubric box (G86); Tweaks for the rubric type and unchanged or adjusted"
     }
   },
   "createdOnFiles": {
@@ -334,7 +327,6 @@
     "GradeFinish.dc.html",
     "GradeBlocked.dc.html",
     "GradeDone.dc.html",
-    "Grade.dc.html",
     "GradeAI.dc.html",
     "RubricC.dc.html",
     "RubricPhoneReplay.dc.html",
