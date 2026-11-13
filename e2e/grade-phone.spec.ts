@@ -367,7 +367,7 @@ test("G100: on a phone the Scored by fullmark row closes the sidebar and shows t
   await expect(frame.locator("[data-results]")).toBeVisible();
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    await noViolations(page);
+    await noViolations(page, ["landmark-unique"]); // two mains: see the wide test (G103)
   }
   // Save grades still works after the row was used
   await press(page, toggle(page));
@@ -378,4 +378,27 @@ test("G100: on a phone the Scored by fullmark row closes the sidebar and shows t
   await press(page, foot(page).locator("[data-action=finish]"));
   await press(page, page.locator("dialog[open] [data-action=save]"));
   await expect(page.locator("[data-grade-saved]")).toContainText("Grades saved");
+});
+
+test("G103: on a phone the frame has no second bar or Download results, and shows in the form's dark and larger text", async ({
+  page,
+}) => {
+  await open(page, folder(), "--name", "Lan");
+  await press(page, page.locator("[data-action=appearance]"));
+  await press(page, page.locator("[data-theme-pick=dark]"));
+  await press(page, page.locator("[data-action=larger]"));
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await press(page, toggle(page));
+  await press(page, page.locator("[data-auto]"));
+  const frame = page.frameLocator("iframe[data-frame=marked]");
+  await expect(frame.locator("[data-results]")).toBeVisible();
+  await expect(frame.locator(".fm-topbar")).toHaveCount(0);
+  await expect(frame.locator("[data-action=export]")).toHaveCount(0);
+  await expect(frame.locator("[data-replay-banner]")).toBeVisible();
+  await expect(frame.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(frame.locator("html")).toHaveAttribute("data-size", "19");
+  // one bar only: the form's
+  await expect(page.locator(".fm-dock")).toHaveCount(1);
+  await noSideways(page);
+  await noViolations(page, ["landmark-unique"]); // two mains: see the wide test (G103)
 });

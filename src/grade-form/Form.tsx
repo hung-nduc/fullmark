@@ -644,6 +644,9 @@ function BlankCard({ state, item }: { state: GradeState; item: GradeItem }) {
 
 // -- the bar and the sidebar ------------------------------------------------------------------------------------------
 
+/** What `applyLook` sets on a document root: the form's look, which its frame copies. */
+const LOOK_ATTRIBUTES = ["data-theme", "data-size", "data-font"] as const;
+
 function Bar({ state, store, t }: { state: GradeState; store: LookStore; t: PageT }) {
   const { r, data } = state;
   const lang = data.uiLang;
@@ -1236,8 +1239,33 @@ export function Form({
   }, [state.current.value, done, state.marked.value]);
   // the frame is made the first time the row is chosen and kept (hidden) after, so the replay keeps its scroll and filter
   const made = useRef(false);
+  const frame = useRef<HTMLIFrameElement>(null);
   const marked = state.marked.value && !done;
   if (marked) made.current = true;
+  // the frame follows the form's look (G103): its theme, text size and font are the form's own, set when it loads and
+  // whenever they change; the frame's page sets none and stores none
+  useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const copy = (): void => {
+      const target = el.contentDocument?.documentElement;
+      if (!target) return;
+      for (const name of LOOK_ATTRIBUTES) {
+        const value = root.getAttribute(name);
+        if (value === null) target.removeAttribute(name);
+        else target.setAttribute(name, value);
+      }
+    };
+    copy();
+    el.addEventListener("load", copy);
+    const watch = new MutationObserver(copy);
+    watch.observe(root, { attributes: true, attributeFilter: [...LOOK_ATTRIBUTES] });
+    return () => {
+      el.removeEventListener("load", copy);
+      watch.disconnect();
+    };
+  }, [made.current]);
   const phone = state.phone.value;
   // on a phone an open sidebar takes the screen: what is under it is not there (as Review's)
   const covered = phone && state.sidebar.value && !done;
@@ -1255,10 +1283,10 @@ export function Form({
           lang={data.uiLang}
           data-covered={covered ? "true" : undefined}
           data-marked={marked ? "" : undefined}
-          aria-label={marked ? state.r.autoHead : undefined}
         >
           {made.current ? (
             <iframe
+              ref={frame}
               class="fm-grade-frame"
               data-frame="marked"
               src="./marked"

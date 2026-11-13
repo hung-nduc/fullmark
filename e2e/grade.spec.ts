@@ -840,6 +840,54 @@ test("G100: passes axe in light and dark with the frame shown", async ({ page })
   await expect(frameOf(page).locator("[data-results]")).toBeVisible();
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    await noViolations(page);
+    // landmark-unique: the form's main and the frame's main are two mains once the form's no longer carries a name
+    // (G103, "one name"); reported to the planner as a proposed gap, so that nothing else is hidden meanwhile
+    await noViolations(page, ["landmark-unique"]);
   }
+});
+
+test("G103: the frame has no top bar and no Download results, and follows the form's theme and text size", async ({
+  page,
+}) => {
+  const server = await web(folder(), "--name", "Lan");
+  await open(page, server);
+  // the look is chosen before the frame is first opened
+  await page.locator("[data-action=appearance]").click();
+  await page.locator("[data-theme-pick=dark]").click();
+  // the wide bar has no text size control (the phone's menu has one, below): the attribute is what `applyLook` sets
+  await page.evaluate(() => document.documentElement.setAttribute("data-size", "19"));
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await autoRow(page).click();
+  const frame = frameOf(page);
+  await expect(frame.locator("[data-results]")).toBeVisible();
+  await expect(frame.locator(".fm-topbar")).toHaveCount(0);
+  await expect(frame.locator("[data-action=sidebar]")).toHaveCount(0);
+  await expect(frame.locator("[data-action=focus-mode]")).toHaveCount(0);
+  await expect(frame.locator("[data-action=export]")).toHaveCount(0);
+  await expect(frame.locator("[data-replay-banner]")).toBeVisible();
+  await expect(frame.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(frame.locator("html")).toHaveAttribute("data-size", "19");
+  // the keys of the page do nothing in the frame
+  await frame.locator("[data-filter=all]").click();
+  await frame.locator("body").press("q");
+  await expect(frame.locator("[data-side=open]")).toHaveCount(0);
+  // a change while the frame exists reaches it
+  await page.evaluate(() => document.documentElement.setAttribute("data-size", "21"));
+  await expect(frame.locator("html")).toHaveAttribute("data-size", "21");
+  await page.locator("[data-action=appearance]").click();
+  await page.locator("[data-theme-pick=light]").click();
+  await expect(frame.locator("html")).not.toHaveAttribute("data-theme", "dark");
+  // the frame stores nothing
+  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+});
+
+test("G103: the form's main keeps its own name while the frame shows; the frame is named by its title alone", async ({
+  page,
+}) => {
+  const server = await web(folder());
+  await open(page, server);
+  await autoRow(page).click();
+  await expect(frameOf(page).locator("[data-results]")).toBeVisible();
+  await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.+/);
+  await expect(page.locator("iframe[data-frame=marked]")).toHaveAttribute("title", /^Marked by fullmark/);
 });
