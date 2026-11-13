@@ -658,7 +658,7 @@ test("G101: each state's badge has its icon and wash, the head, the saved card, 
   await expect(page.locator('[data-crit="defs"] .fm-note-dot')).toHaveCount(0);
   await note(page, "derive").fill("Lost a mark.");
   await note(page, "interp").fill("Lost a mark too.");
-  await expect(badge).toContainText("Graded");
+  await expect(badge).toContainText("Partly right");
   const done = await look();
   expect(done.icons).toBe(1);
   expect(done.wash).not.toBe(bad.wash);

@@ -30,7 +30,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
-| 3r G101, then fullmark's own marking from the form (G83) | built by Sonnet (2026-11-13), waits for the planner's review | `972533e`..`a0948db` |
+| 3r G101, then fullmark's own marking from the form (G83) | done, reviewed (2026-11-13), the result badge fixed in review; G103 for the owner | `972533e`..`e376c8a`, review |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r | |
 | 3h `brief --web` | waits for its boards (3v) | |
@@ -46,7 +46,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 How each slice got here is in its own **Review**; the table above is the summary.
 
-1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is approved (2026-11-13, "Slice 3r", at the end) and handed to one Sonnet agent; the planner reviews it when it reports.
+1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review): the result badge fixed in review; **G103** (what the grader's frame shows of the replay page) waits for the owner, and makes a small slice, **3r2**, with the 3r screens' spec.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
 3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r's review.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
@@ -82,7 +82,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G103. What the grader's frame shows of the replay page** (raised in 3r's review, from the owner's question about two bars). The frame holds the replay page as `quiz replay` builds it, top bar included: under the form's bar, a second title row with its own **Questions** (a second sidebar), **Focus mode**, text size and Appearance; on a phone, two rows of icons. The form's Appearance choices do not reach it, so a grader who picks dark gets a light frame. The results card offers **Download results**, the learner's action. COMMANDS.md calls the view "drawn with the replay's question cards and its All · Missed filter". **Recommend:** with `PageReplay.grader` the page has no top bar: it starts at the Replay banner ("Replay · Attempt of 23 Oct 2026 · grades pending"), then the filter, the results card and the question cards. Its look follows the form's: the form sets its theme and text size on the frame's document (same origin) when the frame is made and whenever they change. The results card keeps the score, points, time, goal and the pending note, and drops **Download results**. The frame is then named once, by the iframe's title; the form's `main` keeps its own name. `quiz replay`'s page and `build`'s are unchanged, apart from the bundle. A small slice, **3r2**, builds it with the 3r screens' spec, before 3p2.
 
 ## Slices
 
@@ -1008,3 +1008,21 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 `npm run check` passes in Chromium and Firefox, the budget test included. The "Scored by fullmark" row shows the attempt's replay inside the form, on Missed, and nothing typed is lost. A `build` page carries no server code and is byte-identical with and without the server features. Every screen set beside its board, each difference listed. Report as the rules say, every golden that changed counted and explained.
 
 ### Review
+
+**Reviewed by Opus on 2026-11-13.** Built by Sonnet in `972533e`..`e376c8a`, from the brief alone, with one review fix (the result badge, below).
+
+- **`npm run check` exits 0**, run in review over Sonnet's commits with the review fix's Form and tests in the Playwright build. Typecheck, Biome and knip clean. The 2 startup tests, then Vitest: 114 files, **2745 of 2745**. Playwright: **525 passed** (266 Chromium, 257 Firefox, the 2 budget projects), 341 skipped (the `screens-*` specs, which run only with `FULLMARK_SCREENS`), none failed. Firefox ran (installed in `~/.cache/ms-playwright`). After the fix, typecheck, Biome, Vitest (2745 of 2745) and `grade.spec.ts` with `grade-phone.spec.ts` in both browsers (70 of 70) were run again.
+- **Goldens: 9 cases, 14 files**, all from the page runtime growing by 259 bytes with `PageReplay.grader`: in 12 HTML pages the runtime, its CSP hash and the two lines around it; in 2 `stdout.txt` the `bytes` count (246020 to 246279). Read in review; nothing else moved, none reverted. A `build` page is still byte-identical with and without the server features.
+- **G101** as the boards draw it: the card's head ("Question 2 · 3 points · essay"), the state badges with their icons and washes, the saved card (768 px at 160 px), the amber dot by a required note, the keys in the monospace font; the sidebar stays 300 px.
+- **G100**: `grade --web` builds the attempt's replay with `buildPage` (no server module, no `connect-src`) and serves it at `/<token>/marked`; `PageReplay.grader` opens it on Missed, drops Retry missed and makes the browser storage read-only. The "Scored by fullmark" row is chosen like a question row and shows it in a frame titled "Marked by fullmark: N questions", made once and hidden, not unloaded; typed values, the replay's filter and its scroll survive; the form's CSP gains `frame-src 'self'`. Checked wide and at 390 px, with axe in light and dark.
+- **Fixed in review: the graded card's badge.** Sonnet kept "✓ Graded · 2 / 3" in green; COMMANDS.md ("The card's state") and RubricC give a graded card the replay's result badge. It now reads **Correct**, **Partly right** or **Wrong** with the score, in the results colours (`ok`; `warn` on `surface` with a 2 px `warn` border; `bad`), with RubricC's icons, from the page's own words (`status`). Two Playwright checks changed with it ("Partly right · 2.25 / 3"). The screen `3-wide-graded.png` still shows the old badge: the 3r screens were taken by hand, with no `screens-3r` spec, so they cannot be taken again by a command (below).
+- **Tried by hand:** the screens, read against the boards. Not driven in a browser outside Playwright.
+
+**Done differently, accepted in review unless the owner says otherwise:** the replay opens on Missed even when nothing was missed (the page's own empty Missed list); the form's `<main>` is named "Scored by fullmark" while the frame shows, since the replay has its own `main` and axe asks landmarks to be unique; while the frame shows, only its row carries `aria-current`; the replay is built with no profile, fonts or `ui_lang` given, so its Information tab is a default `build` page's; on a phone the frame stops above the foot bar, and Previous or Next brings the card back; `Prepared` carries the materials sheets, so the frame shows them as `quiz replay` does; the dot sits beside the note field, outside it, as the board's dot slot does.
+
+**Found in review:**
+- **The frame shows the replay's whole page, its top bar included** (the owner's question on the screens): a second title row with its own **Questions**, **Focus mode**, text size and Appearance, under the form's bar; on a phone, two rows of icons. The brief named only three effects of `grader` and did not say to drop the page's chrome: a gap in the brief, G103. Sonnet's own gap, that the form's look does not reach the frame, is part of it.
+- **The 3r screens have no spec.** `docs/screens/3r/` was taken by hand; earlier slices took theirs with a `screens-<slice>.spec.ts` run by `FULLMARK_SCREENS`. The next slice adds `e2e/screens-3r.spec.ts` (or extends 3p's) and takes them again, the badge included.
+- **Sonnet's second gap** (the frame named twice to assistive technology, by the iframe's title and the `main`'s name): left as it is; it goes with G103, which changes what the frame holds.
+
+**G103 for the owner.**

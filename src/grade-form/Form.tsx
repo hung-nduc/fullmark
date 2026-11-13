@@ -400,6 +400,10 @@ const BADGE_ICONS: Record<string, string> = {
   blank: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
   note: "M12 7v6M12 17v.01",
   done: "M5 12.5l4.5 4.5L19 7",
+  // a graded card shows the replay's result badge (COMMANDS.md, `quiz grade`, "The card's state"): RubricC's icons
+  correct: "M5 12.5l4.5 4.5L19 7",
+  partial: "M12 4a8 8 0 0 1 0 16z",
+  incorrect: "M6 6l12 12M18 6L6 18",
 };
 function BadgeIcon({ condition }: { condition: string }) {
   return (
@@ -516,6 +520,9 @@ function Card({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT
   const { r } = state;
   const ev = state.evaluated.value[item.id];
   const condition = ev?.condition ?? "none";
+  const earned = condition === "done" ? ev?.total?.earned : undefined;
+  const result =
+    earned === undefined ? null : earned >= item.points ? "correct" : earned <= 0 ? "incorrect" : "partial";
   const idx = state.all.findIndex((q) => q.id === item.id);
   const prev = state.all[idx - 1];
   const next = state.all[idx + 1];
@@ -531,12 +538,12 @@ function Card({ state, item, t }: { state: GradeState; item: GradeItem; t: PageT
     >
       <header class="fm-grade-card-head">
         <span class="fm-grade-meta">{r.head(item.number, pointsOf(state, item), kindOf(r, item))}</span>
-        <span class="fm-grade-badge" data-condition={condition}>
-          <BadgeIcon condition={condition} />
-          {r.badge[condition]}
+        <span class="fm-grade-badge" data-condition={condition} data-result={result ?? undefined}>
+          <BadgeIcon condition={result ?? condition} />
+          {result === null ? r.badge[condition] : t.status[result]}
           {condition === "half" && ev ? ` · ${r.halfOf(ev.given, ev.of)}` : ""}
-          {condition === "done" && ev?.total
-            ? ` · ${num(ev.total.earned, state.data.uiLang)} / ${num(item.points, state.data.uiLang)}`
+          {result !== null && earned !== undefined
+            ? ` · ${num(earned, state.data.uiLang)} / ${num(item.points, state.data.uiLang)}`
             : ""}
         </span>
       </header>

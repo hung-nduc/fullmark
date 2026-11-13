@@ -138,7 +138,7 @@ test("grades an additive question by touch: the slot's parts are 44 px and stack
   await value(page, "interp").fill("0.5");
   await note(page, "interp").fill("No link to stability.");
   await expect(page.locator("[data-ctl=total]")).toContainText("2.25");
-  await expect(page.locator("article[data-qid=add] .fm-grade-badge")).toContainText("Graded");
+  await expect(page.locator("article[data-qid=add] .fm-grade-badge")).toContainText("Partly right · 2.25 / 3");
   await expect(page.locator("[data-compact]")).toHaveText("Graded 1 of 5 · Question 2");
   await press(page, page.locator("details[data-fold=sample] summary"));
   await expect(page.locator("details[data-fold=sample]")).toHaveJSProperty("open", true);

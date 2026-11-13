@@ -93,6 +93,18 @@
     background: var(--ok-wash);
   }
 
+  /* a graded card: the replay's result badge, in the results map's colours (RubricC) */
+  .fm-grade-badge[data-result="incorrect"] {
+    color: var(--bad);
+    background: var(--bad-wash);
+  }
+
+  .fm-grade-badge[data-result="partial"] {
+    color: var(--warn);
+    background: var(--surface);
+    border: 2px solid var(--warn);
+  }
+
   .fm-grade-prompt {
     margin: 10px 0 16px;
     font-size: 1.1em;
