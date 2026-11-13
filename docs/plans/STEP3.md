@@ -31,7 +31,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
-| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | brief drafted (2026-11-13), for the owner | |
+| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | brief approved (2026-11-13), handed to the implementing agent | |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
@@ -47,7 +47,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 How each slice got here is in its own **Review**; the table above is the summary.
 
-1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** as recommended; **3r2's brief is drafted** ("Slice 3r2", at the end), waiting for the owner's approval.
+1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** as recommended; **3r2's brief is approved** (2026-11-13) and handed to the implementing agent ("Slice 3r2", at the end); its review comes next.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
 3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r2's review.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
@@ -1031,7 +1031,7 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 
 ## Slice 3r2: G103, the grader's frame without the replay's bar
 
-**Drafted on 2026-11-13, for the owner's approval.** G103 as decided, then the 3r screens taken by a spec, as every slice before 3r took its own. Small: one page flag's effects, one form effect, one spec.
+**Approved by the owner on 2026-11-13.** G103 as decided, then the 3r screens taken by a spec, as every slice before 3r took its own. Small: one page flag's effects, one form effect, one spec.
 
 ### Read first
 
