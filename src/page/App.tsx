@@ -423,6 +423,8 @@ function Dock({
   children?: ComponentChildren;
 }) {
   const answering = state.attempt.value.phase === "answering";
+  // `quiz grade --web`'s frame (G103): no bar and no status line, so the page starts at the Replay banner
+  const grader = state.replay.value?.grader === true;
   // Submit asks first; a deadline that passes submits with no dialog (the phase changes and the dialog goes)
   const [asking, setAsking] = useState(false);
   const dock = useRef<HTMLDivElement>(null);
@@ -453,40 +455,42 @@ function Dock({
     : [];
   return (
     <div class="fm-dock" data-dock data-phone={phone ? "true" : undefined} ref={dock}>
-      <div class="fm-topbar">
-        {phone ? (
-          <>
-            <h1 class="fm-sr">{state.page.title}</h1>
-            <span class="fm-phone-line" data-compact>
-              {line.map((part, i) => (
-                <span key={part.kind}>
-                  {i > 0 ? " · " : null}
-                  <Emphasis kind={part.kind === "progress" ? "question" : part.kind} text={part.text} />
-                </span>
-              ))}
-            </span>
-          </>
-        ) : (
-          <h1 class="fm-title">{state.page.title}</h1>
-        )}
-        <div class="fm-topbar-actions">
-          <SidebarButton t={t} state={state} store={store} />
-          <FocusButton t={t} store={store} />
-          {phone ? null : <TextSize t={t} store={store} />}
-          {store.look.locked && !phone ? null : <AppearanceButton t={t} store={store} />}
-          {answering ? (
-            <button type="button" class="fm-button fm-primary" data-action="submit" onClick={() => setAsking(true)}>
-              {t.submit}
-            </button>
-          ) : null}
+      {grader ? null : (
+        <div class="fm-topbar">
+          {phone ? (
+            <>
+              <h1 class="fm-sr">{state.page.title}</h1>
+              <span class="fm-phone-line" data-compact>
+                {line.map((part, i) => (
+                  <span key={part.kind}>
+                    {i > 0 ? " · " : null}
+                    <Emphasis kind={part.kind === "progress" ? "question" : part.kind} text={part.text} />
+                  </span>
+                ))}
+              </span>
+            </>
+          ) : (
+            <h1 class="fm-title">{state.page.title}</h1>
+          )}
+          <div class="fm-topbar-actions">
+            <SidebarButton t={t} state={state} store={store} />
+            <FocusButton t={t} store={store} />
+            {phone ? null : <TextSize t={t} store={store} />}
+            {store.look.locked && !phone ? null : <AppearanceButton t={t} store={store} />}
+            {answering ? (
+              <button type="button" class="fm-button fm-primary" data-action="submit" onClick={() => setAsking(true)}>
+                {t.submit}
+              </button>
+            ) : null}
+          </div>
         </div>
-      </div>
-      {phone ? null : <StatusLine t={t} state={state} store={store} />}
+      )}
+      {phone || grader ? null : <StatusLine t={t} state={state} store={store} />}
       <p class="fm-sr" role="status" aria-live="polite">
         {state.said.value}
       </p>
       {children}
-      {store.look.locked && !phone ? null : <AppearanceMenu t={t} store={store} />}
+      {grader || (store.look.locked && !phone) ? null : <AppearanceMenu t={t} store={store} />}
       {answering && asking ? (
         <SubmitDialog
           t={t}
@@ -573,14 +577,14 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
   const graded = state.graded.value;
   const started = attempt.phase !== "start";
   const phone = store.screen.phone.value;
+  // the grader's frame (G103) has no sidebar: the form's own is the only one
+  const grader = state.replay.value?.grader === true;
+  const sidebarOpen = state.sidebar.value && !grader;
   const form = sideForm(page, attempt.phase, phone);
   const wide =
-    !phone &&
-    started &&
-    state.sidebar.value &&
-    (form === "stacked" || (form === "tabs" && state.side.value === "materials"));
+    !phone && started && sidebarOpen && (form === "stacked" || (form === "tabs" && state.side.value === "materials"));
   // on a phone an open sidebar (or the start screen's Materials panel) takes the screen: what is under it is not there
-  const covered = phone && (started ? state.sidebar.value : state.shelf.value);
+  const covered = phone && (started ? sidebarOpen : state.shelf.value);
   const materials = page.materials !== undefined && page.materials.length > 0;
   let number = 0;
   const missed = graded ? new Set(missedIds(graded)) : new Set<string>();
@@ -604,11 +608,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
           ) : null}
         </Dock>
       ) : null}
-      <div
-        class="fm-body"
-        data-side={started && state.sidebar.value ? "open" : "closed"}
-        data-wide={wide ? "true" : undefined}
-      >
+      <div class="fm-body" data-side={started && sidebarOpen ? "open" : "closed"} data-wide={wide ? "true" : undefined}>
         <div
           class="fm-main"
           data-covered={covered ? "true" : undefined}
@@ -666,7 +666,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
                   onNew={() => store.newAttempt(page.id)}
                   onRetry={() => store.retry(page.id)}
                   replaying={state.replay.value !== null}
-                  grader={state.replay.value?.grader === true}
+                  grader={grader}
                   served={store.served}
                   delivery={state.delivery.value}
                 />
@@ -710,7 +710,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
           {/* the page's foot, after the last question; Focus mode shows nothing but the quiz: no button, no tab stop */}
           {last && !store.screen.fullscreen.value ? <LicencesButton t={t} /> : null}
         </div>
-        {started && state.sidebar.value ? <Sidebar t={t} state={state} store={store} /> : null}
+        {started && sidebarOpen ? <Sidebar t={t} state={state} store={store} /> : null}
         {attempt.phase === "start" && materials && state.shelf.value ? <MaterialsPanel t={t} state={state} /> : null}
       </div>
     </section>

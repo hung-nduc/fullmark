@@ -18,7 +18,6 @@ import {
   lookKey,
   quizPrefix,
   readLook,
-  readOnly,
   readSaved,
   replayAttemptKey,
   type Saved,
@@ -323,7 +322,7 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
   /** the section of every question, per quiz */
   const sectionOf = new Map<string, Map<string, string>>();
   // under `serve --autosave` the file is the one copy of the attempt: the browser's storage is not used
-  // the frame of `quiz grade --web` (`PageReplay.grader`) reads the look the form shares and writes nothing
+  // the frame of `quiz grade --web` (`PageReplay.grader`) reads and writes nothing: the form sets its look (G103)
   const grader = data.quizzes.some((q) => q.replay?.grader === true);
   const stored: Saver | null =
     deps.storage && data.autosave !== true
@@ -331,7 +330,7 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
           for (const state of quizzes.values()) state.blocked.value = true;
         })
       : null;
-  const saver: Saver | null = stored !== null && grader ? readOnly(stored) : stored;
+  const saver: Saver | null = grader ? null : stored;
 
   for (const page of data.quizzes) {
     const ids = page.sections.flatMap((s) => s.questions.map((q) => q.id));

@@ -15,11 +15,6 @@ export type Saver = {
   keys(prefix: string): string[];
 };
 
-/** A `Saver` that reads and writes nothing: the page of `quiz grade --web`'s frame stores nothing in the browser. */
-export function readOnly(saver: Saver): Saver {
-  return { ...saver, set: () => undefined, remove: () => undefined };
-}
-
 /** A `Saver` over a `Storage` that may be missing or may throw. `onFail` runs once, at the first failure. */
 export function saverOver(find: () => Storage | null | undefined, onFail: () => void): Saver {
   let ok = true;

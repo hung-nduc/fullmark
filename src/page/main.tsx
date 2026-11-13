@@ -15,15 +15,17 @@ if (dataElement && root) {
   const data = JSON.parse(dataElement.textContent ?? "") as PageData;
   // `localStorage` may throw on access (a blocked or sandboxed page): the store wraps every use
   const store = createStore(data, { storage: () => window.localStorage });
+  // the grader's frame (G103) has the look of the form that holds it: the form sets it, the page sets none and has no keys
+  const grader = data.quizzes.some((q) => q.replay?.grader === true);
   // first: the theme, so the page never shows another one than the learner's
-  applyLook(store);
+  if (!grader) applyLook(store);
   hydrate(<App store={store} />, root);
   (window as unknown as { fullmark: unknown }).fullmark = { events: store.events, autosave: store.autosave };
   // after hydration, so the first render is the one the build made: then a saved attempt is restored over it
   const start = (): void => {
     store.restore();
     store.run();
-    installKeys(store);
+    if (!grader) installKeys(store);
     store.events.emit("ready", { quizIds: [...store.quizzes.keys()] });
   };
   // a served page has a second script (the server module) after this one: it is listening before anything is emitted,

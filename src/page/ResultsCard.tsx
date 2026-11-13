@@ -203,7 +203,7 @@ export function ResultsCard({
             ) : null}
           </span>
         ) : null}
-        {delivery === "sent" ? null : (
+        {delivery === "sent" || grader ? null : (
           <button type="button" class="fm-button" data-action="export" title={t.exportHint} onClick={onDownload}>
             <Icon name="download" size={18} />
             {t.download}

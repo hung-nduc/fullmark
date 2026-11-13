@@ -114,12 +114,27 @@ describe("a replay page with grader: true", () => {
     expect(other.writes).toBeGreaterThan(0);
   });
 
-  it("reads the look the form chose, and never keeps another", () => {
+  it("draws no top bar, status line, sidebar or Download results, and starts at the Replay banner (G103)", () => {
+    const grader = page(true).html;
+    expect(grader).not.toContain("fm-topbar");
+    expect(grader).not.toContain('data-action="sidebar"');
+    expect(grader).not.toContain('data-action="focus-mode"');
+    expect(grader).not.toContain('data-action="export"');
+    expect(grader).not.toContain("fm-status");
+    expect(grader).not.toContain("fm-side");
+    expect(grader).toContain("data-replay-banner");
+    // a replay without the flag keeps all of them
+    const plain = page(false).html;
+    expect(plain).toContain("fm-topbar");
+    expect(plain).toContain('data-action="export"');
+  });
+
+  it("reads no stored look and keeps none", () => {
     const shared = new Memory();
     const look = `fullmark:v1:gr:${page(true).q.hash}:look`;
     shared.items.set(look, JSON.stringify({ theme: "dark" }));
     const l = page(true, shared);
-    expect(l.store.look.shown.value).toBe("dark");
+    expect(l.store.look.shown.value).not.toBe("dark");
     expect([...shared.items.keys()]).toEqual([look]);
   });
 });
