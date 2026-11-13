@@ -48,7 +48,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is drafted ("Slice 3r", at the end) and waits for the owner's approval; then an implementing agent builds it and the planner reviews it.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
-3. **3p2** (`grade --web --grades`, G75): waits for the owner's review of the GradeAI board. GradeAI was taken off the canvas on 2026-11-07 with the other Grade boards; its source is `docs/mockup/boards/GradeAI.dc.html` (it imports `Grade.dc.html` with `prefill` set), so the owner either reviews it put back on the canvas, or decides G75 from its text.
+3. **3p2** (`grade --web --grades`, G75): waits for the owner's review of the GradeAI board. GradeAI is back on the canvas (2026-11-13, in the "Forms: quiz grade --web" row, with Grade, which it imports and whose Tweaks switch `prefill`); its rubric predates G86, so RubricC's box stands for the rubric and GradeAI for the band, the card's state, **Undo my changes** and the status line.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
