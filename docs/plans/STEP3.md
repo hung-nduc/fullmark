@@ -31,7 +31,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
-| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | brief approved (2026-11-13), handed to the implementing agent | |
+| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | built, awaiting review | `cf6a38a`..`19b6402` |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
