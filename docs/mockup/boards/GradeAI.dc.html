@@ -239,7 +239,8 @@
               <div style="{{groupHead}}"><span aria-hidden="true">⌄</span><span style="flex: 1">To grade</span><span style="color: {{t.muted}}">{{gradedCount}}</span></div>
               <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
                 <button onClick="{{it.go}}" aria-current="{{it.current}}" aria-label="{{it.label}}" style="{{it.style}}">
-                  <span aria-hidden="true" style="{{it.glyphStyle}}">{{it.glyph}}</span>
+                  <!-- the row's wash still says graded; its mark says whose: the sparkle while the AI's, the pencil once yours, the tick for a grade given only by you -->
+                  <span aria-hidden="true" style="{{it.glyphStyle}}">{{it.glyph}}<sc-if value="{{it.ai}}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display: block; margin: 0 auto"><path d="{{sparkle}}"></path></svg></sc-if></span>
                   <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; text-align: left">
                     <span style="font-weight: 600">{{it.title}}</span>
                     <span style="{{it.subStyle}}">{{it.sub}}</span>
@@ -259,8 +260,9 @@
                 <span style="font-variant-numeric: tabular-nums; font-weight: 600">34 / 40</span>
               </div>
               <div style="{{legend}}">
-                <span style="{{lgItem}}"><span style="{{lgDone}}">✓</span>Graded</span>
+                <span style="{{lgItem}}"><span style="{{lgAi}}"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg></span>AI's, as given</span>
                 <span style="{{lgItem}}"><span style="{{lgAdj}}">✎</span>Adjusted</span>
+                <span style="{{lgItem}}"><span style="{{lgDone}}">✓</span>Graded by you</span>
                 <span style="{{lgItem}}"><span style="{{lgBad}}">!</span>Needs a note</span>
                 <span style="{{lgItem}}"><span style="{{lgCur}}"></span>current</span>
               </div>
@@ -517,8 +519,9 @@
               subStyle: "font-size: 0.8em; color: " + (adj ? t.accent : t.muted) + "; font-weight: " + (adj ? 600 : 400),
               score: pts + " / " + (q.mode === "banded" ? "9" : q.points),
               label: "Question " + q.n + ": " + (adj ? "adjusted" : st === "done" ? b.who.name + "'s grade, unchanged" : st),
-              glyph: adj ? "✎" : GLYPH[st],
-              glyphStyle: "flex: 0 0 18px; text-align: center; font-weight: 700; color: " + (adj ? t.accent : col),
+              ai: st === "done" && !adj,
+              glyph: adj ? "✎" : st === "done" ? "" : GLYPH[st],
+              glyphStyle: "flex: 0 0 18px; text-align: center; font-weight: 700; color: " + (adj ? t.accent : st === "done" ? t.info : col),
               style: "font: inherit; font-size: 0.9em; width: 100%; min-height: 48px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 8px; border-radius: " + inner + "px; cursor: pointer; text-align: left; color: " + t.text + "; background: " + wash + "; border: " + (on ? "2px solid " + t.text : "1px solid " + (st === "none" ? t.line : col))
             };
           });
@@ -577,6 +580,7 @@
             lgItem: "display: inline-flex; align-items: center; gap: 6px",
             lgDone: legendBox(t.okWash, "1px solid " + t.ok, t.ok),
             lgAdj: legendBox(t.okWash, "1px solid " + t.ok, t.accent),
+            lgAi: legendBox(t.okWash, "1px solid " + t.ok, t.info),
             lgBad: legendBox(t.badWash, "1px solid " + t.bad, t.bad),
             lgCur: legendBox(t.card, "2px solid " + t.text, t.text),
             kbd: "font-family: " + MONO + "; font-size: 0.95em; padding: 0 5px; border: 1px solid " + t.lineStrong + "; border-bottom-width: 2px; border-radius: 4px; background: " + t.card + "; color: " + t.text
