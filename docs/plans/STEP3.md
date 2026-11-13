@@ -30,7 +30,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
-| 3r G101, then fullmark's own marking from the form (G83) | brief drafted (2026-11-07), for the owner | |
+| 3r G101, then fullmark's own marking from the form (G83) | brief approved (2026-11-13), handed to Sonnet | |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r | |
 | 3h `brief --web` | waits for its boards (3v) | |
@@ -46,7 +46,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 How each slice got here is in its own **Review**; the table above is the summary.
 
-1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is drafted ("Slice 3r", at the end) and waits for the owner's approval; then an implementing agent builds it and the planner reviews it.
+1. **3r** (G101, then fullmark's own marking in the form, G83): the brief is approved (2026-11-13, "Slice 3r", at the end) and handed to one Sonnet agent; the planner reviews it when it reports.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
 3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r's review.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
@@ -959,7 +959,7 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 
 ## Slice 3r: G101, then fullmark's own marking from the form
 
-**Drafted on 2026-11-07, for the owner's approval.** G101's differences first, then G83 as G100 decides it: the attempt's replay, served beside the form and shown in a frame in the form's main column. Built from GradeFinish, GradeDone and RubricPhone for G101, and from ResultsReplay (`Results.dc.html`, mode `replay`) and RubricC's left column for the replay in the frame.
+**Approved by the owner on 2026-11-13** (drafted 2026-11-07), and handed to one Sonnet agent. G101's differences first, then G83 as G100 decides it: the attempt's replay, served beside the form and shown in a frame in the form's main column. Built from GradeFinish, GradeDone and RubricPhone for G101, and from ResultsReplay (`Results.dc.html`, mode `replay`) and RubricC's left column for the replay in the frame.
 
 ### Read first
 
