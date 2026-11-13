@@ -90,11 +90,11 @@ The design docs left these open, or a slice's review found them. Each needs the 
 - **The status line** ends with a pill in the `info` colours: "Pre-filled from Claude Opus 5.5's grades".
 - **The box head's right side**, which reads "Graded by you / saved at Finish" in the form, reads "Graded by Claude (agent) / 5 Nov 2026 · unchanged" while the question is as Claude left it, and "Claude (agent), adjusted by you / saved at Finish" after any change.
 - **The card's badge** is the result, as on RubricC once a question is graded ("Partly right · 2.5 / 3"), since every pre-filled question is graded; "AI grade, unchanged" and "Adjusted" move to the box head and the sidebar.
-- **What Claude gave stays in sight:** under a changed score or verdict, a muted "Claude gave 1.5" (or "Claude said Missed"); under the total, "Claude's total 2.5"; under a changed note or text, "Claude wrote: …". *New in the redraw.*
-- **The card's foot:** while unchanged, an `info` line on the left, "Claude's grade. Accept it as it is, or change any score or note."; once changed, **Undo my changes** (the undo icon) in its place, which puts Claude's values back for this question. **Clear this question** stays on the right.
+- **Claude's box** (the owner's idea on the canvas, in place of lines saying what Claude gave): each slot opens with a 64 px box holding a sparkle and Claude's value ("✦ 1.5", "✦ Met"): [✦ 1.5] [erase | − | 1.25 | +] / [1.5]. While the row is Claude's it is lit in the `info` colours and pressed, and does nothing; once the score or the note changes it is plain, still showing Claude's value, and a press puts Claude's score and note for that row back. The same box leads a verdict's group and the one score's control; a computed total shows Claude's total in it, display only, dashed once it differs. "Why this score" and "To improve" have a small "✦ Claude's" button by their label that puts Claude's text back. The slot column is 334 px (356 for verdicts).
+- **The card's foot:** while unchanged, an `info` line on the left, "Claude's grade, as given. Change anything; its lit box puts Claude's back."; once changed, **✦ Back to Claude's grade** in its place, for the whole question. **Clear this question** stays on the right.
 - **The sidebar:** an unchanged question is a graded row (✓) with "Claude's grade" under its name; an adjusted one keeps the graded row's colours with ✎ and "adjusted by you" in `accent`. The legend gains **Adjusted**.
 
-**Recommend** (the redraw): as drawn, with the file written as above. The "Claude gave" lines are the redraw's own addition, for the owner to keep or drop.
+**Recommend** (the redraw): as drawn, with the file written as above. Open in the thread: whether a row's box restores the note with the score (as drawn) or the score alone.
 
 ## Slices
 
