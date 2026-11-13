@@ -204,8 +204,9 @@
 
               <!-- The card's foot: G75's line or Undo on the left, Clear this question on the right. -->
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+                <!-- while the question is the AI's, the foot's left is empty: the box head, the lit boxes and the pill already say it -->
                 <sc-if value="{{q.unchanged}}" hint-placeholder-val="{{ true }}">
-                  <span style="{{acceptLine}}">{{q.acceptText}}</span>
+                  <span></span>
                 </sc-if>
                 <sc-if value="{{q.adjusted}}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{q.undo}}" style="{{footBtn}}">
