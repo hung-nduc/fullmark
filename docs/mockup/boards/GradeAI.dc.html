@@ -44,7 +44,8 @@
             <span style="{{statusSep}}">{{statusScore}}</span>
             <!-- G75: where the grades came from, once, for the whole sitting -->
             <span style="{{statusAi}}">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-4-4L4 16v4z"></path></svg>
+              <!-- the sparkle is the mark for "Claude's" everywhere: here, on every Claude box, on Back to Claude's grade -->
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{sparkle}}"></path></svg>
               Pre-filled from Claude Opus 5.5's grades
             </span>
           </div>
@@ -373,11 +374,13 @@
             };
           };
           // G75: Claude's box. In use: lit in info, pressed, nothing to do. Changed: plain, Claude's value in it, a press puts it back.
-          var aiChip = function (on, small) {
-            return "font: inherit; font-size: " + (small ? "0.8em" : "0.85em") + "; font-weight: 700; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box; " + (small ? "height: 30px; padding: 0 10px" : "width: 64px; height: 44px; padding: 0") + "; margin: 0; border-radius: " + inner + "px; outline-offset: 2px; white-space: nowrap; cursor: " + (on ? "default" : "pointer") + "; border: 2px solid " + (on ? t.info : t.lineStrong) + "; background: " + (on ? t.infoWash : t.card) + "; color: " + (on ? t.info : t.muted);
+          // kind: "score" (the value's own size, 1.1em, as in the − value + group), "verdict" (the verdict buttons' 0.92em), "text" (a small label button)
+          var aiChip = function (on, kind) {
+            var size = kind === "text" ? "font-size: 0.8em; height: 30px; padding: 0 10px" : kind === "verdict" ? "font-size: 0.92em; width: 88px; height: 44px; padding: 0" : "font-size: 1.1em; width: 76px; height: 44px; padding: 0";
+            return "font: inherit; " + size + "; font-weight: 700; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-sizing: border-box; margin: 0; border-radius: " + inner + "px; outline-offset: 2px; white-space: nowrap; cursor: " + (on ? "default" : "pointer") + "; border: 2px solid " + (on ? t.info : t.lineStrong) + "; background: " + (on ? t.infoWash : t.card) + "; color: " + (on ? t.info : t.muted);
           };
-          var chip = function (on, text, what, restore, small) {
-            return { aiText: text, aiPressed: on ? "true" : "false", aiStyle: aiChip(on, small),
+          var chip = function (on, text, what, restore, kind) {
+            return { aiText: text, aiPressed: on ? "true" : "false", aiStyle: aiChip(on, kind || "score"),
               aiLabel: on ? what + ": Claude's, in use" : "Back to Claude's " + what + (text ? ": " + text : ""),
               aiRestore: on ? function () {} : restore };
           };
@@ -388,7 +391,7 @@
               count: q.kind === "code" ? q.lines + " lines" : q.words + " words", code: q.kind === "code", prose: q.kind !== "code",
               boxLabel: "Rubric for question " + q.n, typeTitle: { additive: "Points per criterion", banded: "A band per criterion", holistic: "One score" }[q.mode],
               stepLine: (q.mode === "banded" ? "bands 0 to 9, " : "") + "step " + dec(q.step),
-              secTop: "display: grid; grid-template-columns: minmax(0, 1fr) " + (q.mode === "holistic" ? "356px" : "334px") + "; align-items: center; gap: 14px", rows: [] };
+              secTop: "display: grid; grid-template-columns: minmax(0, 1fr) " + (q.mode === "holistic" ? "388px" : "346px") + "; align-items: center; gap: 14px", rows: [] };
             var given = 0, need = 0, missing = 0, score = null, sum = 0;
             if (q.mode !== "holistic") {
               need = q.criteria.length;
@@ -421,14 +424,14 @@
               c.foot.aiText = dec(aScore);
               c.foot.aiLabel = tOn ? "Claude's total, as given" : "Claude's total was " + dec(aScore);
               // display only: dashed where the rows' boxes are solid, since a total follows its rows
-              c.foot.aiStyle = aiChip(tOn, false) + "; cursor: default; border-style: " + (tOn ? "solid" : "dashed");
+              c.foot.aiStyle = aiChip(tOn, "score") + "; cursor: default; border-style: " + (tOn ? "solid" : "dashed");
             } else {
               need = 1;
               c.rows = q.bullets.map(function (b) {
                 var cur = (g.b || {})[b.id], vc = { met: t.ok, partly: t.warn, missed: t.bad }, W = { met: "Met", partly: "Partly", missed: "Missed" };
                 var aCur = (a.b || {})[b.id];
                 return Object.assign(chip(cur === aCur, aCur ? W[aCur] : "–", "verdict for " + b.text,
-                  function () { put(function (gg) { if (aCur) gg[q.id].b[b.id] = aCur; else delete gg[q.id].b[b.id]; }); }), {
+                  function () { put(function (gg) { if (aCur) gg[q.id].b[b.id] = aCur; else delete gg[q.id].b[b.id]; }); }, "verdict"), {
                   text: b.text, meta: "verdict, not scored", isStep: false, isSeg: true, hasNote: false, missing: false,
                   groupLabel: "Verdict for " + b.text, eraseLabel: "Clear the verdict for " + b.text,
                   eraseSeg: eraseSeg(!!cur, t.lineStrong), eraseOff: cur ? "false" : "true",
@@ -456,7 +459,7 @@
             ].map(function (x) {
               x.value = g[x.key] || "";
               Object.assign(x, chip(x.value === (a[x.key] || ""), "", x.label.toLowerCase() + " text",
-                function () { put(function (gg) { gg[q.id][x.key] = a[x.key] || ""; }); }, true));
+                function () { put(function (gg) { gg[q.id][x.key] = a[x.key] || ""; }); }, "text"));
               x.tagStyle = "font-weight: " + (x.miss ? 700 : 400) + "; color: " + (x.miss ? t.bad : t.muted);
               x.area = area(x.miss);
               x.onInput = function (e) { var val = e.target.value; put(function (gg) { gg[q.id][x.key] = val; }); };
@@ -542,8 +545,8 @@
             sec: "display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-top: 1px solid " + border,
             footSec: "display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-top: 2px solid " + t.lineStrong + "; background: " + t.card,
             slotCol: "display: flex; flex-direction: column; gap: 4px; min-width: 0",
-            stepRow: "display: grid; grid-template-columns: 72px minmax(0, 1fr) auto 56px; align-items: center",
-            segRow: "display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center",
+            stepRow: "display: grid; grid-template-columns: 84px minmax(0, 1fr) auto 56px; align-items: center",
+            segRow: "display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center",
             // a four-point sparkle, with a small one at its corner: "Claude's"
             sparkle: "M10 2.5l1.9 5.6 5.6 1.9-5.6 1.9L10 17.5l-1.9-5.6L2.5 10l5.6-1.9zM18.5 14l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z",
             stepBtn: "-webkit-appearance: none; appearance: none; font: inherit; font-size: 1.25em; font-weight: 700; line-height: 1; padding: 0; margin: 0; border: 0; cursor: pointer; outline-offset: -4px; display: flex; align-items: center; justify-content: center; background: transparent; color: " + t.text,
