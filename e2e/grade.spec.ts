@@ -881,7 +881,7 @@ test("G103: the frame has no top bar and no Download results, and follows the fo
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
 });
 
-test("G103: the form's main keeps its own name while the frame shows; the frame is named by its title alone", async ({
+test("G103: the form's main takes no name while the frame shows; the frame is named by its title alone", async ({
   page,
 }) => {
   const server = await web(folder());

@@ -31,7 +31,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
-| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | built, awaiting review | `cf6a38a`..`19b6402` |
+| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 for the owner | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
@@ -47,9 +47,9 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 How each slice got here is in its own **Review**; the table above is the summary.
 
-1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** as recommended; **3r2's brief is approved** (2026-11-13) and handed to the implementing agent ("Slice 3r2", at the end); its review comes next.
+1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) waits for the owner.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
-3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r2's review.
+3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, with G104 once decided; its brief can be drafted now.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -83,7 +83,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+- **G104. Two unnamed `main` landmarks with the frame shown (3r2's review).** G103 said the frame is named by its title alone and the form's `main` takes no name. axe, which looks inside the frame, then fails `landmark-unique`: the form's `main` and the frame's page's `main` are two mains with no name. 3r2 skips that one rule in the three axe checks with the frame shown. **Recommendation:** while the frame shows, the form's `main` is named "Scored by fullmark" (the sidebar group's head, as 3r had it); the frame keeps its title "Marked by fullmark: N questions" as its own name. The landmarks are then unique, a screen reader hears the column's name once and the frame's once, and the skip comes out. (Dropping the frame page's `main` instead would change the page for one host.) For 3p2's first task, with COMMANDS.md's "one name" sentence changed to match.
 
 ## Slices
 
@@ -1059,3 +1059,20 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 `npm run check` passes in Chromium and Firefox, the budget test included. The frame shows the replay from its banner down, in the form's look, with no second bar and no Download results; `quiz replay`'s own page is as it was. `docs/screens/3r/` is taken by its spec. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden that changed counted and explained.
 
 ### Review
+
+**3r2's review (2026-11-13).** Built by the implementing agent in four commits, `cf6a38a`..`870648e` (the last is the slice table's row). Typecheck, Biome and knip clean; the startup tests 2 of 2; Vitest **2746 of 2746** in 114 files (one more than 3r: "reads the look the form chose" became "reads no stored look", and one test was added). Playwright: **531 passed** (269 Chromium, 260 Firefox, the 2 budget projects), 369 skipped (the `screens-*` specs, which run only with `FULLMARK_SCREENS`), none failed. Run again in review, with the same counts. Goldens: **9 cases, 14 files**, all from the page bundle changing with `grader`'s effects: 12 HTML pages (the runtime, its CSP hash) and the `bytes` line of `build/json-built` and `build/json-two-files`. A `build` page stays byte-identical with and without the server features.
+
+Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.spec.ts`; 11 retaken, 2 new: `13-wide-frame-dark.png`, `14-phone-frame-dark.png`). The frame starts at the Replay banner, with one bar (the form's) wide and on a phone; dark chosen in the form shows the frame dark; the graded card shows "Partly right · 2 / 3". The page's sidebar, keys and Download results are gone from the frame; `quiz replay`'s page is unchanged apart from the bundle.
+
+**Done differently,** each accepted:
+- The frame's saver is `null` (it reads and writes nothing, so no stored look), and `readOnly` is deleted, since nothing used it.
+- The form copies its three look attributes from its own root to the frame's (on load, and through a `MutationObserver` on its root), and the frame's page skips `applyLook`, so the page's effect cannot overwrite what the form set.
+- The wide form has no text-size control (only the phone's Appearance menu has one), so the wide test sets `data-size` on the form's root as `applyLook` would; the phone test presses the real A+ button.
+- Two dark-frame screens were added to the set.
+
+**Fixed in review:** one test's title said the form's `main` "keeps its own name" while the test checks that it has none; it now says "takes no name".
+
+**Found in review:**
+- **G104** (below): with the form's `main` unnamed, axe's `landmark-unique` fails, because axe sees the form's `main` and the frame's `main` as two unnamed mains. The agent did not rename silently: the three axe checks with the frame shown skip that one rule, with a comment, and every other rule still runs.
+- The frame still shows the page's foot button (the licences ⓘ, under the results card). It is the page's own and harmless; noted, not a gap.
+- The frame opens on Missed, which shows "Nothing missed" in the fixture; that is 3r's accepted behaviour.
