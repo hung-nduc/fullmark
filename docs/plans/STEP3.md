@@ -30,9 +30,10 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3f `grade --web` at 1280 px | done, reviewed, gaps decided (2026-11-07); its fixes in 3f2 | `2246a37`..`0e44c3d`, review |
 | 3f2 3f's fixes, G96, G97 | done, reviewed, gaps decided (2026-11-07) | `c81833f`..`d4356e6`, review |
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
-| 3r G101, then fullmark's own marking from the form (G83) | done, reviewed (2026-11-13), the result badge fixed in review; G103 for the owner | `972533e`..`e376c8a`, review |
+| 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
+| 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | brief drafted (2026-11-13), for the owner | |
 | 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
-| 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r | |
+| 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
@@ -46,9 +47,9 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 
 How each slice got here is in its own **Review**; the table above is the summary.
 
-1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review): the result badge fixed in review; **G103** (what the grader's frame shows of the replay page) waits for the owner, and makes a small slice, **3r2**, with the 3r screens' spec.
+1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** as recommended; **3r2's brief is drafted** ("Slice 3r2", at the end), waiting for the owner's approval.
 2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
-3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r's review.
+3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks; its brief follows 3r2's review.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -82,7 +83,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G103. What the grader's frame shows of the replay page** (raised in 3r's review, from the owner's question about two bars). The frame holds the replay page as `quiz replay` builds it, top bar included: under the form's bar, a second title row with its own **Questions** (a second sidebar), **Focus mode**, text size and Appearance; on a phone, two rows of icons. The form's Appearance choices do not reach it, so a grader who picks dark gets a light frame. The results card offers **Download results**, the learner's action. COMMANDS.md calls the view "drawn with the replay's question cards and its All · Missed filter". **Recommend:** with `PageReplay.grader` the page has no top bar: it starts at the Replay banner ("Replay · Attempt of 23 Oct 2026 · grades pending"), then the filter, the results card and the question cards. Its look follows the form's: the form sets its theme and text size on the frame's document (same origin) when the frame is made and whenever they change. The results card keeps the score, points, time, goal and the pending note, and drops **Download results**. The frame is then named once, by the iframe's title; the form's `main` keeps its own name. `quiz replay`'s page and `build`'s are unchanged, apart from the bundle. A small slice, **3r2**, builds it with the 3r screens' spec, before 3p2.
+None open.
 
 ## Slices
 
@@ -105,7 +106,8 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3f** | `grade --web` and `--name`: the grading form at 1280 px with the editable rubric box, Finish, the name, the saved card, the report; the `grade` words, en and vi | G70 to G74, G76 to G78, G80 to G82, G86 to G88, G91, 3o |
 | **3p** | G98's differences from the boards, then the grading form on a phone (G79) | G79, G89, G96, G98, 3f2 |
 | **3r** | fullmark's own marking from the form (G83), as G100 has it | G83, G100, 3p |
-| **3p2** | `--web --grades`: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, 3r |
+| **3r2** | G103: the grader's frame shows the replay without its top bar, in the form's look, with no Download results; the 3r screens' spec, and the screens taken again | G103, 3r |
+| **3p2** | `--web --grades`: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, 3r2 |
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
 | **3h** | `brief --web`: the form from the question file, the detail rules, the summary screen, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, boards |
 | **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
@@ -1026,3 +1028,34 @@ The phone matches RubricPhone in the bar, the stacking, the box's head and secti
 - **Sonnet's second gap** (the frame named twice to assistive technology, by the iframe's title and the `main`'s name): left as it is; it goes with G103, which changes what the frame holds.
 
 **G103 for the owner.**
+
+## Slice 3r2: G103, the grader's frame without the replay's bar
+
+**Drafted on 2026-11-13, for the owner's approval.** G103 as decided, then the 3r screens taken by a spec, as every slice before 3r took its own. Small: one page flag's effects, one form effect, one spec.
+
+### Read first
+
+- COMMANDS.md: `quiz grade`, "The form", the "fullmark's own marking" bullet (its second page and its frame, G103's sentences included).
+- TECHNICAL_DESIGN.md: section 7, foundation 9.
+- This plan: "Rules for every slice", G100 and G103 (STEP3-GAPS.md), 3r's Review.
+- Code: `src/page/App.tsx` (the dock and `fm-topbar`, around `QuizView`), `src/page/ResultsCard.tsx` (`grader`, Download results), `src/page/store.ts` (`PageReplay.grader`), `src/page/look.ts` (`applyLook`: `data-theme`, `data-size`, `data-font` on a root), `src/page/Appearance.tsx`; `src/grade-form/Form.tsx` (the frame, around `state.marked`), `src/grade-form/main.tsx`; `e2e/grade.spec.ts`, `e2e/grade-phone.spec.ts`, `e2e/screens-3p.spec.ts` (the screens' pattern).
+
+### Decided for this slice
+
+- **No top bar in the grader's frame (G103).** With `PageReplay.grader` the page draws no `fm-topbar`, wide or on a phone: no title row, no **Questions**, **Focus mode**, text size or Appearance, and none of their keys act. It starts at the Replay banner, then the All · Missed · Flagged filter, the results card and the question cards. The page's own sidebar (the results map) is not shown.
+- **No Download results** in the frame's results card. The score, points, time, goal and the pending note stay.
+- **The frame follows the form's look.** The form puts its theme, text size and font on the frame's document root (the same `data-theme`, `data-size` and `data-font` that `applyLook` sets) when the frame loads and whenever they change. The frame stores nothing and reads no stored look of its own.
+- **One name.** The frame is named by the iframe's title alone; the form's `main` keeps its own name and no longer takes "Scored by fullmark" (3r's review, Sonnet's second gap). axe still passes, so if `landmark-unique` fails, report it with what it says and do not rename silently.
+- **Not changed:** `quiz replay`'s page and `build`'s, apart from the bundle; the form's own bar, sidebar and keys; the submit and the files written.
+
+### Tasks
+
+1. **The page** (one commit): the three effects of `grader` above, unit-tested. Every build golden that changes with the bundle, counted and explained.
+2. **The form** (one commit): the look sent to the frame, and the one name. Playwright, wide and at 390 px: the frame has no `fm-topbar` and no Download results; dark chosen in the form shows the frame dark, and a larger text size shows in it, both before and after the frame is first opened; axe in light and dark with the frame shown.
+3. **The screens' spec** (one commit): `e2e/screens-3r.spec.ts`, after `screens-3p.spec.ts`, that takes every screen in `docs/screens/3r/` (3r's set, the graded card's result badge included, and the frame in light and dark), run with `FULLMARK_SCREENS=1`. Each screen beside its board, each difference listed. The slice table's 3r2 row.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox, the budget test included. The frame shows the replay from its banner down, in the form's look, with no second bar and no Download results; `quiz replay`'s own page is as it was. `docs/screens/3r/` is taken by its spec. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden that changed counted and explained.
+
+### Review
