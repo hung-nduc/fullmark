@@ -35,7 +35,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
-| 3h `brief --web` at 1280 px | brief written (2026-11-16), waits for the owner's approval and G112 to G115 | |
+| 3h `brief --web` at 1280 px | brief approved (2026-11-16), G112 to G115 decided; to build | |
 | 3h2 `brief --web` on a phone | outline; after 3h | |
 | 3z acceptance | last | |
 
@@ -52,7 +52,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h**'s brief is written (2026-11-16) and waits for the owner, with G112 to G115; then 3h2, the phone.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h**'s brief is approved (2026-11-16), with G112 to G115 as recommended: next, hand it to an implementing agent; then 3h2, the phone.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
@@ -85,13 +85,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G112. Cancel in `brief --web` (3h's brief).** The Brief boards put **Cancel** in the bar (and in the phone's foot) and draw a Cancelled card, "Nothing was written. To start again, run `quiz brief DIR`". COMMANDS.md lists "form cancelled" among the exits but says how only for `--tui` (Ctrl+C); the `review` and `grade` forms have no Cancel. **Recommendation:** **Cancel** ends the run at once, with no dialog, as Ctrl+C ends `--tui`: the page posts `{"cancel": true}` to the form's one submit path, the server answers 200 and closes, nothing is written and no `DIR` is created, and the command prints "cancelled: nothing was written" on stderr (`{"status": "cancelled"}` with `--json`) and exits 2. The page then shows the Cancelled card with the command to start again, the flags it was given included, so an agent's pre-fills are not lost. Ctrl+C in the terminal does the same, with the page showing "The server has stopped" on its next action, as the other forms.
-
-**G113. The closing time on the brief form (3h's brief).** The sidebar's foot on the boards says "The form closes in 29 min if left open. Cancel writes nothing." The other forms show no time. **Recommendation:** the page is given the timeout and shows the minutes left, counted from when it loaded and updated each minute ("in less than a minute" at the end); with `--timeout 0` the line says only "Cancel writes nothing." The `review` and `grade` forms stay as they are.
-
-**G114. The brief form's look (3h's brief).** The `review` and `grade` forms take their look from the quiz; a brief has no quiz yet. The boards draw Appearance with the five themes and four fonts. **Recommendation:** the form starts in light or dark as the system is (`prefers-color-scheme`), in the system font; Appearance is always offered, with every theme and font. A choice lasts while the page is open and is not stored: each run is served on a new port, so the browser's storage would not carry it over anyway.
-
-**G115. The profile as choices in `brief --web` (3h's brief).** The question file gives `profile` as `kind: text` (any built-in or configured name), and `--tui` asks for it as text. The boards draw it under **More options** as choices in two columns, the four built-in profiles, with a box that says what each checks, and say "Profiles of your own, from fullmark.toml or config.toml, are listed here too". **Recommendation:** in `--web`, the profile question lists the built-in profiles and every profile `--profile` would accept for this `DIR` (the machine config and a `fullmark.toml` found from `DIR`), built-in first, as choices; it starts at the purpose's profile and follows the purpose until changed, as drawn. The box gives each built-in profile's checks in the form's words (the boards' text, en and vi), and a profile of the user's own its name and the file it comes from, with no description. The question file keeps `kind: text`, so the flags and `--tui` are unchanged.
+None open.
 
 ## Slices
 
@@ -1267,7 +1261,7 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 
 ## Slice 3h: `brief --web` at 1280 px
 
-**Waiting for the owner's approval**, with G112 to G115. Built from the Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone and BriefDark boards (`docs/mockup/boards/`; interactive, no images: read `Brief.dc.html` and its Tweaks), at 1280 px. The phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) is 3h2's. This slice closes step 3's criterion that flags, `--web` and `--tui` write the same bytes.
+**Approved by the owner on 2026-11-16**, with G112 to G115 as recommended. Built from the Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone and BriefDark boards (`docs/mockup/boards/`; interactive, no images: read `Brief.dc.html` and its Tweaks), at 1280 px. The phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) is 3h2's. This slice closes step 3's criterion that flags, `--web` and `--tui` write the same bytes.
 
 ### Read first
 
@@ -1299,7 +1293,7 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 
 ### Tasks
 
-1. G112 to G115 into COMMANDS.md (`quiz brief`, "The forms"), with the code that makes them true.
+1. G112 to G115 are in COMMANDS.md (`quiz brief`, "The forms"): each is built in the task below that it belongs to, and pinned by a test there.
 2. The command without the form (one commit): the stub goes; every refusal and exit with a golden in `test/golden/brief/` (the `web` case's "not available yet" is replaced: count it); the submit read, checked and written as a unit test with a POST (port 0, the timer injected): a written brief, each 400, a timeout, a cancel, Ctrl+C (nothing written, no `DIR`); the `--json` lines.
 3. The form (one or more commits): the components, the bundle, `brief-form.ts`. Playwright through `serveProcess`:
    - answer every question by mouse and by keys, and write; the file against a golden and read by `quiz check` without `brief.invalid`;
