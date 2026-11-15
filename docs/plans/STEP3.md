@@ -34,7 +34,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
-| 3p3 the pre-filled form on a phone | brief approved with G111 (2026-11-15); ready for an implementing agent | |
+| 3p3 the pre-filled form on a phone | built, waits for the planner's review | `9014690`..7cbe60c |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
