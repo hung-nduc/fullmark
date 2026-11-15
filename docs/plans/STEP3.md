@@ -34,7 +34,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
-| 3p3 the pre-filled form on a phone | built, waits for the planner's review | `9014690`..7cbe60c |
+| 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
@@ -50,7 +50,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
-3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone): **brief approved** (2026-11-15, "Slice 3p3"), with G111 (the layout) decided; ready to hand to one implementing agent.
+3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -1241,3 +1241,18 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 ### Done when
 
 `npm run check` passes in Chromium and Firefox, the budget test included, with no axe rule skipped. On a 390 px and a 360 px phone the pre-filled form shows every box whole, nothing runs off the screen, and every restore works as wide. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden and spec that changed counted and explained.
+
+### Review
+
+**3p3's review (2026-11-15).** Built by Sonnet in four commits from the brief alone, `9014690`..`2eea084` (the third is the slice table's row; the fourth changes a selector for Biome, nothing on the page); reviewed by Opus, with one fix.
+
+- **`npm run check` exits 0**, run again in review over the four commits: typecheck, Biome and knip clean; the startup tests 2 of 2 (run alone first, as always: the agent saw `quiz --version` over its 60 ms limit only in a bare `vitest run` beside other work, and it passes alone); Vitest **2757 of 2757** in 114 files; Playwright **613 passed** (both browsers and the 2 budget projects), 443 skipped (the `screens-*` specs), none failed. After the fix, `grade-prefilled-phone.spec.ts` and `grade-phone.spec.ts` in both browsers (50 of 50) and Biome were run again.
+- **The cause of the break:** the wide layout for a pre-filled slot (`.fm-box[data-given]`) applied from 520 px, so between 520 and 759 px and below it the box was a third child in the phone's two-column slot. It now applies from 760 px, and below that the phone rules put each box on a line of its own (G111). No golden and no existing spec changed; the wide form and the plain form on a phone are as they were.
+- **New:** `e2e/grade-prefilled-phone.spec.ts` (390 and 360 px, each rubric type: no sideways overflow, each box at its size and above its control, the controls and the max box at least 44 px, the foot full width, every restore, the pill in the sidebar and not in the compact bar, vi, axe in light and dark at 390 px); `e2e/screens-3p3.spec.ts`, `docs/screens/3p3/` (31).
+- **Tried by looking at the screens,** the ones the agent did not look at included: each box whole at 390 and 360 px, a verdict's box over its three buttons, the total's dashed box over the computed total, a person's pre-fill ("✦ Given", **✦ Back to the given grade**), the foot stacked, the sidebar with the pill and the marks.
+
+**Done differently,** each accepted: the threshold moved (520 to 760 px) rather than overrides added; the pill in the sidebar is a `div` sized to its text with the sheet's 16 px side margin; the 360 px screens are 360 by 740.
+
+**Fixed in review:** the sidebar's pill sat flush against the rule under "Questions"; it now has 10 px above it. `10-sidebar.png` and `12-vi-sidebar.png` taken again. (A retake also moved three box screens by a few pixels in the focused note's text cursor; those were put back, as nothing in them changed.)
+
+**Found in review:** the vi restore for a person's pre-fill ("✦ Về điểm đã cho") was not measured at 360 px; it is shorter than the AI's, which was. Noted.

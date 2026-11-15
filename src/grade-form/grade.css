@@ -1219,7 +1219,7 @@
 
     /* the status pill sits at the top of the sidebar's sheet, the compact bar having no room */
     .fm-grade-side .fm-status-pill {
-      margin: 0 16px 8px;
+      margin: 10px 16px 8px;
       width: fit-content;
     }
 
