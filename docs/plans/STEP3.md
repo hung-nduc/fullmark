@@ -35,7 +35,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
-| 3h `brief --web` | its boards approved (3v, 2026-11-16); brief to write | |
+| 3h `brief --web` at 1280 px | brief written (2026-11-16), waits for the owner's approval and G112 to G115 | |
+| 3h2 `brief --web` on a phone | outline; after 3h | |
 | 3z acceptance | last | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -51,7 +52,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). Next: **3h**'s brief, built from them.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h**'s brief is written (2026-11-16) and waits for the owner, with G112 to G115; then 3h2, the phone.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
@@ -84,7 +85,13 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G112. Cancel in `brief --web` (3h's brief).** The Brief boards put **Cancel** in the bar (and in the phone's foot) and draw a Cancelled card, "Nothing was written. To start again, run `quiz brief DIR`". COMMANDS.md lists "form cancelled" among the exits but says how only for `--tui` (Ctrl+C); the `review` and `grade` forms have no Cancel. **Recommendation:** **Cancel** ends the run at once, with no dialog, as Ctrl+C ends `--tui`: the page posts `{"cancel": true}` to the form's one submit path, the server answers 200 and closes, nothing is written and no `DIR` is created, and the command prints "cancelled: nothing was written" on stderr (`{"status": "cancelled"}` with `--json`) and exits 2. The page then shows the Cancelled card with the command to start again, the flags it was given included, so an agent's pre-fills are not lost. Ctrl+C in the terminal does the same, with the page showing "The server has stopped" on its next action, as the other forms.
+
+**G113. The closing time on the brief form (3h's brief).** The sidebar's foot on the boards says "The form closes in 29 min if left open. Cancel writes nothing." The other forms show no time. **Recommendation:** the page is given the timeout and shows the minutes left, counted from when it loaded and updated each minute ("in less than a minute" at the end); with `--timeout 0` the line says only "Cancel writes nothing." The `review` and `grade` forms stay as they are.
+
+**G114. The brief form's look (3h's brief).** The `review` and `grade` forms take their look from the quiz; a brief has no quiz yet. The boards draw Appearance with the five themes and four fonts. **Recommendation:** the form starts in light or dark as the system is (`prefers-color-scheme`), in the system font; Appearance is always offered, with every theme and font. A choice lasts while the page is open and is not stored: each run is served on a new port, so the browser's storage would not carry it over anyway.
+
+**G115. The profile as choices in `brief --web` (3h's brief).** The question file gives `profile` as `kind: text` (any built-in or configured name), and `--tui` asks for it as text. The boards draw it under **More options** as choices in two columns, the four built-in profiles, with a box that says what each checks, and say "Profiles of your own, from fullmark.toml or config.toml, are listed here too". **Recommendation:** in `--web`, the profile question lists the built-in profiles and every profile `--profile` would accept for this `DIR` (the machine config and a `fullmark.toml` found from `DIR`), built-in first, as choices; it starts at the purpose's profile and follows the purpose until changed, as drawn. The box gives each built-in profile's checks in the form's words (the boards' text, en and vi), and a profile of the user's own its name and the file it comes from, with no description. The question file keeps `kind: text`, so the flags and `--tui` are unchanged.
 
 ## Slices
 
@@ -111,7 +118,8 @@ None open.
 | **3p2** | G104, G106; `--web --grades` at 1280 px: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, G104, G106, G107 to G110, 3r2 |
 | **3p3** | The pre-filled form on a phone (G111) | G111, 3p2 |
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
-| **3h** | `brief --web`: the form from the question file, the detail rules, the summary screen, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, boards |
+| **3h** | `brief --web` at 1280 px: the form from the question file and the Brief boards, the detail rules, the Finish summary, pre-fills and the way back to them, Cancel, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, G112 to G115, boards |
+| **3h2** | `brief --web` on a phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) | 3h |
 | **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
@@ -1256,3 +1264,56 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 **Fixed in review:** the sidebar's pill sat flush against the rule under "Questions"; it now has 10 px above it. `10-sidebar.png` and `12-vi-sidebar.png` taken again. (A retake also moved three box screens by a few pixels in the focused note's text cursor; those were put back, as nothing in them changed.)
 
 **Found in review:** the vi restore for a person's pre-fill ("✦ Về điểm đã cho") was not measured at 360 px; it is shorter than the AI's, which was. Noted.
+
+## Slice 3h: `brief --web` at 1280 px
+
+**Waiting for the owner's approval**, with G112 to G115. Built from the Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone and BriefDark boards (`docs/mockup/boards/`; interactive, no images: read `Brief.dc.html` and its Tweaks), at 1280 px. The phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) is 3h2's. This slice closes step 3's criterion that flags, `--web` and `--tui` write the same bytes.
+
+### Read first
+
+- COMMANDS.md: `quiz brief` (all of it: the question file, the detail rules, the option tables, "The forms", "Also", the exits and their order, "The file"), `quiz serve` (the options, the `listening` line), "Common options" (`--timeout`), "Exit codes".
+- TECHNICAL_DESIGN.md: section 5 (the profiles, what each built-in one checks, "Where the config comes from"); section 7, foundations 4, 6 and 9 (the locked-down server, one module for every form, a built page holds nothing of a server) and Budgets; the catalogs (the `vi` rules).
+- This plan: "Rules for every slice", G11, G12, G15 to G26, G112 to G115; the briefs and Reviews of 3g and 3i (the writer, byte identity by construction, `Given`), 3k and 3f (a form on the one-shot server).
+- The boards: `Brief.dc.html` (everything: its `LANG` tables are the form's words in en and vi, `QS` the icons and short names, `PROFILE_INFO` the profile box, `renderVals()` the tokens and sizes; its Tweaks `prefill`, `sample`, `view` and `side` give each state), and the wrappers named above, each only `Brief` with other options. `docs/mockup/README.md`.
+- Code: `src/cli/brief.ts` (`runBrief`, `Given`, the stub `--web`), `src/cli/brief-tui.ts` (how a form returns `Given`, the purpose's defaults refilled), `src/core/brief/` (`questions.ts`, `write.ts`), `src/brief/questions.yaml`; `src/cli/review.ts` and `src/build/review-form.ts`, `src/cli/grade-web.ts` and `src/build/grade-form.ts` (the model for the command and the form's page); `src/review/` and `src/grade-form/` (the model for the bundle: state, keys, the sidebar, dialogs, the done card); `src/serve/server.ts` (`readSubmit`, `quizIds`, `predicate`, `setTimer`); `src/core/themes.ts` (the five token sets); `src/core/config/` (the profiles `--profile` accepts); `scripts/bundles.mjs`, `scripts/build-page.mjs`; `e2e/helpers.ts` (`serveProcess`, `expectGolden`, `noViolations`), `e2e/review.spec.ts`; `test/golden/brief/`; `test/brief/` (the byte-identity test of 3i); `test/cli-graph.test.ts`; `scripts/samples.mjs`.
+
+### Decided for this slice
+
+- **The command:** `quiz brief DIR --web [--no-open] [--timeout SECONDS] [--port N]`, with every answer flag as a pre-fill and `--json`, as COMMANDS.md says. The browser opens unless `--no-open` (unlike `review`, which opens only with `--open`). The refusals stay in the order COMMANDS.md gives: the flags (a bad value; `--accept-defaults` with `--web`; `--web` with `--tui`), then an existing `DIR/brief.yaml`, each exit 2, before anything is served. Then the form is served with the `listening` line under `--json`, the timeout (default 1800 s, `0` none) and Ctrl+C, as `review` has them. Nothing is written, and no `DIR` created, unless **Write the brief** is accepted; a timeout prints `{"status": "timeout"}` with `--json` and exits 2; Cancel is G112's.
+- **The submit** carries what the person answered as flags would (`Given`), as `--tui`'s form returns it: an answer still at its default is left out (it is a default), one changed, typed or pre-filled and kept is in (it is `user`). The server reads it with its own `readSubmit` (the brief has no quiz: one id of the form's own in `quizIds`), checks every value as the flags are checked (a bad one is a 400 and the server keeps waiting; so is a missing purpose or scope, or a scope under its `min-words`), and `runBrief` then builds the answers, the bytes and the output exactly as for flags, so nothing new decides the bytes. A written brief prints what the flags print (`wrote …`, `defaults used: …`, and with `--json` `{"status": "written", "brief", "defaults_applied", "warnings"}`).
+- **The form** lives in `src/brief-form/`, bundled to `dist/brief.js` as its own IIFE beside `dist/review.js` and `dist/grade.js`, under the 60 KB budget. Its page is built in memory by `src/build/brief-form.ts` from the question file (in the form's language), the pre-fills, the defaults of each purpose (with the machine config's `[brief.purpose.*]`), the profiles (G115), the timeout (G113), `DIR` as shown, and the form's CSS, with a CSP carrying the script's hash and `connect-src 'self'`. It takes its colours from the theme tokens of `src/core/themes.ts` and shares the page's components and styles where they fit, as foundation 9 says of every form. `build`'s output does not change.
+- **What it shows**, as the boards draw it at 1280 px:
+  - The bar: the kicker **Brief**, `DIR`'s name as the title, "what the agent should write"; **Questions** (`Q`), Appearance (G114), **Cancel** (G112), **Finish**. The status line under it: answered *n* of 14 with its progress bar, then *n* yours, *n* pre-filled, *n* default, then *n* to answer or **Ready to finish**.
+  - One page of cards, in the question file's order, under the two section heads (Step 1 of 2, Step 2 of 2) and **More options** for the profile: each card's icon, short name, label and help; a `choice` as buttons with their hints (the profile in two columns), a `multi` as checkboxes with hints, the follow-up box when *other* is ticked, `text` with its placeholder, `number` with − and + (the count's "One question fewer" and "One question more"), *No limit* and *No goal* for `minutes` and `commitment`; the mark of each answer (✓ Your answer, ✎ Pre-filled for you, ○ Default, ○ No goal, ! Needs your answer); "only you can answer" and "optional"; the current card's 2 px accent border. Purpose and scope start empty unless pre-filled; until the purpose is picked the defaults below are Self-study's, and each default that depends on the purpose follows it until changed, as `--tui` does.
+  - The detail rule: a scope under 4 words shows "Too short" with the word count and the example, and keeps Finish at **Some answers are missing** (it is never written with `brief.vague`).
+  - The pre-fills (COMMANDS.md, "The forms"): the agent's note at the top, each kept pre-fill marked, **Back to the pre-filled answer** on a changed one, and **Back to every pre-filled answer (n changed)** in the note while any is changed, which leaves the other questions' answers as they are.
+  - The profile's box (G115).
+  - The sidebar, 320 px, open at 1280 px: the sections as folding groups, a row per question with its 16 px status box, short name and answer, the legend and the keys; G113's line at its foot.
+  - **Finish**: with nothing missing, the dialog "Write the brief?" with the counts, the note naming the file, and the two-column summary (Question, highlighted; Answer; **Chosen by** flush right, with *Yours*, *Pre-filled*, *Default*), where a click on a row goes back to its question; **Go back** and **Write the brief**. With something missing, the BriefBlocked dialog naming each question and why, each a link to it.
+  - After a write, the done card: "Brief written", the counts, `brief.yaml` and `content/` with what each is for, "The server has stopped". The Cancelled card is G112's.
+  - The keys `N` (the next question to answer), `Q` (the sidebar), `Esc` (close the dialog or the sidebar), none while typing, with `aria-keyshortcuts`.
+  Colours, sizes and spacing come from the board's source.
+- **Words:** the question file's for every question, choice and hint; the board's `LANG` tables for the form's own, in a `brief` group of the catalogs, en and vi. The form's language is `--language` (default `en`), fixed for the run: changing the language question in the form changes the quiz's language, not the form's, as in `--tui`. In Vietnamese the agent is **AI**. The CLI's own lines are English only.
+- **Loading:** `brief` through flags and `--tui` load neither `src/serve/` nor the form; `check` still loads neither; `test/cli-graph.test.ts` names the form's chunk.
+- **Not in this slice:** the phone (3h2).
+
+### Tasks
+
+1. G112 to G115 into COMMANDS.md (`quiz brief`, "The forms"), with the code that makes them true.
+2. The command without the form (one commit): the stub goes; every refusal and exit with a golden in `test/golden/brief/` (the `web` case's "not available yet" is replaced: count it); the submit read, checked and written as a unit test with a POST (port 0, the timer injected): a written brief, each 400, a timeout, a cancel, Ctrl+C (nothing written, no `DIR`); the `--json` lines.
+3. The form (one or more commits): the components, the bundle, `brief-form.ts`. Playwright through `serveProcess`:
+   - answer every question by mouse and by keys, and write; the file against a golden and read by `quiz check` without `brief.invalid`;
+   - a scope of 3 words holds Finish at the blocked dialog, and its link goes to the scope;
+   - pick a purpose, then another: the defaults that follow it change, a changed one does not;
+   - pre-fill with flags: each kept pre-fill marked and written as `user`; change two, restore one with its card's button and the other with **Back to every pre-filled answer**;
+   - the summary's rows go to their questions; **Go back** writes nothing;
+   - Cancel (G112), the closing line (G113), Appearance (G114), the profile's choices with a configured profile (G115);
+   - a `vi` form (`--language vi`);
+   - axe in light and dark.
+   - Screens of the Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone and BriefDark states to `docs/screens/3h/`, committed, each beside its board, each difference listed.
+4. **The three-way byte-identity test** (step 3's criterion): 3i's answer sets, and at least one more with pre-fills changed and restored, each through the flags, `--tui` and `--web` (the form driven in Playwright), write the same bytes, the same `defaults_applied` and the same warnings.
+5. The rest (one commit, with the code that makes it true): the samples line for `quiz brief --web`; `--help` and the `brief/help` golden; the slice table's 3h row.
+
+### Done when
+
+`npm run check` passes (the startup tests alone first; say which browsers ran). `quiz brief d --web` opens the form; answering purpose and scope only and pressing **Write the brief** writes a `d/brief.yaml` byte-identical to `quiz brief d --purpose … --scope …`; with `--scope "lectures 3 to 5, the Fourier transform" --count 25` the form opens with both marked **Pre-filled for you**, and keeping them writes the same bytes as those flags. Cancel and Ctrl+C write nothing and exit 2. `brief` through flags and `check` load no server code. The screens are committed. Report as the rules say, every golden that changed counted and explained.
