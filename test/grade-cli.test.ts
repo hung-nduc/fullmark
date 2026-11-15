@@ -180,14 +180,14 @@ describe("quiz grade", () => {
     t.done();
   });
 
-  it("--name without --web, --grades with --web, and several files with --web exit 2", async () => {
+  it("--name without --web, a --grades file that cannot be read with --web, and several files with --web exit 2", async () => {
     const t = setup();
     const c = capture(t.dir);
     expect(await runGrade(["a.json"], { ...OPTS, name: "Hung" }, c.io)).toBe(2);
     expect(c.err.join("\n")).toContain("--name names the grader of --web");
     const g = capture(t.dir);
     expect(await runGrade(["a.json"], { ...OPTS, web: true, grades: "g.json" }, g.io)).toBe(2);
-    expect(g.err.join("\n")).toContain("--grades with --web is not available yet");
+    expect(g.err.join("\n")).toContain("cannot read the grades file");
     writeFileSync(join(t.dir, "b.json"), results(t.dir));
     const s = capture(t.dir);
     expect(await runGrade(["a.json", "b.json"], { ...OPTS, web: true }, s.io)).toBe(2);

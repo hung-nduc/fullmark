@@ -187,10 +187,6 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
     fail(io, opts.json, "--web takes one results file: it grades one attempt");
     return EXIT.usage;
   }
-  if (opts.web && opts.grades !== null) {
-    fail(io, opts.json, "--grades with --web is not available yet");
-    return EXIT.usage;
-  }
   if (opts.name !== null && !opts.web) {
     fail(io, opts.json, "--name names the grader of --web");
     return EXIT.usage;
@@ -283,6 +279,15 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
       emit(got);
       return got.status === "error" ? EXIT.usage : EXIT.problems;
     }
+    // `--grades` is checked as `quiz grade --grades` checks it (exit 1, nothing served): the form is pre-filled from it
+    let given: AppliedGrades | null = null;
+    if (gradesFile) {
+      given = applyGrades(loaded.quiz, got.attempt, got.read.json, gradesFile);
+      if (given.problems.length > 0) {
+        emit({ status: "problems", file: item.file, message: "invalid grades", problems: given.problems });
+        return EXIT.problems;
+      }
+    }
     const { runGradeWeb } = await import("./grade-web");
     return runGradeWeb(
       {
@@ -292,6 +297,7 @@ export async function runGrade(patterns: readonly string[], opts: GradeOptions, 
         assets: loaded.assets,
         sheets: loaded.sheets,
         quizFile: shownPath(opts.quiz, io.cwd),
+        grades: given === null || opts.grades === null ? null : { path: resolve(io.cwd, opts.grades), applied: given },
         ...got,
       },
       opts,

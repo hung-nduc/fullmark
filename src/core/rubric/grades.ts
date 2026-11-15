@@ -148,6 +148,11 @@ export type GradeDetail = {
   /** the overall band of a banded rubric */
   band: number | null;
   graded_by: Grader;
+  /**
+   * `grade --web --grades`: the grader the question was pre-filled from, kept as the file had it (G107). Checked as a
+   * grader is; nothing reads it but the file's reader: the replay and the report name `graded_by`.
+   */
+  reviewed?: Grader;
   /** false when the entry was written against a rubric that has changed since */
   rubric_current: boolean;
   criteria: CriterionResult[];
@@ -240,8 +245,9 @@ export function applyGrades(quiz: Quiz, attempt: Attempt, resultsJson: unknown, 
     const detail = gradeEntry(id, entry, g, where, problems, warnings);
     if (detail && problems.length === before) {
       const own = entry.grader === undefined ? fileGrader : readGrader(entry.grader, `${where}.grader`, problems);
+      const reviewed = entry.reviewed === undefined ? null : readGrader(entry.reviewed, `${where}.reviewed`, problems);
       if (own && problems.length === before) {
-        details.push({ ...detail, graded_by: own });
+        details.push({ ...detail, graded_by: own, ...(reviewed === null ? {} : { reviewed }) });
         manual[id] = detail.earned;
       }
     }

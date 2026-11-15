@@ -250,6 +250,24 @@ describe("what makes a grades file invalid", () => {
     expect(problemsOf((t) => (t.grades.alias.score = null))).toEqual([expect.stringContaining("half-filled")]);
   });
 
+  it("a question's `reviewed` is checked as a grader is, and kept (G107)", () => {
+    const sonnet = { kind: "ai", name: "Claude Sonnet 5.5", model: "claude-sonnet-5-5", at: "2026-10-23T15:40:00" };
+    const f = filled();
+    f.grades.laplace.reviewed = sonnet;
+    const ok = apply(f);
+    expect(ok.problems).toEqual([]);
+    expect(ok.details.find((d) => d.id === "laplace")?.reviewed).toEqual(sonnet);
+    expect(ok.details.find((d) => d.id === "task2")).not.toHaveProperty("reviewed");
+    const bad = filled();
+    bad.grades.laplace.reviewed = { kind: "ai", name: "Claude Sonnet 5.5" };
+    expect(apply(bad).problems).toEqual([
+      expect.stringContaining("grades.laplace.reviewed: an AI grader needs grader.model"),
+    ]);
+    const nul = filled();
+    nul.grades.laplace.reviewed = null;
+    expect(apply(nul).problems).toEqual([expect.stringContaining("grades.laplace.reviewed: the grader is missing")]);
+  });
+
   it("a missing rubric_hash, and a bad verdict", () => {
     expect(problemsOf((t) => delete t.grades.laplace.rubric_hash)).toEqual([
       expect.stringContaining("rubric_hash is missing"),

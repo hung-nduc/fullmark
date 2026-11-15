@@ -264,6 +264,161 @@ describe("quiz grade --web", () => {
   });
 });
 
+const OPUS = { kind: "ai", name: "Claude Opus 5.5", model: "claude-opus-5-5", at: "2026-10-24T09:00:00" };
+const IDS = ["add", "ielts", "banded", "holistic", "code"];
+
+/** `grades.json` of the golden, as the file `--grades` names, written into `dir` under `name` after `edit`. */
+function gradesFile(dir: string, name: string, edit: (doc: Doc & { results_hash: string }) => void = () => undefined) {
+  const doc = JSON.parse(readFileSync(join(input, "grades.json"), "utf8")) as Doc & { results_hash: string };
+  edit(doc);
+  writeFileSync(join(dir, name), `${JSON.stringify(doc, null, 2)}\n`);
+}
+
+describe("quiz grade --web --grades", () => {
+  it("opens the form with the file's grades and each question's grader, and Save writes `reviewed` on each (G75, G107)", async () => {
+    const t = setup();
+    gradesFile(t.dir, "agent.json");
+    const done = runGrade(["results.json"], t.options({ grades: "agent.json" }), t.io);
+    const url = await listening(t.out);
+    const data = await dataOf(url);
+    expect(data.items.map((i) => i.given?.grader)).toEqual(IDS.map(() => OPUS));
+    const add = data.items[0]?.given;
+    expect(add).toMatchObject({
+      score: null,
+      cells: { defs: { value: 0.5, note: null }, derive: { value: 1.25 }, interp: { value: 0.5 } },
+      why: "Solid derivation; the interpretation is the weak part.",
+    });
+    expect(data.items[3]?.given).toMatchObject({
+      score: 3,
+      verdicts: { "names-the-nyquist-rate": "met", "gives-an-example": "partly" },
+    });
+    // saved as given, by a form that sends back the cells and a grader of its own that the server ignores
+    const sent = named(filled(), "Lan");
+    for (const entry of Object.values(sent.grades)) entry.grader = { kind: "human", name: "x" };
+    expect((await submit(url, sent)).status).toBe(200);
+    expect(await done).toBe(0);
+    const file = JSON.parse(readFileSync(join(t.dir, "results-grades.json"), "utf8"));
+    expect(file.grader).toMatchObject({ kind: "human", name: "Lan" });
+    for (const id of IDS) {
+      expect(file.grades[id].reviewed).toEqual(OPUS);
+      expect(file.grades[id]).not.toHaveProperty("grader");
+    }
+    expect(Object.keys(file.grades.add).slice(-3)).toEqual(["justification", "improvement", "reviewed"]);
+  });
+
+  it("each question names its own grader, else the file's (G102); a question the file leaves null is not pre-filled", async () => {
+    const t = setup();
+    const sonnet = { kind: "ai", name: "Claude Sonnet 5.5", model: "claude-sonnet-5-5", at: "2026-10-23T15:40:00" };
+    gradesFile(t.dir, "two.json", (doc) => {
+      (doc.grades.holistic as Record<string, unknown>).grader = sonnet;
+      (doc.grades.ielts as Record<string, unknown>).grader = sonnet;
+      const code = doc.grades.code as Record<string, unknown>;
+      for (const c of Object.values(code.criteria as Record<string, Record<string, unknown>>)) {
+        c.score = null;
+        c.note = null;
+      }
+      code.justification = null;
+      code.improvement = null;
+    });
+    const done = runGrade(["results.json"], t.options({ grades: "two.json" }), t.io);
+    const url = await listening(t.out);
+    const data = await dataOf(url);
+    expect(data.items.map((i) => i.given?.grader.name ?? null)).toEqual([
+      "Claude Opus 5.5",
+      "Claude Sonnet 5.5",
+      "Claude Opus 5.5",
+      "Claude Sonnet 5.5",
+      null,
+    ]);
+    // the form grades the left-over question by hand, and saves: it has no `reviewed`
+    const sent = named(filled(), "Lan");
+    expect((await submit(url, sent)).status).toBe(200);
+    expect(await done).toBe(0);
+    const file = JSON.parse(readFileSync(join(t.dir, "results-grades.json"), "utf8"));
+    expect(IDS.map((id) => file.grades[id].reviewed?.name ?? null)).toEqual([
+      "Claude Opus 5.5",
+      "Claude Sonnet 5.5",
+      "Claude Opus 5.5",
+      "Claude Sonnet 5.5",
+      null,
+    ]);
+  });
+
+  it("a pre-filled question cleared before Save is pending, and carries no `reviewed`", async () => {
+    const t = setup();
+    gradesFile(t.dir, "agent.json");
+    const done = runGrade(["results.json"], t.options({ grades: "agent.json" }), t.io);
+    const url = await listening(t.out);
+    const sent = named(filled(), "Lan");
+    for (const entry of Object.values(sent.grades).slice(1)) {
+      entry.justification = null;
+      entry.improvement = null;
+      if ("score" in entry) entry.score = null;
+      for (const cells of [entry.criteria, entry.bullets]) {
+        for (const cell of Object.values((cells ?? {}) as Record<string, Record<string, unknown>>)) {
+          for (const k of ["score", "band", "note", "verdict"]) if (k in cell) cell[k] = null;
+        }
+      }
+    }
+    expect((await submit(url, sent)).status).toBe(200);
+    await done;
+    const file = JSON.parse(readFileSync(join(t.dir, "results-grades.json"), "utf8"));
+    expect(file.grades.add.reviewed).toEqual(OPUS);
+    expect(file.grades.ielts).not.toHaveProperty("reviewed");
+  });
+
+  it("refuses the file as `quiz grade --grades` does: exit 1 for a bad one, 2 for one that cannot be read; nothing is served", async () => {
+    const bad = setup();
+    gradesFile(bad.dir, "bad.json", (doc) => {
+      ((doc.grades.add as Record<string, any>).criteria.derive as Record<string, unknown>).score = 1.3;
+    });
+    expect(await runGrade(["results.json"], bad.options({ grades: "bad.json" }), bad.io)).toBe(1);
+    expect(bad.out.some((l) => l.includes("listening"))).toBe(false);
+    expect(`${bad.out.join("\n")}${bad.err.join("\n")}`).toContain("grades.add");
+    expect(existsSync(join(bad.dir, "results-grades.json"))).toBe(false);
+    const missing = setup();
+    expect(await runGrade(["results.json"], missing.options({ grades: "nope.json" }), missing.io)).toBe(2);
+    expect(missing.err.join("\n")).toContain("cannot read the grades file");
+    const text = setup();
+    writeFileSync(join(text.dir, "t.json"), "nonsense");
+    expect(await runGrade(["results.json"], text.options({ grades: "t.json" }), text.io)).toBe(1);
+    expect(text.out.some((l) => l.includes("listening"))).toBe(false);
+  });
+
+  it("`--grades` naming the file Save would write is not refused, and Save replaces it (G108); another file is refused", async () => {
+    const same = setup();
+    gradesFile(same.dir, "results-grades.json");
+    const done = runGrade(["results.json"], same.options({ grades: "results-grades.json" }), same.io);
+    const url = await listening(same.out);
+    expect((await dataOf(url)).items[0]?.given?.grader).toEqual(OPUS);
+    expect((await submit(url, named(filled(), "Lan"))).status).toBe(200);
+    expect(await done).toBe(0);
+    const file = JSON.parse(readFileSync(join(same.dir, "results-grades.json"), "utf8"));
+    expect(file.grader.kind).toBe("human");
+    expect(file.grades.add.reviewed).toEqual(OPUS);
+
+    // a timeout leaves it byte for byte
+    const kept = setup();
+    gradesFile(kept.dir, "results-grades.json");
+    const before = readFileSync(join(kept.dir, "results-grades.json"), "utf8");
+    const waiting = runGrade(["results.json"], kept.options({ grades: "./results-grades.json" }), kept.io);
+    await listening(kept.out);
+    kept.timeout();
+    expect(await waiting).toBe(2);
+    expect(readFileSync(join(kept.dir, "results-grades.json"), "utf8")).toBe(before);
+
+    // another file, while results-grades.json holds grades: the refusal stands
+    const other = setup();
+    gradesFile(other.dir, "results-grades.json");
+    gradesFile(other.dir, "other.json");
+    expect(await runGrade(["results.json"], other.options({ grades: "other.json" }), other.io)).toBe(2);
+    expect(other.err.join("\n")).toContain(
+      "results-grades.json already holds grades; move it away, or adjust it with --grades",
+    );
+    expect(other.out.some((l) => l.includes("listening"))).toBe(false);
+  });
+});
+
 describe("isEmptyTemplate", () => {
   it("is true for the template, false for one holding a grade, a note or a grader", () => {
     const template = JSON.parse(readFileSync(join(input, "grades.json"), "utf8")) as Doc;

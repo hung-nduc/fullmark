@@ -5,9 +5,10 @@ import { embeddedFonts, type FontsChoice, fontFaceCss, offeredFonts } from "../c
 import { countWords, type Graded } from "../core/grade";
 import type { Question, Quiz } from "../core/ir";
 import { toBase64 } from "../core/keyblob";
+import type { GradeDetail } from "../core/rubric/grades";
 import { resolveRubric } from "../core/rubric/model";
 import { themeCss } from "../core/themes";
-import type { AutoKind, GradeCriterion, GradeData, GradeItem } from "../grade-form/data";
+import type { AutoKind, GradeCriterion, GradeData, GradeGiven, GradeItem } from "../grade-form/data";
 import { fontDataUri } from "./fonts";
 import type { Highlight } from "./highlight";
 import { escapeAttr, sampleHtml, scriptJson, unwrap } from "./page";
@@ -25,6 +26,8 @@ export type GradeFormOptions = {
   graded: Graded;
   /** the grades template of this attempt (`gradesTemplate`): one entry per answered essay or code question */
   template: { grades: Record<string, Record<string, unknown>> };
+  /** `--grades`: the grades the file gave, by question id, each with the grader it is from (`applyGrades`' details) */
+  given?: readonly GradeDetail[];
   /** `--name` */
   name: string | null;
   /** the two files as the saved card names them */
@@ -42,6 +45,23 @@ export type GradeFormOptions = {
 };
 
 const sha256Source = (text: string): string => `'sha256-${toBase64(sha256(utf8ToBytes(text)))}'`;
+
+/** What a grade detail gave the form: the cells to pre-fill (G75), with the grader (its own, else the file's: G102). */
+function givenOf(d: GradeDetail): GradeGiven {
+  const holistic = d.mode === "holistic";
+  return {
+    grader: d.graded_by,
+    score: holistic ? d.earned : null,
+    cells: holistic
+      ? {}
+      : Object.fromEntries(
+          d.criteria.map((c) => [c.id, { value: d.mode === "banded" ? c.band : c.earned, note: c.note }]),
+        ),
+    verdicts: holistic ? Object.fromEntries(d.criteria.map((c) => [c.id, c.verdict])) : {},
+    why: d.justification,
+    improve: d.improvement,
+  };
+}
 
 /** The form's data (see `GradeData`): the quiz's essays and code split into those to grade and those left blank. */
 export function gradeDataOf(o: GradeFormOptions, md: ReturnType<typeof createRenderer>): GradeData {
@@ -78,6 +98,7 @@ export function gradeDataOf(o: GradeFormOptions, md: ReturnType<typeof createRen
       round: rubric.mode === "banded" ? rubric.round : null,
       criteria,
       entry: o.template.grades[q.id] ?? {},
+      given: ((d) => (d === undefined ? null : givenOf(d)))(o.given?.find((d) => d.id === q.id)),
     };
   };
   const items: GradeItem[] = [];

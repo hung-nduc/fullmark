@@ -15,6 +15,25 @@ export type GradeCriterion = {
   weight: number | null;
 };
 
+/** A grader as the grades file names one (`kind`, `name`, `model` for an AI, `at` as the file had it). */
+export type GradeGrader = { kind: "ai" | "human"; name: string; model?: string; at?: string };
+
+/**
+ * What `--grades` gave one question (G75): every value, note and text of its entry, and the grader it is from (its own
+ * `grader`, else the file's: G102). Only a question the file grades has one; a question it leaves `null` has none.
+ */
+export type GradeGiven = {
+  grader: GradeGrader;
+  /** a holistic rubric's score; else null */
+  score: number | null;
+  /** additive: the score; banded: the band; by criterion id */
+  cells: Record<string, { value: number | null; note: string | null }>;
+  /** holistic: the verdict of each bullet */
+  verdicts: Record<string, "met" | "partly" | "missed" | null>;
+  why: string | null;
+  improve: string | null;
+};
+
 /** An essay or code question of the attempt, with its rubric. */
 export type GradeItem = {
   id: string;
@@ -38,6 +57,8 @@ export type GradeItem = {
   criteria: GradeCriterion[];
   /** the question's entry in the grades template, as `quiz grade --json` writes it: the form fills its cells */
   entry: Record<string, unknown>;
+  /** `--grades`: what the file gave this question, pre-filled in the form; null without `--grades` or when it left it `null` */
+  given: GradeGiven | null;
 };
 
 /**

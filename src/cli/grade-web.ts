@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { buildGradeForm } from "../build/grade-form";
 import { languagesUsed, loadHighlighter } from "../build/highlight";
@@ -16,6 +16,7 @@ import {
   applyGrades,
   GRADES_FORMAT,
   GRADES_VERSION,
+  type Grader,
   gradable,
   gradesTemplate,
   parseGrades,
@@ -45,6 +46,8 @@ export type Prepared = {
   quizFile: string;
   read: Extract<ReturnType<typeof parseResults>, { ok: true }>;
   attempt: Attempt;
+  /** `--grades`, read and checked (G75): where it is, and what it holds */
+  grades: { path: string; applied: AppliedGrades } | null;
 };
 
 const defaultInterrupt = (handler: () => void): (() => void) => {
@@ -53,6 +56,16 @@ const defaultInterrupt = (handler: () => void): (() => void) => {
     process.off("SIGINT", handler);
   };
 };
+
+/** Whether two paths name one file: the same path, or the same file once links are followed. */
+function samePath(a: string, b: string): boolean {
+  if (a === b) return true;
+  try {
+    return realpathSync(a) === realpathSync(b);
+  } catch {
+    return false;
+  }
+}
 
 const wholeNumber = (text: string, min: number): number | null =>
   /^\d+$/.test(text) && Number(text) >= min ? Number(text) : null;
@@ -90,6 +103,17 @@ function inOrderOf(value: unknown, like: unknown): unknown {
   return out;
 }
 
+/** The entries of a submit's grades, without a `grader` or a `reviewed` of their own: the server writes those. */
+function withoutGraders(grades: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(grades).map(([id, entry]) => {
+      if (!isRecord(entry)) return [id, entry];
+      const { grader: _grader, reviewed: _reviewed, ...rest } = entry;
+      return [id, rest];
+    }),
+  );
+}
+
 /** What a submit holds once read and checked: the grades file to write, and the arithmetic the validator did. */
 export type GradesSubmit = { file: Record<string, unknown>; applied: AppliedGrades };
 
@@ -109,6 +133,8 @@ export function gradesSubmitReader(ctx: {
   now: () => Date;
   /** the grades template, whose key order the file keeps (the form's data comes back with its keys sorted) */
   template?: { grades: Record<string, unknown> };
+  /** `--grades`: the grader each pre-filled question came from; a question still graded at Save carries it as `reviewed` (G107) */
+  reviewed?: ReadonlyMap<string, Grader>;
 }): (body: unknown) => SubmitRead<GradesSubmit> {
   const results = resultsHash(ctx.resultsJson);
   return (body) => {
@@ -128,7 +154,8 @@ export function gradesSubmitReader(ctx: {
       version: GRADES_VERSION,
       results_hash: results,
       grader: { kind: "human", name, at: localIso(ctx.now()) },
-      grades: ctx.template ? inOrderOf(doc.grades, ctx.template.grades) : doc.grades,
+      // no question carries a grader of its own, whatever the form sent: the file's is the human's
+      grades: ctx.template ? inOrderOf(withoutGraders(doc.grades), ctx.template.grades) : withoutGraders(doc.grades),
     };
     // the same reader and validator as `quiz grade --grades`
     const read = parseGrades(JSON.stringify(file));
@@ -139,6 +166,12 @@ export function gradesSubmitReader(ctx: {
       return `${applied.problems.slice(0, 6).join("; ")}${more}`;
     }
     if (applied.details.length === 0) return "nothing is graded yet";
+    // G107: each question that was pre-filled and is graded names the grader it was pre-filled from, adjusted or not
+    for (const d of applied.details) {
+      const from = ctx.reviewed?.get(d.id);
+      const entry = (file.grades as Record<string, unknown>)[d.id];
+      if (from !== undefined && isRecord(entry)) entry.reviewed = { ...from };
+    }
     return { quizId: ctx.quizId, value: { file, applied } };
   };
 }
@@ -185,15 +218,15 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
     } catch {
       empty = false;
     }
-    if (!empty) {
-      fail(
-        io,
-        opts.json,
-        `${gradesShown} already holds grades; move it away, or adjust it with --grades once that is built`,
-      );
+    // G108: `--grades` naming this very file is the usual way to review an agent's grades: Save grades replaces it
+    const same = p.grades !== null && samePath(p.grades.path, gradesPath);
+    if (!empty && !same) {
+      fail(io, opts.json, `${gradesShown} already holds grades; move it away, or adjust it with --grades`);
       return EXIT.usage;
     }
   }
+
+  for (const w of p.grades?.applied.warnings ?? []) io.err(`warning: ${w}`);
 
   const folder = io.runtimeDir ?? runtimeFolder();
   const read = (name: string): string | null => {
@@ -226,6 +259,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
     attempt,
     graded,
     template,
+    ...(p.grades === null ? {} : { given: p.grades.applied.details }),
     name: opts.name === null ? null : opts.name.trim(),
     files: { grades: gradesShown, report: reportShown },
     script,
@@ -285,6 +319,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
         name: opts.name === null ? null : opts.name.trim() === "" ? null : opts.name.trim(),
         now: clock,
         template,
+        reviewed: new Map((p.grades?.applied.details ?? []).map((d) => [d.id, d.graded_by])),
       }),
       ...(io.setTimer ? { setTimer: io.setTimer } : {}),
       async onSubmit(_id, { file, applied }) {
