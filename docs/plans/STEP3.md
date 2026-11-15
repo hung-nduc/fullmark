@@ -32,7 +32,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
-| 3q the replay's answer panel and badge (G94) | done, reviewed (2026-11-15); G106 for the owner | `9133d08`..`506b816`, review |
+| 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
@@ -48,8 +48,8 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 How each slice got here is in its own **Review**; the table above is the summary.
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
-2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) waits for the owner.
-3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, after G104; its brief can be drafted now.
+2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
+3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, after G104 and G106; its brief can be drafted now.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -83,7 +83,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-- **G106. The sample answer's code block scrolls sideways but cannot be focused (3q's review).** At 390 px a long line in a sample answer's highlighted code (`.fm-hl`, `overflow-x: auto`) scrolls inside the block, which has no `tabindex`, so a keyboard user cannot scroll it and axe reports `scrollable-region-focusable` (a submitted `types.md` at 390 px). It predates 3q; 3q's panel specs leave `.fm-sample` out of axe so they neither fail on it nor hide it. **Recommendation:** a highlighted code block that scrolls is focusable (`tabindex="0"`, named by its language or "Code"), as 3q's code panel is, wherever the page draws one (sample answers, explanations, prompts); the exclusion comes out of `e2e/answer-panel.spec.ts`. Small: the first task of the next slice that touches the page (3p2, since its pre-filled box sits beside the sample).
+None open.
 
 ## Slices
 
@@ -107,7 +107,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3p** | G98's differences from the boards, then the grading form on a phone (G79) | G79, G89, G96, G98, 3f2 |
 | **3r** | fullmark's own marking from the form (G83), as G100 has it | G83, G100, 3p |
 | **3r2** | G103: the grader's frame shows the replay without its top bar, in the form's look, with no Download results; the 3r screens' spec, and the screens taken again | G103, 3r |
-| **3p2** | G104; `--web --grades`: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, G104, 3r2 |
+| **3p2** | G104, G106; `--web --grades`: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, G104, G106, 3r2 |
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
 | **3h** | `brief --web`: the form from the question file, the detail rules, the summary screen, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, boards |
 | **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
@@ -1138,5 +1138,5 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 - The page catalog's `scoreLine` ("2.25 of 3 points") is no longer used by the page; it stays in `en.ts` and `vi.ts`, tested by `test/page/numbers.test.ts`. Left as it is (removing it changes the bundle and the goldens again); it can go with the next slice that touches the catalogs. The report's own `scoreLine` is a different key and is used.
 - The header's gap changed for every card, while answering too (12 px to 6 px by 10 px, with wrapping); seen in the screens, harmless.
 
-**G106 for the owner.**
+**Decided by the owner on 2026-11-15:** G106, as recommended; 3p2's first task, with G104.
 
