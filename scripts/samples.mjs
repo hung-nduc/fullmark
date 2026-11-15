@@ -88,6 +88,11 @@ const SERVED = [
     try: "quiz grade --web: the grading form opens in your browser (samples/grade holds the essay fixture's attempt, an essay of each rubric mode and a code answer, and no grades file). Grade the five questions: the slot [erase | - | value | +] / [max] takes a typed value, the buttons (from empty, + gives the full marks and - the step below; an empty band starts at the middle) and the full-mark box; the verdicts are a radio group. A mark below the maximum needs a note, a one-score grade needs its reason, and a half-graded question says so; Finish lists what is missing and writes nothing until it is fixed. Q opens the sidebar, N goes to the next question not graded. Finish asks your name, Save grades writes samples/grade/results-grades.json (kind: human) and results-report.md, and the command prints both and exits 0. Then quiz replay samples/grade/results.json --quiz samples/grade/quiz.md shows your grades in the rubric box. Run the command again: it exits 2, since the grades file now holds grades (G87). Ctrl+C instead of Save grades prints interrupted and exits 2, leaving the folder as it was.",
   },
   {
+    command:
+      "node dist/cli.js grade samples/grade-ai/results.json --quiz samples/grade-ai/quiz.md --web --grades samples/grade-ai/grades.json --open",
+    try: "quiz grade --web --grades: the grading form opens with the grades file's grades already in (samples/grade-ai holds the essay fixture's attempt and a grades file by an AI grader). Every question it grades counts as graded: the status line ends with a pill, 'Pre-filled · 3 as given, 0 adjusted'. Each slot opens with a lit box showing the AI's value; press nothing and it stays lit, change a score or a note and the box turns plain, a press on it puts that row's score and its note back; the small AI's by Why this score and To improve puts the text back; Back to the AI's grade on the card's foot puts the whole question back. The box head names who graded and turns to 'adjusted by you'; the sidebar marks each question (the sparkle, the sparkle with a pencil once changed). Finish asks your name and Save grades writes samples/grade-ai/results-grades.json (kind: human, with reviewed on each pre-filled question) and the report. Run the command again: grades.json is not the file Save writes, so results-grades.json now holds grades and the run is refused (exit 2); name that file in --grades instead and the form opens pre-filled from it.",
+  },
+  {
     command: "node dist/cli.js brief samples/brief-tui --tui",
     try: "quiz brief --tui: asks every question in the terminal, in two steps (Quiz 1/2 style progress), with each question's help and each choice's hint. Purpose and scope start empty; a scope under four words is asked again with the example. The summary lists every answer and marks the defaults; pick Change on any line to go back (change the purpose and the defaults that follow it are refilled), then Write brief.yaml: samples/brief-tui/brief.yaml and an empty content/ are written. Ctrl+C at any step writes nothing and exits 2. Run it again: it exits 2 because brief.yaml exists. Pre-fill with flags (--scope \"...\" --language vi) and the form opens with them, in Vietnamese; the same answers through flags (quiz brief samples/brief-flags --purpose ... --scope ...) write the same bytes. With stdin from /dev/null it exits 2: --tui needs a terminal.",
   },
@@ -126,6 +131,12 @@ copyFileSync(join("examples", "rust", "quiz.md"), join(OUT, "since", "quiz.md"))
 mkdirSync(join(OUT, "grade"), { recursive: true });
 copyFileSync(join("test", "fixtures", "replay", "essay.md"), join(OUT, "grade", "quiz.md"));
 copyFileSync(join("test", "fixtures", "replay", "essay-results.json"), join(OUT, "grade", "results.json"));
+
+// the folder `grade --web --grades` is tried in: the same attempt, with the grades file named apart from the one Save writes
+mkdirSync(join(OUT, "grade-ai"), { recursive: true });
+copyFileSync(join("test", "fixtures", "replay", "essay.md"), join(OUT, "grade-ai", "quiz.md"));
+copyFileSync(join("test", "fixtures", "replay", "essay-results.json"), join(OUT, "grade-ai", "results.json"));
+copyFileSync(join("test", "fixtures", "replay", "essay-results-grades.json"), join(OUT, "grade-ai", "grades.json"));
 
 const built = [];
 for (const s of sources) {
