@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type BriefOptions, runBrief } from "../../src/cli/brief";
 import { loadQuestions } from "../../src/cli/brief-questions";
 import { readBrief } from "../../src/core/rules/brief-read";
+import { cases, SCOPE, VI_SCOPE, walk } from "../helpers/brief-cases";
 import { capture, tempTree } from "../helpers/cli";
 import { fakeTerminal, KEY, pick, typed } from "../helpers/tui";
 
@@ -46,51 +47,7 @@ const NONE: BriefOptions = {
   tui: false,
   json: true,
 };
-const SCOPE = "lectures 3 to 5, the Fourier transform";
-const VI_SCOPE = "bài giảng 3 đến 5, phép biến đổi Fourier";
 const questions = loadQuestions();
-
-/** The prompts of the form in the question file's order, one key string each; `over` changes some. */
-type Step =
-  | "purpose"
-  | "scope"
-  | "kinds"
-  | "other"
-  | "elsewhere"
-  | "count"
-  | "minutes"
-  | "mix"
-  | "difficulty"
-  | "mode"
-  | "language"
-  | "request"
-  | "weak"
-  | "commitment"
-  | "profile";
-const ORDER: Step[] = [
-  "purpose",
-  "scope",
-  "kinds",
-  "elsewhere",
-  "count",
-  "minutes",
-  "mix",
-  "difficulty",
-  "mode",
-  "language",
-  "request",
-  "weak",
-  "commitment",
-  "profile",
-];
-function walk(over: Partial<Record<Step, string>>, tail: string[] = [KEY.enter]): string[] {
-  const steps: string[] = [];
-  for (const step of ORDER) {
-    steps.push(over[step] ?? (step === "scope" ? typed(SCOPE) : KEY.enter));
-    if (step === "kinds" && over.other !== undefined) steps.push(over.other);
-  }
-  return [...steps, ...tail];
-}
 
 async function viaForm(
   script: string[],
@@ -359,82 +316,6 @@ describe("quiz brief --tui: the exits", () => {
 });
 
 describe("the same answers through the form and through flags write the same bytes (and the same decided_by)", () => {
-  type Case = {
-    name: string;
-    script: string[];
-    form?: Partial<BriefOptions>;
-    flags: Partial<BriefOptions>;
-    files?: Record<string, string>;
-  };
-  const cases: Case[] = [
-    ...(["self-study", "exam-prep", "classmates", "survey"] as const).map((purpose, i) => ({
-      name: `purpose ${purpose}, defaults for the rest`,
-      script: walk({ purpose: pick(i) }),
-      flags: { purpose, scope: SCOPE },
-    })),
-    {
-      name: "Vietnamese: the language answered in the form",
-      script: walk({
-        purpose: pick(2),
-        scope: typed(VI_SCOPE),
-        language: pick(1),
-        request: typed("ôn kỹ phần chuỗi: Fourier # 2"),
-      }),
-      flags: { purpose: "classmates", scope: VI_SCOPE, language: "vi", request: "ôn kỹ phần chuỗi: Fourier # 2" },
-    },
-    {
-      name: "Vietnamese: language given as a flag and kept",
-      script: walk({ scope: typed(VI_SCOPE) }),
-      form: { language: "vi", purpose: "self-study" },
-      flags: { purpose: "self-study", scope: VI_SCOPE, language: "vi" },
-    },
-    {
-      name: "other with its text, and notes",
-      script: walk({
-        kinds: `${KEY.down.repeat(2)}${KEY.space}${KEY.down.repeat(3)}${KEY.space}${KEY.enter}`,
-        other: typed("a field journal: week 4"),
-      }),
-      flags: { purpose: "self-study", scope: SCOPE, kinds: "notes,other", kindsOther: "a field journal: week 4" },
-    },
-    {
-      name: "the purpose changed on the way back",
-      script: walk({ count: typed("12"), mode: pick(1) }, [pick(1), pick(1), KEY.enter]),
-      flags: { purpose: "exam-prep", scope: SCOPE, count: "12", mode: "timed-exam" },
-    },
-    {
-      name: "weak topics yes (and its warning)",
-      script: walk({ weak: pick(-1) }),
-      flags: { purpose: "self-study", scope: SCOPE, weakTopics: "yes" },
-    },
-    {
-      name: "several answers changed, mix and minutes among them",
-      script: walk({
-        minutes: typed("37.5"),
-        mix: `${KEY.space}${KEY.down.repeat(3)}${KEY.space}${KEY.enter}`,
-        difficulty: pick(1),
-        commitment: typed("75"),
-        elsewhere: typed("the library's reserve copy"),
-      }),
-      flags: {
-        purpose: "self-study",
-        scope: SCOPE,
-        minutes: "37.5",
-        mix: "understanding,calculation,code".replace(
-          "understanding,calculation,code",
-          "calculation,understanding,code",
-        ),
-        difficulty: "harder",
-        commitment: "75",
-        elsewhere: "the library's reserve copy",
-      },
-    },
-    {
-      name: "a flag pre-fill kept, equal to its default",
-      script: walk({ scope: KEY.enter }),
-      form: { scope: SCOPE, count: "20", profile: "default" },
-      flags: { purpose: "self-study", scope: SCOPE, count: "20", profile: "default" },
-    },
-  ];
   for (const c of cases) {
     it(c.name, async () => {
       const form = await viaForm(c.script, c.form ?? {}, c.files);
