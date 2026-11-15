@@ -1289,9 +1289,13 @@
       padding: 0 8px;
     }
 
-    /* a flag and its value are no longer kept whole: one can be wider than the box */
+    /* a flag and its value are no longer kept whole (one can be wider than the box), but a flag's name is */
     .bf-cmd-part {
       white-space: pre-wrap;
+    }
+
+    .bf-cmd-flag {
+      white-space: nowrap;
     }
 
     .bf-end,

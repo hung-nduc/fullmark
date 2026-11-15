@@ -722,7 +722,16 @@ function Command({ state }: { state: FormState }) {
           {parts.map((part, i) => (
             <Fragment key={part}>
               {i > 0 ? " " : null}
-              <span class={part.length > 48 ? undefined : "bf-cmd-part"}>{part}</span>
+              <span class={part.length > 48 ? undefined : "bf-cmd-part"}>
+                {part.startsWith("--") ? (
+                  <>
+                    <span class="bf-cmd-flag">{part.split(" ", 1)[0]}</span>
+                    {part.slice((part.split(" ", 1)[0] ?? "").length)}
+                  </>
+                ) : (
+                  part
+                )}
+              </span>
             </Fragment>
           ))}
         </code>
