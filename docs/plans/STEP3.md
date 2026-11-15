@@ -34,7 +34,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
-| 3p3 the pre-filled form on a phone | brief drafted (2026-11-15), waits for the owner's approval and G111 | |
+| 3p3 the pre-filled form on a phone | brief approved with G111 (2026-11-15); ready for an implementing agent | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
@@ -50,7 +50,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
-3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone): **brief drafted** (2026-11-15, "Slice 3p3"); it waits for the owner's approval and for G111, the layout, since GradeAI draws no phone.
+3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone): **brief approved** (2026-11-15, "Slice 3p3"), with G111 (the layout) decided; ready to hand to one implementing agent.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -84,13 +84,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-- **G111. The pre-filled form's layout on a phone (3p3's brief).** GradeAI draws no phone, and as built below 520 px the pre-filled box, the "/ max" box and the total are squeezed to slivers and the foot's two buttons run off the card (3p3's brief, "As built"). At 390 px a slot's row is about 290 px: the control group and the max box fill it, so the 76 px box does not fit beside them. **Recommendation:**
-  - **Each slot:** the pre-filled box on a line of its own, above the control, left-aligned at its own size (76 px; 88 px for a verdict); the control row under it exactly as without `--grades` ([erase | − | value | +] / [max], full width). The same for the one score's control and a verdict group (the box above the three verdict buttons).
-  - **The total:** the pre-filled total's box on its own line above the computed total, display only, dashed once it differs, as wide.
-  - **"✦ AI's"** stays by **Why this score** and **To improve**, as wide (it fits).
-  - **The card's foot:** once anything changed, **✦ Back to the AI's grade** and **Clear this question** stacked, each the card's full width, the restore first; while unchanged, **Clear this question** alone, as now.
-  - **The pill:** the compact bar has no room; the pill goes at the top of the sidebar's sheet, under its title, with the same words and tooltip, and the compact bar's second line is unchanged ("Graded 5 of 5 · Question 2"). Each card's box head already says "unchanged" or "adjusted by you".
-  A mockup of these can be drawn first if the owner wants to see them, as for G104.
+None open.
 
 ## Slices
 
@@ -1221,7 +1215,7 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 
 ## Slice 3p3: the pre-filled form on a phone
 
-**Drafted on 2026-11-15; waits for the owner's approval, with G111.** 3p2's pre-filled form below 760 px, as 3p made the plain form's phone. GradeAI draws no phone, so the layout is G111's; everything else is the wide form's as 3p2 built it, in RubricPhone's stacked box (G89). Small: CSS and a few elements in `src/grade-form/`, one spec, one screens spec.
+**Approved by the owner on 2026-11-15**, with G111 as recommended. 3p2's pre-filled form below 760 px, as 3p made the plain form's phone. GradeAI draws no phone, so the layout is G111's; everything else is the wide form's as 3p2 built it, in RubricPhone's stacked box (G89). Small: CSS and a few elements in `src/grade-form/`, one spec, one screens spec.
 
 **As built (seen writing this brief, 390 px):** below 520 px the pre-filled box is a third child in the slot's two-column grid, so it is squeezed to a sliver at the left edge, the "/ max" box is squeezed to a sliver under the control, the total's row breaks the same way, and the card's foot puts **✦ Back to the AI's grade** and **Clear this question** on one line, the first running off the card. The status pill is not shown in the phone's compact bar. The form without `--grades` is unaffected.
 
@@ -1229,20 +1223,20 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 
 - COMMANDS.md: `quiz grade`, "The form": "Pre-filled grades" (every bullet, "Pre-filled by a person" included) and "On a phone".
 - TECHNICAL_DESIGN.md: section 6, "The rubric box" (the stacked box, G89).
-- This plan: "Rules for every slice", G79, G89, G75, G102, G109, G110, G111 (STEP3-GAPS.md once decided), the Reviews of 3p and 3p2 (and the fix after 3p2's: the full-marks box).
+- This plan: "Rules for every slice", G79, G89, G75, G102, G109, G110, G111 (STEP3-GAPS.md), the Reviews of 3p and 3p2 (and the fix after 3p2's: the full-marks box).
 - The boards: `RubricPhone.dc.html` (`form="grade"`, every rubric type: the stacked slot, the foot bar), `GradeAI.dc.html` (the pre-filled box's values, the pill, the marks), `GradePhone.dc.html` (the compact bar).
 - Code: `src/grade-form/Form.tsx` (`GivenChip`, the slot, the verdict group, the total, the card's foot, the compact bar `fm-phone-line`, the sidebar's head), `src/grade-form/grade.css` (the `min-width: 520px` block for `.fm-box[data-given]`, and the `max-width: 759px` block); `e2e/grade-phone.spec.ts`, `e2e/grade-prefilled.spec.ts`, `e2e/screens-3p.spec.ts`, `e2e/screens-3p2.spec.ts`.
 
 ### Decided for this slice
 
-- **The layout is G111's** (the Gaps list), at every width under 760 px, 360 px included.
+- **The layout is G111's** (STEP3-GAPS.md; COMMANDS.md, "Pre-filled grades", "On a phone"), at every width under 760 px, 360 px included.
 - **Everything else as at 1280 px:** what a press of each box does, "✦ AI's", the box head's words, the badge, the sidebar's marks, sub-lines and legend (the sidebar takes the whole screen, as on any phone), the saved card; the controls 44 px tall, as 3p has them.
 - **Not changed:** the wide form, the plain form on a phone, the files written.
 
 ### Tasks
 
 1. **G111** (one commit or more): the layout below 760 px. Playwright at 390 px and at 360 px, for each rubric type (additive, banded, holistic, code) unchanged and adjusted: no horizontal overflow of the page or the card; every pre-filled box at its size (76 px, 88 px for a verdict) and fully on screen; the control and the "/ max" box at least 44 px tall and the max box at least 44 px wide; the foot's buttons inside the card; a lit box does nothing, a change makes it plain and a press restores the row, the text and the question, as wide; the pill's count where G111 puts it; axe in light and dark; the longest vi words ("✦ Về điểm của AI", "Điền sẵn · N giữ nguyên, M đã sửa") inside their boxes.
-2. **Screens** (one commit): `e2e/screens-3p3.spec.ts`, `docs/screens/3p3/`: at 390 px each rubric type unchanged and adjusted, a person's pre-fill, the sidebar with its marks, dark, vi, and one at 360 px; each beside RubricPhone (and the G111 mockup if there is one), each difference listed. The slice table's 3p3 row.
+2. **Screens** (one commit): `e2e/screens-3p3.spec.ts`, `docs/screens/3p3/`: at 390 px each rubric type unchanged and adjusted, a person's pre-fill, the sidebar with its marks, dark, vi, and one at 360 px; each beside RubricPhone , each difference listed. The slice table's 3p3 row.
 
 ### Done when
 
