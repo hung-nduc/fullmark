@@ -367,7 +367,7 @@ test("G100: on a phone the Scored by fullmark row closes the sidebar and shows t
   await expect(frame.locator("[data-results]")).toBeVisible();
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    await noViolations(page, ["landmark-unique"]); // two mains: see the wide test (G103)
+    await noViolations(page);
   }
   // Save grades still works after the row was used
   await press(page, toggle(page));
@@ -400,5 +400,5 @@ test("G103: on a phone the frame has no second bar or Download results, and show
   // one bar only: the form's
   await expect(page.locator(".fm-dock")).toHaveCount(1);
   await noSideways(page);
-  await noViolations(page, ["landmark-unique"]); // two mains: see the wide test (G103)
+  await noViolations(page);
 });

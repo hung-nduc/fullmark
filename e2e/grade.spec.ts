@@ -836,13 +836,14 @@ test("G100: Save grades from the frame itself (Finish while it is shown)", async
 test("G100: passes axe in light and dark with the frame shown", async ({ page }) => {
   const server = await web(folder());
   await open(page, server);
+  await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.*/);
   await autoRow(page).click();
   await expect(frameOf(page).locator("[data-results]")).toBeVisible();
+  // G104: while the frame shows, the form's main is named, and no axe rule is skipped
+  await expect(page.locator("main.fm-main")).toHaveAttribute("aria-label", "Scored by fullmark");
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    // landmark-unique: the form's main and the frame's main are two mains once the form's no longer carries a name
-    // (G103, "one name"); reported to the planner as a proposed gap, so that nothing else is hidden meanwhile
-    await noViolations(page, ["landmark-unique"]);
+    await noViolations(page);
   }
 });
 
@@ -881,13 +882,16 @@ test("G103: the frame has no top bar and no Download results, and follows the fo
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
 });
 
-test("G103: the form's main takes no name while the frame shows; the frame is named by its title alone", async ({
+test("G104: the form's main is named while the frame shows and has no name otherwise; the frame keeps its title", async ({
   page,
 }) => {
   const server = await web(folder());
   await open(page, server);
+  await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.*/);
   await autoRow(page).click();
   await expect(frameOf(page).locator("[data-results]")).toBeVisible();
-  await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.+/);
+  await expect(page.locator("main.fm-main")).toHaveAttribute("aria-label", "Scored by fullmark");
   await expect(page.locator("iframe[data-frame=marked]")).toHaveAttribute("title", /^Marked by fullmark/);
+  await page.locator(".fm-grade-side [data-row=holistic]").click();
+  await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.*/);
 });

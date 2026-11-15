@@ -1281,6 +1281,7 @@ export function Form({
         <main
           class="fm-main"
           lang={data.uiLang}
+          aria-label={marked ? state.r.autoHead : undefined}
           data-covered={covered ? "true" : undefined}
           data-marked={marked ? "" : undefined}
         >
