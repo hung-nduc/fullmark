@@ -126,7 +126,7 @@ describe("the results card", () => {
     for (const word of ["Correct", "Wrong", "Not answered", "Partly right", "Waiting for a grader"]) {
       expect(html, word).toContain(`<strong>${word}</strong>`);
     }
-    expect(html).toContain('<span class="fm-icon" aria-hidden="true">✓</span>');
+    expect(html).toMatch(/class="fm-result"[^>]*data-status="correct"[^>]*><svg class="fm-svg"/);
   });
 });
 

@@ -66,7 +66,7 @@ test("a vi page prints a decimal comma", async ({ page }) => {
   await page.getByLabel("đúng v1").check();
   await submitAttempt(page);
   await expect(page.locator('[data-cell="points"]')).toHaveText("2,5 / 2,5");
-  await expect(page.locator(".fm-result")).toContainText("2,5 trên 2,5 điểm");
+  await expect(page.locator(".fm-result")).toContainText("2,5 / 2,5");
 });
 
 /**

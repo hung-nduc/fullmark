@@ -3,7 +3,7 @@ import type { GradedQuestion } from "../../core/grade";
 import { en, type Messages, vi } from "../../core/i18n";
 import type { Question } from "../../core/ir";
 import type { PageGradeDetail, PageQuiz } from "../data";
-import { Icon } from "../icons";
+import { Icon, type IconName } from "../icons";
 import { decimal, num } from "../results";
 
 export type PageMessages = Messages["page"];
@@ -65,16 +65,17 @@ export function Html({
   return <Tag id={id} class={className} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-/** The icon of each state, so that the word and the points are never the only sign besides colour. */
-const ICONS: Record<GradedQuestion["status"], string> = {
-  correct: "✓",
-  partial: "◐",
-  incorrect: "✕",
-  unanswered: "–",
-  pending: "…",
-  ungraded: "•",
+/** The icon of each state, so that the word and the points are never the only sign besides colour (the boards'). */
+const ICONS: Record<GradedQuestion["status"], IconName> = {
+  correct: "check",
+  partial: "half",
+  incorrect: "cross",
+  unanswered: "dash",
+  pending: "clock",
+  ungraded: "dot",
 };
 
+/** The result as a pill: the state's icon, the word, then the points ("Partly right · 2.25 / 3"), on one line. */
 export function ResultLine({
   t,
   result,
@@ -86,7 +87,7 @@ export function ResultLine({
   quizId: string;
   lang: "en" | "vi";
 }) {
-  const points = result.points > 0 ? ` · ${t.scoreLine(num(result.earned ?? 0, lang), num(result.points, lang))}` : "";
+  const points = result.points > 0 ? ` · ${num(result.earned ?? 0, lang)} / ${num(result.points, lang)}` : "";
   return (
     <span
       class="fm-result"
@@ -96,11 +97,11 @@ export function ResultLine({
       data-earned={result.earned ?? 0}
       data-points={result.points}
     >
-      <span class="fm-icon" aria-hidden="true">
-        {ICONS[result.status]}
-      </span>{" "}
-      <strong>{t.status[result.status]}</strong>
-      {points}
+      <Icon name={ICONS[result.status]} size={16} />
+      <span>
+        <strong>{t.status[result.status]}</strong>
+        {points}
+      </span>
     </span>
   );
 }

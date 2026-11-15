@@ -22,7 +22,8 @@
 
   .fm-question-head {
     display: flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 6px 10px;
     align-items: center;
     justify-content: space-between;
     min-height: 36px;
@@ -92,47 +93,50 @@
     border-color: var(--flag);
   }
 
+  /* the result badge is a pill (G94): the state's icon, the word, the points, on one line */
   .fm-result {
     display: inline-flex;
     gap: 6px;
     align-items: center;
+    padding: 2px 10px;
     font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+    background: var(--sunken);
+    border: 2px solid transparent;
+    border-radius: 999px;
   }
 
-  .fm-icon {
-    display: inline-block;
-    min-width: 1.2em;
-    text-align: center;
+  .fm-result .fm-svg {
+    flex: none;
   }
 
   .fm-result[data-status="correct"] {
     color: var(--ok);
+    background: var(--ok-wash);
   }
 
   .fm-result[data-status="incorrect"] {
     color: var(--bad);
+    background: var(--bad-wash);
   }
 
   .fm-result[data-status="partial"] {
     color: var(--warn);
-  }
-
-  .fm-result[data-status="unanswered"],
-  .fm-result[data-status="ungraded"] {
-    color: var(--muted);
-  }
-
-  .fm-result[data-status="unanswered"] {
-    padding: 2px 12px;
     background: var(--surface);
-    border-radius: 999px;
+    border-color: var(--warn);
   }
 
   .fm-result[data-status="pending"] {
-    padding: 2px 12px;
     color: var(--info);
     background: var(--info-wash);
-    border-radius: 999px;
+  }
+
+  @media (max-width: 759px) {
+    .fm-result .fm-svg {
+      width: 14px;
+      height: 14px;
+    }
   }
 
   .fm-prompt {
