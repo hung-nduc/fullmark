@@ -36,7 +36,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
-| 3h2 G116, `brief --web` on a phone | brief approved (2026-11-16), G117 decided; to build | |
+| 3h2 G116, `brief --web` on a phone | built (2026-11-16), to review | `fd2d50a`..`0247344`, and the commit that holds this row |
 | 3z acceptance | last | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.

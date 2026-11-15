@@ -109,7 +109,8 @@ async function dataOf(url: string): Promise<BriefData> {
 /** The brief a flags run writes for the same answers: the bytes the form must match. */
 async function viaFlags(flags: Partial<BriefOptions>): Promise<string> {
   const t = setup();
-  const code = await t.run({ ...flags, web: false });
+  // a flags run has no form to open: `open: false` (the form tests' default) would be `--no-open` without `--web` (G116)
+  const code = await t.run({ ...flags, web: false, open: undefined });
   expect(code).toBe(0);
   return readFileSync(join(t.dir, "d/brief.yaml"), "utf8");
 }
