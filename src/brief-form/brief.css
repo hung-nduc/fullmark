@@ -1224,6 +1224,11 @@
   }
 
   @media (max-width: 759px) {
+    /* as on the page: no grey or blue flash over a tapped button */
+    .bf button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     .bf-bar {
       gap: 12px;
       padding: 10px 16px;

@@ -36,7 +36,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
-| 3h2 G116, `brief --web` on a phone | built (2026-11-16), to review | `fd2d50a`..`0247344`, and the commit that holds this row |
+| 3h2 G116, `brief --web` on a phone | done, reviewed (2026-11-16), one fix in review, no gaps | `fd2d50a`..`0247344`, and the commit that holds this row |
 | 3z acceptance | last | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -52,7 +52,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2**'s brief (G116, then the phone) is approved (2026-11-16), with G117 as recommended: next, hand it to an implementing agent. Then **3z**, acceptance.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2** (G116, then the phone, G117) is **built and reviewed** ("Slice 3h2", its Review), with no new gap: every slice of step 3 but 3z is done. Then **3z**, acceptance.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
@@ -1369,3 +1369,16 @@ Done differently, accepted in review unless the owner says otherwise: the summar
 ### Done when
 
 `npm run check` passes in Chromium and Firefox (the startup tests alone first). On a 390 px and a 360 px phone the brief form shows the compact bar and the foot bar, nothing runs off the screen, and a brief written from the phone is byte-identical with the same answers given wide or as flags. `quiz brief d --port 9` exits 2. The screens are committed. Report as the rules say, every golden and spec that changed counted and explained.
+
+### Review
+
+**3h2's review (2026-11-16).** Built by Sonnet in `fd2d50a`..`0247344` (G116; the phone; the screens), and `8e743ed` for the slice table's row and one test that passed `--no-open` without `--web`. Typecheck and Biome clean; Vitest **117 files, 2820 of 2820**, the 2 startup tests alone first; Playwright **703 passed**, 481 skipped (the by-name skips and the screens specs), none failed, **in Chromium and Firefox** (run in review). Goldens: 6 new (`brief/needs-web-{timeout,port,no-open}-{flags,tui}`), none changed. `e2e/brief-phone.spec.ts` (14 per browser): the whole form by touch and written from the foot bar's **Finish** with the same bytes as wide, a pre-fill changed and restored one by one and all at once, the blocked dialog and its link, the summary's rows, Cancel and **Copy**, the sidebar, the foot bar never over the last card, no sideways scroll at 390 and 360 px, axe in light and dark.
+
+Tried by hand: `--port 9`, `--timeout 5` (with `--json`: `{"status": "error", "message": "--timeout needs --web"}`) and `--no-open` without `--web` each exit 2 with their line and write nothing; `--tui --port 9` exits 2 on `--port` before the terminal check, as COMMANDS.md's order says. The screens (`docs/screens/3h2/`) were read against the board's `isPhone` branches: the compact bar with the sidebar icon and Appearance (G117), the foot bar, the full-screen sidebar, the summary's stacked rows, the Cancelled card at 360 px and the Vietnamese form match what the boards draw.
+
+Done differently, accepted in review unless the owner says otherwise: on a phone the restart command wraps inside a flag's value, only each flag's name kept whole (`bf-cmd-flag`), since the board's unbroken flag-and-value pieces run past a 360 px box; the dialog's `max-width` is lifted on a phone, where the browser's own capped it at 350 px; the summary's hint still says "Click a row", as the board does.
+
+**Fixed in review:** a tapped button showed the browser's blue tap highlight (seen on the sidebar button and the Sans pill in the screens); below 760 px the form's buttons now have none, as the page's have. `02-phone-sidebar`, `01b-phone-changed-card`, `08-phone-dark-appearance` and `08b-phone-dark` taken again. Retaking every screen also moved `docs/screens/3h/08-brief-cancelled.png` by sub-pixel anti-aliasing only (3h2's flag-name spans split the command's text; the wrapping and every glyph are the same); the retaken one is kept.
+
+**Found in review:** nothing new.
+
