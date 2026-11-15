@@ -190,6 +190,16 @@ export async function runBrief(dir: string, opts: BriefOptions, io: BriefIo): Pr
     return EXIT.usage;
   }
 
+  // `--timeout`, `--port` and `--no-open` belong to the web form (G116)
+  if (!opts.web) {
+    const needsWeb =
+      opts.timeout != null ? "--timeout" : opts.port != null ? "--port" : opts.open === false ? "--no-open" : null;
+    if (needsWeb !== null) {
+      fail(io, json, `${needsWeb} needs --web`);
+      return EXIT.usage;
+    }
+  }
+
   let questions: QuestionFile;
   try {
     questions = io.questions ?? loadQuestions();
