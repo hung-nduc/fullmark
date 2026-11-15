@@ -370,7 +370,7 @@ describe("quiz grade --web --grades", () => {
   it("refuses the file as `quiz grade --grades` does: exit 1 for a bad one, 2 for one that cannot be read; nothing is served", async () => {
     const bad = setup();
     gradesFile(bad.dir, "bad.json", (doc) => {
-      ((doc.grades.add as Record<string, any>).criteria.derive as Record<string, unknown>).score = 1.3;
+      cellsOf(doc, "add").derive.score = 1.3;
     });
     expect(await runGrade(["results.json"], bad.options({ grades: "bad.json" }), bad.io)).toBe(1);
     expect(bad.out.some((l) => l.includes("listening"))).toBe(false);

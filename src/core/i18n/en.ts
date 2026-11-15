@@ -195,7 +195,7 @@ export const en = {
     boxHolistic: "One score",
     boxStep: (step: string) => `step ${step}`,
     boxBands: (min: string, max: string, step: string) => `bands ${min} to ${max}, step ${step}`,
-    boxGradedBy: (name: string, kind: "ai" | "human") => `Graded by ${name}${kind === "ai" ? " (agent)" : ""}`,
+    boxGradedBy: (name: string, kind: "ai" | "human") => `Graded by ${name}${kind === "ai" ? " (AI)" : ""}`,
     boxTotal: "Total",
     boxOverall: "Overall band",
     boxScore: "Score",

@@ -75,7 +75,7 @@ describe("grades on a replay page", () => {
   it("shows an additive box: the head, each criterion's slot and note, the total, the grader and the date", () => {
     const { html } = pageOf((g) => g);
     const add = text(card(html, "add"));
-    expect(add).toContain("Points per criterion step 0.25 Graded by Claude Opus 5.5 (agent) 24 Oct 2026");
+    expect(add).toContain("Points per criterion step 0.25 Graded by Claude Opus 5.5 (AI) 24 Oct 2026");
     expect(add).toContain("Define the terms 0.5 of 0.5 points");
     expect(add).toContain(
       "Derive the result 1.25 of 1.5 points 1.25 / 1.5 Skips the zero initial-conditions assumption.",
@@ -108,7 +108,7 @@ describe("grades on a replay page", () => {
   it("shows a banded box: the band per criterion over the scale, the overall band, the scale in the head", () => {
     const { html } = pageOf((g) => g);
     const ielts = text(card(html, "ielts"));
-    expect(ielts).toContain("A band per criterion bands 0 to 9, step 0.5 Graded by Claude Opus 5.5 (agent)");
+    expect(ielts).toContain("A band per criterion bands 0 to 9, step 0.5 Graded by Claude Opus 5.5 (AI)");
     expect(ielts).toContain("Task Response band 6 of 9 6 / 9 Room to improve here.");
     expect(ielts).toContain("Overall band mean 6.25, IELTS rounding to 6.5 band 6.5 of 9 6.5 / 9");
     const banded = text(card(html, "banded"));
@@ -123,7 +123,7 @@ describe("grades on a replay page", () => {
     });
     const raw = card(html, "holistic");
     const holistic = text(raw);
-    expect(holistic).toContain("One score Graded by Claude Opus 5.5 (agent) 24 Oct 2026");
+    expect(holistic).toContain("One score Graded by Claude Opus 5.5 (AI) 24 Oct 2026");
     expect(holistic).toContain("Names the Nyquist rate verdict, not scored verdict: Met Met");
     expect(holistic).toContain("Gives an example verdict, not scored verdict: Partly Partly");
     expect(holistic).toContain("Explains how to avoid it verdict, not scored no verdict No verdict");
@@ -142,11 +142,11 @@ describe("grades on a replay page", () => {
       "nodate",
     );
     const add = text(card(html, "add"));
-    expect(add).toContain("Graded by Claude Opus 5.5 (agent) Define the terms");
+    expect(add).toContain("Graded by Claude Opus 5.5 (AI) Define the terms");
     expect(add).not.toContain("2026");
   });
 
-  it("a human grader has no (agent) after the name", () => {
+  it("a human grader has no (AI) after the name", () => {
     const { html } = pageOf(
       (g) => {
         (g.grader as { kind: string }).kind = "human";
@@ -156,7 +156,7 @@ describe("grades on a replay page", () => {
     );
     const add = text(card(html, "add"));
     expect(add).toContain("Graded by Claude Opus 5.5 24 Oct 2026");
-    expect(add).not.toContain("(agent)");
+    expect(add).not.toContain("(AI)");
   });
 
   it("leaves out an empty or missing note, and each of the grader's two texts when it is not given", () => {

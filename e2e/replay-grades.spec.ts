@@ -52,7 +52,7 @@ test.describe("grades on a replay page", () => {
       "Derive the result 1.25 of 1.5 points 1.25 / 1.5 Skips the zero initial-conditions assumption.",
     );
     await expect(add.locator(".fm-box-head")).toHaveText(
-      /Points per criterion\s*step 0\.25\s*Graded by Claude Opus 5\.5 \(agent\)\s*24 Oct 2026/,
+      /Points per criterion\s*step 0\.25\s*Graded by Claude Opus 5\.5 \(AI\)\s*24 Oct 2026/,
     );
     await expect(add.locator(".fm-result")).toHaveAttribute("data-status", "partial");
     const ielts = page.locator('article[data-qid="ielts"]');
@@ -79,7 +79,7 @@ test.describe("grades on a replay page", () => {
         delete g.grader.at;
       }).url,
     );
-    await expect(page.locator('article[data-qid="add"] .fm-box-who')).toHaveText("Graded by Claude Opus 5.5 (agent)");
+    await expect(page.locator('article[data-qid="add"] .fm-box-who')).toHaveText("Graded by Claude Opus 5.5 (AI)");
     await expect(page.locator("[data-replay-banner]")).toContainText("grades from the report");
   });
 
