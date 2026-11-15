@@ -93,7 +93,7 @@ questions:
       vi: Thư mục content chứa những tài liệu nào?
     help:
       en: Tick every kind you will put in content/. The agent reads these files to write the questions.
-      vi: Chọn mọi loại tài liệu bạn sẽ đặt vào content/. Trợ lý đọc các tệp này để viết câu hỏi.
+      vi: Chọn mọi loại tài liệu bạn sẽ đặt vào content/. AI đọc các tệp này để viết câu hỏi.
     choices:
       - value: lecture-slides
         label:
@@ -146,7 +146,7 @@ questions:
         vi: Tài liệu loại khác là gì?
       help:
         en: Say what it is, so the agent knows how to read it.
-        vi: Cho biết đó là gì để trợ lý biết cách đọc.
+        vi: Cho biết đó là gì để AI biết cách đọc.
 
   - key: content.elsewhere
     flag: elsewhere
@@ -340,7 +340,7 @@ questions:
     default: ""
     label:
       en: Anything else for the agent?
-      vi: Còn điều gì khác cho trợ lý không?
+      vi: Còn điều gì khác cho AI không?
     help:
       en: "Free text: topics to stress, a style to match, things to avoid. Leave empty for none."
       vi: "Văn bản tự do: chủ đề cần nhấn mạnh, phong cách cần theo, điều cần tránh. Để trống nếu không có."
@@ -355,7 +355,7 @@ questions:
       vi: Nhấn mạnh các chủ đề bạn làm kém?
     help:
       en: Needs earlier results. Without a library, the agent picks the topics from your reports.
-      vi: Cần kết quả các lần trước. Khi chưa có thư viện, trợ lý chọn chủ đề từ các báo cáo của bạn.
+      vi: Cần kết quả các lần trước. Khi chưa có thư viện, AI chọn chủ đề từ các báo cáo của bạn.
     choices:
       - value: "yes"
         label:
