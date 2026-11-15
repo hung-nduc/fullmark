@@ -33,7 +33,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
-| 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
+| 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | brief drafted (2026-11-15), waits for the owner's approval and G107 to G110 | |
+| 3p3 the pre-filled form on a phone | outline, after 3p2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
 
@@ -49,7 +50,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
-3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, after G104 and G106; its brief can be drafted now.
+3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). **3p2's brief is drafted** (2026-11-15, "Slice 3p2"), at 1280 px, with G104 and G106 first; it waits for the owner's approval and for G107 to G110. The phone is **3p3**, after it.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -83,7 +84,10 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+- **G107. The shape of `reviewed`, and who reads it (3p2's brief).** TECHNICAL_DESIGN.md says a human grade made over a pre-filled one "records `reviewed` on each question, naming the grader that question was pre-filled from", but `grades-v2` does not show the field, and nothing reads it. **Recommendation:** `reviewed` is an optional field of a question's entry, a grader object of the same shape as `grader` (`kind`, `name`, `model` for an AI, `at` as the source file had it), copied from the question's grader in the `--grades` file (its own, else the file's). `applyGrades` checks it as it checks `grader` (an invalid one is a problem) and otherwise only keeps it; the replay and the report name the question's grader (the human), not the reviewed one, in v1. No "changed or not" flag: the human saw each question before saving. The example in section 6 gains one `reviewed` line.
+- **G108. When `--grades` names the file `--web` writes (3p2's brief).** The usual way: an agent fills `RESULTS-grades.json` (the template's own name), then the owner runs `quiz grade RESULTS --quiz FILE --web --grades RESULTS-grades.json`. Today `--web` refuses an existing grades file, with "move it away, or adjust it with --grades", which promises this case works. **Recommendation:** when `--grades` names the very file `--web` would write, it is not refused: **Save grades** replaces it atomically (the AI's grades remain named in `reviewed`, not their values); a timeout or Ctrl+C leaves it byte for byte. When `--grades` names another file and `RESULTS-grades.json` holds grades, the refusal stands. COMMANDS.md's "Before it serves" gains one sentence.
+- **G109. The words when the pre-filled grader is a person, and "(agent)" (3p2's brief).** COMMANDS.md writes "✦ AI's" and "✦ Back to the AI's grade" and says a human file pre-fills the same way, which would call a person's grade the AI's. Separately, the replay's box head says "Graded by Claude (agent)" in en, where the form's pre-filled box head and vi say "(AI)". **Recommendation:** for a question pre-filled from a person, the buttons say "✦ Given" and "✦ Back to the given grade" ("✦ Đã cho", "✦ Về điểm đã cho" or the owner's vi), and the box head names the person with no suffix; "(AI)" everywhere an AI grader is named, en and vi, the replay's "(agent)" included (its goldens and screens counted).
+- **G110. The grader's short name in the sidebar (3p2's brief).** GradeAI writes "Sonnet's grade" under a row, from a short name the board hard-codes; a grader has only `name` and `model`, and no rule shortens "Claude Sonnet 5.5". **Recommendation:** no short name: the sub-line says "NAME's grade" with the full name ("Claude Sonnet 5.5's grade"; vi "Điểm của NAME"), cut with an ellipsis by CSS when the row is too narrow, the full name in the row's accessible name. Two AIs stay apart, and nothing guesses at a name.
 
 ## Slices
 
@@ -107,7 +111,8 @@ None open.
 | **3p** | G98's differences from the boards, then the grading form on a phone (G79) | G79, G89, G96, G98, 3f2 |
 | **3r** | fullmark's own marking from the form (G83), as G100 has it | G83, G100, 3p |
 | **3r2** | G103: the grader's frame shows the replay without its top bar, in the form's look, with no Download results; the 3r screens' spec, and the screens taken again | G103, 3r |
-| **3p2** | G104, G106; `--web --grades`: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, G104, G106, 3r2 |
+| **3p2** | G104, G106; `--web --grades` at 1280 px: AI grades pre-filled (G75), and several AI graders, each its own questions (G102) | G75, G102, G104, G106, G107 to G110, 3r2 |
+| **3p3** | The pre-filled form on a phone | 3p2 |
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
 | **3h** | `brief --web`: the form from the question file, the detail rules, the summary screen, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, boards |
 | **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
@@ -1140,3 +1145,51 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 
 **Decided by the owner on 2026-11-15:** G106, as recommended; 3p2's first task, with G104.
 
+
+## Slice 3p2: G104, G106, then `grade --web --grades` at 1280 px
+
+**Drafted on 2026-11-15; waits for the owner's approval, with G107 to G110.** G104 and G106 first (small, decided), then G75 and G102 as decided on the redrawn GradeAI board: a grades file's grades pre-filled in the form to accept or adjust, each question naming its own grader, and the file written with `reviewed`. Built at 1280 px from GradeAI (`docs/mockup/boards/GradeAI.dc.html`; interactive, no image: read its source and its Tweaks `q`, `start` and `graders`). The phone is a slice of its own, **3p3**, after this one, as 3p followed 3f: GradeAI draws no phone.
+
+### Read first
+
+- COMMANDS.md: `quiz grade`, the `--web` and `--grades` rows, "Before it serves", "The submit", "Output", and "The form" with every bullet of "Pre-filled grades" and "After saving"; the frame's naming sentence (G104).
+- TECHNICAL_DESIGN.md: section 6, `grades-v2` and "Grader identity", "The rubric box"; section 8, "How it is built", item 3 (G106); section 7, foundations 4 and 9.
+- This plan: "Rules for every slice", G75, G102, G104, G106 (STEP3-GAPS.md), G107 to G110 (the Gaps list above), the Reviews of 3f, 3p, 3r, 3r2 and 3q.
+- The board: `GradeAI.dc.html` (`renderVals()`: the slot and its pre-filled box, `aiLabel`, `aiPlain`, `aiRestore`, `sparkle`, `sparkleMain`, `penSmall`, `statusAi`, `statusAiText`, `statusAiTip`, `boxHead`, `footBtn`, `legend` and `lg*`, the sidebar row's `sub`); RubricC for the box it builds on.
+- Code: `src/cli/grade.ts` (the `--web` with `--grades` refusal), `src/cli/grade-web.ts` (the refusals, `gradesSubmitReader`, the writer), `src/core/rubric/grades.ts` (`readGrader`, `applyGrades`, `GradeDetail.graded_by`), `src/build/grade-form.ts`, `src/grade-form/` (all: `data.ts`, `state.ts`, `logic.ts`, `Form.tsx`, `grade.css`), `src/core/i18n/grade.ts`; for G106, `src/page/questions/shared.tsx` (`Html`) and where `.fm-hl` is made (Shiki, `src/build/`); `e2e/grade.spec.ts`, `e2e/answer-panel.spec.ts`, `e2e/screens-3r.spec.ts`; `test/golden/grade/`.
+
+### Decided for this slice
+
+- **G104.** While the frame shows, the form's `main` is named "Scored by fullmark" ("Fullmark chấm"), and has no name otherwise; the `landmark-unique` skip comes out of the three axe checks (`e2e/grade.spec.ts`, `e2e/grade-phone.spec.ts` twice).
+- **G106.** A highlighted code block that scrolls sideways takes keyboard focus (`tabindex="0"` and a name), on the page wherever it is drawn: prompts, explanations, sample answers. The `.fm-sample` exclusion comes out of `e2e/answer-panel.spec.ts`.
+- **`--web --grades GRADES` (G75)**, as COMMANDS.md has it: the refusal "not available yet" goes; the file is refused as `quiz grade --grades` refuses it (exit 1, nothing served); otherwise every value, note and text it holds is in the form when it opens, and each question it grades counts as graded. A question it leaves `null` is graded as without `--grades`.
+- **Each question's grader (G102):** its own `grader`, else the file's, as `applyGrades` already reads it; the form's box head, the sidebar and the status pill's tooltip name it.
+- **In the form, at 1280 px, as GradeAI draws it:**
+  - the status line's pill (`info` colours, the sparkle): "Pre-filled · 3 as given, 1 adjusted", counted live; its tooltip "Pre-filled from Claude Opus 5.5 (2) and Claude Sonnet 5.5 (2)";
+  - the box head's right side: "Graded by NAME (AI)" over "DATE · unchanged", then "NAME (AI), adjusted by you" over "saved at Finish" (a person: no "(AI)");
+  - the card's badge is the result, as for any graded question;
+  - the pre-filled box leading every slot, every verdict group, the one score's control and a computed total, with its states (lit and pressed while as given, plain once changed, a press restoring that row's score and note together; the total's display only, dashed once it differs); the slot column 346 px, 388 px for verdicts;
+  - "✦ AI's" by **Why this score** and **To improve**, restoring the text;
+  - the card's foot: **✦ Back to the AI's grade** on the left once anything changed, restoring the whole question; **Clear this question** on the right as now;
+  - the sidebar's marks, drawn as SVG: ✦ (AI, as given), the sparkle with the pencil (AI, adjusted), ✓ (a person), ✎ (a person, adjusted); the sub-line "NAME's grade" (G110) or "adjusted by you"; the legend as COMMANDS.md writes it;
+  - the saved card's line "Reviewing the grades of Claude Opus 5.5 and Claude Sonnet 5.5".
+  Every word en and vi, in `src/core/i18n/grade.ts`; the board's vi where GradeVi has one, else written and listed in the report.
+- **The file written:** the file's `grader` is the human (`{kind: "human", name, at}`, as now); each question that was pre-filled carries `reviewed`, naming the grader it was pre-filled from (G107), whether adjusted or not; no question carries its own `grader`.
+- **Not changed:** the form without `--grades`, the replay, `quiz grade` without `--web`, `build`'s page apart from G106.
+- **Not in this slice:** the phone (3p3); `AGENTS.md`'s sentences for several graders (TECHNICAL_DESIGN.md section 6), which ship with `quiz agent-guide`, not in step 3 (G4).
+
+### Tasks
+
+1. **G104 and G106** (one commit each), with their skips and exclusion removed; every golden that changes with the bundle counted.
+2. **G107 to G110**, once decided, folded into the tasks below.
+3. **The data and the file** (one commit): `--grades` read and checked for `--web`; `GradeData` gains each item's pre-filled entry and grader; the submit and the writer write `reviewed` (G107); the same-path case (G108). Vitest for the reader and the writer; contract tests as subprocesses with goldens: a pre-filled file saved unchanged, one adjusted, one from two AI graders (G102), one from a person, a refused `--grades` file, and the same-path case. Each new golden explained.
+4. **The form** (one or more commits): everything under "In the form" above. Playwright at 1280 px: the form opens pre-filled and counts each pre-filled question as graded; a press of a lit box does nothing, a change makes it plain and a press restores the row's score and note; "✦ AI's" restores the text; **✦ Back to the AI's grade** restores the question; the pill counts live; the box heads and sidebar marks for each of the four states; two graders named apart; Save writes `reviewed` on every pre-filled question; axe in light and dark.
+5. **Screens and the docs** (one commit): `e2e/screens-3p2.spec.ts`, `docs/screens/3p2/`, beside GradeAI with its Tweaks (`q` additive, banded, holistic, code; `start` unchanged and adjusted; `graders` one and two), in light and dark, and in vi; each difference listed. The slice table's 3p2 row; `samples` gains a `grade --web --grades` line.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox, the budget test included, with no axe rule skipped. `quiz grade RESULTS --quiz FILE --web --grades GRADES` opens the form pre-filled, every pre-filled value can be accepted, changed and put back as GradeAI draws it, and Save writes a `kind: human` grades file with `reviewed` on each pre-filled question and the report. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden and spec that changed counted and explained.
+
+## Slice 3p3: the pre-filled form on a phone (outline)
+
+After 3p2's review: the pre-filled box, the status pill, the box head and the sidebar's marks at 390 px, in RubricPhone's stacked box (G89). GradeAI draws no phone, so the layout needs the owner's word (or a board) when this is briefed.
