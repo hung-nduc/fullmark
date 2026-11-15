@@ -54,8 +54,12 @@ const withName = (dir: string) => dir;
 
 /** Grades the five questions: by mouse where it can be, by typing where a value is typed. */
 async function gradeAll(page: Page): Promise<void> {
-  // additive: the full-mark box, + then − from empty, a typed value
-  await ctl(page, "defs").locator("[data-act=full]").click();
+  // additive: the full-mark box, + then − from empty, a typed value. The full-mark button is a box before it is
+  // pressed, as the boards draw it, not a bare number (`.fm-ctl button` once stripped its edge at 1280 px)
+  const full = ctl(page, "defs").locator("[data-act=full]");
+  expect(await full.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe("2px");
+  expect(await full.evaluate((el) => getComputedStyle(el).borderTopStyle)).toBe("solid");
+  await full.click();
   await expect(value(page, "defs")).toHaveValue("0.5");
   await ctl(page, "derive").locator("[data-act=more]").click();
   await expect(value(page, "derive")).toHaveValue("1.5");

@@ -305,7 +305,16 @@
     border-radius: var(--box-r);
   }
 
-  .fm-ctl-max[data-full] {
+  /* the full-marks button is a box, as the boards draw it (RubricC, GradeAI: a 2 px edge, the number muted until full);
+     `.fm-ctl button` above would otherwise strip its edge and fill, leaving a bare number that does not look pressable */
+  .fm-ctl button.fm-ctl-max {
+    color: var(--muted);
+    background: var(--card);
+    border: 2px solid var(--line-strong);
+  }
+
+  .fm-ctl-max[data-full],
+  .fm-ctl button.fm-ctl-max[data-full] {
     color: var(--ok);
     background: var(--ok-wash);
     border: 2px solid var(--ok);

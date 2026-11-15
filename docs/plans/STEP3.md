@@ -1211,6 +1211,8 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 - The sample's grades fixture was made for another results file, so `samples/grade-ai` prints the `results_hash` warning, as the replay sample does; harmless.
 - Below 520 px the pre-filled box sits in the slot's stacking, undesigned: 3p3.
 
+**Fixed after the review (the owner's report, 2026-11-15): the full-marks button looked like a bare number.** At 1280 px the "/ 1.5" button that gives a criterion full marks had no edge or fill until the score was already full, so it did not look pressable (pressing it did work). `.fm-ctl button` (border 0, transparent) outranked `.fm-ctl-max`, which the boards draw as a box: a 2 px `line-strong` edge on `card`, the number `muted`, green once full. Older than 3p2: since 3f, at 1280 px only (on a phone a stronger rule kept the box). Now `.fm-ctl button.fm-ctl-max` carries the boards' values; `e2e/grade.spec.ts` checks the 2 px edge before the first press (it fails on the old CSS). `npm run check` exits 0 (Vitest 2757, Playwright 589). No golden changes; the 14 `docs/screens/3p2/` screens that show a slot were taken again. The 3f, 3p and 3r screens still show the bare number.
+
 ## Slice 3p3: the pre-filled form on a phone (outline)
 
 After 3p2's review: the pre-filled box, the status pill, the box head and the sidebar's marks at 390 px, in RubricPhone's stacked box (G89). GradeAI draws no phone, so the layout needs the owner's word (or a board) when this is briefed.
