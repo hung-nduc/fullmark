@@ -873,7 +873,7 @@
     margin-right: auto;
   }
 
-  @media (min-width: 520px) {
+  @media (min-width: 760px) {
     .fm-box[data-given] .fm-box-row {
       grid-template-columns: minmax(0, 1fr) 346px;
     }
@@ -1182,6 +1182,45 @@
 
     .fm-grade-rubric .fm-grade-clear {
       margin-top: 12px;
+    }
+
+    /* --grades (G111): each pre-filled box on a line of its own above its control, left-aligned at its own size */
+    .fm-grade .fm-ctl > .fm-given {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+
+    .fm-grade .fm-ctl-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .fm-grade .fm-ctl-pair > .fm-ctl-verdicts {
+      width: 100%;
+    }
+
+    /* the card's foot: the restore over Clear this question, each the card's full width */
+    .fm-grade-clear {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fm-grade-clear .fm-grade-undo {
+      margin-right: 0;
+    }
+
+    .fm-grade-clear .fm-button,
+    .fm-grade-clear .fm-grade-undo {
+      justify-content: center;
+      width: 100%;
+    }
+
+    /* the status pill sits at the top of the sidebar's sheet, the compact bar having no room */
+    .fm-grade-side .fm-status-pill {
+      margin: 0 16px 8px;
+      width: fit-content;
     }
 
     .fm-grade-clear .fm-button {

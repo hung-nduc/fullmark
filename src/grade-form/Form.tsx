@@ -1119,6 +1119,12 @@ function Side({ state, t }: { state: GradeState; t: PageT }) {
           <div class="fm-side-head">
             <h2 class="fm-side-title">{r.questions}</h2>
           </div>
+          {pre.total === 0 ? null : (
+            <div class="fm-status-pill" data-seg="prefilled" title={r.preFilledFrom(gradersOf(state))}>
+              <Sparkle size={15} />
+              <span>{r.preFilled(pre.asGiven, pre.adjusted)}</span>
+            </div>
+          )}
         </>
       ) : (
         <div class="fm-side-head">
