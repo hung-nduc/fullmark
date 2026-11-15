@@ -22,6 +22,33 @@ function Sample({ c, id }: { c: Ctx; id: string }) {
   );
 }
 
+/**
+ * The learner's answer after Submit (G94, G105): a "YOUR ANSWER" panel, plain text and no form control. An essay's
+ * line breaks are kept, in the quiz's language; a code answer is monospaced, whitespace kept, a long line scrolling
+ * inside the panel (so the panel is focusable, as axe asks of a scrolling region). An empty answer is the dashed panel.
+ */
+function AnswerPanel({ c, text, code }: { c: Ctx; text: string; code?: boolean }) {
+  const empty = text.trim() === "";
+  return (
+    <div class="fm-answer-panel" data-empty={empty} data-kind={code ? "code" : "essay"} id={`${c.name}/answer`}>
+      <span class="fm-panel-label" id={`${c.name}/answer-label`}>
+        {c.t.yourAnswer}
+      </span>
+      {empty ? (
+        <p class="fm-panel-text">{c.t.noAnswer}</p>
+      ) : code ? (
+        <pre class="fm-panel-text" tabindex={0}>
+          {text}
+        </pre>
+      ) : (
+        <p class="fm-panel-text" lang={c.quiz.lang}>
+          {text}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** "87 / 120 words minimum", "87 / 300 words maximum", "87 words, 120 to 300", or "87 words". */
 function countLine(t: Ctx["t"], words: number, min: number | null, max: number | null): string {
   if (min !== null && max !== null) return t.wordsRange(words, min, max);
@@ -41,23 +68,28 @@ export function Essay({ q, c }: { q: Extract<PageQuestion, { type: "essay" }>; c
   return (
     <div class="fm-open">
       {q.rubric !== null && !c.submitted ? <Rubric rubric={q.rubric} c={c} /> : null}
-      <textarea
-        class="fm-textarea fm-essay"
-        rows={8}
-        spellcheck
-        aria-labelledby={`${c.name}/prompt`}
-        aria-describedby={`${c.name}/count`}
-        value={text}
-        readOnly={c.submitted}
-        onInput={(e) => {
-          const v = (e.currentTarget as HTMLTextAreaElement).value;
-          c.set(v === "" ? null : { text: v });
-        }}
-      />
-      <p class="fm-count" id={`${c.name}/count`} data-over={over}>
-        {countLine(t, words, min, max)}
-        {over ? ` · ${t.overMaximum}` : ""}
-      </p>
+      {c.submitted ? (
+        <AnswerPanel c={c} text={text} />
+      ) : (
+        <>
+          <textarea
+            class="fm-textarea fm-essay"
+            rows={8}
+            spellcheck
+            aria-labelledby={`${c.name}/prompt`}
+            aria-describedby={`${c.name}/count`}
+            value={text}
+            onInput={(e) => {
+              const v = (e.currentTarget as HTMLTextAreaElement).value;
+              c.set(v === "" ? null : { text: v });
+            }}
+          />
+          <p class="fm-count" id={`${c.name}/count`} data-over={over}>
+            {countLine(t, words, min, max)}
+            {over ? ` · ${t.overMaximum}` : ""}
+          </p>
+        </>
+      )}
       <Grade c={c} />
       <Sample c={c} id={c.name} />
     </div>
@@ -100,23 +132,26 @@ export function Code({ q, c }: { q: Extract<PageQuestion, { type: "code" }>; c: 
   return (
     <div class="fm-open">
       {q.rubric !== null && !c.submitted ? <Rubric rubric={q.rubric} c={c} /> : null}
-      <textarea
-        class="fm-textarea fm-code"
-        rows={Math.max(6, starter.split("\n").length + 1)}
-        spellcheck={false}
-        autocapitalize="off"
-        autocomplete="off"
-        aria-labelledby={`${c.name}/prompt`}
-        data-language={q.language}
-        readOnly={c.submitted}
-        ref={box}
-        value={text}
-        onInput={(e) => {
-          const v = (e.currentTarget as HTMLTextAreaElement).value;
-          setText(v);
-          c.set(v === "" || v === starter ? null : { code: v, language: q.language });
-        }}
-      />
+      {c.submitted ? (
+        <AnswerPanel c={c} text={given ?? ""} code />
+      ) : (
+        <textarea
+          class="fm-textarea fm-code"
+          rows={Math.max(6, starter.split("\n").length + 1)}
+          spellcheck={false}
+          autocapitalize="off"
+          autocomplete="off"
+          aria-labelledby={`${c.name}/prompt`}
+          data-language={q.language}
+          ref={box}
+          value={text}
+          onInput={(e) => {
+            const v = (e.currentTarget as HTMLTextAreaElement).value;
+            setText(v);
+            c.set(v === "" || v === starter ? null : { code: v, language: q.language });
+          }}
+        />
+      )}
       {text === "" && starter !== "" && !c.submitted ? (
         <button type="button" class="fm-button fm-reset-starter" onClick={reset}>
           {c.t.resetToStarter}

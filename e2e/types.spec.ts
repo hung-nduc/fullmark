@@ -25,7 +25,7 @@ async function arrange(list: Locator, target: number[]): Promise<void> {
 
 const exam = buildIn("examples/exam/quiz.md", "exam.md");
 
-// a failure of an attribute check (`data-result` on a blank, `readonly` on a code box) is shown with the page's own
+// a failure of an attribute check (`data-result` on a blank, a code box) is shown with the page's own
 // state, so that a recurrence carries its cause: whether the page was visible and focused, and what the boxes held
 test.afterEach(async ({ page }, info) => {
   if (info.status === info.expectedStatus || page.isClosed()) return;
@@ -128,7 +128,8 @@ test("every simple type: status and points on the page equal quiz grade", async 
   await expect(card(page, "e1")).toContainText("Waiting for a grader");
   await expect(card(page, "e1").locator(".fm-sample")).toContainText("zq-sample-essay");
   await expect(card(page, "k1").locator(".fm-sample pre")).toContainText("zqlargest");
-  await expect(card(page, "k1").locator("textarea")).toHaveAttribute("readonly", "");
+  await expect(card(page, "k1").locator("textarea")).toHaveCount(0);
+  await expect(card(page, "k1").locator(".fm-answer-panel")).toContainText("fn zqlargest() {}");
 
   expect(seen.problems).toEqual([]);
   expect(seen.requests).toEqual([]);
