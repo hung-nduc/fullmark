@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quiz brief --web form</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&amp;family=Lexend:wght@400;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#46608a}a:hover{color:#2a2b31}
+.bf input[type=number]::-webkit-inner-spin-button,.bf input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.bf input[type=number]{-moz-appearance:textfield}
+.bf a.sumrow{text-decoration:none;color:inherit}
+.bf a.sumrow:hover>span{background-image:linear-gradient(rgba(70,96,138,.10),rgba(70,96,138,.10))}
+.bf a.sumrow:focus-visible{outline:2px solid #46608a;outline-offset:-2px}
+</style>
+</helmet>
+<div class="bf" lang="{{lang}}" style="{{s.root}}">
+
+<header style="{{s.header}}">
+  <div style="{{s.hdrRow}}">
+    <sc-if value="{{notPhone}}" hint-placeholder-val="{{ true }}">
+      <div style="min-width: 0; display: flex; align-items: baseline; gap: 10px; white-space: nowrap; overflow: hidden">
+        <span style="{{s.kicker}}">{{L.brief}}</span>
+        <span lang="en" style="font-weight: 700; font-size: 1.1em; overflow: hidden; text-overflow: ellipsis">signals-midterm</span>
+        <span style="font-size: 0.85em; color: {{t.muted}}">{{L.meta}}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{isPhone}}" hint-placeholder-val="{{ false }}">
+      <div style="min-width: 0; display: flex; flex-direction: column">
+        <span style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{L.briefColon}} signals-midterm</span>
+        <span style="font-size: 0.85em; color: {{t.muted}}">{{phoneStatus}}</span>
+      </div>
+    </sc-if>
+    <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0">
+      <sc-if value="{{canSide}}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{toggleSide}}" aria-expanded="{{sideExpanded}}" aria-label="{{L.questions}}" title="{{L.questions}} (Q)" style="{{s.sideBtn}}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></svg>
+          <sc-if value="{{notPhone}}" hint-placeholder-val="{{ true }}">{{L.questions}}</sc-if>
+        </button>
+      </sc-if>
+      <sc-if value="{{notPhone}}" hint-placeholder-val="{{ true }}">
+        <button type="button" onClick="{{toggleMenu}}" aria-label="{{L.appearance}}" aria-expanded="{{menuExpanded}}" title="{{L.appearance}}" style="{{s.menuBtn}}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"></path></svg>
+        </button>
+        <sc-if value="{{isForm}}" hint-placeholder-val="{{ true }}">
+          <button type="button" onClick="{{cancel}}" style="{{s.hdrBtn}}">{{L.cancel}}</button>
+          <button type="button" onClick="{{finish}}" style="{{s.primary}}">{{L.finish}}</button>
+        </sc-if>
+      </sc-if>
+    </div>
+  </div>
+  <sc-if value="{{showStatus}}" hint-placeholder-val="{{ true }}">
+    <div style="{{s.statusRow}}">
+      <span style="display: inline-flex; align-items: center; gap: 8px; padding-right: 14px">{{answeredText}}
+        <span role="progressbar" aria-label="{{L.answeredAria}}" aria-valuemin="0" aria-valuemax="{{total}}" aria-valuenow="{{readyN}}" style="width: 72px; height: 6px; border-radius: 3px; background: {{t.sunken}}; border: 1px solid {{t.line}}; overflow: hidden"><span style="{{s.barFill}}"></span></span><b style="color: {{t.text}}">{{pct}}</b></span>
+      <span style="{{s.segSep}}"><b style="color: {{t.ok}}">{{youN}}</b> {{L.yoursW}} · <b style="color: {{t.info}}">{{agentN}}</b> {{L.suggestedW}} · <b style="color: {{t.text}}">{{defN}}</b> {{L.defaultW}}</span>
+      <span style="{{s.segSep}}"><b style="{{s.leftStyle}}">{{leftText}}</b></span>
+    </div>
+  </sc-if>
+</header>
+
+<sc-if value="{{menuShown}}" hint-placeholder-val="{{ false }}">
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding: 12px 28px; background: {{t.surface}}; border-bottom: 1px solid {{t.line}}; font-size: 0.85em">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+      <span style="color: {{t.muted}}; font-weight: 600">{{L.theme}}</span>
+      <sc-for list="{{themePills}}" as="p" hint-placeholder-count="5">
+        <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+      <span style="color: {{t.muted}}; font-weight: 600">{{L.font}}</span>
+      <sc-for list="{{fontPills}}" as="p" hint-placeholder-count="4">
+        <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<div style="flex: 1; display: flex; min-height: 0; position: relative">
+
+  <sc-if value="{{isForm}}" hint-placeholder-val="{{ true }}">
+  <main style="{{s.main}}">
+    <sc-if value="{{hasAgent}}" hint-placeholder-val="{{ false }}">
+      <div role="note" style="{{s.agentBox}}">
+        <span style="{{s.agentChip}}">{{L.agentChip}}</span>
+        <p style="margin: 0">{{L.agentNote}}</p>
+        <p style="margin: 0; font-size: 0.9em; color: {{t.muted}}">{{L.agentKeep}}</p>
+        <sc-if value="{{anyChanged}}" hint-placeholder-val="{{ false }}">
+          <button type="button" onClick="{{revertAll}}" style="{{s.revertBtn}}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
+            {{revertAllText}}
+          </button>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{noAgent}}" hint-placeholder-val="{{ true }}">
+      <p style="margin: 0; color: {{t.muted}}">{{L.intro}}</p>
+    </sc-if>
+
+    <sc-for list="{{sections}}" as="sec" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 8px">
+          <span style="{{s.kicker}}">{{sec.step}}</span>
+          <h2 id="{{sec.headId}}" style="margin: 0; font-size: 1.3em; line-height: 1.3; font-weight: 700">{{sec.title}}</h2>
+        </div>
+        <sc-for list="{{sec.qs}}" as="q" hint-placeholder-count="4">
+          <section id="{{q.anchor}}" aria-labelledby="{{q.lblId}}" style="{{q.cardStyle}}">
+            <div style="{{s.cardHead}}">
+              <span style="display: inline-flex; align-items: center; gap: 8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{q.icon}}"></path></svg>
+                {{q.headText}}
+              </span>
+              <span style="{{q.markStyle}}">{{q.mark}}</span>
+            </div>
+            <h3 id="{{q.lblId}}" style="{{s.qText}}">{{q.label}}</h3>
+            <p style="{{s.help}}">{{q.help}}</p>
+
+            <sc-if value="{{q.isChoices}}" hint-placeholder-val="{{ true }}">
+              <div role="group" aria-labelledby="{{q.lblId}}" style="{{q.gridStyle}}">
+                <sc-for list="{{q.choices}}" as="c" hint-placeholder-count="3">
+                  <button type="button" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="{{c.style}}">
+                    <span aria-hidden="true" style="{{c.markStyle}}">
+                      <sc-if value="{{c.showCheck}}" hint-placeholder-val="{{ false }}">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L19 7"></path></svg>
+                      </sc-if>
+                    </span>
+                    <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+                      <span style="{{c.labelStyle}}">{{c.label}}</span>
+                      <span style="{{s.hint}}">{{c.hint}}</span>
+                    </span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{q.showFollow}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px">
+                <label for="in-kinds-other" style="{{s.noteLabel}}">{{q.followLabel}}</label>
+                <span style="{{s.hint}}">{{q.followHelp}}</span>
+                <input id="in-kinds-other" type="text" value="{{q.followValue}}" onChange="{{q.onFollow}}" placeholder="{{L.otherPh}}" style="{{s.field}}">
+              </div>
+            </sc-if>
+
+            <sc-if value="{{q.isLine}}" hint-placeholder-val="{{ false }}">
+              <input type="text" aria-labelledby="{{q.lblId}}" value="{{q.value}}" onChange="{{q.onText}}" placeholder="{{q.placeholder}}" style="{{q.fieldStyle}}">
+            </sc-if>
+            <sc-if value="{{q.isLong}}" hint-placeholder-val="{{ false }}">
+              <textarea aria-labelledby="{{q.lblId}}" rows="3" value="{{q.value}}" onChange="{{q.onText}}" placeholder="{{q.placeholder}}" style="{{q.fieldStyle}}"></textarea>
+            </sc-if>
+
+            <sc-if value="{{q.isNumber}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+                <div style="{{s.slot}}">
+                  <button type="button" aria-label="{{q.decLabel}}" title="{{q.decLabel}}" onClick="{{q.dec}}" style="{{s.slotBtn}}">−</button>
+                  <input type="number" aria-labelledby="{{q.lblId}}" value="{{q.value}}" onChange="{{q.onNum}}" placeholder="–" style="{{s.slotInput}}">
+                  <button type="button" aria-label="{{q.incLabel}}" title="{{q.incLabel}}" onClick="{{q.inc}}" style="{{s.slotBtn}}">+</button>
+                </div>
+                <span style="font-size: 0.9em; color: {{t.muted}}">{{q.numNote}}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{q.hasExample}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{L.example}} <i>{{q.example}}</i></p>
+            </sc-if>
+            <sc-if value="{{q.hasErr}}" hint-placeholder-val="{{ false }}">
+              <p role="alert" style="{{s.errLine}}">{{q.errText}}</p>
+            </sc-if>
+            <sc-if value="{{q.hasNote}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{q.note}}</p>
+            </sc-if>
+            <sc-if value="{{q.canRevert}}" hint-placeholder-val="{{ false }}">
+              <div style="{{s.revertRow}}">
+                <button type="button" onClick="{{q.revert}}" style="{{s.revertBtn}}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
+                  {{q.revertText}}
+                </button>
+              </div>
+            </sc-if>
+          </section>
+        </sc-for>
+      </div>
+    </sc-for>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <button type="button" aria-expanded="{{moreOpenStr}}" onClick="{{toggleMore}}" style="{{s.moreBtn}}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{s.moreChev}}"><path d="M9 6l6 6-6 6"></path></svg>
+        {{L.more}}
+        <span style="margin-left: auto; font-weight: 400; color: {{t.muted}}">{{moreSummary}}</span>
+      </button>
+      <sc-if value="{{moreOpen}}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{moreQs}}" as="q" hint-placeholder-count="1">
+          <section id="{{q.anchor}}" aria-labelledby="{{q.lblId}}" style="{{q.cardStyle}}">
+            <div style="{{s.cardHead}}">
+              <span style="display: inline-flex; align-items: center; gap: 8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{q.icon}}"></path></svg>
+                {{q.headText}}
+              </span>
+              <span style="{{q.markStyle}}">{{q.mark}}</span>
+            </div>
+            <h3 id="{{q.lblId}}" style="{{s.qText}}">{{q.label}}</h3>
+            <p style="{{s.help}}">{{q.help}}</p>
+            <div role="group" aria-labelledby="{{q.lblId}}" style="{{q.gridStyle}}">
+              <sc-for list="{{q.choices}}" as="c" hint-placeholder-count="3">
+                <button type="button" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="{{c.style}}">
+                  <span aria-hidden="true" style="{{c.markStyle}}"></span>
+                  <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+                    <span style="{{c.labelStyle}}">{{c.label}}</span>
+                    <span style="{{s.hint}}">{{c.hint}}</span>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{q.note}}</p>
+            <div style="{{s.profBox}}">
+              <h4 style="margin: 0; font-size: 0.95em; font-weight: 700">{{L.profHead}}</h4>
+              <dl style="margin: 0; display: flex; flex-direction: column; gap: 0">
+                <sc-for list="{{profInfo}}" as="pi" hint-placeholder-count="4">
+                  <div style="{{pi.rowStyle}}">
+                    <dt style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+                      <code style="{{s.profName}}">{{pi.name}}</code>
+                      <span style="font-size: 0.85em; color: {{t.muted}}">{{pi.forText}}</span>
+                      <sc-if value="{{pi.chosen}}" hint-placeholder-val="{{ false }}">
+                        <span style="{{s.chosenPill}}">{{L.profChosen}}</span>
+                      </sc-if>
+                    </dt>
+                    <dd style="margin: 4px 0 0; font-size: 0.9em">{{pi.text}}</dd>
+                  </div>
+                </sc-for>
+              </dl>
+              <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{L.profFoot}}</p>
+            </div>
+          </section>
+        </sc-for>
+      </sc-if>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{isEnd}}" hint-placeholder-val="{{ false }}">
+  <main style="{{s.endMain}}">
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <section style="{{s.endCard}}">
+        <div style="display: flex; align-items: center; gap: 10px; color: {{t.ok}}; font-weight: 700; font-size: 1.2em">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+          {{L.written}}
+        </div>
+        <p style="margin: 0; font-weight: 700">{{doneLine}}</p>
+        <ul style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px">
+          <li><code style="{{s.inlineCode}}">signals-midterm/brief.yaml</code> {{L.fileBrief}}</li>
+          <li><code style="{{s.inlineCode}}">signals-midterm/content/</code> {{L.fileContent}}</li>
+        </ul>
+        <p style="margin: 0; color: {{t.muted}}; font-size: 0.9em">{{L.closed}}</p>
+      </section>
+    </sc-if>
+    <sc-if value="{{isCancelled}}" hint-placeholder-val="{{ false }}">
+      <section style="{{s.endCard}}">
+        <div style="font-weight: 700; font-size: 1.2em">{{L.cancelled}}</div>
+        <p style="margin: 0">{{L.cancelledLine}} <code style="{{s.inlineCode}}">quiz brief signals-midterm</code></p>
+        <p style="margin: 0; color: {{t.muted}}; font-size: 0.9em">{{L.closed}}</p>
+      </section>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{showSide}}" hint-placeholder-val="{{ true }}">
+  <aside aria-label="{{L.questions}}" style="{{s.side}}">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px 10px">
+      <h2 style="margin: 0; font-size: 1.05em; font-weight: 700">{{L.questions}}</h2>
+      <button type="button" onClick="{{toggleSide}}" aria-label="{{L.closeSide}}" title="{{L.closeSide}}" style="{{s.closeBtn}}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 16px 16px">
+      <sc-for list="{{sections}}" as="sec" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <button type="button" onClick="{{sec.toggle}}" aria-expanded="{{sec.openStr}}" style="{{sec.headStyle}}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{sec.chev}}"><path d="M9 6l6 6-6 6"></path></svg>
+            <span style="flex: 1; text-align: left">{{sec.title}}</span>
+            <span style="{{sec.countStyle}}">{{sec.countText}}</span>
+          </button>
+          <sc-if value="{{sec.open}}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="5">
+              <a href="{{r.href}}" onClick="{{r.go}}" style="{{r.rowStyle}}">
+                <span aria-hidden="true" style="{{r.icon}}">{{r.glyph}}</span>
+                <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+                  <span style="font-weight: 600">{{r.short}}</span>
+                  <span style="{{r.subStyle}}">{{r.display}}</span>
+                </span>
+              </a>
+            </sc-for>
+          </sc-if>
+        </div>
+      </sc-for>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; padding-top: 12px; border-top: 1px solid {{t.line}}; font-size: 0.8em; color: {{t.muted}}">
+        <span style="{{s.lgItem}}"><span aria-hidden="true" style="{{lg.you}}">✓</span>{{L.lgYou}}</span>
+        <span style="{{s.lgItem}}"><span aria-hidden="true" style="{{lg.agent}}">✎</span>{{L.lgAgent}}</span>
+        <span style="{{s.lgItem}}"><span aria-hidden="true" style="{{lg.def}}"></span>{{L.lgDefault}}</span>
+        <span style="{{s.lgItem}}"><span aria-hidden="true" style="{{lg.missing}}">!</span>{{L.lgMissing}}</span>
+        <span style="{{s.lgItem}}"><span aria-hidden="true" style="{{lg.cur}}"></span>{{L.lgCurrent}}</span>
+      </div>
+      <sc-if value="{{notPhone}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.8em; color: {{t.muted}}">
+          <span style="{{s.lgItem}}"><kbd style="{{s.kbd}}">N</kbd> {{L.keyNext}}</span>
+          <span style="{{s.lgItem}}"><kbd style="{{s.kbd}}">Q</kbd> {{L.keyQ}}</span>
+          <span style="{{s.lgItem}}"><kbd style="{{s.kbd}}">Esc</kbd> {{L.keyClose}}</span>
+        </div>
+      </sc-if>
+      <p style="margin: 0; font-size: 0.8em; color: {{t.muted}}">{{L.closes}}</p>
+    </div>
+  </aside>
+  </sc-if>
+</div>
+
+<sc-if value="{{phoneBar}}" hint-placeholder-val="{{ false }}">
+  <div style="flex: none; display: flex; gap: 10px; padding: 12px 16px; background: {{t.card}}; border-top: 1px solid {{t.line}}">
+    <button type="button" onClick="{{cancel}}" style="{{s.hdrBtn}}; flex: 1; height: 48px">{{L.cancel}}</button>
+    <button type="button" onClick="{{finish}}" style="{{s.primary}}; flex: 1; height: 48px">{{L.finish}}</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{showSummary}}" hint-placeholder-val="{{ false }}">
+  <div style="{{s.backdrop}}">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlgTitle" style="{{s.dialog}}">
+      <h2 id="dlgTitle" style="margin: 0; font-size: 1.15em; font-weight: 700">{{L.dlgTitle}}</h2>
+      <p style="margin: 0">{{dlgBody}}</p>
+      <div style="{{s.sumBox}}">
+        <div aria-hidden="true" style="{{s.sumTh}}">
+          <span style="{{s.thLabel}}">{{L.colQuestion}}</span>
+          <span style="{{s.thCell}}">{{L.colAnswer}}</span>
+          <span style="{{s.thRight}}">{{L.colBy}}</span>
+        </div>
+        <sc-for list="{{sections}}" as="sec" hint-placeholder-count="2">
+          <div style="{{s.sumGroup}}">{{sec.title}}</div>
+          <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="5">
+            <a class="sumrow" href="{{r.href}}" onClick="{{r.go}}" title="{{r.editAria}}" style="{{s.sumRow}}">
+              <span style="{{r.cellLabel}}">{{r.short}}</span>
+              <span style="{{r.cellVal}}">{{r.display}}</span>
+              <span style="{{r.cellMark}}">{{r.markShort}}</span>
+            </a>
+          </sc-for>
+        </sc-for>
+      </div>
+      <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{L.sumHint}}</p>
+      <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{L.dlgNote}}</p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; flex-wrap: wrap">
+        <button type="button" onClick="{{closeDlg}}" style="{{s.hdrBtn}}">{{L.goBack}}</button>
+        <button type="button" onClick="{{write}}" style="{{s.primary}}">{{L.write}}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{showBlocked}}" hint-placeholder-val="{{ false }}">
+  <div style="{{s.backdrop}}">
+    <div role="dialog" aria-modal="true" aria-labelledby="blkTitle" style="{{s.dialogSmall}}">
+      <h2 id="blkTitle" style="margin: 0; font-size: 1.15em; font-weight: 700">{{L.blkTitle}}</h2>
+      <p style="margin: 0">{{L.blkLead}}</p>
+      <ul style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px">
+        <sc-for list="{{missingList}}" as="m" hint-placeholder-count="2">
+          <li><a href="{{m.href}}" onClick="{{m.go}}">{{m.short}}</a>: {{m.why}}</li>
+        </sc-for>
+      </ul>
+      <div style="display: flex; justify-content: flex-end; margin-top: 8px">
+        <button type="button" onClick="{{closeDlg}}" style="{{s.hdrBtn}}">{{L.goBack}}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark","oled","white","paper"],"default":"light"},"font":{"editor":"enum","options":["system","sans","serif","readable"],"default":"system"},"lang":{"editor":"enum","options":["en","vi"],"default":"en"},"device":{"editor":"enum","options":["desktop","phone"],"default":"desktop"},"prefill":{"editor":"enum","options":["none","agent"],"default":"none"},"sample":{"editor":"enum","options":["none","vague","changed"],"default":"none"},"view":{"editor":"enum","options":["form","finish","done","cancelled"],"default":"form"},"side":{"editor":"enum","options":["open","closed"],"default":"open"},"$preview":{"width":1280,"height":940}}'>
+var T = {
+  light: { bg: "#eceae5", surface: "#f4f3ef", card: "#fcfcfa", sunken: "#e4e2dc", line: "#d6d4cd", lineStrong: "#8c8b83", text: "#2a2b31", muted: "#55554f", accent: "#46608a", onAccent: "#fcfcfa", ok: "#3d6946", bad: "#963f3e", warn: "#725b1c", info: "#365b84", shadow: "0 1px 2px rgba(40,38,30,0.06), 0 2px 8px rgba(40,38,30,0.04)", okWash: "#e3ebe2", badWash: "#f2e3e1", infoWash: "#e2e8f0" },
+  dark: { bg: "#1b1d22", surface: "#262a31", card: "#2c3038", sunken: "#15171b", line: "#464c57", lineStrong: "#7b8394", text: "#d9dce2", muted: "#a9afba", accent: "#8fa8d4", onAccent: "#15171b", ok: "#92b99a", bad: "#d08a88", warn: "#cfb277", info: "#8fb0d6", shadow: "0 1px 3px rgba(0,0,0,0.35)", okWash: "#2a3a30", badWash: "#3d2b2d", infoWash: "#243042" },
+  oled: { bg: "#000000", surface: "#0e0e10", card: "#0f0f11", sunken: "#18181b", line: "#303238", lineStrong: "#73767e", text: "#e0e0e0", muted: "#a3a5aa", accent: "#9fb2d4", onAccent: "#000000", ok: "#9cc2a5", bad: "#d9a09d", warn: "#d3bf91", info: "#a0b8d6", shadow: "none", okWash: "#121c15", badWash: "#201414", infoWash: "#111a26" },
+  white: { bg: "#ffffff", surface: "#ffffff", card: "#ffffff", sunken: "#f2f2f2", line: "#c9c9c9", lineStrong: "#767676", text: "#1a1a1a", muted: "#575757", accent: "#1f4f8f", onAccent: "#ffffff", ok: "#2f6f3a", bad: "#b02a26", warn: "#7f5d00", info: "#1f5f9e", shadow: "none", okWash: "#eef5ef", badWash: "#fbeeed", infoWash: "#eaf1fa" },
+  paper: { bg: "#f6f1e7", surface: "#efe8da", card: "#fbf8f1", sunken: "#ebe3d3", line: "#dcd2bf", lineStrong: "#8b806c", text: "#37302a", muted: "#665b4e", accent: "#4c6b65", onAccent: "#fbf8f1", ok: "#426a44", bad: "#97463b", warn: "#755a17", info: "#426283", shadow: "0 1px 2px rgba(70,55,30,0.07)", okWash: "#e6ebdc", badWash: "#f1e1d8", infoWash: "#e4e6e4" }
+};
+var F = { system: "'Segoe UI', system-ui, -apple-system, Roboto, 'Noto Sans', sans-serif", sans: "'Be Vietnam Pro', 'Segoe UI', sans-serif", serif: "'Source Serif 4', Georgia, serif", readable: "'Lexend', 'Segoe UI', sans-serif" };
+var MONO = "'Cascadia Code', Consolas, Menlo, monospace";
+var LANG = {
+  en: {
+    brief: "Brief", briefColon: "Brief:", meta: "what the agent should write", questions: "Questions", appearance: "Appearance", cancel: "Cancel", finish: "Finish",
+    theme: "Theme", font: "Font", themeNames: { light: "Light", dark: "Dark", oled: "OLED", white: "White", paper: "Paper" }, fontNames: { system: "System", sans: "Sans", serif: "Serif", readable: "Readable" },
+    answered: function (n, m) { return "Answered " + n + " of " + m; }, answeredAria: "Questions answered", yoursW: "yours", suggestedW: "pre-filled", defaultW: "default",
+    toAnswer: function (n) { return n + " to answer"; }, ready: "Ready to finish",
+    qOf: function (i, n) { return "Question " + i + " of " + n; }, onlyYou: "only you can answer", optional: "optional",
+    mYou: "✓ Your answer", mAgent: "✎ Pre-filled for you", mAgentShort: "✎ Pre-filled", mDefault: "○ Default", mNoGoal: "○ No goal", noGoalW: "No goal", mMissing: "! Needs your answer",
+    agentChip: "Pre-filled for you", agentNote: "The agent filled in what you told it. Check each answer marked Pre-filled for you, change what is wrong, then press Finish.",
+    intro: "Answer what the agent should know before it writes your quiz. Every question has a default except the purpose and the scope.",
+    step: function (i) { return "Step " + i + " of 2"; }, example: "For example:",
+    tooShort: function (n) { return "Too short: " + n + " of the 4 words needed. Name the chapters, lectures or topics."; },
+    needed: "Needed: the agent cannot start without it.", pickOne: "Needed: pick one. It sets the defaults below.",
+    nothingPicked: "Nothing is picked for you. Until you pick, the defaults below are those of Self-study.",
+    followsPurpose: function (p) { return "The default for " + p + ". It follows the purpose until you change it."; },
+    weakNote: "There is no history here, so the agent picks the weak topics from your reports.",
+    words: function (n) { return n + (n === 1 ? " word" : " words"); },
+    otherPh: "problem sets from the tutorials", scopePh: "Chapters, lectures or topics", emptyPh: "Leave empty for none",
+    noLimit: "No limit", minutesW: "minutes", questionsW: "questions", noGoalHint: "No goal: leave empty for none", pctHint: "% on the results card",
+    fewer: "One question fewer", moreQ: "One question more", takeOff: function (n) { return "Take " + n + " off"; }, add: function (n) { return "Add " + n; },
+    more: "More options", profileIs: function (p) { return "Check profile: " + p; }, chosenProfile: "Chosen by you, whatever the purpose.",
+    profileFollows: function (p) { return "Follows the purpose (" + p + ")."; },
+    closeSide: "Close the sidebar (Esc)", lgYou: "Your answer", lgAgent: "Pre-filled for you", lgDefault: "Default", lgMissing: "Needs your answer", lgCurrent: "current",
+    keyNext: "next to answer", keyQ: "questions", keyClose: "close", closes: "The form closes in 29 min if left open. Cancel writes nothing.",
+    none: "None", notAnswered: "Not answered", minShort: function (n) { return n + " min"; }, nQuestions: function (n) { return n + " questions"; }, otherIs: function (x) { return "Other: " + x; },
+    dlgTitle: "Write the brief?", dlgBody: function (n, y, a, d) { return n + " answers: " + y + " yours, " + a + " pre-filled for you, " + d + " defaults."; },
+    dlgNote: "Writes signals-midterm/brief.yaml and an empty content/. A pre-filled answer you keep is recorded as yours, a default as decided_by: default.",
+    goBack: "Go back", write: "Write the brief", editAria: function (x) { return "Go to the question: " + x; },
+    colQuestion: "Question", colAnswer: "Answer", colBy: "Chosen by", sumHint: "Click a row to go back to its question.",
+    revertTo: function (x) { return "Back to the pre-filled answer: " + x; },
+    revertAll: function (n) { return "Back to every pre-filled answer (" + n + (n === 1 ? " changed)" : " changed)"); },
+    agentKeep: "A pre-filled answer you keep is written to brief.yaml as your own answer. Change one, and its card offers a way back to it.",
+    profHead: "What each profile checks", profChosen: "Chosen",
+    profFoot: "Under every profile, a quiz that cannot work fails: bad syntax, a missing answer key, a missing image. Profiles of your own, from fullmark.toml or config.toml, are listed here too. The agent never changes the profile to make a quiz pass.",
+    blkTitle: "Some answers are missing", blkLead: "Nothing is written until these are answered:",
+    whyPurpose: "pick what the quiz is for", whyScope: "say what the quiz covers", whyVague: "too short, give at least 4 words",
+    written: "Brief written", doneLine: function (n, y, d) { return n + " answers: " + y + " yours, " + d + " defaults."; },
+    fileBrief: "the brief, for the agent", fileContent: "empty: put your material here", closed: "The server has stopped. You can close this tab.",
+    cancelled: "Cancelled", cancelledLine: "Nothing was written. To start again, run"
+  },
+  vi: {
+    brief: "Yêu cầu", briefColon: "Yêu cầu:", meta: "những gì AI sẽ viết", questions: "Câu hỏi", appearance: "Giao diện", cancel: "Huỷ", finish: "Hoàn tất",
+    theme: "Nền", font: "Phông", themeNames: { light: "Sáng", dark: "Tối", oled: "OLED", white: "Trắng", paper: "Giấy" }, fontNames: { system: "Hệ thống", sans: "Không chân", serif: "Có chân", readable: "Dễ đọc" },
+    answered: function (n, m) { return "Đã trả lời " + n + " / " + m; }, answeredAria: "Số câu đã trả lời", yoursW: "của bạn", suggestedW: "điền sẵn", defaultW: "mặc định",
+    toAnswer: function (n) { return "Còn " + n + " câu"; }, ready: "Sẵn sàng hoàn tất",
+    qOf: function (i, n) { return "Câu " + i + " / " + n; }, onlyYou: "chỉ bạn trả lời được", optional: "không bắt buộc",
+    mYou: "✓ Bạn chọn", mAgent: "✎ Điền sẵn cho bạn", mAgentShort: "✎ Điền sẵn", mDefault: "○ Mặc định", mNoGoal: "○ Không đặt mục tiêu", noGoalW: "Không đặt mục tiêu", mMissing: "! Cần bạn trả lời",
+    agentChip: "Điền sẵn cho bạn", agentNote: "AI đã điền sẵn theo những gì bạn nói. Hãy xem từng câu có nhãn Điền sẵn cho bạn, sửa chỗ chưa đúng, rồi bấm Hoàn tất.",
+    intro: "Trả lời những gì AI cần biết trước khi viết bài. Mọi câu đều có giá trị mặc định, trừ mục đích và phạm vi.",
+    step: function (i) { return "Bước " + i + " / 2"; }, example: "Ví dụ:",
+    tooShort: function (n) { return "Quá ngắn: " + n + " / 4 từ cần có. Hãy nêu rõ chương, bài giảng hoặc chủ đề."; },
+    needed: "Bắt buộc: AI không thể bắt đầu nếu thiếu.", pickOne: "Bắt buộc: chọn một. Nó quyết định các giá trị mặc định bên dưới.",
+    nothingPicked: "Không có lựa chọn sẵn. Khi bạn chưa chọn, các giá trị mặc định bên dưới là của Tự học.",
+    followsPurpose: function (p) { return "Mặc định của " + p + ". Nó đổi theo mục đích cho đến khi bạn sửa."; },
+    weakNote: "Ở đây chưa có lịch sử làm bài, nên AI chọn chủ đề yếu từ các báo cáo của bạn.",
+    words: function (n) { return n + " từ"; },
+    otherPh: "bài tập của các buổi trợ giảng", scopePh: "Chương, bài giảng hoặc chủ đề", emptyPh: "Để trống nếu không có",
+    noLimit: "Không giới hạn", minutesW: "phút", questionsW: "câu", noGoalHint: "Không đặt mục tiêu: để trống", pctHint: "% trên thẻ kết quả",
+    fewer: "Bớt một câu", moreQ: "Thêm một câu", takeOff: function (n) { return "Bớt " + n; }, add: function (n) { return "Thêm " + n; },
+    more: "Tuỳ chọn khác", profileIs: function (p) { return "Bộ quy tắc: " + p; }, chosenProfile: "Do bạn chọn, bất kể mục đích.",
+    profileFollows: function (p) { return "Theo mục đích (" + p + ")."; },
+    closeSide: "Đóng thanh bên (Esc)", lgYou: "Bạn chọn", lgAgent: "Điền sẵn cho bạn", lgDefault: "Mặc định", lgMissing: "Cần bạn trả lời", lgCurrent: "đang xem",
+    keyNext: "câu cần trả lời tiếp", keyQ: "câu hỏi", keyClose: "đóng", closes: "Biểu mẫu tự đóng sau 29 phút nếu để yên. Huỷ thì không ghi gì.",
+    none: "Không có", notAnswered: "Chưa trả lời", minShort: function (n) { return n + " phút"; }, nQuestions: function (n) { return n + " câu"; }, otherIs: function (x) { return "Khác: " + x; },
+    dlgTitle: "Ghi bản yêu cầu?", dlgBody: function (n, y, a, d) { return n + " câu trả lời: " + y + " của bạn, " + a + " điền sẵn cho bạn, " + d + " mặc định."; },
+    dlgNote: "Ghi signals-midterm/brief.yaml và thư mục content/ trống. Câu điền sẵn mà bạn giữ lại được ghi là của bạn, giá trị mặc định ghi là decided_by: default.",
+    goBack: "Quay lại", write: "Ghi bản yêu cầu", editAria: function (x) { return "Đến câu hỏi: " + x; },
+    colQuestion: "Câu hỏi", colAnswer: "Câu trả lời", colBy: "Ai chọn", sumHint: "Bấm vào một dòng để quay về câu hỏi đó.",
+    revertTo: function (x) { return "Về lại câu điền sẵn: " + x; },
+    revertAll: function (n) { return "Về lại tất cả câu điền sẵn (" + n + " câu đã sửa)"; },
+    agentKeep: "Câu điền sẵn mà bạn giữ lại sẽ được ghi vào brief.yaml là câu trả lời của bạn. Nếu bạn sửa một câu, thẻ của câu đó có nút để về lại câu điền sẵn.",
+    profHead: "Mỗi bộ quy tắc kiểm tra gì", profChosen: "Đang chọn",
+    profFoot: "Với mọi bộ quy tắc, bài không thể chạy đều trượt: sai cú pháp, thiếu đáp án, thiếu hình. Các bộ quy tắc riêng của bạn trong fullmark.toml hoặc config.toml cũng hiện ở đây. AI không bao giờ đổi bộ quy tắc để bài được đạt.",
+    blkTitle: "Còn thiếu câu trả lời", blkLead: "Chưa ghi gì cho đến khi các câu này được trả lời:",
+    whyPurpose: "chọn mục đích của bài", whyScope: "nêu nội dung bài kiểm tra", whyVague: "quá ngắn, cần ít nhất 4 từ",
+    written: "Đã ghi bản yêu cầu", doneLine: function (n, y, d) { return n + " câu trả lời: " + y + " của bạn, " + d + " mặc định."; },
+    fileBrief: "bản yêu cầu cho AI", fileContent: "trống: đặt tài liệu của bạn vào đây", closed: "Máy chủ đã dừng. Bạn có thể đóng thẻ này.",
+    cancelled: "Đã huỷ", cancelledLine: "Chưa ghi gì. Để bắt đầu lại, chạy"
+  }
+};
+var SECTIONS = [{ id: "about", title: { en: "About the material", vi: "Về tài liệu" } }, { id: "quiz", title: { en: "The quiz", vi: "Bài kiểm tra" } }];
+var MIX_DEF = { "self-study": ["recall", "understanding", "calculation"], "exam-prep": ["understanding", "calculation", "essay"], classmates: ["recall", "understanding"], survey: [] };
+var PROFILE_DEF = { "exam-prep": "exam", survey: "survey" };
+var AGENT = {
+  en: { purpose: "exam-prep", scope: "lectures 3 to 5, the Fourier transform and its properties", kinds: ["lecture-slides", "past-exams"], count: 30, minutes: 90, mode: "timed-exam", request: "Match the style of the 2024 midterm. No proofs." },
+  vi: { purpose: "exam-prep", scope: "bài giảng 3 đến 5, phép biến đổi Fourier và các tính chất", kinds: ["lecture-slides", "past-exams"], count: 30, minutes: 90, mode: "timed-exam", language: "vi", request: "Theo dạng đề giữa kỳ năm 2024. Không có câu chứng minh." }
+};
+function c(v, le, lv, he, hv) { return { value: v, label: { en: le, vi: lv }, hint: { en: he, vi: hv } }; }
+function x(en, vi) { return { en: en, vi: vi }; }
+var QS = [
+  { key: "purpose", sec: "about", kind: "choice", human: true, cols: 2, short: x("Purpose", "Mục đích"), label: x("What is the quiz for?", "Bài kiểm tra này dùng để làm gì?"), help: x("The purpose sets the defaults of the other questions and the checks the quiz is held to.", "Mục đích quyết định giá trị mặc định của các câu hỏi khác và các quy tắc kiểm tra áp dụng cho bài."),
+    choices: [c("self-study", "Self-study", "Tự học", "Practice for yourself, to find what you do not know yet.", "Tự luyện tập để tìm ra phần mình chưa biết."), c("exam-prep", "Exam preparation", "Ôn thi", "A mock exam, checked more strictly.", "Một đề thi thử, được kiểm tra chặt chẽ hơn."), c("classmates", "For classmates", "Cho bạn cùng lớp", "A quiz you share with others.", "Bài bạn chia sẻ cho người khác."), c("survey", "Survey", "Khảo sát", "Questions without right answers, to collect opinions.", "Câu hỏi không có đáp án đúng, để thu thập ý kiến.")] },
+  { key: "scope", sec: "about", kind: "text", human: true, minWords: 4, short: x("Scope", "Phạm vi"), label: x("What should the quiz cover?", "Bài kiểm tra nên bao gồm nội dung gì?"), help: x("Chapters, lectures or topics. Be specific, so the questions stay on them.", "Các chương, bài giảng hoặc chủ đề. Hãy nêu cụ thể để câu hỏi không đi lạc."), example: x("lectures 3 to 5, the Fourier transform", "bài giảng 3 đến 5, phép biến đổi Fourier"), ph: "scopePh" },
+  { key: "kinds", sec: "about", kind: "multi", cols: 3, short: x("Material", "Tài liệu"), label: x("What material is in the content folder?", "Thư mục content chứa những tài liệu nào?"), help: x("Tick every kind you will put in content/. The agent reads these files to write the questions.", "Chọn mọi loại tài liệu bạn sẽ đặt vào content/. AI đọc các tệp này để viết câu hỏi."),
+    choices: [c("lecture-slides", "Lecture slides", "Slide bài giảng", "PDF or PowerPoint slides.", "Slide PDF hoặc PowerPoint."), c("textbook", "Textbook", "Giáo trình", "A chapter or more of a textbook.", "Một hoặc nhiều chương giáo trình."), c("notes", "Notes", "Ghi chú", "Your own notes or a classmate's.", "Ghi chú của bạn hoặc của bạn học."), c("past-exams", "Past exams", "Đề thi cũ", "Earlier exam papers, to match their style.", "Các đề thi trước, để bám sát dạng đề."), c("lab-manual", "Lab manual", "Tài liệu thực hành", "Instructions for lab sessions.", "Hướng dẫn cho các buổi thực hành."), c("other", "Something else", "Loại khác", "Name it in the box that opens.", "Ghi rõ vào ô hiện ra.")],
+    follow: { label: x("What other material?", "Tài liệu loại khác là gì?"), help: x("Say what it is, so the agent knows how to read it.", "Cho biết đó là gì để AI biết cách đọc.") } },
+  { key: "elsewhere", sec: "about", kind: "text", short: x("Elsewhere", "Tài liệu khác"), label: x("Is there material that is not in the content folder?", "Có tài liệu nào không nằm trong thư mục content không?"), help: x("Say where it is (a link, a book and its pages), or leave empty.", "Cho biết nó ở đâu (đường dẫn, sách và số trang), hoặc để trống."), ph: "emptyPh" },
+  { key: "count", sec: "quiz", kind: "number", min: 1, max: 200, step: 1, short: x("Questions", "Số câu"), label: x("How many questions?", "Bao nhiêu câu hỏi?"), help: x("The number of questions the quiz should have. A quiz far from it gets a warning.", "Số câu hỏi của bài. Bài lệch nhiều so với số này sẽ bị cảnh báo.") },
+  { key: "minutes", sec: "quiz", kind: "number", min: 0, max: 600, step: 5, short: x("Time limit", "Thời gian"), label: x("How many minutes?", "Bao nhiêu phút?"), help: x("The time limit in minutes. 0 means no limit.", "Thời gian làm bài tính bằng phút. 0 nghĩa là không giới hạn.") },
+  { key: "mix", sec: "quiz", kind: "multi", cols: 3, short: x("Kinds", "Dạng câu"), label: x("What kinds of questions?", "Những dạng câu hỏi nào?"), help: x("Tick the kinds to include. The quiz is checked to have questions that can show each.", "Chọn các dạng cần có. Bài sẽ được kiểm tra xem có câu hỏi phù hợp với từng dạng không."),
+    choices: [c("recall", "Recall", "Ghi nhớ", "Facts, definitions, terms.", "Sự kiện, định nghĩa, thuật ngữ."), c("understanding", "Understanding", "Hiểu", "Why and how, not only what.", "Tại sao và như thế nào, không chỉ là cái gì."), c("calculation", "Calculation", "Tính toán", "Problems with a number or several fields as the answer.", "Bài toán có đáp án là một số hoặc nhiều ô."), c("code", "Code", "Lập trình", "Write or fix a piece of code.", "Viết hoặc sửa một đoạn mã."), c("essay", "Essay", "Tự luận", "Written answers, graded against a rubric.", "Câu trả lời viết, chấm theo thang tiêu chí.")] },
+  { key: "difficulty", sec: "quiz", kind: "choice", cols: 3, short: x("Difficulty", "Độ khó"), label: x("How hard?", "Độ khó?"), help: x("How demanding the questions should be, compared with the real thing.", "Mức độ đòi hỏi của câu hỏi so với bài thi thật."),
+    choices: [c("warm-up", "Warm-up", "Khởi động", "Easier than the exam, to build confidence.", "Dễ hơn bài thi, để lấy đà."), c("like-the-exam", "Like the exam", "Như bài thi", "The level you expect to meet.", "Mức độ bạn dự kiến gặp."), c("harder", "Harder", "Khó hơn", "Harder than the exam, to be safe.", "Khó hơn bài thi, cho chắc ăn.")] },
+  { key: "mode", sec: "quiz", kind: "choice", cols: 3, short: x("Mode", "Cách làm"), label: x("How should it be taken?", "Làm bài theo cách nào?"), help: x("When the learner sees the answers.", "Khi nào người học xem được đáp án."),
+    choices: [c("each-question", "Check each question", "Kiểm tra từng câu", "Feedback straight after each answer.", "Có phản hồi ngay sau mỗi câu trả lời."), c("at-the-end", "Check at the end", "Kiểm tra ở cuối", "All answers are shown after submitting.", "Đáp án hiện ra sau khi nộp bài."), c("timed-exam", "Timed exam", "Thi tính giờ", "A time limit and a locked page, like the real exam.", "Có giới hạn thời gian và trang bị khóa, như thi thật.")] },
+  { key: "language", sec: "quiz", kind: "choice", cols: 2, short: x("Language", "Ngôn ngữ"), label: x("What language is the quiz in?", "Bài kiểm tra viết bằng ngôn ngữ nào?"), help: x("The language the questions are written in. One quiz has one language.", "Ngôn ngữ của các câu hỏi. Mỗi bài chỉ dùng một ngôn ngữ."),
+    choices: [c("en", "English", "Tiếng Anh", "The questions are in English.", "Câu hỏi bằng tiếng Anh."), c("vi", "Vietnamese", "Tiếng Việt", "The questions are in Vietnamese.", "Câu hỏi bằng tiếng Việt.")] },
+  { key: "weak_topics", sec: "quiz", kind: "choice", cols: 2, short: x("Weak topics", "Chủ đề yếu"), label: x("Stress the topics you did badly on?", "Nhấn mạnh các chủ đề bạn làm kém?"), help: x("Needs earlier results. Without a library, the agent picks the topics from your reports.", "Cần kết quả các lần trước. Khi chưa có thư viện, AI chọn chủ đề từ các báo cáo của bạn."),
+    choices: [c("yes", "Yes", "Có", "Put more questions on the weak topics.", "Đặt nhiều câu hỏi hơn vào các chủ đề yếu."), c("no", "No", "Không", "Cover the scope evenly.", "Phủ đều phạm vi.")] },
+  { key: "commitment", sec: "quiz", kind: "number", human: true, optional: true, min: 0, max: 100, step: 5, short: x("Commitment", "Cam kết"), label: x("What score are you committing to?", "Bạn cam kết đạt số điểm nào?"), help: x("A percent from 1 to 100, shown as your goal on the results card. 0, or empty, means no goal.", "Một phần trăm từ 1 đến 100, hiện làm mục tiêu trên thẻ kết quả. 0 hoặc để trống nghĩa là không đặt mục tiêu.") },
+  { key: "request", sec: "quiz", kind: "text", long: true, short: x("Request", "Lời nhắn"), label: x("Anything else for the agent?", "Còn điều gì khác cho AI không?"), help: x("Free text: topics to stress, a style to match, things to avoid. Leave empty for none.", "Văn bản tự do: chủ đề cần nhấn mạnh, phong cách cần theo, điều cần tránh. Để trống nếu không có."), ph: "emptyPh" },
+  { key: "profile", sec: "more", kind: "choice", cols: 2, short: x("Profile", "Bộ quy tắc"), label: x("Which check profile?", "Dùng bộ quy tắc kiểm tra nào?"), help: x("A built-in or configured profile. Leave it to follow the purpose; most people never change it.", "Một bộ quy tắc có sẵn hoặc do bạn cấu hình. Để mặc định theo mục đích; hầu hết mọi người không đổi."),
+    choices: [c("default", "default", "default", "The usual checks: warnings, nothing fails.", "Kiểm tra thông thường: chỉ cảnh báo."), c("draft", "draft", "draft", "Writing in progress: only broken quizzes fail.", "Đang viết dở: chỉ bài hỏng mới trượt."), c("exam", "exam", "exam", "Strictest, for a mock exam.", "Chặt nhất, cho đề thi thử."), c("survey", "survey", "survey", "No right answers.", "Không có đáp án đúng.")] }
+];
+// One stroke path per question, drawn at 16 px in the card's head (icons kept few and quiet)
+var ICONS = {
+  purpose: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8zM12 11.5v1",
+  scope: "M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z",
+  kinds: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+  elsewhere: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+  count: "M5 9h14M5 15h14M10 4L8 20M16 4l-2 16",
+  minutes: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 7v5l3 2",
+  mix: "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
+  difficulty: "M5 20v-6M12 20V9M19 20V4",
+  mode: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6z",
+  language: "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z",
+  weak_topics: "M3 7l6 6 4-4 8 8M15 17h6v-6",
+  commitment: "M5 21V4M5 4h11l-2 4 2 4H5",
+  request: "M4 5h16v11H9l-5 4z",
+  profile: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"
+};
+// TECHNICAL_DESIGN.md, section 5, "Profiles"
+var PROFILE_INFO = [
+  { name: "default", forText: x("for everything", "cho mọi bài"),
+    text: x("Quality findings (a correct choice that gives itself away, a short explanation, answers bunched on one letter) are warnings: you see them, and the quiz still passes.",
+            "Lỗi chất lượng (đáp án đúng tự lộ, lời giải thích quá ngắn, đáp án dồn vào một chữ cái) chỉ là cảnh báo: bạn thấy chúng, và bài vẫn đạt.") },
+  { name: "draft", forText: x("for a quiz still being written", "cho bài đang viết dở"),
+    text: x("Quality findings drop to notes, so only a quiz that cannot work fails.",
+            "Lỗi chất lượng chỉ còn là ghi chú, nên bài chỉ trượt khi không thể chạy.") },
+  { name: "exam", forText: x("for a mock exam", "cho đề thi thử"),
+    text: x("Every quality warning becomes an error. Each question needs an explanation of at least 8 words and a tag; no answer letter may hold more than 40% of the answers; the question count must be within 10% of the brief; no rule can be switched off inside the quiz.",
+            "Mọi cảnh báo chất lượng thành lỗi. Mỗi câu cần lời giải thích ít nhất 8 từ và một thẻ chủ đề; không chữ cái đáp án nào chiếm quá 40%; số câu lệch không quá 10% so với yêu cầu; không được tắt quy tắc ngay trong bài.") },
+  { name: "survey", forText: x("for a questionnaire", "cho bảng khảo sát"),
+    text: x("The checks that assume a right answer are off: the giveaway choice, the explanations and the spread of answer letters.",
+            "Các kiểm tra giả định có đáp án đúng được tắt: đáp án tự lộ, lời giải thích và độ phân bố chữ cái đáp án.") }
+];
+function words(s) { s = (s || "").trim(); return s ? s.split(/\s+/).length : 0; }
+
+class Component extends DCLogic {
+  renderVals() {
+    var self = this, p = this.props, st = this.state || {};
+    var lang = p.lang === "vi" ? "vi" : "en";
+    var L = LANG[lang];
+    function tx(o) { return o[lang]; }
+    var themeName = st.theme || p.theme || "light";
+    var fontName = st.font || p.font || "system";
+    var t = T[themeName] || T.light;
+    var edged = themeName === "oled" || themeName === "white";
+    var isPhone = (p.device || "desktop") === "phone";
+    var view = st.view || p.view || "form";
+    var base = (p.prefill || "none") === "agent" ? AGENT[lang] : {};
+    var vals = st.vals || ((p.sample || "none") === "vague" ? { purpose: "self-study", scope: lang === "vi" ? "tín hiệu" : "signals" } : p.sample === "changed" ? { count: 25 } : {});
+    var tried = st.tried != null ? st.tried : view === "finish";
+    var sideOpen = st.side != null ? st.side : isPhone ? p.side === "open" : (p.side || "open") === "open";
+    var fold = st.fold || {};
+    var moreOpen = !!st.more;
+
+    function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+    var purpose = has(vals, "purpose") ? vals.purpose : base.purpose;
+    function def(k) {
+      switch (k) {
+        case "kinds": return []; case "kinds_other": case "elsewhere": case "request": case "scope": return "";
+        case "count": return 20; case "minutes": return 0; case "mix": return (MIX_DEF[purpose || "self-study"] || []).slice();
+        case "difficulty": return "like-the-exam"; case "mode": return "at-the-end"; case "language": return "en";
+        case "weak_topics": return "no"; case "commitment": return ""; case "profile": return PROFILE_DEF[purpose] || "default";
+      }
+      return undefined;
+    }
+    function get(k) { return has(vals, k) ? vals[k] : has(base, k) ? base[k] : def(k); }
+    function decided(q) {
+      var v = get(q.key);
+      if (q.human && !q.optional && (v == null || v === "")) return "missing";
+      if (has(vals, q.key)) return "you";
+      if (has(base, q.key)) return "agent";
+      return "default";
+    }
+    function vagueOf(q) { var v = get(q.key); return !!(q.minWords && v && words(v) < q.minWords); }
+    function set(k, v) { var n = Object.assign({}, vals); n[k] = v; self.setState({ vals: n, cur: k }); }
+    function labelOf(q, v) { for (var i = 0; i < (q.choices || []).length; i++) if (q.choices[i].value === v) return tx(q.choices[i].label); return v; }
+    var purposeLabel = labelOf(QS[0], purpose || "self-study");
+
+    var firstOpen = null;
+    QS.forEach(function (q) { if (!firstOpen && (decided(q) === "missing" || vagueOf(q))) firstOpen = q.key; });
+    var cur = st.cur || (p.sample === "changed" ? "count" : view === "form" ? firstOpen : null);
+
+    var COL = { you: t.ok, agent: t.info, "default": t.muted, missing: t.bad };
+    var WASH = { you: t.okWash, agent: t.infoWash, "default": t.card, missing: t.badWash };
+    function markOf(d, q) { return d === "you" ? L.mYou : d === "agent" ? L.mAgent : d === "missing" ? L.mMissing : q.key === "commitment" ? L.mNoGoal : L.mDefault; }
+    var lgf = function (bg, border, color) { return "width: 16px; height: 16px; flex: none; box-sizing: border-box; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85em; font-weight: 700; background: " + bg + "; border: " + border + "; color: " + color; };
+    var lg = { you: lgf(t.okWash, "1px solid " + t.ok, t.ok), agent: lgf(t.infoWash, "1px solid " + t.info, t.info), def: lgf(t.card, "1px solid " + t.lineStrong, t.muted), missing: lgf(t.badWash, "1px solid " + t.bad, t.bad), cur: lgf(t.card, "2px solid " + t.text, t.text) };
+    var ICON = { you: [lg.you, "✓"], agent: [lg.agent, "✎"], "default": [lg.def, ""], missing: [lg.missing, "!"] };
+
+    function display(q, v0) {
+      var v = v0 !== undefined ? v0 : get(q.key);
+      if (q.kind === "choice") return v ? labelOf(q, v) : L.notAnswered;
+      if (q.kind === "multi") {
+        if (!v.length) return L.none;
+        var out = v.map(function (y) { return labelOf(q, y); });
+        if (q.key === "kinds" && v.indexOf("other") >= 0 && get("kinds_other")) out[v.indexOf("other")] = L.otherIs(get("kinds_other"));
+        return out.join(", ");
+      }
+      if (q.key === "minutes") return v === 0 ? L.noLimit : L.minShort(v);
+      if (q.key === "commitment") return v === "" || v === 0 ? L.noGoalW : v + "%";
+      if (q.key === "count") return L.nQuestions(v);
+      if (q.kind === "text") return v ? v : (q.human ? L.notAnswered : L.none);
+      return String(v);
+    }
+
+    var cardBase = "display: flex; flex-direction: column; gap: 10px; background: " + t.card + "; border-radius: " + (themeName === "white" ? 4 : 12) + "px; padding: " + (isPhone ? "16px 16px" : "20px 26px") + "; box-shadow: " + t.shadow + "; scroll-margin-top: 16px";
+    var total = QS.length;
+    function build(q, i) {
+      var v = get(q.key), d = decided(q), vague = vagueOf(q), isCur = cur === q.key;
+      var bad = (d === "missing" && tried) || vague;
+      var item = {
+        key: q.key, short: tx(q.short), label: tx(q.label), help: tx(q.help),
+        anchor: "q-" + q.key, lblId: "lbl-" + q.key, href: "#q-" + q.key,
+        headText: L.qOf(i + 1, total) + (q.human && !q.optional ? " · " + L.onlyYou : q.optional ? " · " + L.optional : ""),
+        mark: markOf(d, q), markStyle: "font-weight: 700; white-space: nowrap; color: " + COL[d],
+        display: display(q),
+        cardStyle: cardBase + "; border: " + (isCur ? "2px solid " + t.accent : "1px solid " + (edged ? t.lineStrong : t.line)),
+        rowStyle: "display: flex; align-items: center; gap: 10px; min-height: 48px; box-sizing: border-box; padding: 6px 12px 6px 10px; border-radius: 8px; text-decoration: none; font-size: 0.85em; color: " + t.text + "; background: " + (vague ? t.badWash : WASH[d]) + "; border: " + (isCur ? "2px solid " + t.text : "1px solid " + (d === "missing" || vague ? t.bad : t.line)),
+        icon: vague ? lg.missing : ICON[d][0], glyph: vague ? "!" : ICON[d][1],
+        subStyle: "font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: " + (d === "missing" ? t.bad : t.muted),
+        sumVal: "min-width: 0; overflow-wrap: anywhere; " + (d === "missing" || vague ? "color: " + t.bad + "; font-weight: 600" : ""),
+        editAria: L.editAria(tx(q.short)),
+        go: function () { var ch = { view: "form", cur: q.key }; if (q.sec === "more") ch.more = true; if (isPhone) ch.side = false; self.setState(ch); },
+        isChoices: q.kind === "choice" || q.kind === "multi",
+        isLine: q.kind === "text" && !q.long, isLong: q.kind === "text" && !!q.long, isNumber: q.kind === "number",
+        value: v == null ? "" : v, placeholder: q.ph ? L[q.ph] : "",
+        hasExample: !!q.example, example: q.example ? tx(q.example) : "",
+        hasErr: false, errText: "", hasNote: false, note: "", showFollow: false,
+        fieldStyle: "font: inherit; width: 100%; box-sizing: border-box; min-height: 44px; resize: vertical; padding: 8px 12px; border-radius: 8px; background: " + t.sunken + "; color: " + t.text + "; border: " + (bad ? "2px solid " + t.bad : "1px solid " + t.lineStrong),
+        onText: function (e) { set(q.key, e.target.value); }
+      };
+      item.icon = ICONS[q.key];
+      item.markShort = d === "agent" ? L.mAgentShort : item.mark;
+      // A pre-filled answer the person changed can go back to what the agent filled in
+      var changed = has(vals, q.key) && has(base, q.key) && JSON.stringify(vals[q.key]) !== JSON.stringify(base[q.key]);
+      item.canRevert = changed;
+      item.revertText = changed ? L.revertTo(display(q, base[q.key])) : "";
+      item.revert = function () { var n = Object.assign({}, vals); delete n[q.key]; self.setState({ vals: n, cur: q.key }); };
+      var flagged = d === "missing" || vague;
+      var labelBg = themeName === "white" ? t.sunken : t.surface;
+      item.cellLabel = "display: flex; align-items: center; padding: 8px 12px; font-weight: 700; background: " + (flagged ? t.badWash : labelBg) + "; border-right: " + (isPhone ? "0" : "1px solid " + t.lineStrong);
+      item.cellVal = "display: flex; align-items: center; min-width: 0; overflow-wrap: anywhere; padding: " + (isPhone ? "6px 12px 10px; grid-column: 1 / -1; grid-row: 2" : "8px 14px") + (flagged ? "; color: " + t.bad + "; font-weight: 600" : "");
+      item.cellMark = "display: flex; align-items: center; justify-content: flex-end; padding: 8px 16px 8px 12px; white-space: nowrap; font-size: 0.85em; font-weight: 700; color: " + COL[d] + (isPhone ? "; background: " + (flagged ? t.badWash : labelBg) : "");
+      if (isPhone) item.sumVal += "; grid-column: 1 / -1; grid-row: 2";
+      if (item.isChoices) {
+        var multi = q.kind === "multi";
+        item.gridStyle = "display: grid; grid-template-columns: repeat(" + (isPhone ? 1 : q.cols) + ", minmax(0, 1fr)); gap: 8px";
+        item.choices = q.choices.map(function (ch) {
+          var sel = multi ? v.indexOf(ch.value) >= 0 : v === ch.value;
+          return {
+            label: tx(ch.label), hint: tx(ch.hint), pressed: sel ? "true" : "false", showCheck: multi && sel,
+            labelStyle: "font-weight: " + (sel ? 700 : 600) + (q.key === "profile" ? "; font-family: " + MONO + "; font-size: 0.92em" : ""),
+            style: "font: inherit; display: flex; align-items: flex-start; gap: 12px; min-height: 44px; box-sizing: border-box; padding: 9px 14px; border-radius: 8px; text-align: left; cursor: pointer; color: " + t.text + "; " + (sel ? "border: 2px solid " + t.accent + "; background: " + t.infoWash : "border: 1px solid " + (d === "missing" && tried ? t.bad : t.line) + "; background: " + t.surface),
+            markStyle: "flex: none; margin-top: 4px; width: 18px; height: 18px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: " + t.onAccent + "; border-radius: " + (multi ? "4px" : "50%") + "; " + (multi ? (sel ? "background: " + t.accent + "; border: 2px solid " + t.accent : "background: " + t.card + "; border: 2px solid " + t.lineStrong) : "background: " + t.card + "; border: " + (sel ? "6px solid " + t.accent : "2px solid " + t.lineStrong)),
+            pick: function () {
+              if (!multi) { set(q.key, ch.value); return; }
+              var n = v.slice(), j = n.indexOf(ch.value);
+              if (j >= 0) n.splice(j, 1); else n.push(ch.value);
+              set(q.key, n);
+            }
+          };
+        });
+      }
+      if (q.follow && v.indexOf("other") >= 0) {
+        item.showFollow = true; item.followLabel = tx(q.follow.label); item.followHelp = tx(q.follow.help); item.followValue = get("kinds_other");
+        item.onFollow = function (e) { set("kinds_other", e.target.value); };
+      }
+      if (q.key === "scope") {
+        if (vague) { item.hasErr = true; item.errText = L.tooShort(words(v)); }
+        else if (d === "missing" && tried) { item.hasErr = true; item.errText = L.needed; }
+        else if (v) { item.hasNote = true; item.note = L.words(words(v)); }
+      }
+      if (q.key === "purpose" && d === "missing") { if (tried) { item.hasErr = true; item.errText = L.pickOne; } else { item.hasNote = true; item.note = L.nothingPicked; } }
+      if (q.key === "mix" && d === "default") { item.hasNote = true; item.note = L.followsPurpose(purposeLabel); }
+      if (q.key === "weak_topics" && v === "yes") { item.hasNote = true; item.note = L.weakNote; }
+      if (q.key === "profile") item.note = d === "default" ? L.profileFollows(purposeLabel) : L.chosenProfile;
+      if (q.kind === "number") {
+        var step = q.step || 1;
+        item.numNote = q.key === "minutes" ? (v === 0 ? L.noLimit : L.minutesW) : q.key === "commitment" ? (v === "" || v === 0 ? L.noGoalHint : L.pctHint) : L.questionsW;
+        item.decLabel = q.key === "count" ? L.fewer : L.takeOff(step);
+        item.incLabel = q.key === "count" ? L.moreQ : L.add(step);
+        item.dec = function () { if (v === "") return; var n = Math.max(q.min, v - step); set(q.key, q.key === "commitment" && n === 0 ? "" : n); };
+        item.inc = function () { set(q.key, v === "" ? (q.key === "commitment" ? 70 : q.min) : Math.min(q.max, v + step)); };
+        item.onNum = function (e) { var r = e.target.value; if (r === "") { set(q.key, q.key === "commitment" ? "" : q.min); return; } var n = parseInt(r, 10); if (!isNaN(n)) set(q.key, Math.max(q.min, Math.min(q.max, n))); };
+      }
+      return item;
+    }
+
+    var items = QS.map(build);
+    var byKey = {}; items.forEach(function (it) { byKey[it.key] = it; });
+    var counts = { you: 0, agent: 0, "default": 0, missing: 0 }, vagueAny = false;
+    QS.forEach(function (q) { counts[decided(q)]++; if (vagueOf(q)) vagueAny = true; });
+    var notReady = counts.missing + (vagueAny ? 1 : 0);
+    var readyN = total - notReady;
+    var blocked = notReady > 0;
+
+    var sections = SECTIONS.map(function (sc, si) {
+      var qs = QS.filter(function (q) { return q.sec === sc.id; }).map(function (q) { return byKey[q.key]; });
+      var rows = qs.slice();
+      if (sc.id === "quiz") rows.push(byKey.profile);
+      var m = rows.filter(function (r) { var q = QS.filter(function (z) { return z.key === r.key; })[0]; return decided(q) === "missing" || vagueOf(q); }).length;
+      var open = !fold[sc.id];
+      return {
+        id: sc.id, title: tx(sc.title), step: L.step(si + 1), headId: "sec-" + sc.id, qs: qs, rows: rows, open: open, openStr: open ? "true" : "false",
+        countText: m ? L.toAnswer(m) : (rows.length + " / " + rows.length),
+        countStyle: "font-weight: 700; color: " + (m ? t.bad : t.muted),
+        headStyle: "font: inherit; font-size: 0.85em; font-weight: 600; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 0 10px; border-radius: 8px; cursor: pointer; border: 1px solid " + t.line + "; background: " + (open ? t.surface : t.card) + "; color: " + t.text,
+        chev: "flex: none; transition: transform 120ms; transform: rotate(" + (open ? 90 : 0) + "deg)",
+        toggle: function () { var f = Object.assign({}, fold); f[sc.id] = open; self.setState({ fold: f }); }
+      };
+    });
+
+    var missingList = [];
+    QS.forEach(function (q) {
+      var d = decided(q);
+      if (d === "missing" || vagueOf(q)) missingList.push({ short: tx(q.short), href: "#q-" + q.key, why: vagueOf(q) ? L.whyVague : q.key === "purpose" ? L.whyPurpose : L.whyScope, go: byKey[q.key].go });
+    });
+
+    var pill = function (on) { return "font: inherit; min-height: 36px; padding: 0 12px; border-radius: 999px; cursor: pointer; border: 1px solid " + (on ? t.accent : t.line) + "; background: " + (on ? t.accent : t.card) + "; color: " + (on ? t.onAccent : t.text) + "; font-weight: " + (on ? 700 : 400); };
+    var pct = Math.round(readyN / total * 100);
+    // Pre-filled answers the person has changed: the agent box offers to put them all back
+    var changedKeys = Object.keys(base).filter(function (k) { return has(vals, k) && JSON.stringify(vals[k]) !== JSON.stringify(base[k]); });
+    var SUMCOLS = "180px minmax(0, 1fr) auto";
+    var labelBg0 = themeName === "white" ? t.sunken : t.surface;
+    var isForm = view === "form" || view === "finish";
+
+    var s = {
+      root: "position: relative; width: " + (isPhone ? "390px; height: 844px" : "1280px; height: 940px") + "; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: " + t.bg + "; color: " + t.text + "; font-family: " + F[fontName] + "; font-size: " + (isPhone ? 16 : 17) + "px; line-height: 1.6",
+      header: "flex: none; display: flex; flex-direction: column; background: " + t.card + "; border-bottom: 1px solid " + t.line,
+      hdrRow: "display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: " + (isPhone ? "10px 16px" : "12px 28px 8px"),
+      kicker: "font-size: 0.8em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: " + t.muted,
+      sideBtn: "font: inherit; font-size: 1em; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; box-sizing: border-box; height: 44px; min-width: 44px; white-space: nowrap; padding: 0 " + (isPhone ? 0 : 14) + "px; border-radius: 8px; cursor: pointer; border: 2px solid " + (sideOpen ? t.accent : t.lineStrong) + "; background: " + (sideOpen ? t.surface : t.card) + "; color: " + t.text,
+      menuBtn: "font: inherit; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; border: 2px solid " + (st.menu ? t.accent : t.lineStrong) + "; background: " + (st.menu ? t.surface : t.card) + "; color: " + t.text,
+      hdrBtn: "font: inherit; font-size: 1em; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; box-sizing: border-box; height: 44px; white-space: nowrap; padding: 0 14px; border-radius: 8px; cursor: pointer; border: 2px solid " + t.lineStrong + "; background: " + t.card + "; color: " + t.text,
+      primary: "font: inherit; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box; height: 44px; white-space: nowrap; padding: 0 22px; border-radius: 8px; border: 2px solid " + t.accent + "; background: " + t.accent + "; color: " + t.onAccent + "; cursor: pointer",
+      statusRow: "display: flex; align-items: center; padding: 0 28px 10px; font-size: 0.85em; color: " + t.muted + "; font-variant-numeric: tabular-nums; white-space: nowrap",
+      barFill: "display: block; width: " + pct + "%; height: 100%; background: " + t.accent,
+      segSep: "padding: 0 14px; border-left: 1px solid " + t.line,
+      leftStyle: "color: " + (blocked ? t.bad : t.ok),
+      main: "flex: 1 1 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; min-width: 0; overflow-y: auto; padding: " + (isPhone ? "16px" : "24px 28px") + (sideOpen || isPhone ? "" : "; max-width: 876px; margin: 0 auto"),
+      endMain: "flex: 1 1 0; box-sizing: border-box; min-width: 0; overflow-y: auto; padding: " + (isPhone ? "16px" : "24px 28px") + "; max-width: " + (isPhone ? "none" : "876px") + "; margin: 0 auto",
+      endCard: cardBase + "; gap: 12px; margin-top: " + (isPhone ? 8 : 40) + "px; border: 1px solid " + (edged ? t.lineStrong : t.line),
+      agentBox: "display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 20px; border-radius: 12px; background: " + t.infoWash + "; border: 2px solid " + t.info,
+      agentChip: "display: inline-flex; align-items: center; font-size: 0.8em; font-weight: 700; letter-spacing: 0.04em; background: " + t.info + "; color: " + t.card + "; border-radius: 999px; padding: 2px 12px",
+      cardHead: "display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 0.8em; color: " + t.muted,
+      qText: "margin: 0; font-size: 1.1em; font-weight: 600; line-height: 1.45",
+      help: "margin: 0; font-size: 0.9em; color: " + t.muted,
+      hint: "font-size: 0.85em; color: " + t.muted,
+      noteLabel: "font-size: 0.85em; font-weight: 600",
+      field: "font: inherit; width: 100%; box-sizing: border-box; min-height: 44px; padding: 8px 12px; border-radius: 8px; background: " + t.sunken + "; color: " + t.text + "; border: 1px solid " + t.lineStrong,
+      errLine: "margin: 0; font-size: 0.85em; font-weight: 600; color: " + t.bad,
+      slot: "display: flex; flex-shrink: 0; box-sizing: border-box; height: 44px; border-radius: 8px; overflow: hidden; outline: 2px solid " + t.lineStrong + "; outline-offset: -2px; background: " + t.card,
+      slotBtn: "min-width: 44px; height: 44px; padding: 0; font: inherit; font-weight: 700; font-size: 1.1em; border: 0; background: " + t.card + "; color: " + t.text + "; cursor: pointer",
+      slotInput: "width: 4em; height: 44px; box-sizing: border-box; font: inherit; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; border: 0; border-left: 1px solid " + t.line + "; border-right: 1px solid " + t.line + "; background: " + t.surface + "; color: " + t.text,
+      moreBtn: "font: inherit; font-size: 0.9em; font-weight: 600; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer; border: 1px solid " + t.line + "; background: " + (moreOpen ? t.surface : t.card) + "; color: " + t.text,
+      moreChev: "flex: none; transition: transform 120ms; transform: rotate(" + (moreOpen ? 90 : 0) + "deg)",
+      side: isPhone
+        ? "position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; background: " + t.card
+        : "flex: 0 0 320px; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: " + t.card + "; border-left: 1px solid " + (edged ? t.lineStrong : t.line),
+      closeBtn: "font: inherit; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 8px; cursor: pointer; border: 1px solid " + t.lineStrong + "; background: " + t.card + "; color: " + t.text,
+      lgItem: "display: inline-flex; align-items: center; gap: 5px",
+      kbd: "font-family: " + MONO + "; font-size: 0.95em; padding: 0 5px; border: 1px solid " + t.lineStrong + "; border-bottom-width: 2px; border-radius: 4px; background: " + t.card + "; color: " + t.text,
+      inlineCode: "font-family: " + MONO + "; font-size: 0.9em; background: " + t.sunken + "; padding: 1px 6px; border-radius: 4px",
+      backdrop: "position: absolute; inset: 0; z-index: 10; background: rgba(20, 20, 24, 0.45); display: flex; align-items: flex-start; justify-content: center; padding-top: " + (isPhone ? 40 : 90) + "px",
+      dialog: "width: " + (isPhone ? "calc(100% - 24px)" : "640px") + "; max-height: " + (isPhone ? "760px" : "780px") + "; box-sizing: border-box; background: " + t.card + "; border: 1px solid " + t.lineStrong + "; border-radius: 12px; padding: " + (isPhone ? "20px 16px" : "24px 26px") + "; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.25)",
+      dialogSmall: "width: " + (isPhone ? "calc(100% - 24px)" : "560px") + "; box-sizing: border-box; background: " + t.card + "; border: 1px solid " + t.lineStrong + "; border-radius: 12px; padding: " + (isPhone ? "20px 16px" : "24px 26px") + "; margin-top: " + (isPhone ? 0 : 60) + "px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.25)",
+      sumBox: "flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; border: 1px solid " + t.lineStrong + "; border-radius: 8px; background: " + t.card,
+      sumTh: isPhone ? "display: none" : "flex: none; display: grid; grid-template-columns: " + SUMCOLS + "; position: sticky; top: 0; z-index: 1; font-size: 0.8em; font-weight: 700; color: " + t.muted + "; background: " + t.card + "; border-bottom: 2px solid " + t.lineStrong,
+      thLabel: "padding: 6px 12px; background: " + labelBg0 + "; border-right: 1px solid " + t.lineStrong,
+      thCell: "padding: 6px 14px",
+      thRight: "padding: 6px 16px 6px 12px; text-align: right",
+      sumGroup: "flex: none; padding: 10px 12px 4px; font-size: 0.75em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: " + t.muted + "; background: " + t.card + "; border-top: 1px solid " + t.lineStrong,
+      sumRow: "flex: none; display: grid; align-items: stretch; grid-template-columns: " + (isPhone ? "minmax(0, 1fr) auto" : SUMCOLS) + "; min-height: 44px; font-size: 0.9em; cursor: pointer; border-top: 1px solid " + t.line,
+      revertRow: "display: flex; padding-top: 10px; margin-top: 2px; border-top: 1px dashed " + t.line,
+      revertBtn: "font: inherit; font-size: 0.85em; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer; border: 1px solid " + t.info + "; background: " + t.infoWash + "; color: " + t.info + "; text-align: left",
+      profBox: "display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding: 14px 16px; border-radius: 8px; background: " + labelBg0 + "; border: 1px solid " + t.line,
+      profName: "font-family: " + MONO + "; font-size: 0.9em; font-weight: 700; padding: 1px 8px; border-radius: 4px; background: " + t.card + "; border: 1px solid " + t.line,
+      chosenPill: "display: inline-flex; align-items: center; font-size: 0.75em; font-weight: 700; padding: 1px 10px; border-radius: 999px; background: " + t.accent + "; color: " + t.onAccent
+    };
+
+    return {
+      s: s, t: t, L: L, lang: lang, lg: lg,
+      isPhone: isPhone, notPhone: !isPhone,
+      isForm: isForm, isEnd: view === "done" || view === "cancelled", isDone: view === "done", isCancelled: view === "cancelled",
+      showStatus: !isPhone && isForm,
+      canSide: isForm,
+      showSide: isForm && sideOpen, sideExpanded: sideOpen ? "true" : "false",
+      phoneBar: isPhone && isForm && !sideOpen,
+      phoneStatus: L.answered(readyN, total) + " · " + (blocked ? L.toAnswer(notReady) : L.ready),
+      menuShown: !!st.menu && !isPhone, menuExpanded: st.menu ? "true" : "false",
+      hasAgent: (p.prefill || "none") === "agent", noAgent: (p.prefill || "none") !== "agent",
+      sections: sections, moreQs: [byKey.profile],
+      moreOpen: moreOpen, moreOpenStr: moreOpen ? "true" : "false", moreSummary: L.profileIs(get("profile")),
+      answeredText: L.answered(readyN, total), total: total, readyN: readyN, pct: pct + "%",
+      youN: counts.you, agentN: counts.agent, defN: counts["default"],
+      leftText: blocked ? L.toAnswer(notReady) : L.ready,
+      showSummary: view === "finish" && !blocked, showBlocked: view === "finish" && blocked,
+      dlgBody: L.dlgBody(total, counts.you, counts.agent, counts["default"]),
+      missingList: missingList,
+      anyChanged: changedKeys.length > 0,
+      revertAllText: L.revertAll(changedKeys.length),
+      revertAll: function () { var n = Object.assign({}, vals); Object.keys(base).forEach(function (k) { delete n[k]; }); self.setState({ vals: n, cur: null }); },
+      profInfo: PROFILE_INFO.map(function (pi, i) {
+        return { name: pi.name, forText: tx(pi.forText), text: tx(pi.text), chosen: pi.name === get("profile"), rowStyle: "padding: 10px 0" + (i ? "; border-top: 1px solid " + t.line : "") };
+      }),
+      doneLine: L.doneLine(total, counts.you + counts.agent, counts["default"]),
+      themePills: ["light", "dark", "oled", "white", "paper"].map(function (k) {
+        var on = k === themeName;
+        return { label: L.themeNames[k], pressed: on ? "true" : "false", style: pill(on), pick: function () { self.setState({ theme: k }); } };
+      }),
+      fontPills: ["system", "sans", "serif", "readable"].map(function (k) {
+        var on = k === fontName;
+        return { label: L.fontNames[k], pressed: on ? "true" : "false", style: pill(on) + "; font-family: " + F[k], pick: function () { self.setState({ font: k }); } };
+      }),
+      toggleSide: function () { self.setState({ side: !sideOpen }); },
+      toggleMenu: function () { self.setState({ menu: !st.menu }); },
+      toggleMore: function () { self.setState({ more: !moreOpen }); },
+      finish: function () { self.setState({ view: "finish", tried: true, side: isPhone ? false : sideOpen }); },
+      closeDlg: function () { self.setState({ view: "form" }); },
+      write: function () { if (!blocked) self.setState({ view: "done", side: false }); },
+      cancel: function () { self.setState({ view: "cancelled", side: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

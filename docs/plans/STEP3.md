@@ -1,6 +1,6 @@
 # Step 3: the server, the forms and the authoring commands
 
-## Handoff (2026-11-03, updated 2026-11-15): start here
+## Handoff (2026-11-03, updated 2026-11-16): start here
 
 A new session picks up from this section alone; it needs no earlier chat.
 
@@ -20,7 +20,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3g 3d's fixes, `brief` through flags | done, reviewed, gaps decided | `27a61a4`..`2e6b449` |
 | 3i 3g's fixes, `brief --tui` | done, reviewed, gaps decided | `fb5ed78`..`546ccc0` |
 | 3j 3i's fixes, `build --watch` and `--serve` | done, reviewed, gaps decided (G35 built in review) | `4a0835f`..`45fe811` |
-| 3v the form boards (on the Design canvas) | `review` boards drafted by Opus and reviewed by the owner (2026-11-04); G38 to G47 decided (2026-11-04); boards and images in `docs/mockup/` `grade --web` boards drafted by Opus (2026-11-06) and reviewed by the owner (2026-11-07), with RubricC for G86; G70 to G86 decided, G75 last (2026-11-13, with G102, on the redrawn GradeAI); boards in `docs/mockup/`; images of GradeFinish, GradeBlocked, GradeDone, RubricC, RubricPhone and RubricPhoneReplay exported (2026-11-07), the other Grade boards were taken off the canvas and have no images. `brief --web` boards drafted by Opus (2026-11-16) under "Forms: quiz brief --web" (Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone, BriefDark, BriefPhone, BriefPhoneSide, BriefPhoneFinish); the owner decided the pre-fill wording and "AI" for the agent in Vietnamese (2026-11-16, in COMMANDS.md and the question file); the rest of their review is open, and the boards are not yet copied to `docs/mockup/` | |
+| 3v the form boards (on the Design canvas) | `review` boards drafted by Opus and reviewed by the owner (2026-11-04); G38 to G47 decided (2026-11-04); boards and images in `docs/mockup/` `grade --web` boards drafted by Opus (2026-11-06) and reviewed by the owner (2026-11-07), with RubricC for G86; G70 to G86 decided, G75 last (2026-11-13, with G102, on the redrawn GradeAI); boards in `docs/mockup/`; images of GradeFinish, GradeBlocked, GradeDone, RubricC, RubricPhone and RubricPhoneReplay exported (2026-11-07), the other Grade boards were taken off the canvas and have no images. `brief --web` boards drafted by Opus (2026-11-16) under "Forms: quiz brief --web" (Brief, BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone, BriefDark, BriefPhone, BriefPhoneSide, BriefPhoneFinish); the owner decided the pre-fill wording, the way back to the pre-filled answers (each question and all at once) and "AI" for the agent in Vietnamese, and approved the boards (2026-11-16; in COMMANDS.md and the question file); boards in `docs/mockup/`, no images (interactive, not exported) | |
 | 3e G47, the review file, `check --review`, `inspect --review` | done, reviewed, gaps decided (2026-11-04) | `5e9b45c`..`dbcd43e` |
 | 3k G51, `quiz review` and its form | done, reviewed, gaps decided (2026-11-04) | `91a8821`..`c326d9f` |
 | 3l G50, G56, 3k's fixes, `quiz review --since` | done, reviewed, gaps decided (2026-11-05) | `54214a5`..`4140cf6`, review |
@@ -35,7 +35,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
-| 3h `brief --web` | waits for its boards (3v) | |
+| 3h `brief --web` | its boards approved (3v, 2026-11-16); brief to write | |
 | 3z acceptance | last | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -51,7 +51,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are drafted and in the owner's review (2026-11-16); then **3h** from them.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). Next: **3h**'s brief, built from them.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.

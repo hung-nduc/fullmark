@@ -262,6 +262,94 @@
       "y": 14522,
       "is_interactive": true,
       "title": "G75, interactive: grade --web over Claude's grades, in the rubric box (G86); Tweaks for the rubric type and unchanged or adjusted"
+    },
+    "Brief.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 0,
+      "y": 20080,
+      "is_interactive": true,
+      "title": "quiz brief --web, interactive: the question file's questions, one card each; purpose and scope not pre-chosen; Tweaks for theme, lang, phone, pre-fill and view"
+    },
+    "BriefAgent.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 1360,
+      "y": 20080,
+      "is_interactive": true,
+      "title": "Pre-filled by the agent (answer flags with --web): Suggested on what it filled, the person confirms"
+    },
+    "BriefVague.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 2720,
+      "y": 20080,
+      "is_interactive": true,
+      "title": "A scope under min-words (\"signals\"): asked again, with the example"
+    },
+    "BriefVi.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 4080,
+      "y": 20080,
+      "is_interactive": true,
+      "title": "quiz brief --web --language vi: the form in Vietnamese, from the question file's vi text"
+    },
+    "BriefFinish.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 0,
+      "y": 21140,
+      "is_interactive": true,
+      "title": "Finish: the summary, every answer and who chose it, Edit to go back, then Write the brief"
+    },
+    "BriefBlocked.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 1360,
+      "y": 21140,
+      "is_interactive": true,
+      "title": "Finish blocked: the purpose and the scope not answered, nothing written"
+    },
+    "BriefDone.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 2720,
+      "y": 21140,
+      "is_interactive": true,
+      "title": "Written: brief.yaml and content/, the server stopped"
+    },
+    "BriefDark.dc.html": {
+      "h": 940,
+      "w": 1280,
+      "x": 4080,
+      "y": 21140,
+      "is_interactive": true,
+      "title": "dark + sans, pre-filled by the agent"
+    },
+    "BriefPhone.dc.html": {
+      "h": 844,
+      "w": 390,
+      "x": 0,
+      "y": 22200,
+      "is_interactive": true,
+      "title": "On a phone: one column, Cancel and Finish in the bar at the foot"
+    },
+    "BriefPhoneSide.dc.html": {
+      "h": 844,
+      "w": 390,
+      "x": 470,
+      "y": 22200,
+      "is_interactive": true,
+      "title": "On a phone: the questions list takes the screen, with a way back"
+    },
+    "BriefPhoneFinish.dc.html": {
+      "h": 844,
+      "w": 390,
+      "x": 940,
+      "y": 22200,
+      "is_interactive": true,
+      "title": "On a phone: Finish, the summary"
     }
   },
   "createdOnFiles": {
@@ -274,7 +362,8 @@
   },
   "noteOrder": [
     "formsReview",
-    "formsGrade"
+    "formsGrade",
+    "formsBrief"
   ],
   "notes": {
     "formsGrade": {
@@ -292,6 +381,14 @@
       "w": 240,
       "x": 0,
       "y": 11700
+    },
+    "formsBrief": {
+      "kind": "title1",
+      "maxW": 5360,
+      "text": "Forms: quiz brief --web",
+      "w": 240,
+      "x": 0,
+      "y": 19800
     }
   },
   "order": [
@@ -330,7 +427,18 @@
     "GradeAI.dc.html",
     "RubricC.dc.html",
     "RubricPhoneReplay.dc.html",
-    "RubricPhone.dc.html"
+    "RubricPhone.dc.html",
+    "Brief.dc.html",
+    "BriefAgent.dc.html",
+    "BriefVague.dc.html",
+    "BriefVi.dc.html",
+    "BriefFinish.dc.html",
+    "BriefBlocked.dc.html",
+    "BriefDone.dc.html",
+    "BriefDark.dc.html",
+    "BriefPhone.dc.html",
+    "BriefPhoneSide.dc.html",
+    "BriefPhoneFinish.dc.html"
   ],
   "pages": [],
   "title": "fullmark themes"
