@@ -32,7 +32,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
-| 3q the replay's answer panel and badge (G94) | built, awaiting review | `9133d08`..`6657a02` |
+| 3q the replay's answer panel and badge (G94) | done, reviewed (2026-11-15); G106 for the owner | `9133d08`..`506b816`, review |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
@@ -48,7 +48,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 How each slice got here is in its own **Review**; the table above is the summary.
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
-2. **3q** (the replay's answer panel and badge, G94): **brief approved** (2026-11-15, "Slice 3q"), with G105 (a code answer and an empty answer in the panel) decided; ready to hand to one implementing agent.
+2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) waits for the owner.
 3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, after G104; its brief can be drafted now.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
@@ -83,7 +83,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+- **G106. The sample answer's code block scrolls sideways but cannot be focused (3q's review).** At 390 px a long line in a sample answer's highlighted code (`.fm-hl`, `overflow-x: auto`) scrolls inside the block, which has no `tabindex`, so a keyboard user cannot scroll it and axe reports `scrollable-region-focusable` (a submitted `types.md` at 390 px). It predates 3q; 3q's panel specs leave `.fm-sample` out of axe so they neither fail on it nor hide it. **Recommendation:** a highlighted code block that scrolls is focusable (`tabindex="0"`, named by its language or "Code"), as 3q's code panel is, wherever the page draws one (sample answers, explanations, prompts); the exclusion comes out of `e2e/answer-panel.spec.ts`. Small: the first task of the next slice that touches the page (3p2, since its pre-filled box sits beside the sample).
 
 ## Slices
 
@@ -1117,3 +1117,26 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 ### Done when
 
 `npm run check` passes in Chromium and Firefox, the budget test included. After Submit and in the replay, every result is a pill in its state's colours, two lines at most with the header on a phone; an essay's and a code question's answer is a panel, with no text box. `docs/screens/3q/` is taken by its spec. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden and every spec that changed counted and explained.
+
+### Review
+
+**3q's review (2026-11-15).** Built by Sonnet in four commits from the brief alone, `9133d08`..`506b816` (the last is the slice table's row); reviewed by Opus. No fix in review.
+
+- **`npm run check` exits 0**, run again in review: typecheck, Biome and knip clean; the startup tests 2 of 2; Vitest **2746 of 2746** in 114 files; Playwright **559 passed** (both browsers and the 2 budget projects), 383 skipped (the `screens-*` specs), none failed. Firefox ran. Two specs are new: `e2e/result-pill.spec.ts` (5 tests a browser) and `e2e/answer-panel.spec.ts` (11).
+- **Goldens: 14 files**, each rewritten twice (once with the badge, once with the panel), all from the page bundle: 12 built pages, the replay page in `replay/good/`, and the `bytes` lines of `build/json-built` and `build/json-two-files`. Read in review; no content moved, none reverted. A `build` page stays byte-identical with and without the server features.
+- **Specs changed:** `e2e/chrome.spec.ts` reads "2,5 / 2,5" for "2,5 trên 2,5 điểm"; `e2e/types.spec.ts` finds the code panel where it checked a `readonly` text box; `test/page/after-submit.test.ts` matches the SVG icon for the old glyph.
+- **Tried by looking at the screens** (`docs/screens/3q/`, 13, taken by `e2e/screens-3q.spec.ts`) beside ResultsReplay and RubricPhoneReplay: the pills in their states' colours in paper, light and dark; the essay panel with its line breaks; the code panel in the monospace font; the dashed "No answer"; at 390 px the pill under the meta when the two do not fit; vi; the panel and pills in the grader's frame. The screens are of the cards (820 px wide), not the whole 1280 px replay; the words differ from the boards as the brief lists ("Not answered", "Waiting for a grader").
+
+**Done differently,** each accepted:
+- The code panel's `pre` has `tabindex="0"`, where the brief said the panel is not in the tab order: a region that scrolls sideways must be reachable by keyboard (axe's `scrollable-region-focusable`). The essay panel is not focusable.
+- At 390 px the pill stays beside the meta when both fit and drops to a second line when they do not, as RubricPhone's `cardHead` wraps; the test checks two lines at most.
+- Every pill has a 2 px border, transparent but for partly right, so all pills are one height.
+- The pill's 14 px icon applies below 760 px, the page's phone breakpoint.
+- The panel specs run axe with `.fm-sample` left out, because of G106.
+
+**Found in review:**
+- The page catalog's `scoreLine` ("2.25 of 3 points") is no longer used by the page; it stays in `en.ts` and `vi.ts`, tested by `test/page/numbers.test.ts`. Left as it is (removing it changes the bundle and the goldens again); it can go with the next slice that touches the catalogs. The report's own `scoreLine` is a different key and is used.
+- The header's gap changed for every card, while answering too (12 px to 6 px by 10 px, with wrapping); seen in the screens, harmless.
+
+**G106 for the owner.**
+
