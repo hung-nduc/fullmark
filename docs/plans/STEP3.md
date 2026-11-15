@@ -35,7 +35,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
-| 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 open | `10ea547`..`74a00a6`, review |
+| 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
 | 3h2 `brief --web` on a phone | outline; after 3h | |
 | 3z acceptance | last | |
 
@@ -52,7 +52,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) waits for the owner. Next: 3h2, the phone, with G116 as its first task.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. Next: 3h2's brief, the phone, with G116 as its first task.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
@@ -85,7 +85,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G116. `--timeout`, `--port` and `--no-open` without `--web` (3h's review).** `quiz brief` through flags, or with `--tui`, accepts the three and ignores them (3g's review accepted it before `--web` existed); `build` refuses `--port` without `--serve`. **Recommendation:** each exits 2 without `--web`, among the flag checks ("--port needs --web", and the same for `--timeout` and `--no-open`), with a golden each; COMMANDS.md's `quiz brief` says so.
+None open.
 
 ## Slices
 
@@ -113,7 +113,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3p3** | The pre-filled form on a phone (G111) | G111, 3p2 |
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
 | **3h** | `brief --web` at 1280 px: the form from the question file and the Brief boards, the detail rules, the Finish summary, pre-fills and the way back to them, Cancel, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, G112 to G115, boards |
-| **3h2** | `brief --web` on a phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) | 3h |
+| **3h2** | G116; `brief --web` on a phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) | G116, 3h |
 | **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
@@ -1324,5 +1324,5 @@ Done differently, accepted in review unless the owner says otherwise: the summar
 - **The Cancelled card:** the command to start again is in a box of its own, each flag kept with its value on one line where it fits, under the line "Nothing was written. To start again, run:", with **Copy** (a copy icon; "Copied" for 2 s, or the command selected where there is no clipboard) beside that line.
 - **What each profile checks:** one row per profile, the name and who it is for on the left and what it checks on the right, each line tagged **Fails**, **Warns**, **Note** or **Off** in the colour of its outcome (vi *Trượt*, *Cảnh báo*, *Ghi chú*, *Tắt*); the chosen row tinted with an accent bar; a last row, **Every profile**, for what always fails. The choices above stay as they were. A new screen, `04b-brief-vi-more.png`, shows the box in Vietnamese.
 
-**Found in review:** G116, above.
+**Found in review:** G116, decided by the owner on 2026-11-16 as recommended (STEP3-GAPS.md), 3h2's first task.
 
