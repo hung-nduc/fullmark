@@ -1,5 +1,7 @@
 import { render } from "preact";
+import { en, vi } from "../core/i18n";
 import { applyLook } from "../page/look";
+import { focusScrollingCode } from "../page/scrollfocus";
 import { createFormLook } from "../review/look";
 import type { GradeData } from "./data";
 import { Form } from "./Form";
@@ -29,6 +31,7 @@ if (dataElement && root) {
   onNarrow();
   narrow?.addEventListener("change", onNarrow);
   render(<Form state={state} store={store} data={data} />, root);
+  focusScrollingCode(root, (data.uiLang === "vi" ? vi : en).page.codeBlock);
   installKeys(state, store);
   (window as unknown as { fullmarkGrade: unknown }).fullmarkGrade = { ready: true };
 }

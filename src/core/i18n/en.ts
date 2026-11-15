@@ -96,6 +96,7 @@ export const en = {
     scoreLine: (earned: string, points: string) => `${earned} of ${points} ${points === "1" ? "point" : "points"}`,
     correctAnswer: "Correct answer",
     yourAnswer: "Your answer",
+    codeBlock: "Code",
     noAnswer: "No answer",
     trueLabel: "True",
     falseLabel: "False",

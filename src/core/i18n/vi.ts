@@ -96,6 +96,7 @@ export const vi = {
     scoreLine: (earned: string, points: string) => `${earned} trên ${points} điểm`,
     correctAnswer: "Đáp án đúng",
     yourAnswer: "Câu trả lời của bạn",
+    codeBlock: "Code",
     noAnswer: "Chưa có câu trả lời",
     trueLabel: "Đúng",
     falseLabel: "Sai",

@@ -1,8 +1,10 @@
 import { hydrate } from "preact";
+import { en, vi } from "../core/i18n";
 import { App } from "./App";
 import type { PageData } from "./data";
 import { installKeys } from "./keys";
 import { applyLook } from "./look";
+import { focusScrollingCode } from "./scrollfocus";
 import { createStore } from "./store";
 
 /**
@@ -20,6 +22,7 @@ if (dataElement && root) {
   // first: the theme, so the page never shows another one than the learner's
   if (!grader) applyLook(store);
   hydrate(<App store={store} />, root);
+  focusScrollingCode(root, (data.quizzes[0]?.uiLang === "vi" ? vi : en).page.codeBlock);
   (window as unknown as { fullmark: unknown }).fullmark = { events: store.events, autosave: store.autosave };
   // after hydration, so the first render is the one the build made: then a saved attempt is restored over it
   const start = (): void => {

@@ -16,12 +16,9 @@ const phone = base.extend({
 });
 const wide = base;
 
-/**
- * axe over the page, bar the sample answer: its code block (`.fm-hl`, older than 3q) scrolls sideways at 390 px and is
- * not focusable (`scrollable-region-focusable`); reported as a gap in 3q's review, not part of the panel.
- */
+/** axe over the page: no exclusion (G106: a code block that scrolls sideways takes keyboard focus). */
 async function noViolations(page: Page): Promise<void> {
-  const result = await new AxeBuilder({ page }).exclude(".fm-sample").analyze();
+  const result = await new AxeBuilder({ page }).analyze();
   expect(
     result.violations.map((v) => ({ id: v.id, nodes: v.nodes.map((n) => n.target.join(" ")).slice(0, 3) })),
   ).toEqual([]);
@@ -90,6 +87,37 @@ for (const [name, test] of [
     await noViolations(page);
   });
 }
+
+phone(
+  "G106: a code block that scrolls sideways takes keyboard focus, and one that does not is left alone",
+  async ({ page }) => {
+    await submitted(page, "light", false);
+    const blocks = page.locator("pre.fm-hl");
+    const n = await blocks.count();
+    expect(n).toBeGreaterThan(0);
+    let scrolling = 0;
+    for (let i = 0; i < n; i++) {
+      const block = blocks.nth(i);
+      const scrolls = await block.evaluate((e) => e.scrollWidth > e.clientWidth);
+      if (scrolls) {
+        scrolling++;
+        await expect(block).toHaveAttribute("tabindex", "0");
+        await expect(block).toHaveAttribute("aria-label", /.+/);
+        await block.focus();
+        await expect(block).toBeFocused();
+      } else await expect(block).not.toHaveAttribute("tabindex", /.*/);
+    }
+    expect(scrolling).toBeGreaterThan(0);
+    await noViolations(page);
+  },
+);
+
+wide("G106: at 1280 px a code block that fits is not in the tab order", async ({ page }) => {
+  await submitted(page, "light", false);
+  const fits = await page.locator("pre.fm-hl").evaluateAll((all) => all.every((e) => e.scrollWidth <= e.clientWidth));
+  wide.skip(!fits, "a block scrolls even at 1280 px");
+  await expect(page.locator("pre.fm-hl[tabindex]")).toHaveCount(0);
+});
 
 for (const theme of ["light", "dark"]) {
   for (const [name, test] of [
