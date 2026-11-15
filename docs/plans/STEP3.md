@@ -36,7 +36,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
-| 3h2 G116, `brief --web` on a phone | brief written (2026-11-16), waits for the owner's approval and G117 | |
+| 3h2 G116, `brief --web` on a phone | brief approved (2026-11-16), G117 decided; to build | |
 | 3z acceptance | last | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -52,7 +52,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
-4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2**'s brief (G116, then the phone) is written (2026-11-16) and waits for the owner, with G117. Then **3z**, acceptance.
+4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2**'s brief (G116, then the phone) is approved (2026-11-16), with G117 as recommended: next, hand it to an implementing agent. Then **3z**, acceptance.
 5. **3z**, acceptance.
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
@@ -85,7 +85,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G117. Appearance on the brief form's phone (3h2's brief).** The phone boards (BriefPhone, BriefPhoneSide, BriefPhoneFinish) leave Appearance out of the compact bar, which holds only the sidebar icon. Review's and Grade's phones keep the Appearance icon beside it (COMMANDS.md, their "On a phone"), and G114 offers Appearance always. **Recommendation:** the compact bar holds the sidebar icon and the Appearance icon, as Review's and Grade's do; the menu opens as it does on their phones. Nothing else on the boards changes.
+None open.
 
 ## Slices
 
@@ -1328,7 +1328,7 @@ Done differently, accepted in review unless the owner says otherwise: the summar
 
 ## Slice 3h2: G116, then `brief --web` on a phone
 
-**Waiting for the owner's approval**, with G117. G116 first (small, decided), then the brief form below 760 px, as 3l, 3m and 3p made Review's and Grade's phones. Built from the BriefPhone, BriefPhoneSide and BriefPhoneFinish boards (`docs/mockup/boards/`; interactive, no images: `Brief.dc.html` with `device="phone"`, every branch on `isPhone`), at 390 × 844. Everything not drawn there is 3h's form as built and reviewed, narrowed.
+**Approved by the owner on 2026-11-16**, with G117 as recommended. G116 first (small, decided), then the brief form below 760 px, as 3l, 3m and 3p made Review's and Grade's phones. Built from the BriefPhone, BriefPhoneSide and BriefPhoneFinish boards (`docs/mockup/boards/`; interactive, no images: `Brief.dc.html` with `device="phone"`, every branch on `isPhone`), at 390 × 844. Everything not drawn there is 3h's form as built and reviewed, narrowed.
 
 **As built (seen writing this brief, 390 px):** nothing scrolls sideways and the sidebar covers the screen, but the form is only stacked: the top bar wraps to three rows (the kicker and title; the sidebar, Appearance, **Cancel** and **Finish** buttons; then the status line on three lines), about 190 px of an 844 px screen; there is no foot bar; the choices are one column already and the profile rows stack. The summary's rows already put the answer under the question and its mark.
 
