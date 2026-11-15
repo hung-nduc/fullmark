@@ -35,7 +35,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
 | 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
-| 3h `brief --web` at 1280 px | brief approved (2026-11-16), G112 to G115 decided; to build | |
+| 3h `brief --web` at 1280 px | built (2026-11-16), to review | `10ea547`..`74a00a6` |
 | 3h2 `brief --web` on a phone | outline; after 3h | |
 | 3z acceptance | last | |
 
