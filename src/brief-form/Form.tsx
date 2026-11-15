@@ -37,6 +37,8 @@ const messages = (state: FormState): BriefMessages => (state.data.lang === "vi" 
 /** Makes a question the current one, opens what holds it, scrolls its card into view and focuses its first control. */
 export function jump(state: FormState, key: string): void {
   state.dialog.value = "none";
+  // on a phone the sidebar covers the screen: a tapped row closes it and goes to its question
+  if (state.phone.value) state.sidebar.value = false;
   if (MORE_KEYS.includes(key)) state.more.value = true;
   state.current.value = key;
   if (typeof document === "undefined") return;
@@ -64,16 +66,32 @@ function Bar({ state, look }: Props) {
   const notReady = open.length;
   const ready = total - notReady;
   const ended = state.ended.value !== null;
+  const phone = state.phone.value;
   return (
-    <header class="bf-header">
+    <header class="bf-header" data-phone={phone ? "true" : undefined}>
       <div class="bf-bar">
-        <h1 class="bf-title">
-          <span class="bf-kicker">{b.brief}</span>
-          <span class="bf-dir" lang="en">
-            {state.data.dir}
-          </span>
-        </h1>
-        <span class="bf-meta">{b.meta}</span>
+        {phone ? (
+          <div class="bf-phone-head">
+            <h1 class="bf-title">
+              {b.brief}: <span lang="en">{state.data.dir}</span>
+            </h1>
+            {ended ? null : (
+              <span class="bf-phone-line" data-compact>
+                {b.answered(ready, total)} · {notReady === 0 ? b.ready : b.toAnswer(notReady)}
+              </span>
+            )}
+          </div>
+        ) : (
+          <>
+            <h1 class="bf-title">
+              <span class="bf-kicker">{b.brief}</span>
+              <span class="bf-dir" lang="en">
+                {state.data.dir}
+              </span>
+            </h1>
+            <span class="bf-meta">{b.meta}</span>
+          </>
+        )}
         <div class="bf-actions">
           {ended ? null : (
             <button
@@ -82,6 +100,7 @@ function Bar({ state, look }: Props) {
               data-action="sidebar"
               aria-expanded={state.sidebar.value}
               aria-keyshortcuts="Q"
+              aria-label={phone ? b.questions : undefined}
               title={`${b.questions} (Q)`}
               data-on={state.sidebar.value ? "true" : undefined}
               onClick={() => {
@@ -102,7 +121,7 @@ function Bar({ state, look }: Props) {
                 <rect x="3" y="4" width="18" height="16" rx="2" />
                 <path d="M15 4v16" />
               </svg>
-              <span class="bf-btn-text">{b.questions}</span>
+              {phone ? null : <span class="bf-btn-text">{b.questions}</span>}
             </button>
           )}
           <button
@@ -132,31 +151,10 @@ function Bar({ state, look }: Props) {
               <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" />
             </svg>
           </button>
-          {ended ? null : (
-            <>
-              <button
-                type="button"
-                class="bf-btn"
-                data-action="cancel"
-                disabled={state.sending.value}
-                onClick={() => void state.cancel()}
-              >
-                {b.cancel}
-              </button>
-              <button
-                type="button"
-                class="bf-btn bf-primary"
-                data-action="finish"
-                disabled={state.sending.value}
-                onClick={() => state.finish()}
-              >
-                {b.finish}
-              </button>
-            </>
-          )}
+          {ended || phone ? null : <Actions state={state} />}
         </div>
       </div>
-      {ended ? null : (
+      {ended || phone ? null : (
         <ul class="bf-status" aria-label={b.questions}>
           <li class="bf-seg" data-seg="answered">
             <span>{b.answered(ready, total)}</span>
@@ -176,6 +174,33 @@ function Bar({ state, look }: Props) {
       )}
       <Menu state={state} look={look} b={b} />
     </header>
+  );
+}
+
+/** Cancel and Finish: in the top bar, and on a phone in the bar at the foot of the screen (BriefPhone). */
+function Actions({ state }: { state: FormState }) {
+  const b = messages(state);
+  return (
+    <>
+      <button
+        type="button"
+        class="bf-btn"
+        data-action="cancel"
+        disabled={state.sending.value}
+        onClick={() => void state.cancel()}
+      >
+        {b.cancel}
+      </button>
+      <button
+        type="button"
+        class="bf-btn bf-primary"
+        data-action="finish"
+        disabled={state.sending.value}
+        onClick={() => state.finish()}
+      >
+        {b.finish}
+      </button>
+    </>
   );
 }
 
@@ -1040,6 +1065,15 @@ export function Form({ state, look }: Props) {
         </main>
         {sidebar ? <Side state={state} /> : null}
       </div>
+      {state.phone.value && !ended ? (
+        <div
+          class="bf-footbar"
+          data-footbar
+          data-covered={sidebar || state.dialog.value !== "none" ? "true" : undefined}
+        >
+          <Actions state={state} />
+        </div>
+      ) : null}
       <Dialogs state={state} />
     </div>
   );

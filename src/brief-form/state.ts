@@ -32,6 +32,8 @@ export type FormState = {
   /** the question the keys act on: the last one focused, jumped to, or answered */
   current: Signal<string | null>;
   sidebar: Signal<boolean>;
+  /** below 760 px (the page's `PHONE_QUERY`): the compact bar, the foot bar, the full-screen sidebar */
+  phone: Signal<boolean>;
   dialog: Signal<Dialog>;
   /** Finish was pressed once: what is missing is shown as needed */
   tried: Signal<boolean>;
@@ -91,6 +93,7 @@ export function createFormState(data: BriefData): FormState {
     kept,
     current,
     sidebar: signal(true),
+    phone: signal(false),
     dialog: signal("none"),
     tried: signal(false),
     folded: signal({}),

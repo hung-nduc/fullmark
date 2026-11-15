@@ -24,7 +24,17 @@ if (dataElement && root) {
     fonts: ["system", "sans", "serif", "readable"],
   });
   applyLook({ look });
-  state.sidebar.value = window.innerWidth >= 760;
+  // below 760 px (the page's `PHONE_QUERY`) the form is a phone's: the sidebar starts closed, and closes when the window
+  // narrows to a phone, since there it takes the whole screen
+  const narrow = typeof window.matchMedia === "function" ? window.matchMedia("(max-width: 759px)") : null;
+  const onNarrow = (): void => {
+    const was = state.phone.value;
+    state.phone.value = narrow?.matches === true;
+    if (state.phone.value && !was) state.sidebar.value = false;
+  };
+  onNarrow();
+  narrow?.addEventListener("change", onNarrow);
+  state.sidebar.value = !state.phone.value;
   render(<Form state={state} look={look} />, root);
   installKeys(state, look);
   // the minutes left, counted from when the page loaded (G113), updated each minute
