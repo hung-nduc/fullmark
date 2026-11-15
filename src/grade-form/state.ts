@@ -2,7 +2,18 @@ import { computed, signal } from "@preact/signals";
 import { type GradeMessages, gradeEn, gradeVi } from "../core/i18n/grade";
 import { num } from "../page/results";
 import type { GradeData, GradeItem } from "./data";
-import { acceptedValue, type Evaluated, emptyFill, entryOf, evaluate, type Fill, pressed, specOf } from "./logic";
+import {
+  acceptedValue,
+  type Evaluated,
+  emptyFill,
+  entryOf,
+  evaluate,
+  type Fill,
+  givenFill,
+  pressed,
+  sameFill,
+  specOf,
+} from "./logic";
 
 export type Saved = { graded: number; pending: GradeItem[]; earned: number; points: number; name: string };
 
@@ -10,7 +21,13 @@ export type Saved = { graded: number; pending: GradeItem[]; earned: number; poin
 export function createGradeState(data: GradeData) {
   const r: GradeMessages = data.uiLang === "vi" ? gradeVi : gradeEn;
   const all = [...data.items, ...data.unanswered].sort((a, b) => a.number - b.number);
-  const fills = signal<Record<string, Fill>>(Object.fromEntries(data.items.map((i) => [i.id, emptyFill(i)])));
+  /** `--grades` (G75): what the file gave, by question: the fill each starts from, and what a restore puts back */
+  const base: Record<string, Fill> = Object.fromEntries(
+    data.items.flatMap((i) => (i.given === null ? [] : [[i.id, givenFill(i, i.given, (x) => num(x, data.uiLang))]])),
+  );
+  const fills = signal<Record<string, Fill>>(
+    Object.fromEntries(data.items.map((i) => [i.id, base[i.id] ?? emptyFill(i)])),
+  );
   const current = signal<string>((data.items[0] ?? data.unanswered[0])?.id ?? "");
   /** the "Scored by fullmark" row is chosen: the main column shows fullmark's own marking in a frame (G100) */
   const marked = signal(false);
@@ -60,6 +77,20 @@ export function createGradeState(data: GradeData) {
     const base = data.base;
     const score = { earned: round(base.earned + earned), points: round(base.points + points) };
     return { graded, given: { earned: round(earned), points: round(points) }, score };
+  });
+
+  /** Whether a pre-filled question has moved from what the file gave (false for one the file did not grade). */
+  const adjusted = (id: string): boolean => {
+    const item = data.items.find((i) => i.id === id);
+    const was = base[id];
+    const fill = fills.value[id];
+    return item !== undefined && was !== undefined && fill !== undefined && !sameFill(item, fill, was);
+  };
+  /** The pill's counts: the pre-filled questions as given, and adjusted; live. */
+  const prefilled = computed(() => {
+    const given = data.items.filter((i) => i.given !== null);
+    const changed = given.filter((i) => adjusted(i.id)).length;
+    return { total: given.length, asGiven: given.length - changed, adjusted: changed };
   });
 
   /** The first question after `from` that is not graded, going on from the one the grader is at. */
@@ -136,6 +167,32 @@ export function createGradeState(data: GradeData) {
               },
             },
       );
+    },
+    base,
+    adjusted,
+    prefilled,
+    /** a row's score (or band) and note back to what the file gave */
+    restoreRow: (id: string, crit: string) => {
+      const was = base[id]?.cells[crit];
+      if (was) patch(id, (f) => ({ ...f, cells: { ...f.cells, [crit]: { ...was } } }));
+    },
+    /** the holistic score back to what the file gave */
+    restoreScore: (id: string) => {
+      const was = base[id];
+      if (was) patch(id, (f) => ({ ...f, score: was.score }));
+    },
+    restoreVerdict: (id: string, crit: string) => {
+      const was = base[id];
+      if (was) patch(id, (f) => ({ ...f, verdicts: { ...f.verdicts, [crit]: was.verdicts[crit] ?? null } }));
+    },
+    restoreText: (id: string, which: "why" | "improve") => {
+      const was = base[id];
+      if (was) patch(id, (f) => ({ ...f, [which]: was[which] }));
+    },
+    /** the whole question back to what the file gave */
+    restoreAll: (id: string) => {
+      const was = base[id];
+      if (was) fills.value = { ...fills.value, [id]: structuredClone(was) };
     },
     /** every score, verdict, note and text of the question */
     clear: (id: string) => {

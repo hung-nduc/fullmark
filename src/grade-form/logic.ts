@@ -1,5 +1,5 @@
 import { bandPoints, isMultiple, meanBand, overallBand, sumMarks } from "../core/rubric/arith";
-import type { GradeItem } from "./data";
+import type { GradeGiven, GradeItem } from "./data";
 
 /** What the grader typed for one question: the raw text of each value (so a half-typed number is kept), and the texts. */
 export type Fill = {
@@ -145,4 +145,56 @@ export function entryOf(item: GradeItem, fill: Fill): Record<string, unknown> {
   entry.justification = text(fill.why);
   entry.improvement = text(fill.improve);
   return entry;
+}
+
+// -- `--grades`: what the file gave, and how far the grader has moved from it (G75) ---------------------------------
+
+/** The fill that is exactly what the file gave (`fmt` writes a number as the form's language does). */
+export function givenFill(item: GradeItem, given: GradeGiven, fmt: (n: number) => string): Fill {
+  const shown = (v: number | null): string => (v === null ? "" : fmt(v));
+  return {
+    cells: Object.fromEntries(
+      item.criteria.map((c) => [
+        c.id,
+        { raw: shown(given.cells[c.id]?.value ?? null), note: given.cells[c.id]?.note ?? "" },
+      ]),
+    ),
+    score: shown(given.score),
+    verdicts: Object.fromEntries(item.criteria.map((c) => [c.id, given.verdicts[c.id] ?? null])),
+    why: given.why ?? "",
+    improve: given.improve ?? "",
+  };
+}
+
+/** The number a raw text stands for, or null when it is empty; `undefined` when it is not a value the control takes. */
+const givenValue = (spec: Spec, raw: string): number | null | undefined =>
+  raw.trim() === "" ? null : (acceptedValue(spec, raw) ?? undefined);
+
+const sameText = (a: string, b: string): boolean => a.trim() === b.trim();
+
+/** Whether a criterion's score (or band) and note are as given. */
+export function sameCell(item: GradeItem, crit: string, fill: Fill, base: Fill): boolean {
+  const spec = specOf(item, crit);
+  const a = fill.cells[crit] ?? { raw: "", note: "" };
+  const b = base.cells[crit] ?? { raw: "", note: "" };
+  return givenValue(spec, a.raw) === givenValue(spec, b.raw) && sameText(a.note, b.note);
+}
+
+/** Whether the holistic score is as given. */
+export const sameScore = (item: GradeItem, fill: Fill, base: Fill): boolean =>
+  givenValue(specOf(item), fill.score) === givenValue(specOf(item), base.score);
+
+export const sameVerdict = (crit: string, fill: Fill, base: Fill): boolean =>
+  (fill.verdicts[crit] ?? null) === (base.verdicts[crit] ?? null);
+
+export const sameWhy = (fill: Fill, base: Fill): boolean => sameText(fill.why, base.why);
+export const sameImprove = (fill: Fill, base: Fill): boolean => sameText(fill.improve, base.improve);
+
+/** Whether every value, verdict, note and text of the question is as given. */
+export function sameFill(item: GradeItem, fill: Fill, base: Fill): boolean {
+  if (item.mode === "holistic") {
+    if (!sameScore(item, fill, base)) return false;
+    if (!item.criteria.every((c) => sameVerdict(c.id, fill, base))) return false;
+  } else if (!item.criteria.every((c) => sameCell(item, c.id, fill, base))) return false;
+  return sameWhy(fill, base) && sameImprove(fill, base);
 }

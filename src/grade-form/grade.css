@@ -766,6 +766,180 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* --grades (G75; the GradeAI board): the pre-filled value's box, the status pill, the sidebar's marks */
+  .fm-status-pill {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 1px 10px;
+    margin-left: 18px;
+    font-weight: 600;
+    color: var(--info);
+    background: var(--info-wash);
+    border-radius: 999px;
+  }
+
+  .fm-given {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: none;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+    background: var(--card);
+    border: 2px solid var(--line-strong);
+    border-radius: var(--box-r);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fm-given[data-kind="score"] {
+    width: 76px;
+  }
+
+  .fm-given[data-kind="verdict"] {
+    width: 88px;
+    font-size: 0.92em;
+  }
+
+  .fm-given[data-kind="text"] {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 0.8em;
+  }
+
+  .fm-given .fm-svg {
+    flex: none;
+  }
+
+  /* in use: the info wash inside a 2 px border in a gradient of the theme's blues, pressed, and a press does nothing */
+  .fm-given[data-on] {
+    color: var(--info);
+    cursor: default;
+    background:
+      linear-gradient(var(--info-wash), var(--info-wash)) padding-box,
+      linear-gradient(120deg, var(--info), var(--accent) 55%, var(--hint)) border-box;
+    border: 2px solid transparent;
+  }
+
+  /* a computed total shows the given total and is display only: dashed once it differs from the rows' total */
+  .fm-given[data-total] {
+    cursor: default;
+  }
+
+  .fm-given[data-total]:not([data-on]) {
+    border-style: dashed;
+  }
+
+  .fm-box-label-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .fm-ctl-pair {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+  }
+
+  .fm-ctl-pair > .fm-ctl-verdicts {
+    width: 100%;
+  }
+
+  .fm-grade-undo {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-right: auto;
+  }
+
+  @media (min-width: 520px) {
+    .fm-box[data-given] .fm-box-row {
+      grid-template-columns: minmax(0, 1fr) 346px;
+    }
+
+    .fm-box[data-given] .fm-box-row[data-wide] {
+      grid-template-columns: minmax(0, 1fr) 388px;
+    }
+
+    .fm-box[data-given] .fm-ctl > .fm-given {
+      margin-right: 2px;
+    }
+
+    .fm-box[data-given] .fm-ctl-group {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .fm-box[data-given] .fm-ctl-value {
+      flex: 1;
+      width: auto;
+    }
+  }
+
+  .fm-grade-row[data-mark] .fm-grade-mark {
+    position: relative;
+    color: var(--info);
+  }
+
+  .fm-grade-row[data-mark="person"] .fm-grade-mark {
+    color: var(--ok);
+  }
+
+  .fm-grade-row[data-mark="person-adjusted"] .fm-grade-mark {
+    color: var(--accent);
+  }
+
+  .fm-spark-pen {
+    overflow: visible;
+  }
+
+  .fm-spark-main {
+    fill: var(--info);
+  }
+
+  .fm-spark-small {
+    fill: var(--accent);
+    stroke: var(--ok-wash);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+
+  .fm-grade-row-sub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fm-grade-row[data-adjusted] .fm-grade-row-sub {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .fm-grade-key[data-key="ai"] {
+    color: var(--info);
+    background: var(--ok-wash);
+    border-color: var(--ok);
+  }
+
+  .fm-grade-key[data-key="pen"] {
+    color: var(--accent);
+    background: var(--ok-wash);
+    border-color: var(--ok);
+  }
+
   /* the foot bar and the answer's folds belong to the phone only */
   .fm-footbar {
     display: none;
