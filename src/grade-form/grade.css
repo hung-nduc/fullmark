@@ -1202,7 +1202,7 @@
     }
 
     /* the card's foot: the restore over Clear this question, each the card's full width */
-    .fm-grade-clear {
+    .fm-grade .fm-grade-clear {
       flex-direction: column;
       gap: 8px;
     }
