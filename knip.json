@@ -4,6 +4,7 @@
     "src/page/main.tsx",
     "src/review/main.tsx",
     "src/grade-form/main.tsx",
+    "src/brief-form/main.tsx",
     "src/serve/module.ts",
     "src/serve/reload.ts",
     "scripts/*.mjs"

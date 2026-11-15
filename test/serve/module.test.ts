@@ -50,9 +50,9 @@ describe("a shared page carries no server code", () => {
   it("is not changed by the server's other half existing: `build` never reads dist/serve.js", () => {
     for (const dir of ["src/build", "src/cli"]) {
       for (const f of readdirSync(join(root, dir)).filter((x) => x.endsWith(".ts"))) {
-        // the commands that serve (`review.ts` and `grade-web.ts` serve their own forms and read no serve.js); `build-watch.ts` is only
-        // loaded for `--watch` and reads `reload.js`, below
-        if (f === "serve.ts" || f === "review.ts" || f === "grade-web.ts" || f === "build-watch.ts") continue;
+        // the commands that serve (`review.ts`, `grade-web.ts` and `brief-web.ts` serve their own forms and read no serve.js);
+        // `build-watch.ts` is only loaded for `--watch` and reads `reload.js`, below
+        if (["serve.ts", "review.ts", "grade-web.ts", "brief-web.ts", "build-watch.ts"].includes(f)) continue;
         const text = readFileSync(join(root, dir, f), "utf8");
         expect(text, `${dir}/${f}`).not.toMatch(/from "\.\.\/serve|module-file|["\x27`]serve\.js["\x27`]/);
       }

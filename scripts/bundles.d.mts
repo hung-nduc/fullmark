@@ -25,3 +25,4 @@ export const SERVE_BUNDLE: typeof PAGE_BUNDLE;
 export const RELOAD_BUNDLE: typeof PAGE_BUNDLE;
 export const REVIEW_BUNDLE: typeof PAGE_BUNDLE;
 export const GRADE_BUNDLE: typeof PAGE_BUNDLE;
+export const BRIEF_BUNDLE: typeof PAGE_BUNDLE;

@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { build } from "esbuild";
-import { GRADE_BUNDLE, PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "./bundles.mjs";
+import { BRIEF_BUNDLE, GRADE_BUNDLE, PAGE_BUNDLE, RELOAD_BUNDLE, REVIEW_BUNDLE, SERVE_BUNDLE } from "./bundles.mjs";
 import { minifyCss } from "./minify-css.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -54,6 +54,19 @@ await build({
 writeFileSync(
   join(root, "dist/grade.css"),
   `${minifyCss(readFileSync(join(root, "src/grade-form/grade.css"), "utf8"))}
+`,
+);
+
+// The brief form of `quiz brief --web`: its code and the styles it adds to the page's own.
+await build({
+  ...BRIEF_BUNDLE,
+  entryPoints: [join(root, "src/brief-form/main.tsx")],
+  outfile: join(root, "dist/brief.js"),
+  logLevel: "warning",
+});
+writeFileSync(
+  join(root, "dist/brief.css"),
+  `${minifyCss(readFileSync(join(root, "src/brief-form/brief.css"), "utf8"))}
 `,
 );
 

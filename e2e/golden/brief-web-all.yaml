@@ -1,0 +1,38 @@
+purpose: exam-prep
+scope: "lectures 3 to 5, the Fourier transform"
+content:
+  kinds:
+    - lecture-slides
+    - other
+  kinds_other: "a field journal: week 4"
+  elsewhere: "the reserve copy, pp. 3 to 9"
+count: 21
+minutes: 37.5
+mix:
+  - understanding
+  - calculation
+  - code
+  - essay
+difficulty: harder
+mode: timed-exam
+language: vi
+request: "Match the 2024 midterm.\nNo proofs. # not a comment"
+weak_topics: true
+commitment: 70
+focus_tags: []
+profile: "draft"
+decided_by:
+  purpose: user
+  scope: user
+  content: user
+  count: user
+  minutes: user
+  mix: user
+  difficulty: user
+  mode: user
+  language: user
+  request: user
+  weak_topics: user
+  commitment: user
+  focus_tags: default
+  profile: user

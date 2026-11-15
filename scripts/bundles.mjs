@@ -58,3 +58,6 @@ export const REVIEW_BUNDLE = { ...PAGE_BUNDLE };
 
 /** The grading form (`dist/grade.js`): its own IIFE beside `dist/review.js`, carried only by the page `quiz grade --web` builds. */
 export const GRADE_BUNDLE = { ...PAGE_BUNDLE };
+
+/** The brief form (`dist/brief.js`): its own IIFE beside `dist/grade.js`, carried only by the page `quiz brief --web` builds. */
+export const BRIEF_BUNDLE = { ...PAGE_BUNDLE };
