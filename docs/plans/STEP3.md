@@ -32,7 +32,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p G98, the grading form on a phone | done, reviewed, gaps decided (2026-11-07) | `3ee9d79`..`1a422e4`, `c7ce6b3`, review |
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
-| 3q the replay's answer panel and badge (G94) | outline; 3f is done, so it can be briefed | |
+| 3q the replay's answer panel and badge (G94) | brief drafted (2026-11-15), waits for the owner's approval and G105 | |
 | 3p2 `--web --grades`, AI grades pre-filled (G75, G102) | G75 and G102 decided (2026-11-13) on the GradeAI board; can be briefed after 3r2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
@@ -48,7 +48,7 @@ Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done wh
 How each slice got here is in its own **Review**; the table above is the summary.
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
-2. **3q** (the replay's answer panel and badge, G94): an outline; it can be briefed now, since 3f is done.
+2. **3q** (the replay's answer panel and badge, G94): **brief drafted** (2026-11-15, "Slice 3q"); it waits for the owner's approval and for G105 (a code answer and an empty answer in the panel).
 3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). They are 3p2's first tasks, after G104; its brief can be drafted now.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
@@ -83,7 +83,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+- **G105. A code answer, and an empty answer, in the panel (3q's brief).** The boards draw the "YOUR ANSWER" panel for an essay only: they have no code answer in the replay, and no unanswered essay. Today both are the read-only text box (the code in the monospace font, an empty answer an empty box). **Recommendation:** a code answer is the same panel with its text in the page's monospace font, whitespace kept, scrolling sideways inside the panel when a line is long (never the page). An unanswered essay or code question shows the panel as the boards' typed "no answer" box does (`typedNone`: a 1 px dashed `line-strong` border on `surface`, "YOUR ANSWER" then "No answer" in muted italics, the catalog's word). For 3q's first task, with TECHNICAL_DESIGN.md section 8 ("Results (after Submit)") saying it.
 
 ## Slices
 
@@ -1076,3 +1076,44 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 - **G104** (decided 2026-11-15, in STEP3-GAPS.md): with the form's `main` unnamed, axe's `landmark-unique` fails, because axe sees the form's `main` and the frame's `main` as two unnamed mains. The agent did not rename silently: the three axe checks with the frame shown skip that one rule, with a comment, and every other rule still runs.
 - The frame still shows the page's foot button (the licences ⓘ, under the results card). It is the page's own and harmless; noted, not a gap.
 - The frame opens on Missed, which shows "Nothing missed" in the fixture; that is 3r's accepted behaviour.
+
+## Slice 3q: G94, the replay's answer panel and the result badge as a pill
+
+**Drafted on 2026-11-15; waits for the owner's approval, with G105.** G94 as decided: after Submit, on the page and in the replay, an essay's or a code question's answer is a "YOUR ANSWER" panel, not a read-only text box, and every question's result is a pill, kept to one or two lines on a phone. Built from ResultsReplay (`Results.dc.html`, mode `replay`) and RubricPhoneReplay (`RubricPhone.dc.html`, form `replay`). Small: two components, their CSS, the specs that read them, one screens spec.
+
+### Read first
+
+- TECHNICAL_DESIGN.md: section 8, the rows "Question card", "Results (after Submit)" and "Answering ordering, matching, essay, code"; section 6, "The rubric box" (the card's badge is the result badge); section 7, foundation 9.
+- COMMANDS.md: `quiz replay`; `quiz grade`, "The form", "The card's state" (the form's result badge, already a pill).
+- This plan: "Rules for every slice", G94 (STEP3-GAPS.md), G105 (below), 3o's and 3r's Reviews.
+- The boards: `docs/mockup/boards/Results.dc.html` (`badge`, `essayBadge`, `okBadge`, `badBadge`, `warnBadge`, `mutedBadge`, `cardHead`, `statLabel`, `typedNone`, and question 32's answer panel), `RubricPhone.dc.html` (`badge`, `cardHead`, `answerBox`, with `form="replay"`); their images `docs/mockup/images/ResultsReplay.png` and `RubricPhoneReplay.png`.
+- Code: `src/page/questions/shared.tsx` (`ResultLine`, `ICONS`), `src/page/questions/Card.tsx` (the header), `src/page/questions/Open.tsx` (`Essay`, `Code`), `src/page/icons.tsx`, `src/page/styles/30-question.css` (`.fm-result`, `.fm-question-end`, `.fm-textarea`), `src/page/styles/20-quiz.css` (`.fm-count`); `src/core/i18n/en.ts` and `vi.ts` (the page's `status`, `scoreLine`, `yourAnswer`); for comparison only, the form's badge (`src/grade-form/Form.tsx`, `BadgeIcon` and `.fm-grade-badge` in `src/grade-form/grade.css`), which 3r built from the same boards. Specs: `e2e/results.spec.ts`, `e2e/replay.spec.ts`, `e2e/replay-grades.spec.ts`, `e2e/submit.spec.ts`, `e2e/types.spec.ts`, `e2e/phone.spec.ts`, `e2e/screens-3o.spec.ts` (the screens' pattern).
+
+### Decided for this slice
+
+- **The result badge is a pill (G94)**, as the boards draw it, on every question card after Submit and after Check, in every theme:
+  - an inline pill: the state's icon (an SVG, 16 px wide and 14 px on a phone, `currentColor`, hidden from assistive technology), then the word and the points, 700 weight, padding 2px 10px, fully rounded, on one line (`white-space: nowrap`);
+  - its colours by state: correct `ok` on `ok-wash`; wrong `bad` on `bad-wash`; partly right `warn` on `surface` with a 2 px `warn` border; unanswered and not scored `muted` on `sunken`; waiting for a grader `info` on `info-wash`;
+  - the icons are the boards' (and the form's): a check, a cross, the half-filled circle, a dash for unanswered, the clock for waiting; not scored keeps its dot, drawn as an icon;
+  - the points as the boards and section 8 write them, "Partly right · 2.25 / 3", in place of "2.25 of 3 points"; a question with no points shows the word alone. The words stay the page's own ("Not answered", "Waiting for a grader" where the board writes "Unanswered" and "Waiting for a grade · not in the score yet"): listed as differences, not changed.
+  - The element keeps its class and `data-status`, `data-qid`, `data-quiz`, `data-earned` and `data-points`, which the specs and the results map read.
+- **The header on a phone**: the header wraps (`flex-wrap`, row gap 6 px, column gap 10 px, as RubricPhone's `cardHead`), so at 390 px the meta is the first line and the pill the second, never three. Wide, both stay on one line, as now.
+- **The answer panel (G94)**, after Submit, for `essay` (and `code`, G105): in place of the read-only text box,
+  - a box in the `sunken` fill with a 1 px `line` border, 8 px radius, padding 12px 16px (10px 14px on a phone), at 0.95em;
+  - a label "YOUR ANSWER" (the catalog's `yourAnswer`, uppercase by CSS: 0.72em, 700, letter-spacing 0.08em, `muted`), then the answer's text with its line breaks kept, in the quiz's language (`lang`);
+  - the word count under the box is gone after Submit, as the boards draw it (while answering it stays as it is);
+  - the panel is plain text, not a form control: no resize handle, not in the tab order.
+  It shows on `build`'s page after Submit, in `quiz replay`, and so in the grader's frame (3r). The rubric box and the sample answer stay under it, as now.
+- **Not changed:** answering (the text boxes, their count, Reset to starter), the grading form's own answer and badge, typed and choice answers' boxes, the results card and map, the files written.
+
+### Tasks
+
+1. **G105**, once decided (it is in the decisions above where the owner says yes).
+2. **The badge** (one commit): `ResultLine` and its CSS, the icons, the header's wrap, the points' new form. Every spec that reads the old text ("of 1 point") or the old look updated, each counted in the report. Playwright, wide and at 390 px: one question in each of the five states (and a not-scored survey question) shows its pill with its colours; at 390 px the header is two lines at most, the pill on one line, with the longest word in en and vi ("Waiting for a grader", "Đang chờ chấm").
+3. **The panel** (one commit): `Essay` and `Code` after Submit. Playwright: after Submit, and in `quiz replay`, an essay shows no `textarea`, the panel's text is the answer as typed (line breaks kept), and the rubric box follows it; an unanswered essay shows the panel as G105 says; axe in light and dark, wide and at 390 px, on a submitted page and on a replay with grades.
+4. **The goldens** (with the commit that changes them): every build golden that changes with the bundle, counted and explained. The bundle budget still passes.
+5. **The screens' spec** (one commit): `e2e/screens-3q.spec.ts`, run with `FULLMARK_SCREENS=1`, takes `docs/screens/3q/`: the replay at 1280 px in the boards' theme (paper, serif) with the five states and a graded essay; the same in light and dark; a code answer; an unanswered essay; at 390 px a graded essay (beside RubricPhoneReplay) and the longest pending badge; one in vi; the grader's frame showing the panel. Each screen beside its board, each difference listed. The slice table's 3q row.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox, the budget test included. After Submit and in the replay, every result is a pill in its state's colours, two lines at most with the header on a phone; an essay's and a code question's answer is a panel, with no text box. `docs/screens/3q/` is taken by its spec. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden and every spec that changed counted and explained.
