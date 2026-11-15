@@ -33,7 +33,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
-| 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | built, awaiting review | `a433497`..`aae0502` |
+| 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | done, reviewed (2026-11-15), no gaps | `a433497`..`565bd9b`, review |
 | 3p3 the pre-filled form on a phone | outline, after 3p2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
@@ -50,7 +50,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 
 1. **3r** (G101, then fullmark's own marking in the form, G83) is **built and reviewed** ("Slice 3r", its Review), the result badge fixed in review. **G103 is decided** and **3r2 is built and reviewed** ("Slice 3r2", its Review). **G104** (two unnamed `main` landmarks with the frame shown) is decided (2026-11-15), as recommended, and written into COMMANDS.md; it is 3p2's first task.
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
-3. **3p2** (`grade --web --grades`, G75 and G102): both decided on 2026-11-13, as recommended, on the redrawn GradeAI board (interactive, on the canvas; its source in `docs/mockup/boards/`), and written into COMMANDS.md (`quiz grade`, "Pre-filled grades") and TECHNICAL_DESIGN.md (section 6, "Grader identity"). **3p2's brief is approved** (2026-11-15, "Slice 3p2"), at 1280 px, with G104 and G106 first and G107 to G110 decided; ready to hand to one implementing agent. The phone is **3p3**, after it.
+3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone) is next: an outline; GradeAI draws no phone, so its brief needs the owner's word on the layout.
 4. **The `brief --web` boards** (3v), then **3h** from them. Not started.
 5. **3z**, acceptance.
 
@@ -1186,6 +1186,30 @@ Tried by looking at the screens (`docs/screens/3r/`, taken by `e2e/screens-3r.sp
 ### Done when
 
 `npm run check` passes in Chromium and Firefox, the budget test included, with no axe rule skipped. `quiz grade RESULTS --quiz FILE --web --grades GRADES` opens the form pre-filled, every pre-filled value can be accepted, changed and put back as GradeAI draws it, and Save writes a `kind: human` grades file with `reviewed` on each pre-filled question and the report. A `build` page carries no server code and is byte-identical with and without the server features. Report as the rules say, every golden and spec that changed counted and explained.
+
+### Review
+
+**3p2's review (2026-11-15).** Built by Sonnet in seven commits from the brief alone, `a433497`..`565bd9b` (the last is the slice table's row); reviewed by Opus. No fix in review.
+
+- **`npm run check` exits 0**, run again in review: typecheck, Biome and knip clean; the startup tests 2 of 2; Vitest **2757 of 2757** in 114 files (11 more than 3q); Playwright **589 passed** (both browsers and the 2 budget projects), 415 skipped (the `screens-*` specs), none failed, **no axe rule skipped anywhere**. Firefox ran.
+- **Goldens.** The 14 page files of 3q's review (12 built pages, `replay/good`, two `bytes` lines) change twice with the bundle: G106's code, then G109's "(AI)". In `test/golden/grade/`: `web-grades-refused` now refuses an off-step score (exit 1, the grades problem) where it refused "not available yet" (exit 2); `web-grades-exist` and `web-grades-exist-json` lose " once that is built"; five cases added (`web-grades-refused-json`, `-missing`, `-not-grades`, `-v1`, `-held-other-file`). Five `e2e/golden/grade-web-prefilled-*.jsonl` added (unchanged, adjusted, two graders, a person, the same path), each the written file with `grader.at` masked. Read in review; none reverted. A `build` page stays byte-identical with and without the server features.
+- **Specs changed:** the `landmark-unique` skips out (`grade.spec.ts`, `grade-phone.spec.ts`), G103's "takes no name" test now G104's; the `.fm-sample` exclusion out of `answer-panel.spec.ts`; "(agent)" to "(AI)" in `replay-grades.spec.ts` and `test/page/replay-grades.test.ts`; `test/grade-cli.test.ts` expects "cannot read the grades file" where it expected "not available yet".
+- **Read in review:** `--web --grades` is checked by `applyGrades` before anything is served; the submit strips any `grader` or `reviewed` the form sends and writes `reviewed` from the `--grades` file only, on each pre-filled question still graded at Save (G107); the same-path test follows links (`realpathSync`), and another file holding grades is still refused (G108).
+- **Tried by looking at the screens** (`docs/screens/3p2/`, 17, taken by `e2e/screens-3p2.spec.ts`) beside GradeAI's source and Tweaks: the status pill, the box head "Claude Sonnet 5.5 (AI), adjusted by you", the lit and plain pre-filled boxes, the dashed total, "✦ AI's", **✦ Back to the AI's grade**, verdict groups, the sidebar's marks with the full names (G110) and the six-entry legend, a person's pre-fill, vi, dark, the Finish dialog and the saved card. Differences as the agent lists them (the golden quiz's questions for the board's, the system fonts, the flex control group with the board's widths asserted, the tooltip not in a screenshot).
+
+**Done differently,** each accepted:
+- G106 is done in the browser (`src/page/scrollfocus.ts`): only a block that overflows at the width it is drawn takes `tabindex`, a group role and its language as a name ("Code" else, a new catalog word), and loses them when it stops overflowing.
+- `--grades` warnings (a `results_hash` from another attempt, say) are printed as `warning: …` on stderr before serving.
+- The pill counts only questions the file graded; any change counts as adjusted, **Clear this question** included; three or more graders are joined "A (1), B (1) and C (1)".
+- A pre-filled row not yet done says its state ("not graded", "half graded") under its name; with `--grades` the legend is COMMANDS.md's six entries only.
+- A lit box's name includes its value (axe's `label-content-name-mismatch`).
+- The `--grades` file is read before the results and the quiz, and checked against the attempt after it is read, keeping COMMANDS.md's exits.
+
+**Found in review:**
+- **The vi words GradeVi does not have** are the agent's (the pill "Điền sẵn · N giữ nguyên, M đã sửa", "bạn đã sửa", "chưa đổi", "Đã cho", "Về điểm của AI", "Về điểm đã cho", "Điểm của NAME", the legend "Của AI", "Của AI, đã sửa", "Của một người", "Của một người, đã sửa", the saved card's "Đang xem lại điểm của …"), all in `src/core/i18n/grade.ts`: for the owner to read when trying the sample, not a gap.
+- A pre-filled question whose rubric changed since the file was written is pre-filled with the validator's warning, as `quiz grade --grades` treats it; noted.
+- The sample's grades fixture was made for another results file, so `samples/grade-ai` prints the `results_hash` warning, as the replay sample does; harmless.
+- Below 520 px the pre-filled box sits in the slot's stacking, undesigned: 3p3.
 
 ## Slice 3p3: the pre-filled form on a phone (outline)
 
