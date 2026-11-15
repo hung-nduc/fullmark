@@ -298,7 +298,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       "ask what a quiz is for and write brief.yaml (and an empty content/ folder) for an agent to write it from",
     )
     .argument("<dir>", "the folder for brief.yaml and content/ (created when missing)")
-    .option("--web", "ask in a form in the browser (not available yet)")
+    .option("--web", "ask in a form in the browser, served once on 127.0.0.1; the other flags pre-fill it")
     .option(
       "--tui",
       "ask in the terminal, drawn on stderr (stdin and stderr must be terminals); the other flags pre-fill it",
@@ -347,6 +347,10 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         web: Boolean(options.web),
         tui: Boolean(options.tui),
         json: Boolean(options.json),
+        open: options.open !== false,
+        timeout: text("timeout"),
+        port: text("port"),
+        version: VERSION,
       };
       outcome.exit = await (await import("./brief")).runBrief(dir, opts, io);
     });

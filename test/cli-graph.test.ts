@@ -139,10 +139,34 @@ describe("what each command loads", () => {
     expect(closure(chunkWith("// src/cli/brief.ts"))).not.toContain(prompts);
   });
 
+  it("brief --web is a chunk of its own with the server, and the form is not in it (dist/brief.js)", () => {
+    const web = chunkWith("// src/cli/brief-web.ts");
+    const text = textOf(closure(web));
+    for (const marker of [...SERVE_ONLY, "// src/build/brief-form.ts"]) expect(text, marker).toContain(marker);
+    // the form's code and its words belong to the browser bundle, never to the CLI; it needs no page builder either
+    expect(text).not.toContain("// src/brief-form/");
+    expect(text).not.toContain("// src/core/i18n/brief.ts");
+    expect(text).not.toContain("// src/page/");
+    expect(text).not.toContain("// src/build/page.ts");
+    for (const marker of CLACK) expect(text, marker).not.toContain(marker);
+    // `brief` through flags and `--tui` reach it by a dynamic import only: they load neither the server nor the form
+    const brief = chunkWith("// src/cli/brief.ts");
+    expect(readFileSync(join(dist, brief), "utf8")).toContain(`import("./${web}")`);
+    expect(closure(brief)).not.toContain(web);
+    expect(textOf(closure(brief))).not.toContain("// src/serve/");
+    const tui = chunkWith("// src/cli/brief-tui.ts");
+    expect(closure(tui)).not.toContain(web);
+    expect(textOf(closure(tui))).not.toContain("// src/serve/");
+    expect(closure(entry("main"))).not.toContain(web);
+    expect(closure(entry("check"))).not.toContain(web);
+    expect(textOf(closure(entry("check")))).not.toContain("// src/serve/");
+  });
+
   for (const [name, start] of [
     ["main", entry("main")],
     ["check", entry("check")],
     ["brief through flags", chunkWith("// src/cli/brief.ts")],
+    ["brief --web", chunkWith("// src/cli/brief-web.ts")],
     ["build", entry("build")],
     ["serve", entry("serve")],
   ] as const) {

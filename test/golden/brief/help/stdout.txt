@@ -8,7 +8,8 @@ Arguments:
                           missing)
 
 Options:
-  --web                   ask in a form in the browser (not available yet)
+  --web                   ask in a form in the browser, served once on
+                          127.0.0.1; the other flags pre-fill it
   --tui                   ask in the terminal, drawn on stderr (stdin and stderr
                           must be terminals); the other flags pre-fill it
   --no-open               with --web: do not open the browser

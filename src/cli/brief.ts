@@ -1,6 +1,6 @@
 import { existsSync, statSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import type { Readable, Writable } from "node:stream";
 import {
   defaultOf,
@@ -22,7 +22,7 @@ import {
   type MixKind,
   type Purpose,
 } from "../core/brief/write";
-import { resolveProfile, unknownProfileMessage } from "../core/config/resolve";
+import { profileOptions, resolveProfile, unknownProfileMessage } from "../core/config/resolve";
 import { WriteError, writeFileAtomic } from "./atomic";
 import { loadQuestions } from "./brief-questions";
 import { loadConfig, type Machine } from "./config";
@@ -54,6 +54,26 @@ export type BriefOptions = {
   web: boolean;
   tui: boolean;
   json: boolean;
+  /** `--web`: false with `--no-open` (the browser opens by default); absent: true */
+  open?: boolean;
+  /** `--web`: seconds as given; null or absent: 1800 */
+  timeout?: string | null;
+  /** `--web`: as given; null or absent: a free port */
+  port?: string | null;
+  version?: string;
+};
+
+/** What `runBrief` needs beyond the plain `Io`: the question file and the machine config (tests), and the seams of the forms. */
+export type BriefIo = Io & {
+  questions?: QuestionFile;
+  machine?: Machine;
+  tui?: TuiStreams;
+  /** `--web`: where `dist/brief.js` is, the clock, the opener, Ctrl+C and the timer, which tests control */
+  runtimeDir?: string;
+  now?: () => Date;
+  open?: (url: string) => void | Promise<void>;
+  onInterrupt?: (handler: () => void) => () => void;
+  setTimer?: (fire: () => void, ms: number) => () => void;
 };
 
 /** A warning in `--json`'s `warnings` (and, in words, on stderr). */
@@ -119,34 +139,54 @@ function numberOf(q: Question, flag: string, given: string, whole: boolean): num
   return parsed.value;
 }
 
+const wholeNumber = (text: string, min: number): number | null =>
+  /^\d+$/.test(text) && Number(text) >= min ? Number(text) : null;
+
 const asDecider = (given: boolean, accepted = false): Decider => (given ? "user" : accepted ? "agent" : "default");
 
 /** The text, the example and the minimum of a detail rule, as they are shown in `lang`. */
 const exampleIn = (q: Question, lang: Lang): string => q.example?.[lang] ?? "";
 
+/** The answer flags as text: what a form's answers are turned into so that one parser checks them all. */
+export type FlagText = Pick<
+  BriefOptions,
+  | "purpose"
+  | "scope"
+  | "kinds"
+  | "kindsOther"
+  | "elsewhere"
+  | "count"
+  | "minutes"
+  | "mix"
+  | "difficulty"
+  | "mode"
+  | "weakTopics"
+  | "commitment"
+  | "language"
+  | "request"
+  | "profile"
+>;
+
 /**
- * `quiz brief DIR` through flags (COMMANDS.md): every option checked against the question file, the defaults filled
- * and recorded, then `DIR/brief.yaml` and an empty `DIR/content/` written. A human-only value without a flag makes
- * the run exit 3 and write nothing. `--web` and `--tui` come in later slices.
+ * `quiz brief DIR` (COMMANDS.md): every option checked against the question file, the defaults filled and recorded,
+ * then `DIR/brief.yaml` and an empty `DIR/content/` written. A human-only value without a flag makes the run exit 3
+ * and write nothing. With `--tui` or `--web` the flags only pre-fill a form, which returns the answers as `Given`, and
+ * the bytes are made from that exactly as from flags.
  */
-export async function runBrief(
-  dir: string,
-  opts: BriefOptions,
-  io: Io & { questions?: QuestionFile; machine?: Machine; tui?: TuiStreams },
-): Promise<ExitCode> {
+export async function runBrief(dir: string, opts: BriefOptions, io: BriefIo): Promise<ExitCode> {
   const json = opts.json;
   const say = (line: string): void => (json ? io.err(line) : io.out(line));
   if (opts.web && opts.tui) {
     fail(io, json, "--web and --tui cannot be used together: choose one form");
     return EXIT.usage;
   }
-  if (opts.web) {
-    fail(io, json, "--web is not available yet: give the answers as flags (quiz brief --help)");
-    return EXIT.usage;
-  }
   // the form answers a person: `--accept-defaults` is for an agent that has been handed the choices
   if (opts.tui && opts.acceptDefaults) {
     fail(io, json, "--accept-defaults cannot be used with --tui: the person at the terminal answers");
+    return EXIT.usage;
+  }
+  if (opts.web && opts.acceptDefaults) {
+    fail(io, json, "--accept-defaults cannot be used with --web: the person at the form answers");
     return EXIT.usage;
   }
 
@@ -171,32 +211,52 @@ export async function runBrief(
     return EXIT.usage;
   }
 
-  // -- every flag checked before anything else happens
-  let given: Given;
-  try {
-    given = {};
-    if (opts.purpose !== null) given.purpose = oneOf(q("purpose"), "purpose", opts.purpose) as Purpose;
-    if (opts.scope !== null && opts.scope.trim() !== "") given.scope = opts.scope.trim();
-    if (opts.kinds !== null) given.kinds = manyOf(q("content.kinds"), "kinds", opts.kinds) as ContentKind[];
-    if (opts.kindsOther !== null) {
-      if (!given.kinds?.includes("other")) throw new Usage("--kinds-other needs `other` in --kinds");
-      given.kindsOther = opts.kindsOther;
+  /** The answers of `flags` checked against the question file: `Given`, or a `Usage` naming the first that is wrong. */
+  const parseFlags = (flags: FlagText): Given => {
+    const out: Given = {};
+    if (flags.purpose !== null) out.purpose = oneOf(q("purpose"), "purpose", flags.purpose) as Purpose;
+    if (flags.scope !== null && flags.scope.trim() !== "") out.scope = flags.scope.trim();
+    if (flags.kinds !== null) out.kinds = manyOf(q("content.kinds"), "kinds", flags.kinds) as ContentKind[];
+    if (flags.kindsOther !== null) {
+      if (!out.kinds?.includes("other")) throw new Usage("--kinds-other needs `other` in --kinds");
+      out.kindsOther = flags.kindsOther;
     }
-    if (opts.elsewhere !== null) given.elsewhere = opts.elsewhere;
-    if (opts.count !== null) given.count = numberOf(q("count"), "count", opts.count, true);
-    if (opts.minutes !== null) given.minutes = numberOf(q("minutes"), "minutes", opts.minutes, false);
-    if (opts.mix !== null) given.mix = manyOf(q("mix"), "mix", opts.mix) as MixKind[];
-    if (opts.difficulty !== null) given.difficulty = oneOf(q("difficulty"), "difficulty", opts.difficulty);
-    if (opts.mode !== null) given.mode = oneOf(q("mode"), "mode", opts.mode);
-    if (opts.weakTopics !== null) given.weakTopics = oneOf(q("weak_topics"), "weak-topics", opts.weakTopics) === "yes";
-    if (opts.commitment !== null) given.commitment = numberOf(q("commitment"), "commitment", opts.commitment, true);
-    if (opts.language !== null) given.language = oneOf(q("language"), "language", opts.language) as Lang;
-    if (opts.request !== null) given.request = opts.request;
-    if (opts.profile !== null) {
-      const name = opts.profile.trim();
+    if (flags.elsewhere !== null) out.elsewhere = flags.elsewhere;
+    if (flags.count !== null) out.count = numberOf(q("count"), "count", flags.count, true);
+    if (flags.minutes !== null) out.minutes = numberOf(q("minutes"), "minutes", flags.minutes, false);
+    if (flags.mix !== null) out.mix = manyOf(q("mix"), "mix", flags.mix) as MixKind[];
+    if (flags.difficulty !== null) out.difficulty = oneOf(q("difficulty"), "difficulty", flags.difficulty);
+    if (flags.mode !== null) out.mode = oneOf(q("mode"), "mode", flags.mode);
+    if (flags.weakTopics !== null) out.weakTopics = oneOf(q("weak_topics"), "weak-topics", flags.weakTopics) === "yes";
+    if (flags.commitment !== null) out.commitment = numberOf(q("commitment"), "commitment", flags.commitment, true);
+    if (flags.language !== null) out.language = oneOf(q("language"), "language", flags.language) as Lang;
+    if (flags.request !== null) out.request = flags.request;
+    if (flags.profile !== null) {
+      const name = flags.profile.trim();
       if (resolveProfile(name, config.layers).profile === null)
         throw new Usage(unknownProfileMessage(name, config.layers));
-      given.profile = name;
+      out.profile = name;
+    }
+    return out;
+  };
+
+  // -- every flag checked before anything else happens
+  let given: Given;
+  let timeout = 1800;
+  let port = 0;
+  try {
+    given = parseFlags(opts);
+    if (opts.web) {
+      if (opts.timeout != null) {
+        const t = wholeNumber(opts.timeout, 0);
+        if (t === null) throw new Usage(`--timeout ${opts.timeout} is not a number of seconds (0 waits forever)`);
+        timeout = t;
+      }
+      if (opts.port != null) {
+        const n = wholeNumber(opts.port, 1);
+        if (n === null || n > 65535) throw new Usage(`--port ${opts.port} is not a port number (1 to 65535)`);
+        port = n;
+      }
     }
   } catch (error) {
     if (!(error instanceof Usage)) throw error;
@@ -219,9 +279,166 @@ export async function runBrief(
     return EXIT.usage;
   }
 
-  // -- human-only values: purpose has a default `--accept-defaults` may take, scope has none. With `--tui` the flags
-  // only pre-fill the form, which asks every question
+  // -- human-only values: purpose has a default `--accept-defaults` may take, scope has none. With a form the flags
+  // only pre-fill it, which asks every question
   const purposeQuestion = q("purpose");
+  const overridesOf = (p: Purpose): Readonly<Record<string, QuestionValue>> =>
+    config.layers.user?.briefDefaults[p] ?? {};
+
+  /** The answers, the file's text and the warnings made from what was given: the same for flags, `--tui` and `--web`. */
+  const compose = (answered: Given): { brief: ReturnType<typeof briefOf>; text: string; warnings: BriefWarning[] } => {
+    // -- every other value: the flag, else the default of the purpose (the machine config's table may change it)
+    const purpose: Purpose = answered.purpose ?? (purposeQuestion.default as Purpose);
+    const overrides = overridesOf(purpose);
+    const fill = <T>(key: string, value: T | undefined, by: Decider = "default"): Answer<T> =>
+      value !== undefined ? { value, by: "user" } : { value: defaultOf(q(key), purpose, overrides) as T, by };
+
+    const answers: BriefAnswers = {
+      purpose:
+        answered.purpose !== undefined
+          ? { value: purpose, by: "user" }
+          : { value: purpose, by: asDecider(false, true) },
+      scope: { value: answered.scope as string, by: "user" },
+      kinds: fill("content.kinds", answered.kinds),
+      kindsOther: { value: answered.kindsOther ?? "", by: asDecider(answered.kindsOther !== undefined) },
+      elsewhere: fill("content.elsewhere", answered.elsewhere),
+      count: fill("count", answered.count),
+      minutes: fill("minutes", answered.minutes),
+      mix: fill("mix", answered.mix),
+      difficulty: fill("difficulty", answered.difficulty) as BriefAnswers["difficulty"],
+      mode: fill("mode", answered.mode) as BriefAnswers["mode"],
+      language: fill("language", answered.language) as BriefAnswers["language"],
+      request: fill("request", answered.request),
+      weakTopics:
+        answered.weakTopics !== undefined
+          ? { value: answered.weakTopics, by: "user" }
+          : { value: defaultOf(q("weak_topics"), purpose, overrides) === "yes", by: "default" },
+      commitment: fill("commitment", answered.commitment),
+      ...(answered.profile !== undefined ? { profile: { value: answered.profile, by: "user" as const } } : {}),
+    };
+
+    const brief = briefOf(answers);
+    const text = emitBrief(brief);
+    const lang: Lang = answered.language ?? "en";
+
+    // -- warnings: a short answer is accepted (detail rules), weak topics have no history to read here (G17)
+    const warnings: BriefWarning[] = [];
+    // only the answers the user (or the agent) gave are held to a detail rule; a default is never vague
+    for (const rule of questions.questions) {
+      const min = rule["min-words"];
+      const value = rule.key === "scope" ? answered.scope : undefined;
+      if (value === undefined || min === undefined) continue;
+      const words = wordCount(value);
+      if (words >= min) continue;
+      const example = exampleIn(rule, lang);
+      warnings.push({
+        rule: "brief.vague",
+        key: rule.key,
+        words,
+        example,
+        message: `--${rule.flag} has ${words} word${words === 1 ? "" : "s"}; ${min} or more say what the quiz covers, for example "${example}"`,
+      });
+    }
+    if (brief.weak_topics && answered.weakTopics === true) {
+      warnings.push({
+        rule: "brief.no-history",
+        message:
+          "focus_tags is empty: quiz brief reads no history; pick the weak topics from the learner's reports, or use the library's brief (step 4), which fills them from stats",
+      });
+    }
+    return { brief, text, warnings };
+  };
+
+  /** brief.yaml first (atomic, creates DIR), then the empty content folder; an existing one is kept. Throws what it could not do. */
+  const writeOut = async (text: string): Promise<void> => {
+    if (existsSync(folder) && !statSync(folder).isDirectory()) throw new WriteError(folder, { code: "ENOTDIR" });
+    await writeFileAtomic(target, Buffer.from(text, "utf8"));
+    await mkdir(join(folder, "content"), { recursive: true });
+  };
+  const writeProblem = (error: unknown): string => {
+    const file = (error as { file?: string }).file ?? folder;
+    return `cannot write ${shownPath(file, io.cwd)}: ${error instanceof WriteError ? error.message : readFailure(error)}`;
+  };
+
+  const report = (brief: ReturnType<typeof briefOf>, warnings: BriefWarning[]): void => {
+    const shown = shownPath(target, io.cwd);
+    const applied = Object.entries(brief.decided_by)
+      .filter(([key, by]) => by !== "user" && key !== "focus_tags")
+      .map(([key]) => key);
+    for (const w of warnings) io.err(`warning ${w.rule}: ${w.message}`);
+    if (json) {
+      io.out(JSON.stringify({ status: "written", brief: shown, defaults_applied: applied, warnings }));
+    }
+    say(`wrote ${shown} and ${shownPath(join(folder, "content"), io.cwd)}/`);
+    if (applied.length > 0) say(`defaults used: ${applied.join(", ")}`);
+  };
+
+  if (opts.web) {
+    const { serveBriefForm } = await import("./brief-web");
+    let taken: ReturnType<typeof compose> | null = null;
+    let writeFailure: string | null = null;
+    const outcome = await serveBriefForm({
+      io,
+      json,
+      questions,
+      lang: given.language ?? "en",
+      prefill: given,
+      overridesOf,
+      profiles: profileOptions(config.layers),
+      timeout,
+      port,
+      open: opts.open !== false,
+      dir: basename(folder),
+      target: shownPath(target, io.cwd),
+      command: restartCommand(dir, opts),
+      version: opts.version ?? "1.0.0",
+      parse: (flags) => {
+        try {
+          return parseFlags(flags);
+        } catch (error) {
+          if (error instanceof Usage) throw new Error(error.message);
+          throw error;
+        }
+      },
+      async commit(answered) {
+        // the brief may have appeared while the form was open: it is never overwritten
+        if (existsSync(target))
+          return `${shownPath(target, io.cwd)} already exists: edit it, or delete it to start again`;
+        const made = compose(answered);
+        try {
+          await writeOut(made.text);
+        } catch (error) {
+          writeFailure = writeProblem(error);
+          throw error;
+        }
+        taken = made;
+        return null;
+      },
+    });
+    switch (outcome.kind) {
+      case "written": {
+        const made = taken as unknown as ReturnType<typeof compose>;
+        report(made.brief, made.warnings);
+        return EXIT.done;
+      }
+      case "cancelled":
+        if (json) io.out(JSON.stringify({ status: "cancelled" }));
+        io.err("cancelled: nothing was written");
+        return EXIT.usage;
+      case "timeout":
+        if (json) io.out(JSON.stringify({ status: "timeout" }));
+        io.err(`timed out after ${timeout} seconds without a Finish; nothing was written`);
+        return EXIT.usage;
+      case "interrupted":
+        if (json) io.out(JSON.stringify({ status: "interrupted" }));
+        io.err("stopped; nothing was written");
+        return EXIT.usage;
+      case "failed":
+        fail(io, json, writeFailure ?? outcome.message);
+        return EXIT.usage;
+    }
+  }
+
   if (opts.tui) {
     const { askForm } = await import("./brief-tui");
     const controller = new AbortController();
@@ -233,7 +450,7 @@ export async function runBrief(
         questions,
         lang: given.language ?? "en",
         prefill: given,
-        overridesOf: (p) => config.layers.user?.briefDefaults[p] ?? {},
+        overridesOf,
         profileProblem: (name) =>
           resolveProfile(name, config.layers).profile === null ? unknownProfileMessage(name, config.layers) : null,
         input: streams.input,
@@ -264,88 +481,40 @@ export async function runBrief(
     return EXIT.needsInput;
   }
 
-  // -- every other value: the flag, else the default of the purpose (the machine config's table may change it)
-  const purpose: Purpose = given.purpose ?? (purposeQuestion.default as Purpose);
-  const overrides: Record<string, QuestionValue> = config.layers.user?.briefDefaults[purpose] ?? {};
-  const fill = <T>(key: string, value: T | undefined, by: Decider = "default"): Answer<T> =>
-    value !== undefined ? { value, by: "user" } : { value: defaultOf(q(key), purpose, overrides) as T, by };
-  const lang: Lang = given.language ?? "en";
-
-  const answers: BriefAnswers = {
-    purpose:
-      given.purpose !== undefined ? { value: purpose, by: "user" } : { value: purpose, by: asDecider(false, true) },
-    scope: { value: given.scope as string, by: "user" },
-    kinds: fill("content.kinds", given.kinds),
-    kindsOther: { value: given.kindsOther ?? "", by: asDecider(given.kindsOther !== undefined) },
-    elsewhere: fill("content.elsewhere", given.elsewhere),
-    count: fill("count", given.count),
-    minutes: fill("minutes", given.minutes),
-    mix: fill("mix", given.mix),
-    difficulty: fill("difficulty", given.difficulty) as BriefAnswers["difficulty"],
-    mode: fill("mode", given.mode) as BriefAnswers["mode"],
-    language: fill("language", given.language) as BriefAnswers["language"],
-    request: fill("request", given.request),
-    weakTopics:
-      given.weakTopics !== undefined
-        ? { value: given.weakTopics, by: "user" }
-        : { value: defaultOf(q("weak_topics"), purpose, overrides) === "yes", by: "default" },
-    commitment: fill("commitment", given.commitment),
-    ...(given.profile !== undefined ? { profile: { value: given.profile, by: "user" as const } } : {}),
-  };
-
-  const brief = briefOf(answers);
-  const text = emitBrief(brief);
-
-  // -- warnings: a short answer is accepted (detail rules), weak topics have no history to read here (G17)
-  const warnings: BriefWarning[] = [];
-  // only the answers the user (or the agent) gave are held to a detail rule; a default is never vague
-  for (const rule of questions.questions) {
-    const min = rule["min-words"];
-    const value = rule.key === "scope" ? given.scope : undefined;
-    if (value === undefined || min === undefined) continue;
-    const words = wordCount(value);
-    if (words >= min) continue;
-    const example = exampleIn(rule, lang);
-    warnings.push({
-      rule: "brief.vague",
-      key: rule.key,
-      words,
-      example,
-      message: `--${rule.flag} has ${words} word${words === 1 ? "" : "s"}; ${min} or more say what the quiz covers, for example "${example}"`,
-    });
-  }
-  if (brief.weak_topics && given.weakTopics === true) {
-    warnings.push({
-      rule: "brief.no-history",
-      message:
-        "focus_tags is empty: quiz brief reads no history; pick the weak topics from the learner's reports, or use the library's brief (step 4), which fills them from stats",
-    });
-  }
-
-  // -- write: brief.yaml first (atomic, creates DIR), then the empty content folder; an existing one is kept
+  const made = compose(given);
   try {
-    if (existsSync(folder) && !statSync(folder).isDirectory()) throw new WriteError(folder, { code: "ENOTDIR" });
-    await writeFileAtomic(target, Buffer.from(text, "utf8"));
-    await mkdir(join(folder, "content"), { recursive: true });
+    await writeOut(made.text);
   } catch (error) {
-    const file = (error as { file?: string }).file ?? folder;
-    fail(
-      io,
-      json,
-      `cannot write ${shownPath(file, io.cwd)}: ${error instanceof WriteError ? error.message : readFailure(error)}`,
-    );
+    fail(io, json, writeProblem(error));
     return EXIT.usage;
   }
-
-  const shown = shownPath(target, io.cwd);
-  const applied = Object.entries(brief.decided_by)
-    .filter(([key, by]) => by !== "user" && key !== "focus_tags")
-    .map(([key]) => key);
-  for (const w of warnings) io.err(`warning ${w.rule}: ${w.message}`);
-  if (json) {
-    io.out(JSON.stringify({ status: "written", brief: shown, defaults_applied: applied, warnings }));
-  }
-  say(`wrote ${shown} and ${shownPath(join(folder, "content"), io.cwd)}/`);
-  if (applied.length > 0) say(`defaults used: ${applied.join(", ")}`);
+  report(made.brief, made.warnings);
   return EXIT.done;
+}
+
+/** The flags as `--web` was given them, for the command that starts again (G112): the answers, `--language` and `--profile`. */
+function restartCommand(dir: string, opts: BriefOptions): string {
+  const quote = (text: string): string =>
+    /^[\w@%+=:,./-]+$/.test(text) ? text : `"${text.replace(/(["\\$`])/g, "\\$1")}"`;
+  const parts = ["quiz", "brief", quote(dir), "--web"];
+  const add = (flag: string, value: string | null): void => {
+    if (value !== null) parts.push(`--${flag}`, quote(value));
+  };
+  add("purpose", opts.purpose);
+  add("scope", opts.scope);
+  add("kinds", opts.kinds);
+  add("kinds-other", opts.kindsOther);
+  add("elsewhere", opts.elsewhere);
+  add("count", opts.count);
+  add("minutes", opts.minutes);
+  add("mix", opts.mix);
+  add("difficulty", opts.difficulty);
+  add("mode", opts.mode);
+  add("weak-topics", opts.weakTopics);
+  add("commitment", opts.commitment);
+  add("language", opts.language);
+  add("request", opts.request);
+  add("profile", opts.profile);
+  if (opts.config !== null) add("config", opts.config);
+  return parts.join(" ");
 }

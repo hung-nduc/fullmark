@@ -1,7 +1,5 @@
-import { spawn } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { languagesUsed, loadHighlighter } from "../build/highlight";
 import { buildPage, type ReplayData } from "../build/page";
 import { buildPaper } from "../build/paper";
@@ -92,29 +90,9 @@ export type WatchIo = BuildIo & {
   roundDone?: () => void;
 };
 
-/** The system's opener (COMMANDS.md, `--open`): `start` through `cmd` on Windows, `open` on macOS, else `xdg-open`. */
-export function systemOpen(path: string): Promise<void> {
-  const [command, args]: [string, string[]] =
-    process.platform === "win32"
-      ? ["cmd", ["/c", "start", '""', `"${path}"`]]
-      : process.platform === "darwin"
-        ? ["open", [path]]
-        : ["xdg-open", [path]];
-  return new Promise((done, fail) => {
-    const child = spawn(command, args, { detached: true, stdio: "ignore", windowsVerbatimArguments: true });
-    child.once("error", fail);
-    child.once("spawn", () => {
-      child.unref();
-      done();
-    });
-  });
-}
+import { runtimeFolder, systemOpen } from "./runtime";
 
-/** `dist/`: `page.js` and `page.css` sit beside `cli.js`. Run from the sources (tests), they are in `<repo>/dist`. */
-export function runtimeFolder(): string {
-  const here = dirname(fileURLToPath(import.meta.url));
-  return existsSync(join(here, "page.js")) ? here : resolve(here, "..", "..", "dist");
-}
+export { runtimeFolder, systemOpen };
 
 /** `21.4 MB`: one decimal, MB being 1,000,000 bytes. */
 export const megabytes = (bytes: number): string => `${(bytes / 1e6).toFixed(1)} MB`;

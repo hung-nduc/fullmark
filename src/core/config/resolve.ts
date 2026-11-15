@@ -49,6 +49,21 @@ const known = (layers: Layers): string[] =>
   ].sort();
 
 /**
+ * The profiles `--profile` would accept (the brief form's choices): the built-in ones first, in their own order, then
+ * every profile the config files define, by name, each with the config file it comes from (its name only: `fullmark.toml`
+ * or `config.toml`). A built-in profile that a config file changes is still listed as the built-in one.
+ */
+export function profileOptions(layers: Layers): { name: string; file: string | null }[] {
+  const builtin = [...BUILTIN_PROFILES.keys()];
+  const own = known(layers).filter((n) => !BUILTIN_PROFILES.has(n));
+  const fileOf = (name: string): string => {
+    const layer = layers.project?.profiles.has(name) ? layers.project : layers.user;
+    return (layer?.file ?? "").split(/[\\/]/).at(-1) ?? "";
+  };
+  return [...builtin.map((name) => ({ name, file: null })), ...own.map((name) => ({ name, file: fileOf(name) }))];
+}
+
+/**
  * Resolves a profile: follows `extends` (a profile named like a built-in one, with no `extends` of its own, changes
  * that built-in profile; a project profile replaces a user profile of the same name), then applies the rule
  * settings from the base up. The errors are config errors, each with the file and line it comes from.

@@ -178,16 +178,6 @@ describe("quiz brief through flags", () => {
     expect(readFileSync(join(other, "d/content/a.md"), "utf8")).toBe("keep");
   });
 
-  it("--web exits 2, not available yet (3h)", async () => {
-    for (const opts of [{ web: true }]) {
-      const dir = tree();
-      const r = await run(dir, opts);
-      expect(r.code).toBe(2);
-      expect(r.json.message).toContain("not available yet");
-      expect(existsSync(join(dir, "d"))).toBe(false);
-    }
-  });
-
   it("a file in the way of DIR exits 2", async () => {
     const dir = tree({ d: "a file" });
     const r = await run(dir, {});
