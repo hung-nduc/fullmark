@@ -37,7 +37,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
 | 3h2 G116, `brief --web` on a phone | done, reviewed (2026-11-16), one fix in review, no gaps | `fd2d50a`..`0247344`, and the commit that holds this row |
-| 3z acceptance | last | |
+| 3z G118, the vi scans, acceptance | brief written (2026-11-16), waits for the owner's approval and G118 | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
@@ -53,7 +53,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
 4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2** (G116, then the phone, G117) is **built and reviewed** ("Slice 3h2", its Review), with no new gap: every slice of step 3 but 3z is done. Then **3z**, acceptance.
-5. **3z**, acceptance.
+5. **3z**'s brief is written (2026-11-16) and waits for the owner, with G118: the JSON Schemas and the forms' `vi` scans (an implementing agent), then the acceptance run (the planner) and the samples (the owner).
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
 
@@ -85,7 +85,12 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G118. The JSON Schemas of step 3's last slice (3z's brief).** TECHNICAL_DESIGN.md (the 0.x-to-1.0 table, "JSON Schemas are written by hand") says the JSON Schemas of `results`, `report`, `grades` and `review` arrive together in one task of step 3's last slice, generated from the zod schemas. It does not say where they live, how they are named, whether they ship, or how they are kept current; and the report has no zod schema yet (`Report` is a TypeScript type in `src/core/report/build.ts`). **Recommendation:**
+- Four files in `schemas/` at the repository's root: `results-v2.schema.json`, `report-v2.schema.json`, `grades-v2.schema.json`, `review-v2.schema.json`, JSON Schema draft 2020-12, each with a `title` and a `description` that names the format and its version, and an `$id` of `fullmark-<name>-v2` (no URL: nothing hosts them).
+- Generated from the zod schemas with zod's own `toJSONSchema` by `scripts/schemas.mjs` (`npm run schemas`), committed, and copied into `dist/schemas/` by the build, so they ship with the package.
+- The report gains a zod schema (`src/core/report/schema.ts`), the source of `Report` from then on; no report's bytes change and `quiz grade` checks nothing new.
+- A test regenerates the four and fails when a committed one differs (a stale schema fails like a golden), and validates every results, report, grades and review file under `test/golden/`, `e2e/golden/` and `examples/` against its schema, with a validator as a development dependency only.
+- No command prints them in v1; TECHNICAL_DESIGN.md names the folder, and the agent guide (step 5) points to it.
 
 ## Slices
 
@@ -114,7 +119,7 @@ None open.
 | **3q** | The replay's answer panel ("YOUR ANSWER", in place of the read-only textarea) and the result badge as a pill, on the page and in the replay, kept to one or two lines on a phone; built from ResultsReplay and RubricPhoneReplay | G94, 3f |
 | **3h** | `brief --web` at 1280 px: the form from the question file and the Brief boards, the detail rules, the Finish summary, pre-fills and the way back to them, Cancel, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, G112 to G115, boards |
 | **3h2** | G116; `brief --web` on a phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) | G116, G117, 3h |
-| **3z** | Acceptance: every "Done when" item checked in Chromium and Firefox, samples tried by the owner | |
+| **3z** | G118 (the JSON Schemas); a `vi` scan of the `review` and `grade` forms; then acceptance: every "Done when" item checked in Chromium and Firefox, the samples tried by the owner, step 3 closed | G118 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1382,3 +1387,43 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 **Found in review:** nothing new.
 
+## Slice 3z: the JSON Schemas, the forms' `vi` scans, then step 3's acceptance
+
+**Waiting for the owner's approval**, with G118. Two parts, as step 2 closed (archive/STEP2.md, items 73 to 75): first what is still owed, built by one implementing agent; then the acceptance, run by the planner against "Done when" (the Goal above) and tried by the owner, and step 3 closed.
+
+**Owed, found writing this brief:**
+- **The JSON Schemas.** TECHNICAL_DESIGN.md puts the export of the `results`, `report`, `grades` and `review` JSON Schemas in "one task of the last slice of step 3" (G118).
+- **The forms' `vi` scans.** "Every new form has a `vi` scan": `brief --web` has one (`e2e/brief.spec.ts`, no English chrome); `review` and `grade --web` are tested in Vietnamese (`e2e/review.spec.ts`, `e2e/grade.spec.ts`) but no test scans either for English chrome, as `e2e/vi-scan.spec.ts` scans the page.
+
+### Read first
+
+- This plan: the Goal ("Done when", "Not in step 3"), "Rules for every slice", G118, and the Reviews of 3k, 3f, 3p2 and 3h (each form's tests).
+- archive/STEP2.md, items 73 to 75 (how step 2's acceptance was run, recorded and closed, and item 73's rule on environmental failures).
+- TECHNICAL_DESIGN.md: the 0.x-to-1.0 table (JSON Schemas), section 4 (`results-v2`, `review-v2`), section 6 (`grades-v2`, the report), the libraries table (zod v4's JSON Schema export); section 11 (foundations 4 and 9) and section 12 (step 3).
+- Code: `src/core/attempt/results.ts` (`ResultsSchema`), `src/core/rubric/grades.ts` (`GradesFileSchema`), `src/core/review/schema.ts` (`ReviewSchema`), `src/core/report/build.ts` (`Report`) and `src/core/report/index.ts`; `package.json` (`scripts`, `files`), `tsup.config.ts`, `scripts/build-brief.mjs` (how a data file is copied into `dist/`); `e2e/vi-scan.spec.ts` (`own`, how a page is scanned), `e2e/review.spec.ts`, `e2e/grade.spec.ts`, `e2e/brief.spec.ts` (its vi scan).
+
+### Decided for this slice
+
+- **The schemas, as G118 says**, generated and checked; the report's zod schema is the source of `Report`, and no golden moves.
+- **The `vi` scans:** `e2e/vi-scan.spec.ts` gains the `review` form (with `--since` too) and the `grade --web` form (with `--grades` too) on a `ui_lang: vi` quiz: every state the form has (the cards, the open sidebar, each dialog, the saved card), scanned for English chrome as the page is, the quiz's own text and a grader's own words left out as `own` leaves them out. A word found is a bug to fix in the catalogs, not an exception to add.
+- **The acceptance** (the planner, after the agent's report and its review), recorded as numbered items at the end of this plan, as step 2's were. Each "Done when" item, with the test or run that shows it:
+  - contract tests for each command (`serve`, `review`, `grade --web`, `brief` through flags, `--web` and `--tui`, `stats`, `inspect`, `new`, `template`, `build --watch` and `--serve`): their goldens in `test/golden/` and their specs;
+  - flags, `--web` and `--tui` write byte-identical `brief.yaml` files: `e2e/brief-identity.spec.ts`;
+  - the server rejects a wrong token, `Host` or `Origin`: `test/serve/server.test.ts`;
+  - a `build` page is byte-identical with and without the server features and holds no server code: `test/build/page.test.ts`;
+  - the two-quiz server seam: `test/serve/server.test.ts`;
+  - every new form passes axe in both themes and has a `vi` scan;
+  - `npm run samples` has a line for each served command, and the owner has tried them by hand.
+  The whole `npm run check` in Chromium and Firefox, on one commit named in the record; every screens spec run once (`FULLMARK_SCREENS=1`) and any changed screen explained.
+- **Closing:** once every item passes and the owner has tried the samples, step 3 is closed: this plan is archived as `docs/plans/archive/STEP3.md` with a note at its top, as STEP2.md was, CLAUDE.md's "Start here" points to the next plan, and the Handoff names what step 4 starts from (TODO.md's shared `config.toml`, due before step 4, and the open proposals).
+- **Not in this slice:** `fullmark-shelf`'s schema (step 4); a command that prints the schemas.
+
+### Tasks
+
+1. **G118** (one commit or more): the report's zod schema; `scripts/schemas.mjs`, `npm run schemas`, `schemas/`, the copy into `dist/schemas/`; the test (fresh and valid against every file named in G118); TECHNICAL_DESIGN.md's table row and section 4 say where they are.
+2. **The `vi` scans** (one commit, with any catalog fixes they find, each named in the report).
+3. **The slice table's 3z row** (one commit). The agent's report as for every slice; the planner reviews it, then runs the acceptance.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; `npm run schemas` leaves the tree unchanged; the four schemas are in `dist/schemas/` after a build; the `vi` scans pass. Then the acceptance: every "Done when" item of the Goal recorded as passing, the owner's samples run recorded, and step 3 closed.
