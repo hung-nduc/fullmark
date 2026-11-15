@@ -33,7 +33,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3r G101, then fullmark's own marking from the form (G83) | done, reviewed, gaps decided (2026-11-13); the result badge fixed in review | `972533e`..`e376c8a`, `58484ff` |
 | 3r2 G103: the grader's frame without the replay's bar, the 3r screens' spec | done, reviewed (2026-11-13); G104 decided (2026-11-15) | `cf6a38a`..`870648e` |
 | 3q the replay's answer panel and badge (G94) | done, reviewed, gaps decided (2026-11-15) | `9133d08`..`506b816`, review |
-| 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | brief approved with G107 to G110 (2026-11-15); ready for an implementing agent | |
+| 3p2 G104, G106, `--web --grades` at 1280 px (G75, G102) | built, awaiting review | `a433497`..`aae0502` |
 | 3p3 the pre-filled form on a phone | outline, after 3p2 | |
 | 3h `brief --web` | waits for its boards (3v) | |
 | 3z acceptance | last | |
