@@ -1410,7 +1410,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
   - contract tests for each command (`serve`, `review`, `grade --web`, `brief` through flags, `--web` and `--tui`, `stats`, `inspect`, `new`, `template`, `build --watch` and `--serve`): their goldens in `test/golden/` and their specs;
   - flags, `--web` and `--tui` write byte-identical `brief.yaml` files: `e2e/brief-identity.spec.ts`;
   - the server rejects a wrong token, `Host` or `Origin`: `test/serve/server.test.ts`;
-  - a `build` page is byte-identical with and without the server features and holds no server code: `test/build/page.test.ts`;
+  - a `build` page is byte-identical with and without the server features and holds no server code: `test/serve/module.test.ts`;
   - the two-quiz server seam: `test/serve/server.test.ts`;
   - every new form passes axe in both themes and has a `vi` scan;
   - `npm run samples` has a line for each served command, and the owner has tried them by hand.
