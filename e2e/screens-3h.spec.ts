@@ -81,6 +81,10 @@ test("BriefVague: a scope of one word", async ({ page }) => {
 test("BriefVi: the Vietnamese form", async ({ page }) => {
   await open(page, AGENT_VI);
   await shot(page, "04-brief-vi");
+  // the profile box in Vietnamese: the longest tag (Cảnh báo) and the exam card's lines
+  await page.locator("[data-action=more]").click();
+  await page.locator("[data-profile-box]").scrollIntoViewIfNeeded();
+  await page.screenshot({ path: out("04b-brief-vi-more") });
 });
 
 test("BriefFinish: the summary", async ({ page }) => {

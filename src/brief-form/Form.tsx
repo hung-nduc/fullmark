@@ -1,7 +1,8 @@
-import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
+import { Fragment } from "preact";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { wordCount } from "../core/brief/defaults";
 import type { Question } from "../core/brief/questions";
-import { type BriefMessages, briefEn, briefVi } from "../core/i18n/brief";
+import { type BriefMessages, briefEn, briefVi, type CheckLevel, type ProfileWords } from "../core/i18n/brief";
 import { THEME_NAMES } from "../core/themes";
 import type { Look } from "../page/store";
 import { blocking, countsOf, currentOf, isVague, type Mark, markOf, question, questionsOf } from "./logic";
@@ -526,24 +527,50 @@ function ProfileBox({ state }: { state: FormState }) {
   const b = messages(state);
   const { model, kept } = state;
   const chosen = String(currentOf(model, kept.value, questionsOf(model).find((x) => x.key === "profile") as Question));
+  const level = (l: CheckLevel) => (
+    <span class="bf-lvl" data-level={l}>
+      {b.levels[l]}
+    </span>
+  );
   return (
     <div class="bf-profbox" data-profile-box>
       <h4 class="bf-prof-head">{b.profHead}</h4>
-      <dl class="bf-prof-list">
+      <div class="bf-prof-list">
         {state.data.profiles.map((p) => {
-          const known = (b.profiles as Record<string, { forText: string; text: string } | undefined>)[p.name];
+          const known = (b.profiles as Record<string, ProfileWords | undefined>)[p.name];
+          const own = p.file !== null || !known;
           return (
-            <div class="bf-prof-row" key={p.name} data-profile={p.name}>
-              <dt>
+            <div class="bf-prof-row" key={p.name} data-profile={p.name} data-chosen={p.name === chosen}>
+              <div class="bf-prof-id">
                 <code class="bf-prof-name">{p.name}</code>
-                <span class="bf-meta">{p.file === null ? (known?.forText ?? "") : b.profileOwn(p.file)}</span>
+                <span class="bf-prof-for">{own ? b.profileOwn(p.file ?? "") : known.forText}</span>
                 {p.name === chosen ? <span class="bf-chosen">{b.profChosen}</span> : null}
-              </dt>
-              {p.file === null && known ? <dd>{known.text}</dd> : null}
+              </div>
+              {own ? null : (
+                <ul class="bf-prof-checks">
+                  {known.checks.map((c) => (
+                    <li key={c.text}>
+                      {level(c.level)}
+                      <span>{c.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           );
         })}
-      </dl>
+        <div class="bf-prof-row" data-every>
+          <div class="bf-prof-id">
+            <span class="bf-prof-every">{b.profEvery}</span>
+          </div>
+          <ul class="bf-prof-checks">
+            <li>
+              {level("fails")}
+              <span>{b.profEveryText}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
       <p class="bf-note">{b.profFoot}</p>
     </div>
   );
@@ -632,6 +659,53 @@ function Form_({ state }: { state: FormState }) {
   );
 }
 
+/** The command that starts again, in a box of its own: one flag and its value per unbroken piece, and Copy. */
+function Command({ state }: { state: FormState }) {
+  const b = messages(state);
+  const text = state.data.command;
+  const [copied, setCopied] = useState(false);
+  const ref = useRef<HTMLPreElement>(null);
+  const copy = async (): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // no clipboard here: select the command, so the person can copy it themselves
+      const range = document.createRange();
+      if (ref.current) range.selectNodeContents(ref.current);
+      getSelection()?.removeAllRanges();
+      getSelection()?.addRange(range);
+    }
+  };
+  const parts = text.split(/ (?=--[a-z])/);
+  return (
+    <div class="bf-cmd" data-command>
+      <div class="bf-cmd-head">
+        <p>{b.cancelledLine}</p>
+        <button type="button" class="bf-btn bf-cmd-copy" onClick={() => void copy()} aria-live="polite">
+          {copied ? (
+            <Ico d="M5 12.5l4.5 4.5L19 7" />
+          ) : (
+            <Ico d="M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1zM5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+          )}
+          {copied ? b.copied : b.copy}
+        </button>
+      </div>
+      <pre ref={ref} class="bf-cmd-text">
+        <code>
+          {parts.map((part, i) => (
+            <Fragment key={part}>
+              {i > 0 ? " " : null}
+              <span class={part.length > 48 ? undefined : "bf-cmd-part"}>{part}</span>
+            </Fragment>
+          ))}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
 function Ended({ state }: { state: FormState }) {
   const b = messages(state);
   const ended = state.ended.value;
@@ -640,9 +714,7 @@ function Ended({ state }: { state: FormState }) {
     return (
       <section class="bf-card bf-end" role="status" data-ended="cancelled">
         <div class="bf-end-title">{b.cancelled}</div>
-        <p>
-          {b.cancelledLine} <code class="bf-code">{state.data.command}</code>
-        </p>
+        <Command state={state} />
         <p class="bf-note">{b.closed}</p>
       </section>
     );

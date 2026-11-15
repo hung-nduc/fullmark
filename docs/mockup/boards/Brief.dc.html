@@ -218,20 +218,28 @@ a{color:#46608a}a:hover{color:#2a2b31}
             <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{q.note}}</p>
             <div style="{{s.profBox}}">
               <h4 style="margin: 0; font-size: 0.95em; font-weight: 700">{{L.profHead}}</h4>
-              <dl style="margin: 0; display: flex; flex-direction: column; gap: 0">
+              <div style="{{s.profList}}">
                 <sc-for list="{{profInfo}}" as="pi" hint-placeholder-count="4">
                   <div style="{{pi.rowStyle}}">
-                    <dt style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px">
                       <code style="{{s.profName}}">{{pi.name}}</code>
                       <span style="font-size: 0.85em; color: {{t.muted}}">{{pi.forText}}</span>
                       <sc-if value="{{pi.chosen}}" hint-placeholder-val="{{ false }}">
                         <span style="{{s.chosenPill}}">{{L.profChosen}}</span>
                       </sc-if>
-                    </dt>
-                    <dd style="margin: 4px 0 0; font-size: 0.9em">{{pi.text}}</dd>
+                    </div>
+                    <ul style="{{s.profChecks}}">
+                      <sc-for list="{{pi.checks}}" as="c" hint-placeholder-count="2">
+                        <li style="{{s.profCheck}}"><span style="{{c.tagStyle}}">{{c.tag}}</span><span>{{c.text}}</span></li>
+                      </sc-for>
+                    </ul>
                   </div>
                 </sc-for>
-              </dl>
+                <div style="{{everyRow}}">
+                  <b style="font-size: 0.9em">{{L.profEvery}}</b>
+                  <ul style="{{s.profChecks}}"><li style="{{s.profCheck}}"><span style="{{everyTag}}">{{everyTagText}}</span><span>{{L.profEveryText}}</span></li></ul>
+                </div>
+              </div>
               <p style="margin: 0; font-size: 0.85em; color: {{t.muted}}">{{L.profFoot}}</p>
             </div>
           </section>
@@ -260,7 +268,16 @@ a{color:#46608a}a:hover{color:#2a2b31}
     <sc-if value="{{isCancelled}}" hint-placeholder-val="{{ false }}">
       <section style="{{s.endCard}}">
         <div style="font-weight: 700; font-size: 1.2em">{{L.cancelled}}</div>
-        <p style="margin: 0">{{L.cancelledLine}} <code style="{{s.inlineCode}}">quiz brief signals-midterm</code></p>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <p style="margin: 0">{{L.cancelledLine}}</p>
+          <button type="button" onClick="{{copyCmd}}" style="{{s.hdrBtn}}; flex: none; display: inline-flex; align-items: center; gap: 8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{copyIcon}}"></path></svg>
+            {{copyText}}
+          </button>
+        </div>
+        <div>
+          <pre style="{{s.cmdText}}"><code><span style="white-space: nowrap">quiz brief signals-midterm --web</span> <span style="white-space: nowrap">--purpose exam-prep</span> --scope "lectures 3 to 5, the Fourier transform and its properties" <span style="white-space: nowrap">--count 30</span></code></pre>
+        </div>
         <p style="margin: 0; color: {{t.muted}}; font-size: 0.9em">{{L.closed}}</p>
       </section>
     </sc-if>
@@ -417,12 +434,13 @@ var LANG = {
     revertAll: function (n) { return "Back to every pre-filled answer (" + n + (n === 1 ? " changed)" : " changed)"); },
     agentKeep: "A pre-filled answer you keep is written to brief.yaml as your own answer. Change one, and its card offers a way back to it.",
     profHead: "What each profile checks", profChosen: "Chosen",
-    profFoot: "Under every profile, a quiz that cannot work fails: bad syntax, a missing answer key, a missing image. Profiles of your own, from fullmark.toml or config.toml, are listed here too. The agent never changes the profile to make a quiz pass.",
+    levels: { fails: "Fails", warns: "Warns", note: "Note", off: "Off" }, profEvery: "Every profile", profEveryText: "A quiz that cannot work: bad syntax, a missing answer key, a missing image.",
+    profFoot: "Profiles of your own, from fullmark.toml or config.toml, are listed here too. The agent never changes the profile to make a quiz pass.",
     blkTitle: "Some answers are missing", blkLead: "Nothing is written until these are answered:",
     whyPurpose: "pick what the quiz is for", whyScope: "say what the quiz covers", whyVague: "too short, give at least 4 words",
     written: "Brief written", doneLine: function (n, y, d) { return n + " answers: " + y + " yours, " + d + " defaults."; },
     fileBrief: "the brief, for the agent", fileContent: "empty: put your material here", closed: "The server has stopped. You can close this tab.",
-    cancelled: "Cancelled", cancelledLine: "Nothing was written. To start again, run"
+    cancelled: "Cancelled", cancelledLine: "Nothing was written. To start again, run:", copy: "Copy", copied: "Copied"
   },
   vi: {
     brief: "Yêu cầu", briefColon: "Yêu cầu:", meta: "những gì AI sẽ viết", questions: "Câu hỏi", appearance: "Giao diện", cancel: "Huỷ", finish: "Hoàn tất",
@@ -456,12 +474,13 @@ var LANG = {
     revertAll: function (n) { return "Về lại tất cả câu điền sẵn (" + n + " câu đã sửa)"; },
     agentKeep: "Câu điền sẵn mà bạn giữ lại sẽ được ghi vào brief.yaml là câu trả lời của bạn. Nếu bạn sửa một câu, thẻ của câu đó có nút để về lại câu điền sẵn.",
     profHead: "Mỗi bộ quy tắc kiểm tra gì", profChosen: "Đang chọn",
-    profFoot: "Với mọi bộ quy tắc, bài không thể chạy đều trượt: sai cú pháp, thiếu đáp án, thiếu hình. Các bộ quy tắc riêng của bạn trong fullmark.toml hoặc config.toml cũng hiện ở đây. AI không bao giờ đổi bộ quy tắc để bài được đạt.",
+    levels: { fails: "Trượt", warns: "Cảnh báo", note: "Ghi chú", off: "Tắt" }, profEvery: "Mọi bộ quy tắc", profEveryText: "Bài không thể chạy: sai cú pháp, thiếu đáp án, thiếu hình.",
+    profFoot: "Các bộ quy tắc riêng của bạn trong fullmark.toml hoặc config.toml cũng hiện ở đây. AI không bao giờ đổi bộ quy tắc để bài được đạt.",
     blkTitle: "Còn thiếu câu trả lời", blkLead: "Chưa ghi gì cho đến khi các câu này được trả lời:",
     whyPurpose: "chọn mục đích của bài", whyScope: "nêu nội dung bài kiểm tra", whyVague: "quá ngắn, cần ít nhất 4 từ",
     written: "Đã ghi bản yêu cầu", doneLine: function (n, y, d) { return n + " câu trả lời: " + y + " của bạn, " + d + " mặc định."; },
     fileBrief: "bản yêu cầu cho AI", fileContent: "trống: đặt tài liệu của bạn vào đây", closed: "Máy chủ đã dừng. Bạn có thể đóng thẻ này.",
-    cancelled: "Đã huỷ", cancelledLine: "Chưa ghi gì. Để bắt đầu lại, chạy"
+    cancelled: "Đã huỷ", cancelledLine: "Chưa ghi gì. Để bắt đầu lại, chạy:", copy: "Sao chép", copied: "Đã chép"
   }
 };
 var SECTIONS = [{ id: "about", title: { en: "About the material", vi: "Về tài liệu" } }, { id: "quiz", title: { en: "The quiz", vi: "Bài kiểm tra" } }];
@@ -517,18 +536,20 @@ var ICONS = {
 };
 // TECHNICAL_DESIGN.md, section 5, "Profiles"
 var PROFILE_INFO = [
-  { name: "default", forText: x("for everything", "cho mọi bài"),
-    text: x("Quality findings (a correct choice that gives itself away, a short explanation, answers bunched on one letter) are warnings: you see them, and the quiz still passes.",
-            "Lỗi chất lượng (đáp án đúng tự lộ, lời giải thích quá ngắn, đáp án dồn vào một chữ cái) chỉ là cảnh báo: bạn thấy chúng, và bài vẫn đạt.") },
-  { name: "draft", forText: x("for a quiz still being written", "cho bài đang viết dở"),
-    text: x("Quality findings drop to notes, so only a quiz that cannot work fails.",
-            "Lỗi chất lượng chỉ còn là ghi chú, nên bài chỉ trượt khi không thể chạy.") },
-  { name: "exam", forText: x("for a mock exam", "cho đề thi thử"),
-    text: x("Every quality warning becomes an error. Each question needs an explanation of at least 8 words and a tag; no answer letter may hold more than 40% of the answers; the question count must be within 10% of the brief; no rule can be switched off inside the quiz.",
-            "Mọi cảnh báo chất lượng thành lỗi. Mỗi câu cần lời giải thích ít nhất 8 từ và một thẻ chủ đề; không chữ cái đáp án nào chiếm quá 40%; số câu lệch không quá 10% so với yêu cầu; không được tắt quy tắc ngay trong bài.") },
-  { name: "survey", forText: x("for a questionnaire", "cho bảng khảo sát"),
-    text: x("The checks that assume a right answer are off: the giveaway choice, the explanations and the spread of answer letters.",
-            "Các kiểm tra giả định có đáp án đúng được tắt: đáp án tự lộ, lời giải thích và độ phân bố chữ cái đáp án.") }
+  { name: "default", forText: x("for everything", "cho mọi bài"), checks: [
+    ["warns", x("Quality findings: a correct choice that gives itself away, a short explanation, answers bunched on one letter. You see them, and the quiz still passes.",
+                "Lỗi chất lượng: đáp án đúng tự lộ, lời giải thích quá ngắn, đáp án dồn vào một chữ cái. Bạn thấy chúng, và bài vẫn đạt.")]] },
+  { name: "draft", forText: x("for a quiz still being written", "cho bài đang viết dở"), checks: [
+    ["note", x("Quality findings, so only a quiz that cannot work fails.", "Lỗi chất lượng, nên bài chỉ trượt khi không thể chạy.")]] },
+  { name: "exam", forText: x("for a mock exam", "cho đề thi thử"), checks: [
+    ["fails", x("Every quality warning.", "Mọi cảnh báo chất lượng.")],
+    ["fails", x("A question without a tag, or with an explanation under 8 words.", "Câu không có thẻ chủ đề, hoặc lời giải thích dưới 8 từ.")],
+    ["fails", x("One answer letter holding more than 40% of the answers.", "Một chữ cái đáp án chiếm quá 40% số đáp án.")],
+    ["fails", x("A question count more than 10% from the brief.", "Số câu lệch quá 10% so với yêu cầu.")],
+    ["fails", x("A rule switched off inside the quiz.", "Quy tắc bị tắt ngay trong bài.")]] },
+  { name: "survey", forText: x("for a questionnaire", "cho bảng khảo sát"), checks: [
+    ["off", x("The checks that assume a right answer: the giveaway choice, the explanations, the spread of answer letters.",
+              "Các kiểm tra giả định có đáp án đúng: đáp án tự lộ, lời giải thích, độ phân bố chữ cái đáp án.")]] }
 ];
 function words(s) { s = (s || "").trim(); return s ? s.split(/\s+/).length : 0; }
 
@@ -543,6 +564,13 @@ class Component extends DCLogic {
     var t = T[themeName] || T.light;
     var edged = themeName === "oled" || themeName === "white";
     var isPhone = (p.device || "desktop") === "phone";
+    function profRow(i, bg, bar) {
+      return "display: grid; grid-template-columns: " + (isPhone ? "minmax(0, 1fr)" : "170px minmax(0, 1fr)") + "; gap: " + (isPhone ? 8 : 16) + "px; padding: 12px 14px 12px 11px; border-left: 3px solid " + bar + "; background: " + bg + (i ? "; border-top: 1px solid " + t.line : "");
+    }
+    function levelStyle(l) {
+      var c = l === "fails" ? t.bad : l === "warns" ? t.warn : l === "note" ? t.info : t.muted;
+      return "justify-self: start; padding: 1px 7px; font-size: 0.72em; font-weight: 700; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; border: 1px solid " + c + "; border-radius: 4px; color: " + c;
+    }
     var view = st.view || p.view || "form";
     var base = (p.prefill || "none") === "agent" ? AGENT[lang] : {};
     var vals = st.vals || ((p.sample || "none") === "vague" ? { purpose: "self-study", scope: lang === "vi" ? "tín hiệu" : "signals" } : p.sample === "changed" ? { count: 25 } : {});
@@ -772,8 +800,12 @@ class Component extends DCLogic {
       sumRow: "flex: none; display: grid; align-items: stretch; grid-template-columns: " + (isPhone ? "minmax(0, 1fr) auto" : SUMCOLS) + "; min-height: 44px; font-size: 0.9em; cursor: pointer; border-top: 1px solid " + t.line,
       revertRow: "display: flex; padding-top: 10px; margin-top: 2px; border-top: 1px dashed " + t.line,
       revertBtn: "font: inherit; font-size: 0.85em; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer; border: 1px solid " + t.info + "; background: " + t.infoWash + "; color: " + t.info + "; text-align: left",
-      profBox: "display: flex; flex-direction: column; gap: 6px; margin-top: 4px; padding: 14px 16px; border-radius: 8px; background: " + labelBg0 + "; border: 1px solid " + t.line,
-      profName: "font-family: " + MONO + "; font-size: 0.9em; font-weight: 700; padding: 1px 8px; border-radius: 4px; background: " + t.card + "; border: 1px solid " + t.line,
+      profBox: "display: flex; flex-direction: column; gap: 12px; margin-top: 4px; padding: 16px 18px; border-radius: 8px; background: " + labelBg0 + "; border: 1px solid " + t.line,
+      profName: "font-family: " + MONO + "; font-size: 1.05em; font-weight: 700",
+      profList: "display: flex; flex-direction: column; overflow: hidden; background: " + t.card + "; border: 1px solid " + t.line + "; border-radius: 8px",
+      profChecks: "list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.9em",
+      profCheck: "display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px; align-items: baseline",
+      cmdText: "margin: 0; padding: 12px 16px; font-family: " + MONO + "; font-size: 0.9em; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; background: " + t.sunken + "; border: 1px solid " + t.line + "; border-radius: 8px",
       chosenPill: "display: inline-flex; align-items: center; font-size: 0.75em; font-weight: 700; padding: 1px 10px; border-radius: 999px; background: " + t.accent + "; color: " + t.onAccent
     };
 
@@ -800,8 +832,15 @@ class Component extends DCLogic {
       revertAllText: L.revertAll(changedKeys.length),
       revertAll: function () { var n = Object.assign({}, vals); Object.keys(base).forEach(function (k) { delete n[k]; }); self.setState({ vals: n, cur: null }); },
       profInfo: PROFILE_INFO.map(function (pi, i) {
-        return { name: pi.name, forText: tx(pi.forText), text: tx(pi.text), chosen: pi.name === get("profile"), rowStyle: "padding: 10px 0" + (i ? "; border-top: 1px solid " + t.line : "") };
+        var chosen = pi.name === get("profile");
+        return { name: pi.name, forText: tx(pi.forText), chosen: chosen, rowStyle: profRow(i, chosen ? t.infoWash : "transparent", chosen ? t.accent : "transparent"),
+          checks: pi.checks.map(function (c) { return { tag: L.levels[c[0]], text: tx(c[1]), tagStyle: levelStyle(c[0]) }; }) };
       }),
+      everyRow: profRow(1, labelBg0, "transparent"),
+      copyIcon: st.copied ? "M5 12.5l4.5 4.5L19 7" : "M9 9h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1zM5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1",
+      everyTag: levelStyle("fails"), everyTagText: L.levels.fails,
+      copyText: st.copied ? L.copied : L.copy,
+      copyCmd: function () { self.setState({ copied: true }); },
       doneLine: L.doneLine(total, counts.you + counts.agent, counts["default"]),
       themePills: ["light", "dark", "oled", "white", "paper"].map(function (k) {
         var on = k === themeName;

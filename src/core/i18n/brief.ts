@@ -58,27 +58,47 @@ const shortVi: ShortNames = {
   profile: "Bộ quy tắc",
 };
 
+/** How hard a check is under a profile: the tag before each line of the profile box. */
+export type CheckLevel = "fails" | "warns" | "note" | "off";
+export type ProfileWords = { hint: string; forText: string; checks: { level: CheckLevel; text: string }[] };
+
 /** What each built-in profile checks (TECHNICAL_DESIGN.md, section 5, "Profiles"), in the form's words. */
-const profilesEn = {
+const profilesEn: Record<"default" | "draft" | "exam" | "survey", ProfileWords> = {
   default: {
     hint: "The usual checks: warnings, nothing fails.",
     forText: "for everything",
-    text: "Quality findings (a correct choice that gives itself away, a short explanation, answers bunched on one letter) are warnings: you see them, and the quiz still passes.",
+    checks: [
+      {
+        level: "warns",
+        text: "Quality findings: a correct choice that gives itself away, a short explanation, answers bunched on one letter. You see them, and the quiz still passes.",
+      },
+    ],
   },
   draft: {
     hint: "Writing in progress: only broken quizzes fail.",
     forText: "for a quiz still being written",
-    text: "Quality findings drop to notes, so only a quiz that cannot work fails.",
+    checks: [{ level: "note", text: "Quality findings, so only a quiz that cannot work fails." }],
   },
   exam: {
     hint: "Strictest, for a mock exam.",
     forText: "for a mock exam",
-    text: "Every quality warning becomes an error. Each question needs an explanation of at least 8 words and a tag; no answer letter may hold more than 40% of the answers; the question count must be within 10% of the brief; no rule can be switched off inside the quiz.",
+    checks: [
+      { level: "fails", text: "Every quality warning." },
+      { level: "fails", text: "A question without a tag, or with an explanation under 8 words." },
+      { level: "fails", text: "One answer letter holding more than 40% of the answers." },
+      { level: "fails", text: "A question count more than 10% from the brief." },
+      { level: "fails", text: "A rule switched off inside the quiz." },
+    ],
   },
   survey: {
     hint: "No right answers.",
     forText: "for a questionnaire",
-    text: "The checks that assume a right answer are off: the giveaway choice, the explanations and the spread of answer letters.",
+    checks: [
+      {
+        level: "off",
+        text: "The checks that assume a right answer: the giveaway choice, the explanations, the spread of answer letters.",
+      },
+    ],
   },
 };
 
@@ -86,22 +106,38 @@ const profilesVi: typeof profilesEn = {
   default: {
     hint: "Kiểm tra thông thường: chỉ cảnh báo.",
     forText: "cho mọi bài",
-    text: "Lỗi chất lượng (đáp án đúng tự lộ, lời giải thích quá ngắn, đáp án dồn vào một chữ cái) chỉ là cảnh báo: bạn thấy chúng, và bài vẫn đạt.",
+    checks: [
+      {
+        level: "warns",
+        text: "Lỗi chất lượng: đáp án đúng tự lộ, lời giải thích quá ngắn, đáp án dồn vào một chữ cái. Bạn thấy chúng, và bài vẫn đạt.",
+      },
+    ],
   },
   draft: {
     hint: "Đang viết dở: chỉ bài hỏng mới trượt.",
     forText: "cho bài đang viết dở",
-    text: "Lỗi chất lượng chỉ còn là ghi chú, nên bài chỉ trượt khi không thể chạy.",
+    checks: [{ level: "note", text: "Lỗi chất lượng, nên bài chỉ trượt khi không thể chạy." }],
   },
   exam: {
     hint: "Chặt nhất, cho đề thi thử.",
     forText: "cho đề thi thử",
-    text: "Mọi cảnh báo chất lượng thành lỗi. Mỗi câu cần lời giải thích ít nhất 8 từ và một thẻ chủ đề; không chữ cái đáp án nào chiếm quá 40%; số câu lệch không quá 10% so với yêu cầu; không được tắt quy tắc ngay trong bài.",
+    checks: [
+      { level: "fails", text: "Mọi cảnh báo chất lượng." },
+      { level: "fails", text: "Câu không có thẻ chủ đề, hoặc lời giải thích dưới 8 từ." },
+      { level: "fails", text: "Một chữ cái đáp án chiếm quá 40% số đáp án." },
+      { level: "fails", text: "Số câu lệch quá 10% so với yêu cầu." },
+      { level: "fails", text: "Quy tắc bị tắt ngay trong bài." },
+    ],
   },
   survey: {
     hint: "Không có đáp án đúng.",
     forText: "cho bảng khảo sát",
-    text: "Các kiểm tra giả định có đáp án đúng được tắt: đáp án tự lộ, lời giải thích và độ phân bố chữ cái đáp án.",
+    checks: [
+      {
+        level: "off",
+        text: "Các kiểm tra giả định có đáp án đúng: đáp án tự lộ, lời giải thích, độ phân bố chữ cái đáp án.",
+      },
+    ],
   },
 };
 
@@ -202,8 +238,11 @@ export const briefEn = {
   revertAll: (n: number) => `Back to every pre-filled answer (${n} changed)`,
   profHead: "What each profile checks",
   profChosen: "Chosen",
+  levels: { fails: "Fails", warns: "Warns", note: "Note", off: "Off" } as Record<CheckLevel, string>,
+  profEvery: "Every profile",
+  profEveryText: "A quiz that cannot work: bad syntax, a missing answer key, a missing image.",
   profFoot:
-    "Under every profile, a quiz that cannot work fails: bad syntax, a missing answer key, a missing image. Profiles of your own, from fullmark.toml or config.toml, are listed here too. The agent never changes the profile to make a quiz pass.",
+    "Profiles of your own, from fullmark.toml or config.toml, are listed here too. The agent never changes the profile to make a quiz pass.",
   profileOwn: (file: string) => `your own, from ${file}`,
   profiles: profilesEn,
   short: shortEn,
@@ -218,7 +257,9 @@ export const briefEn = {
   fileContent: "empty: put your material here",
   closed: "The server has stopped. You can close this tab.",
   cancelled: "Cancelled",
-  cancelledLine: "Nothing was written. To start again, run",
+  cancelledLine: "Nothing was written. To start again, run:",
+  copy: "Copy",
+  copied: "Copied",
   stopped: "The server has stopped, so nothing was sent. Run the command again to start over.",
   notSent: (why: string) => `The brief was not written: ${why}`,
   sending: "Writing the brief",
@@ -321,8 +362,11 @@ export const briefVi: BriefMessages = {
   revertAll: (n) => `Về lại tất cả câu điền sẵn (${n} câu đã sửa)`,
   profHead: "Mỗi bộ quy tắc kiểm tra gì",
   profChosen: "Đang chọn",
+  levels: { fails: "Trượt", warns: "Cảnh báo", note: "Ghi chú", off: "Tắt" },
+  profEvery: "Mọi bộ quy tắc",
+  profEveryText: "Bài không thể chạy: sai cú pháp, thiếu đáp án, thiếu hình.",
   profFoot:
-    "Với mọi bộ quy tắc, bài không thể chạy đều trượt: sai cú pháp, thiếu đáp án, thiếu hình. Các bộ quy tắc riêng của bạn trong fullmark.toml hoặc config.toml cũng hiện ở đây. AI không bao giờ đổi bộ quy tắc để bài được đạt.",
+    "Các bộ quy tắc riêng của bạn trong fullmark.toml hoặc config.toml cũng hiện ở đây. AI không bao giờ đổi bộ quy tắc để bài được đạt.",
   profileOwn: (file) => `của riêng bạn, từ ${file}`,
   profiles: profilesVi,
   short: shortVi,
@@ -337,7 +381,9 @@ export const briefVi: BriefMessages = {
   fileContent: "trống: đặt tài liệu của bạn vào đây",
   closed: "Máy chủ đã dừng. Bạn có thể đóng thẻ này.",
   cancelled: "Đã huỷ",
-  cancelledLine: "Chưa ghi gì. Để bắt đầu lại, chạy",
+  cancelledLine: "Chưa ghi gì. Để bắt đầu lại, chạy:",
+  copy: "Sao chép",
+  copied: "Đã chép",
   stopped: "Máy chủ đã dừng nên chưa gửi được gì. Hãy chạy lại lệnh để bắt đầu lại.",
   notSent: (why) => `Chưa ghi được bản yêu cầu: ${why}`,
   sending: "Đang ghi bản yêu cầu",
