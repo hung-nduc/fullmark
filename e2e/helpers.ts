@@ -287,7 +287,7 @@ export const SCREENS_USE = { timezoneId: "Asia/Ho_Chi_Minh", locale: "en-US", re
  * every screens spec in a `beforeEach`; the page is not changed.
  */
 export async function fixScreens(page: Page): Promise<void> {
-  // a screenshot waits until the page has settled: the fonts are ready
+  // a screenshot waits until the page has settled: the fonts are ready and the layout drawn again
   const take = page.screenshot.bind(page);
   page.screenshot = async (options) => {
     await settle(page);
@@ -315,11 +315,21 @@ export async function fixScreens(page: Page): Promise<void> {
   });
 }
 
-/** Waits for the fonts (not for a frame: a spec that pauses the clock stops frames too). */
+/**
+ * Waits for the fonts (not for a frame: a spec that pauses the clock stops frames too), then makes the page lay out and
+ * draw again, by a viewport one pixel wider and back: a sticky part (the forms' sidebar) is otherwise drawn a pixel
+ * higher or lower, depending on the order in which the page measured its bar and the browser placed the part.
+ */
 export async function settle(page: Page): Promise<void> {
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  const size = page.viewportSize();
+  if (!size) return;
+  // the window cannot be resized in full screen (Focus mode): there the page is left as it is
+  if (await page.evaluate(() => document.fullscreenElement !== null)) return;
+  await page.setViewportSize({ width: size.width + 1, height: size.height });
+  await page.setViewportSize(size);
 }
 
 /** A PDF of the page, its creation and modification dates replaced by the fixed time, so two runs write the same bytes. */
