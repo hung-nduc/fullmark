@@ -132,10 +132,10 @@ describe("the form's bundle and its words", () => {
     expect([briefEn.byYou, briefEn.byPrefilled, briefEn.byDefault]).toEqual(["Yours", "Pre-filled", "Default"]);
     expect([briefVi.byPrefilled, briefVi.prefilledW]).toEqual(["Điền sẵn", "điền sẵn"]);
     expect(briefEn.closesIn(29)).toBe("The form closes in 29 min if left open. Cancel writes nothing.");
-    expect(briefVi.closesIn(29)).toBe("Biểu mẫu tự đóng sau 29 phút nếu để yên. Huỷ thì không ghi gì.");
+    expect(briefVi.closesIn(29)).toBe("Biểu mẫu tự đóng sau 29 phút nếu để yên. Hủy thì không ghi gì.");
     expect(briefEn.closesNever).toBe("Cancel writes nothing.");
     expect(briefVi.finish).toBe("Hoàn tất");
-    expect(briefVi.cancel).toBe("Huỷ");
+    expect(briefVi.cancel).toBe("Hủy");
     expect(briefVi.doneLine(14, 12, 2)).toBe("14 câu trả lời: 12 của bạn, 2 mặc định.");
   });
 

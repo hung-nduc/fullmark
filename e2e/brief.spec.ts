@@ -550,9 +550,9 @@ test("a vi form (--language vi): the question file's words and the board's, AI f
   expect(body).toContain("Điền sẵn cho bạn");
   expect(body).not.toMatch(/trợ lý/i);
   await expect(finish(page)).toHaveText("Hoàn tất");
-  await expect(page.locator("[data-action=cancel]")).toHaveText("Huỷ");
+  await expect(page.locator("[data-action=cancel]")).toHaveText("Hủy");
   await expect(page.locator("[data-closes]")).toHaveText(
-    "Biểu mẫu tự đóng sau 30 phút nếu để yên. Huỷ thì không ghi gì.",
+    "Biểu mẫu tự đóng sau 30 phút nếu để yên. Hủy thì không ghi gì.",
   );
   // no English string of the form's own words, nor of the question file's, differs from its vi twin in what is on screen
   const on = async (): Promise<string> =>

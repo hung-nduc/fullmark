@@ -137,7 +137,7 @@ describe("the Information tab", () => {
   it("shows an option as given, in the page's language", () => {
     const given = { profile: "strict-exam", fonts: "none" as const, uiLang: "vi" as const, strict: true };
     const t = text(buildPage([{ ...quizOf("examples/medical/quiz.md"), uiLang: "vi" }], { ...options, given }));
-    expect(t).toContain("Hồ sơ kiểm tra strict-exam");
+    expect(t).toContain("Bộ quy tắc kiểm tra strict-exam");
     expect(t).toContain("Phông chữ none");
     expect(t).toContain("Ngôn ngữ giao diện vi");
     expect(t).toContain("Chế độ nghiêm ngặt bật");
