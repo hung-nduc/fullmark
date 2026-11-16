@@ -49,12 +49,12 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
 | 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
 | 3z12 G145: full-page shots without the bars | built and reviewed (2026-11-16), one fix in review, no gaps | `cc5ccd8`..`5359380`, review |
-| 3z13 G146: the examples' intros | brief approved (2026-11-16); to build | |
+| 3z13 G146: the examples' intros | built and reviewed (2026-11-16), no fix in review; G147 open | `ea4c3b6`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G147, below (3z13's review).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -100,7 +100,8 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G147. Three more lines that name a control (3z13's review).** The agent's search found three, left unchanged since their wording is a choice: `templates/blank/quiz.md`, a hint "Hints stay hidden behind a button." and an explanation "Shown after the question is checked or after submit."; `examples/exam/quiz.md`, the first section's intro "Answer all questions. You cannot see the correct answers until you submit." Each is printed on the paper as it stands. **Recommendation:** reword them to hold on page and paper alike, saying what the block is rather than which control shows it: the hint "A hint for the learner, shown only when asked for.", the explanation "Why the answer is right, shown with the result.", the exam intro "Answer all questions. The correct answers are shown only at the end." The planner makes these three text changes in the review commit of this round (the blank template's goldens and the exam's hash follow, counted), with no slice of their own.
+
 
 ## Slices
 
@@ -1955,4 +1956,14 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; no example or template names a control of the page; the samples build.
+
+### Review (2026-11-16)
+
+**Built** in `ea4c3b6`: the chemistry intro is "Chọn đáp án đúng.", the calculus intro "Work through these first."; nothing in `src/` changed.
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 831 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean. `npm run samples` builds 33 of 33 pages, and `samples/paper-chemistry.html` no longer has the sentence. **Goldens:** 7 change: the calculus intro line in `new/from-copy`, `new/from-skeleton`, `new/template-calculus` and `template/add-with-assets` (4); the calculus version hash in `inspect/example-calculus`; the chemistry paper `build/print-example-chemistry`, the intro gone and the new version in the body, the key and the `@page` footer (so the style's CSP hash too); and `e2e/golden/review-since-written.jsonl`, the calculus `quizHash` only. Screens: none show the line, none taken again.
+
+**Done differently, accepted:** the e2e golden, which `npm run golden:update` does not cover, was written with `FULLMARK_GOLDEN_UPDATE=1` once `review.spec.ts`'s `--since` test showed the new hash as its only difference.
+
+**Gaps:** G147 (three more lines that name a control), open in "Gaps".
 
