@@ -45,7 +45,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
-| 3z9 G139, G140: the brief form on a phone | brief approved (2026-11-16); to build | |
+| 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1778,4 +1778,20 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; the "+" is tapped right after a choice with no settle step in any test; the screens show the mark on its own line at 360 and 390 px. Then step 3's acceptance is run again.
+
+### Review (2026-11-16)
+
+**Built** in `f97e299` (G139), `6c21f52` (G140), `c13fd43` (the screens and `e2e/screens-3z9.spec.ts`) and `d6a7d80` (the G140 check retyped for `tsc`, a commit of its own since amending is not allowed). The agent did not edit the plan; the planner added the review.
+
+**G139's cause, shown by the agent:** the current card's border was 2 px against 1 px. A touch on the commitment "+" moves the focus into that card, it becomes current, and its content box loses 2 px; at 390 px its help paragraph rewraps from two lines to three (49 to 73 px), and the "+" moves 23.5 px between pointerdown and click. **The fix:** the current card keeps a 1 px border in the accent and adds a 1 px inset shadow, so the edge looks the same and the layout does not change. `brief-phone.spec.ts` taps the "+" right after the last choice, with no settle step; a new check at the three phones taps a choice and the next card's "+" at once and finds the "+" where it was (it fails at all three against the old CSS).
+
+**G140:** under 520 px the card head is a column; the mark ("✎ Pre-filled for you", "! Needs your answer" and the others) is on its own line under the head line, at the left; a check at the three phones.
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 825 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean. Goldens: none changed. The four screens in `docs/screens/3z9/` show the mark on its own line at 360 and 390 px, the head line at full width.
+
+**Fix in review:** the other current-item edges were checked for the same cause. The page's question card and the `review` card keep their border width when current (only the colour changes); the `grade --web` sidebar's current row went from 1 to 2 px, so its text could rewrap the moment it became current. It now has the same 1 px border and 1 px inset shadow (`src/grade-form/grade.css`); the grade specs and the full check pass; no golden changes.
+
+**Done differently, accepted:** the G139 check uses the "no" choice of `weak_topics`, since "yes" adds a note under the card, which moves the controls below it by design; the brief called the mark "Missing", whose English text is "! Needs your answer".
+
+**Gaps:** none.
 
