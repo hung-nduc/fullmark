@@ -46,6 +46,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
+| 3z10 G142, G143: reproducible screens | brief written (2026-11-16); waits for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -134,6 +135,7 @@ None open.
 | **3z7** | G126 (Materials as a pop-up on the start screen), G134 (the example's tone marks), G127's last word | G126, G134 |
 | **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen; added by the owner during the build: the whole-quiz row and By part on a phone, G136, G137, G138 | G135 to G138 |
 | **3z9** | G139 (the brief's "+" tap on a phone), G140 (the brief card's head on a phone) | G139, G140 |
+| **3z10** | G142 (reproducible screens), G143 (tall element shots on a phone) | G142, G143 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1806,4 +1808,36 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 **Done differently, accepted:** the G139 check uses the "no" choice of `weak_topics`, since "yes" adds a note under the card, which moves the controls below it by design; the brief called the mark "Missing", whose English text is "! Needs your answer".
 
 **Gaps:** none.
+
+## Slice 3z10: reproducible screens
+
+**Brief written on 2026-11-16; waits for the owner's approval.** G142 and G143 are decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, says what is wanted. Tests and screens only: nothing in `src/` changes. After 3z10, the owner tries the samples and step 3 is closed.
+
+### Read first
+
+- This plan: "Rules for every slice"; "Acceptance", item 3 (the causes of the 210 changed screens); STEP3-GAPS.md, G122, G141 to G143.
+- TECHNICAL_DESIGN.md, section 4, "Seeds" (the page draws its seed from `crypto.getRandomValues` at Start, `src/page/seed.ts`), and foundation 8.
+- Code: `e2e/helpers.ts`; every `e2e/screens-*.spec.ts` (38); `playwright.config.ts`.
+
+### Decided for this slice
+
+- **One setup for every screens spec**, in `e2e/helpers.ts` (for example `fixScreens(page)`, called before the page loads), used by all 38 specs:
+  - **the clock**: `page.clock` set to one fixed local time, 2026-10-23 09:00, so "Submitted …", "Started …", "saved at", the time used and the paper's date come out the same on every run; a spec that needs time to pass (a timer, a deadline) moves the fixed clock forward itself, by a fixed amount;
+  - **the random bytes**: an init script replaces `crypto.getRandomValues` in the page with a fixed sequence (a small seeded generator), so the seed drawn at Start, and with it the shuffle and the draw, are the same on every run. This lives in the spec only; the page is not changed;
+  - **the time zone and locale** of the screens are fixed in their Playwright context (`timezoneId`, `locale`), so another machine's settings do not move a date.
+- **Where the time comes from the command** (the forms' "saved at", `review`'s `reviewedAt`, a replay's report): the spec passes the command's injected clock where one exists; where none exists, list the screen in the report and leave it, a gap if it needs a seam in `src/`.
+- **Element shots** (G143): a helper (for example `shotOf(locator, path)`) adds a style for the capture only that hides the page's sticky parts (the top bar, the replay banner, the filter tabs, the foot bar, the forms' bars), takes the shot, and removes the style; every screen of one element on a phone uses it. Full-page and viewport screens are left as they are.
+- **The proof**: run every screens spec twice on the same commit; the second run changes no screen (not one byte, PNGs and PDFs). A PDF's own creation date is fixed too, or the report says why it cannot be.
+- **Screens**: every screen taken once after the change and committed, counted, with each cause (expected: the fixed time and the fixed order everywhere; the tall element shots without the sticky bars; nothing else).
+- **Goldens:** none change.
+
+### Tasks
+
+1. **The setup** (one commit): the helper, and every screens spec using it.
+2. **Element shots** (one commit): the helper and the specs that shoot one element on a phone.
+3. **Screens** (one commit): every screen taken, then taken again with no difference. Do not edit `docs/plans/` or `docs/design/`. The agent's report as for every slice, with the counts and any screen that is still not reproducible.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; two runs of every screens spec on the same commit give the same bytes; the phone element shots show the card whole. Then the owner tries the samples and step 3 is closed.
 
