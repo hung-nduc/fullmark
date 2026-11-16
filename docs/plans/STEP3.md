@@ -47,12 +47,13 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
-| 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 open | `e705a67`..`2ba17e7`, review |
+| 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
+| 3z12 G145: full-page shots without the bars | brief written (2026-11-16); waits for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-G145, below (3z11's review).
+None open.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -98,8 +99,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G145. Full-page phone shots draw the bars across the page (3z11's review).** The 16 "whole" shots of the `grade --web` form on a phone (`3p/8b`, `9b`, `10b`, and `3p3/*-whole`) are full-page captures: Playwright makes the window as tall as the page, and the sticky dock and the foot bar land wherever they were when it captured, often across the middle of a card (`3p3/06-holistic-adjusted-whole` has the dock over "Explains how to avoid it"). Where they land varies, so these are also the screens that still differ between runs: the planner's second run on `2ba17e7` changed `3p/10b-phone-holistic-whole` (83 240 pixels, the dock moved from the middle to the top and the foot bar from the bottom to the middle); the agent's second run changed none. G143 hid the bars for element shots only. **Recommendation:** a full-page shot hides the sticky parts for the capture too (the same `shotOf` style, used for every full-page screen), since the `-top`, `-box` and `-foot` shots beside each one already show the bars in place; then every screen is taken again, twice, as in 3z11.
-
+None open.
 
 ## Slices
 
@@ -139,6 +139,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3z9** | G139 (the brief's "+" tap on a phone), G140 (the brief card's head on a phone) | G139, G140 |
 | **3z10** | G142 (reproducible screens), G143 (tall element shots on a phone) | G142, G143 |
 | **3z11** | G144 (the dock a whole number of pixels tall; the last five screens) | G144 |
+| **3z12** | G145 (full-page shots without the bars) | G145 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1890,4 +1891,30 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 **Done differently, accepted:** the dock's inline `min-height` made `maths-code.spec.ts`'s count of `[style]` elements wrong; its selector leaves out the dock and the quiz root. `watchDock` keeps the last whole number when the dock measures 0 (the hidden replay frame in `grade --web`, which otherwise lost its scroll; `grade.spec.ts:759` found it).
 
 **Gaps:** G145, open in "Gaps".
+
+## Slice 3z12: full-page shots without the bars
+
+**Brief written on 2026-11-16; waits for the owner's approval.** G145 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, now says a whole-page screen hides the sticky parts too. Tests and screens only: nothing in `src/` changes. Same hard stop as 3z11.
+
+### Read first
+
+- This plan: "Rules for every slice"; the reviews of 3z10 and 3z11; STEP3-GAPS.md, G143 to G145.
+- Code: `e2e/helpers.ts` (`shotOf`, `settle`, `fixScreens`); the 24 `fullPage` screenshots in `e2e/screens-2d`, `2e`, `2j`, `2j2`, `2k2`, `2k3`, `3p`, `3p3`, `3q`.
+
+### Decided for this slice
+
+- **One helper for whole-page screens** (for example `pageShot(page, path)`), next to `shotOf` and sharing its hiding: every sticky or fixed part of the page and of the forms (the page's dock and foot bar, the replay banner and filter tabs where they stick, and the `review`, `grade --web` and `brief --web` forms' top and foot bars) is hidden by element style for the capture and restored after. `shotOf` hides the same list. Every `fullPage` screenshot in the screens specs uses it.
+- **Viewport screens** (no `fullPage`) are left as they are: there the bars are where a person sees them.
+- **Look at** `3p3/06-holistic-adjusted-whole`, `3p/10b-phone-holistic-whole` and one desktop full-page screen (for example `2e/1-results-card`) after the change: the content whole, no bar across it.
+- **The proof, with a hard stop:** take every screen, commit, take them again: no screen changes. If any still changes, do not try other fixes: put it back, list it (path, pixels differing, max channel difference) and report.
+- **Goldens:** none change.
+
+### Tasks
+
+1. **The helper and the specs** (one commit).
+2. **The screens and the proof** (one commit). Do not edit `docs/plans/` or `docs/design/`. The agent's report as for every slice, with the screens it looked at.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; no full-page screen shows a bar across its content; two screens runs on the same commit give the same bytes, or the screens that do not are listed. Then the owner tries the samples and step 3 is closed.
 
