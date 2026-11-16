@@ -162,6 +162,6 @@ describe("the start screen", () => {
     expect(html(make(false))).not.toContain('data-action="materials"');
     const open = make();
     open.state.shelf.value = true;
-    expect(html(open)).toContain('class="fm-shelf"');
+    expect(html(open)).toContain('class="fm-materials-dialog"');
   });
 });

@@ -327,6 +327,7 @@ export const en = {
     clockStartsMaterials: "The clock starts when you press Start. Materials can be opened first.",
     closeMaterials: "Close",
     closeMaterialsLabel: "Close the materials",
+    materialsFoot: "Esc, Close or a click outside closes this. The clock has not started.",
     sidebarAria: "Sidebar",
     closeSidebar: "Close the sidebar",
     closeSidebarTitle: "Close (Esc)",

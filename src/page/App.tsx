@@ -583,8 +583,8 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
   const form = sideForm(page, attempt.phase, phone);
   const wide =
     !phone && started && sidebarOpen && (form === "stacked" || (form === "tabs" && state.side.value === "materials"));
-  // on a phone an open sidebar (or the start screen's Materials panel) takes the screen: what is under it is not there
-  const covered = phone && (started ? sidebarOpen : state.shelf.value);
+  // on a phone an open sidebar takes the screen: what is under it is not there (the start screen's Materials pop-up is a modal dialog)
+  const covered = phone && started && sidebarOpen;
   const materials = page.materials !== undefined && page.materials.length > 0;
   let number = 0;
   const missed = graded ? new Set(missedIds(graded)) : new Set<string>();

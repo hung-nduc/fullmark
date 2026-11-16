@@ -60,6 +60,13 @@ for (const s of subjects) {
     const look = async (step: string) => seen.push([step, await onScreen(page)]);
 
     await look("the start screen");
+    if ((await page.locator("[data-action=materials]").count()) > 0) {
+      await page.locator("[data-action=materials]").click();
+      await expect(page.locator("dialog.fm-materials-dialog")).toBeVisible();
+      await look("the Materials pop-up");
+      expect(seen.at(-1)?.[1]).toContain("Đồng hồ chưa chạy.");
+      await page.keyboard.press("Escape");
+    }
     await page.getByRole("button", { name: "Bắt đầu" }).click();
     await page.locator("article[data-qid] input[type=radio], article[data-qid] input[type=checkbox]").first().check();
     await look("answering");

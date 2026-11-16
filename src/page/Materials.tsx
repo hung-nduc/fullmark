@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "preact/hooks";
 import type { PageQuiz } from "./data";
 import { Icon } from "./icons";
 import type { PageMessages } from "./questions/shared";
@@ -80,27 +81,57 @@ export function Sheets({ t, state }: { t: PageMessages; state: QuizState }) {
   );
 }
 
-/** The start screen's Materials panel: docked over the right edge, the same chips and sheet as the sidebar. */
+/**
+ * The start screen's Materials pop-up (G126, MaterialsWide): a modal `dialog`, so the browser keeps the focus inside,
+ * closes it on Esc and makes what is behind it inert; Close, Esc and a click on the scrim (outside the box) close it and
+ * the focus returns to Materials. The same chips and sheet as the sidebar; on a phone it takes the screen (CSS).
+ */
 export function MaterialsPanel({ t, state }: { t: PageMessages; state: QuizState }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useLayoutEffect(() => {
+    const el = dialog.current;
+    if (el === null) return;
+    if (!el.open) el.showModal();
+    // a click outside the dialog's box (on the scrim) closes it; a click on its padding or gaps is inside the box
+    const outside = (event: MouseEvent): void => {
+      const box = el.getBoundingClientRect();
+      const inside =
+        event.clientX >= box.left &&
+        event.clientX <= box.right &&
+        event.clientY >= box.top &&
+        event.clientY <= box.bottom;
+      if (event.target === el && !inside) el.close();
+    };
+    el.addEventListener("click", outside);
+    return () => el.removeEventListener("click", outside);
+  }, []);
   return (
-    <aside class="fm-shelf" aria-label={t.materialsLabel}>
-      <div class="fm-shelf-head">
-        <h2 class="fm-shelf-title">{t.materialsLabel}</h2>
+    <dialog
+      ref={dialog}
+      class="fm-materials-dialog"
+      aria-labelledby={`${state.page.id}/materials-title`}
+      onClose={() => {
+        state.shelf.value = false;
+        focusMaterialsButton();
+      }}
+    >
+      <div class="fm-materials-head">
+        <h2 id={`${state.page.id}/materials-title`} class="fm-materials-title">
+          {t.materialsLabel}
+        </h2>
         <button
           type="button"
-          class="fm-button fm-shelf-close"
+          class="fm-button fm-materials-close"
           data-action="close-materials"
           aria-label={t.closeMaterialsLabel}
-          onClick={() => {
-            state.shelf.value = false;
-            focusMaterialsButton();
-          }}
+          onClick={() => dialog.current?.close()}
         >
           {t.closeMaterials}
         </button>
       </div>
       <Sheets t={t} state={state} />
-    </aside>
+      <p class="fm-materials-foot">{t.materialsFoot}</p>
+    </dialog>
   );
 }
 

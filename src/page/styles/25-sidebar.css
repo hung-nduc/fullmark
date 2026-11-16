@@ -594,39 +594,66 @@
     border-bottom: 1px solid var(--line);
   }
 
-  /* the start screen's Materials panel (Start board `suppBtn` and its `<aside>`) */
-  .fm-shelf {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
+  /* the start screen's Materials pop-up (MaterialsWide board, `start` view): 960px, 40px from the top and bottom */
+  .fm-materials-dialog {
+    box-sizing: border-box;
+    width: min(960px, calc(100vw - 64px));
+    max-width: none;
+    height: calc(100dvh - 80px);
+    max-height: none;
+    padding: 0;
+    margin: auto;
+    overflow: hidden;
+    color: var(--text);
+    background: var(--card);
+    border: 2px solid var(--line-strong);
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgb(0 0 0 / 35%);
+  }
+
+  .fm-materials-dialog[open] {
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    width: min(380px, 100%);
-    background: var(--card);
-    border-left: 2px solid var(--line-strong);
-    box-shadow: -8px 0 24px rgb(0 0 0 / 18%);
   }
 
-  .fm-shelf-head {
+  .fm-materials-dialog::backdrop {
+    background: rgb(0 0 0 / 45%);
+  }
+
+  .fm-materials-head {
     display: flex;
-    gap: 12px;
+    flex: none;
+    gap: 16px;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--line);
+    padding: 16px 24px 12px;
   }
 
-  .fm-shelf-title {
+  .fm-materials-title {
     margin: 0;
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: 700;
   }
 
-  .fm-shelf-close {
-    padding: 0 12px;
+  .fm-materials-close {
+    padding: 0 16px;
+  }
+
+  .fm-materials-dialog .fm-chips {
+    padding: 0 24px;
+  }
+
+  .fm-materials-dialog .fm-sheet-panel {
+    padding: 20px 24px 24px;
+  }
+
+  .fm-materials-foot {
+    flex: none;
+    padding: 10px 24px;
+    margin: 0;
+    font-size: 0.82em;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
   }
 
   .fm-materials-button {
@@ -806,14 +833,36 @@
     .fm-quiz .fm-flag {
       min-height: 44px;
     }
+  }
 
-    .fm-shelf {
-      width: 100%;
-      border-left: 0;
+  /* under 520px the pop-up takes the whole screen (MaterialsWidePhone) */
+  @media (max-width: 519px) {
+    .fm-materials-dialog {
+      width: 100vw;
+      height: 100dvh;
+      border: 0;
+      border-radius: 0;
       box-shadow: none;
     }
 
-    .fm-shelf-head {
+    .fm-materials-head {
+      padding: 10px 16px;
+    }
+
+    .fm-materials-dialog .fm-chips {
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .fm-materials-dialog .fm-chip {
+      margin-bottom: 10px;
+    }
+
+    .fm-materials-dialog .fm-sheet-panel {
+      padding: 16px;
+    }
+
+    .fm-materials-foot {
       padding: 8px 16px;
     }
   }

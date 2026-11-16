@@ -259,6 +259,7 @@ export const vi = {
     clockStartsMaterials: "Đồng hồ bắt đầu chạy khi bạn nhấn Bắt đầu. Có thể mở tài liệu trước.",
     closeMaterials: "Đóng",
     closeMaterialsLabel: "Đóng tài liệu",
+    materialsFoot: "Esc, Đóng hoặc nhấp ra ngoài để đóng. Đồng hồ chưa chạy.",
     sidebarAria: "Thanh bên",
     closeSidebar: "Đóng thanh bên",
     closeSidebarTitle: "Đóng (Esc)",

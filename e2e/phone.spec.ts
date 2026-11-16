@@ -225,13 +225,20 @@ test("after Submit: the results map, Back to the results, the tabs and the filte
   await noViolations(page);
 });
 
-test("the start screen's Materials panel takes the screen and hides the start screen", async ({ page }) => {
+test("the start screen's Materials pop-up takes the screen and hides the start screen", async ({ page }) => {
   await page.goto(quiz.url);
   await press(page, page.locator("[data-action=materials]"));
-  const panel = page.locator("aside.fm-shelf");
+  const panel = page.locator("dialog.fm-materials-dialog");
   const box = (await panel.boundingBox()) as { x: number; y: number; width: number; height: number };
   expect(box).toMatchObject({ x: 0, y: 0, width: 390, height: 844 });
-  await expect(page.getByRole("button", { name: "Start" })).toBeHidden();
+  // the start screen is under the pop-up: what is at Start's place is the dialog
+  const start = (await page.getByRole("button", { name: "Start" }).boundingBox()) as { x: number; y: number };
+  expect(
+    await page.evaluate(
+      ([x, y]) => document.elementFromPoint(x as number, y as number)?.closest("dialog") != null,
+      [start.x + 5, start.y + 5],
+    ),
+  ).toBe(true);
   await page.locator("[data-action=close-materials]").focus();
   for (let i = 0; i < 20; i++) {
     await page.keyboard.press("Tab");

@@ -1,5 +1,4 @@
 import { focusLookButton } from "./Appearance";
-import { focusMaterialsButton } from "./Materials";
 import { hasMaterials, sideForm } from "./map";
 import { focusChip, focusInSidebar, focusMap, focusSidebarButton } from "./mapdom";
 import type { Store } from "./store";
@@ -33,7 +32,8 @@ type KeyLike = {
  * The page's one key handler. `F` toggles Focus mode; `Q` opens the sidebar at Questions (the focus goes to its map) or
  * closes it; `M` does the same at Materials (the focus goes to the chosen chip) and does nothing on a quiz without
  * materials; while answering the sidebar is stacked, so `Q` opens or closes it and `M` moves the focus to the chips.
- * `Esc` closes the sidebar, or the start screen's Materials panel, and returns the focus to its button. A key never
+ * `Esc` closes the sidebar and returns the focus to its button (the start screen's Materials pop-up is a modal dialog,
+ * which closes itself on Esc). A key never
  * acts while the focus is in a text field, a `select` or a `contenteditable`, nor with a modifier held.
  */
 export function keyHandler(store: Store): (event: KeyLike) => void {
@@ -42,14 +42,6 @@ export function keyHandler(store: Store): (event: KeyLike) => void {
     if (typingIn(event.target)) return;
     // a modal dialog is open: the page behind it is inert, and its own keys (Esc, Enter) are the dialog's
     if (typeof document !== "undefined" && document.querySelector("dialog[open]") !== null) return;
-    if (event.key === "Escape" && !event.defaultPrevented) {
-      const shelf = [...store.quizzes.values()].find((s) => s.shelf.value);
-      if (shelf !== undefined) {
-        shelf.shelf.value = false;
-        focusMaterialsButton();
-        return;
-      }
-    }
     if (event.key === "Escape" && !event.defaultPrevented && store.look.menu.value) {
       store.look.menu.value = false;
       focusLookButton();

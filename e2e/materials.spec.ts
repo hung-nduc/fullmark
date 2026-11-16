@@ -127,7 +127,11 @@ test("after Submit the tabs switch, the chosen sheet is kept and the keys move b
   await expect(side(page).getByRole("tab", { name: "Materials" })).toHaveAttribute("aria-selected", "true");
 });
 
-test("the start screen's Materials opens a sheet, closes by Esc, by Close and by Start", async ({ page }) => {
+const popup = (page: Page) => page.locator("dialog.fm-materials-dialog");
+
+test("the start screen's Materials opens a pop-up: 960 px wide, 40 px from the top and bottom, a sheet per chip", async ({
+  page,
+}) => {
   const seen = watch(page);
   await page.setViewportSize({ width: 1280, height: 940 });
   await page.goto(quiz.url);
@@ -136,26 +140,122 @@ test("the start screen's Materials opens a sheet, closes by Esc, by Close and by
   await expect(page.getByText("Materials can be opened first.")).toBeVisible();
   await open.click();
   await expect(open).toHaveAttribute("aria-expanded", "true");
-  const panel = page.locator("aside.fm-shelf");
-  await expect(panel).toBeVisible();
-  expect(Math.abs(((await panel.boundingBox())?.width ?? 0) - 380)).toBeLessThan(2);
-  await expect(panel.getByRole("heading", { name: "Materials", exact: true })).toBeVisible();
-  await expect(panel.getByRole("heading", { name: "Fourier transform properties" })).toBeVisible();
-  await noViolations(page);
+  const dialog = popup(page);
+  await expect(dialog).toBeVisible();
+  // the start screen has no side panel any more
+  await expect(page.locator("aside.fm-shelf")).toHaveCount(0);
+  const box = (await dialog.boundingBox()) as { x: number; y: number; width: number; height: number };
+  expect(Math.abs(box.width - 960)).toBeLessThan(2);
+  expect(Math.abs(box.y - 40)).toBeLessThan(2);
+  expect(Math.abs(box.y + box.height - 900)).toBeLessThan(2);
+  await expect(dialog.getByRole("heading", { name: "Materials", exact: true })).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Close the materials" })).toBeVisible();
+  await expect(dialog.getByText("Esc, Close or a click outside closes this. The clock has not started.")).toBeVisible();
+  // one chip per sheet, each showing its sheet
+  await expect(dialog.getByRole("tab")).toHaveCount(3);
+  await expect(dialog.getByRole("heading", { name: "Fourier transform properties" })).toBeVisible();
   await chip(page, "Trigonometric identities").click();
-  await page.keyboard.press("Escape");
-  await expect(panel).toHaveCount(0);
-  await expect(open).toBeFocused();
-  await open.click();
-  await panel.getByRole("button", { name: "Close the materials" }).click();
-  await expect(panel).toHaveCount(0);
-  await open.click();
-  await page.getByRole("button", { name: "Start" }).click();
-  await expect(panel).toHaveCount(0);
-  // the sheet chosen there is the one the sidebar shows
-  await expect(chip(page, "Trigonometric identities")).toHaveAttribute("aria-selected", "true");
+  await expect(dialog.getByRole("heading", { name: "Trigonometric identities" })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Fourier transform properties" })).toHaveCount(0);
+  await chip(page, "Units and constants").click();
+  await expect(dialog.getByRole("heading", { name: "Units and constants" })).toBeVisible();
   expect(seen.problems).toEqual([]);
 });
+
+test("the pop-up closes by Esc, by Close and by a click on the scrim, and the focus returns to Materials", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 940 });
+  await page.goto(quiz.url);
+  const open = page.getByRole("button", { name: "Materials", exact: true });
+  const dialog = popup(page);
+  await open.click();
+  await expect(dialog).toBeVisible();
+  await chip(page, "Trigonometric identities").click();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(open).toBeFocused();
+  await open.click();
+  await dialog.getByRole("button", { name: "Close the materials" }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(open).toBeFocused();
+  await open.click();
+  await page.mouse.click(10, 10);
+  await expect(dialog).toHaveCount(0);
+  await expect(open).toBeFocused();
+  // a click inside, on the dialog's own padding, does not close it
+  await open.click();
+  const box = (await dialog.boundingBox()) as { x: number; y: number };
+  await page.mouse.click(box.x + 6, box.y + 6);
+  await expect(dialog).toBeVisible();
+  // the sheet chosen there is the one the sidebar shows
+  await dialog.getByRole("button", { name: "Close the materials" }).click();
+  await page.getByRole("button", { name: "Start" }).click();
+  await expect(popup(page)).toHaveCount(0);
+  await expect(chip(page, "Trigonometric identities")).toHaveAttribute("aria-selected", "true");
+});
+
+test("the pop-up keeps the focus inside: Tab and Shift+Tab never leave it", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 940 });
+  await page.goto(quiz.url);
+  await page.getByRole("button", { name: "Materials", exact: true }).click();
+  // the modal dialog makes the page behind it inert: the focus is in the dialog, or (past its last control) in the
+  // browser's own chrome, which the page sees as the body; never on the Start screen's buttons
+  const behind = (): Promise<boolean> =>
+    page.evaluate(() => {
+      const el = document.activeElement;
+      return el !== null && el !== document.body && el.closest("dialog.fm-materials-dialog") === null;
+    });
+  let reached = 0;
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press("Tab");
+    expect(await behind()).toBe(false);
+    reached += (await popup(page).locator(":focus").count()) > 0 ? 1 : 0;
+  }
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press("Shift+Tab");
+    expect(await behind()).toBe(false);
+  }
+  expect(reached).toBeGreaterThan(3);
+});
+
+test("a wide table is shown whole in the pop-up at 1280 x 940: no column cut off", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 940 });
+  await page.goto(quiz.url);
+  await page.getByRole("button", { name: "Materials", exact: true }).click();
+  const table = popup(page).locator(".fm-sheet table").first();
+  await expect(table).toBeVisible();
+  expect(await table.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true);
+  const dialog = (await popup(page).boundingBox()) as { x: number; width: number };
+  const last = (await table.locator("th").last().boundingBox()) as { x: number; width: number };
+  expect(last.x + last.width).toBeLessThanOrEqual(dialog.x + dialog.width);
+  await expect(table.locator("th").last()).toBeInViewport({ ratio: 1 });
+});
+
+test("at 390 x 844 the pop-up takes the whole screen, with Close at its top", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(quiz.url);
+  await page.getByRole("button", { name: "Materials", exact: true }).click();
+  const dialog = popup(page);
+  expect(await dialog.boundingBox()).toMatchObject({ x: 0, y: 0, width: 390, height: 844 });
+  const close = (await dialog.getByRole("button", { name: "Close the materials" }).boundingBox()) as { y: number };
+  expect(close.y).toBeLessThan(60);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+});
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`axe is clean with the pop-up open (${scheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.setViewportSize({ width: 1280, height: 940 });
+    await page.goto(quiz.url);
+    await page.getByRole("button", { name: "Materials", exact: true }).click();
+    await expect(popup(page)).toBeVisible();
+    await noViolations(page);
+    await chip(page, "Units and constants").click();
+    await noViolations(page);
+  });
+}
 
 test("opening sheets leaves the export the same", async ({ page }) => {
   const exportOf = async (open: boolean): Promise<string> => {
@@ -165,6 +265,7 @@ test("opening sheets leaves the export the same", async ({ page }) => {
     if (open) {
       await page.getByRole("button", { name: "Materials", exact: true }).click();
       await chip(page, "Units and constants").click();
+      await page.keyboard.press("Escape");
     }
     await page.getByRole("button", { name: "Start" }).click();
     await page.getByLabel(/right m1$/).check();

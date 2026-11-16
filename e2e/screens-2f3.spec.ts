@@ -46,9 +46,9 @@ test("in Focus mode with the sidebar opened", async ({ page }) => {
   await page.screenshot({ path: out("3-materials-focus") });
 });
 
-test("the start screen with the Materials panel open", async ({ page }) => {
+test("the start screen with the Materials pop-up open", async ({ page }) => {
   await page.goto(quiz.url);
   await page.getByRole("button", { name: "Materials", exact: true }).click();
-  await expect(page.locator("aside.fm-shelf")).toBeVisible();
+  await expect(page.locator("dialog.fm-materials-dialog")).toBeVisible();
   await page.screenshot({ path: out("4-start-materials") });
 });
