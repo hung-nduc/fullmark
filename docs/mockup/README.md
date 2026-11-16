@@ -9,4 +9,6 @@ The owner's design of the quiz page, from the Design canvas <https://claude.ai/a
 
 **The `brief --web` boards** (copied 2026-11-16): **Brief** draws the form and holds everything (interactive, with Tweaks for the theme, font, language, device, the pre-fill, a sample, the view and the sidebar); BriefAgent, BriefVague, BriefVi, BriefFinish, BriefBlocked, BriefDone, BriefDark, BriefPhone, BriefPhoneSide and BriefPhoneFinish only import it with other options. They have no images: read the source and its Tweaks.
 
+**The Materials wide boards** (copied 2026-11-16, G126): **MaterialsWide** draws the start screen's Materials pop-up (960 px wide, in all five themes) and **MaterialsWidePhone** the same on a phone, taking the screen. Only MaterialsWide's `start` view is adopted; its `quiz-sidebar` and `quiz-expanded` views, drawn as the boards MaterialsWideSidebar and MaterialsWideExpanded, are not adopted and not copied.
+
 Where the boards and the design docs disagree, the design docs win (they hold later decisions, such as **Continue** where the start board says Resume), and the difference is reported. The zip exports and the PDF the images were made from are kept outside git.
