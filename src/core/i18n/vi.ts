@@ -307,6 +307,8 @@ export const vi = {
     infoTabs: "Thông tin hoặc giấy phép",
     infoIntro: "Trang này được tạo như thế nào.",
     infoFullmark: "fullmark",
+    infoGroupQuiz: "Bài kiểm tra này",
+    infoGroupBuilt: "Cách tạo trang",
     infoQuiz: "Phiên bản bài kiểm tra",
     infoBuilt: "Tạo lúc",
     infoMadeWith: "Được tạo bằng",

@@ -110,7 +110,7 @@ describe("the page", () => {
 });
 
 describe("the Information tab", () => {
-  const infoOf = (html: string) => /<div id="fm-info-panel"[\s\S]*?<\/dl>/.exec(html)?.[0] ?? "";
+  const infoOf = (html: string) => /<div id="fm-info-panel"[\s\S]*<\/dl>/.exec(html)?.[0] ?? "";
   const text = (html: string) =>
     infoOf(html)
       .replace(/<[^>]+>/g, " ")
@@ -124,14 +124,34 @@ describe("the Information tab", () => {
     expect(t).toContain(`Quiz version ${quiz.hash.slice(0, 4)} `);
     expect(t).toContain("Theme auto (default)");
     expect(t).toContain("Look free (default)");
+    // the page's bytes keep the ISO string; the page formats it when the dialog opens
     expect(t).toContain("Built at 2026-10-28T10:00:00+07:00");
-    expect(t).toContain("Profile default");
-    expect(t).toContain("Fonts default");
-    expect(t).toContain("Interface language default");
+    expect(infoOf(html)).toContain('data-built-at="2026-10-28T10:00:00+07:00"');
+    expect(t).toContain("Profile default (default)");
+    expect(t).toContain("Fonts quiz (default)");
+    expect(t).toContain("Interface language en (default)");
     expect(t).toContain("Strict off (default)");
     expect(t).toMatch(/Made with Preact \d+\.\d+\.\d+/);
     expect(t).not.toContain("KaTeX");
     expect(t).not.toContain("Shiki");
+  });
+
+  it("has two groups, each under a heading, with a rule between them (G130)", () => {
+    const html = infoOf(buildPage([quizOf("test/fixtures/page/singles.md")], options));
+    const [quizGroup = "", built = ""] = html.split('<hr class="fm-info-rule"');
+    expect(quizGroup).toContain(">This quiz</h3>");
+    for (const label of ["Quiz version", "Built at", "Theme", "Look", "Fonts", "Interface language"]) {
+      expect(quizGroup, label).toContain(`<dt>${label}</dt>`);
+    }
+    expect(built).toContain(">How it was built</h3>");
+    for (const label of ["fullmark", "Made with", "Profile", "Strict"])
+      expect(built, label).toContain(`<dt>${label}</dt>`);
+    expect(built).not.toContain("<dt>Theme</dt>");
+    const vi = infoOf(buildPage([{ ...quizOf("test/fixtures/page/singles.md"), uiLang: "vi" }], options));
+    expect(vi).toContain(">Bài kiểm tra này</h3>");
+    expect(vi).toContain(">Cách tạo trang</h3>");
+    expect(vi).toContain("<dt>Ngôn ngữ giao diện</dt><dd>vi</dd>"); // not the front matter's, so not the default
+    expect(vi).toContain("Phông chữ</dt><dd>quiz (mặc định)</dd>");
   });
 
   it("shows an option as given, in the page's language", () => {
@@ -166,6 +186,8 @@ describe("the Information tab", () => {
       code: true,
       theme: "dark",
       look: "locked",
+      uiLang: "en",
+      uiLangDefault: "en",
       given: {},
     });
     expect(sync.packages.map((p) => p.name)).toEqual(["Preact", "KaTeX", "Shiki", "Source Serif 4", "Lexend"]);

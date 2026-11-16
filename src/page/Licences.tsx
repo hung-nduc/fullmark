@@ -23,9 +23,12 @@ export type BuildInfo = {
   /** what shapes the page: Preact, KaTeX with maths, Shiki with highlighted code, each embedded font */
   packages: readonly { name: string; version: string }[];
   options: {
-    profile: string | null;
-    fonts: string | null;
-    uiLang: string | null;
+    /** each option's value as used, with the value it has when not given */
+    profile: string;
+    fonts: string;
+    uiLang: string;
+    /** the interface language the quiz's front matter asks for, which `--ui-lang` may change */
+    uiLangDefault: string;
     theme: string;
     look: string;
     strict: boolean;
@@ -35,8 +38,17 @@ export type BuildInfo = {
 /** The id of the popup, which the build writes after the page's root. */
 export const LICENCES_ID = "fm-licences";
 
+/** "16 Nov 2026, 10:58" in the reader's local time (`vi`: "16 thg 11 2026, 10:58"); null when it is not a date. */
+export function builtAtText(iso: string, t: PageMessages): string | null {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const two = (n: number): string => String(n).padStart(2, "0");
+  const date = t.gradedOn(d.getDate(), t.monthsShort[d.getMonth()] ?? "", d.getFullYear());
+  return `${date}, ${two(d.getHours())}:${two(d.getMinutes())}`;
+}
+
 /** Opens the popup; the first time it also wires the close button, a click on the backdrop and the return of the focus. */
-export function openLicences(): void {
+export function openLicences(t: PageMessages): void {
   const dialog = document.getElementById(LICENCES_ID) as HTMLDialogElement | null;
   if (dialog === null || typeof dialog.showModal !== "function") return;
   const tabs = [...dialog.querySelectorAll<HTMLElement>("[data-info-tab]")];
@@ -60,6 +72,9 @@ export function openLicences(): void {
     dialog.addEventListener("close", () => document.querySelector<HTMLElement>("[data-action=licences]")?.focus());
   }
   show("info");
+  // the page's bytes keep the ISO string; the reader sees their own time zone
+  const built = dialog.querySelector<HTMLElement>("[data-built-at]");
+  if (built !== null) built.textContent = builtAtText(built.dataset.builtAt ?? "", t) ?? built.dataset.builtAt ?? "";
   dialog.showModal();
 }
 
@@ -73,7 +88,7 @@ export function LicencesButton({ t }: { t: PageMessages }) {
         data-action="licences"
         aria-label={t.licences}
         title={t.licences}
-        onClick={openLicences}
+        onClick={() => openLicences(t)}
       >
         <Icon name="info" size={18} />
       </button>
@@ -84,33 +99,43 @@ export function LicencesButton({ t }: { t: PageMessages }) {
 const TABS = ["info", "licences"] as const;
 
 /** One row of the Information tab: a name and its value. */
-const Row = ({ label, value }: { label: string; value: string }) => (
+const Row = ({ label, value, builtAt }: { label: string; value: string; builtAt?: string }) => (
   <div class="fm-info-row">
     <dt>{label}</dt>
-    <dd>{value}</dd>
+    <dd data-built-at={builtAt}>{value}</dd>
   </div>
 );
 
-/** The Information tab: the build inputs, as a list of names and values. */
+/** The Information tab, in two groups: the quiz, and how the page was built. */
 function InfoPanel({ t, info }: { t: PageMessages; info: BuildInfo }) {
+  // every option shows the value it used, then "(default)" when that is the default
   const orDefault = (value: string, fallback: string): string =>
     value === fallback ? `${value} (${t.infoDefault})` : value;
-  const given = (value: string | null): string => value ?? t.infoDefault;
+  const o = info.options;
   return (
     <div id="fm-info-panel" role="tabpanel" aria-labelledby="fm-info-tab" data-info-panel="info">
       <p class="fm-licences-intro">{t.infoIntro}</p>
-      <dl class="fm-info-list">
-        <Row label={t.infoFullmark} value={info.fullmark} />
-        <Row label={t.infoQuiz} value={info.quiz} />
-        <Row label={t.infoBuilt} value={info.builtAt} />
-        <Row label={t.infoMadeWith} value={info.packages.map((p) => `${p.name} ${p.version}`).join(", ")} />
-        <Row label={t.infoProfile} value={given(info.options.profile)} />
-        <Row label={t.infoFonts} value={given(info.options.fonts)} />
-        <Row label={t.infoUiLang} value={given(info.options.uiLang)} />
-        <Row label={t.infoTheme} value={orDefault(info.options.theme, "auto")} />
-        <Row label={t.infoLook} value={orDefault(info.options.look, "free")} />
-        <Row label={t.infoStrict} value={info.options.strict ? t.infoOn : `${t.infoOff} (${t.infoDefault})`} />
-      </dl>
+      <section class="fm-info-group" aria-labelledby="fm-info-quiz">
+        <h3 id="fm-info-quiz">{t.infoGroupQuiz}</h3>
+        <dl class="fm-info-list">
+          <Row label={t.infoQuiz} value={info.quiz} />
+          <Row label={t.infoBuilt} value={info.builtAt} builtAt={info.builtAt} />
+          <Row label={t.infoTheme} value={orDefault(o.theme, "auto")} />
+          <Row label={t.infoLook} value={orDefault(o.look, "free")} />
+          <Row label={t.infoFonts} value={orDefault(o.fonts, "quiz")} />
+          <Row label={t.infoUiLang} value={orDefault(o.uiLang, o.uiLangDefault)} />
+        </dl>
+      </section>
+      <hr class="fm-info-rule" />
+      <section class="fm-info-group" aria-labelledby="fm-info-built">
+        <h3 id="fm-info-built">{t.infoGroupBuilt}</h3>
+        <dl class="fm-info-list">
+          <Row label={t.infoFullmark} value={info.fullmark} />
+          <Row label={t.infoMadeWith} value={info.packages.map((p) => `${p.name} ${p.version}`).join(", ")} />
+          <Row label={t.infoProfile} value={orDefault(o.profile, "default")} />
+          <Row label={t.infoStrict} value={o.strict ? t.infoOn : `${t.infoOff} (${t.infoDefault})`} />
+        </dl>
+      </section>
     </div>
   );
 }

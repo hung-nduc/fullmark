@@ -45,6 +45,9 @@ export function infoFor(input: {
   code: boolean;
   theme: string;
   look: string;
+  /** the interface language the page uses, and the one the front matter asks for */
+  uiLang: "en" | "vi";
+  uiLangDefault: "en" | "vi";
   given: { profile?: string | null; fonts?: FontsChoice | null; uiLang?: "en" | "vi" | null; strict?: boolean };
 }): BuildInfo {
   const names = [
@@ -63,9 +66,10 @@ export function infoFor(input: {
     builtAt: input.builtAt,
     packages,
     options: {
-      profile: input.given.profile ?? null,
-      fonts: input.given.fonts ?? null,
-      uiLang: input.given.uiLang ?? null,
+      profile: input.given.profile ?? "default",
+      fonts: input.given.fonts ?? "quiz",
+      uiLang: input.uiLang,
+      uiLangDefault: input.uiLangDefault,
       theme: input.theme,
       look: input.look,
       strict: input.given.strict ?? false,

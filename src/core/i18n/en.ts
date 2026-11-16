@@ -247,6 +247,8 @@ export const en = {
     infoTabs: "Information or licences",
     infoIntro: "How this page was built.",
     infoFullmark: "fullmark",
+    infoGroupQuiz: "This quiz",
+    infoGroupBuilt: "How it was built",
     infoQuiz: "Quiz version",
     infoBuilt: "Built at",
     infoMadeWith: "Made with",

@@ -459,6 +459,8 @@ export function buildPage(quizzes: readonly BuildQuiz[], options: PageOptions): 
         code: coloured,
         theme: front.theme,
         look: front.look,
+        uiLang: first.uiLang,
+        uiLangDefault: front.uiLang,
         given: options.given ?? {},
       }),
     }),
