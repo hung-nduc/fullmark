@@ -41,7 +41,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
-| 3z5 G124, mhchem and the chemistry example | built, awaiting review (2026-11-16); G125 built with it | `e93672f`, `c31719c`, `7b5802e`, `3d34db7`, plan-order fix and this row |
+| 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 decided, G129 for the owner | `e93672f`..`0ea5d86`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1601,3 +1601,11 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; `npm run notices` and `npm run schemas` leave the tree unchanged; the example builds, as a page and as a paper with its key, and `\ce` renders in both.
+
+### Review
+
+**3z5's review (2026-11-16).** Built by a Sonnet implementing agent in `e93672f` (mhchem, its notice, the tests, QUIZ_SYNTAX.md), `c31719c` (Biome's format), `7b5802e` (the example), `3d34db7` (G125) and `0ea5d86` (the slice table's row, and `plan-order.test.ts`). Run in review after a fresh `npm run build` on `0ea5d86`: `npm run notices` and `npm run schemas` leave the tree unchanged. `npm run check` exits 0: Vitest, the 2 startup tests alone, then **118 files, 3099 of 3099**; Playwright **719 passed**, 481 skipped, none failed, **in Chromium and Firefox**. Goldens: two added (`check/example-chemistry`, `build/print-example-chemistry`), one changed (`build/print-inline`, the study sheet's head only, G125).
+
+- **mhchem** loads with KaTeX in `loadKatex`, still lazy; `\ce` and `\pu` pass `check` and render. Its notice ("mhchem for KaTeX", 0.19.1, Apache-2.0, the MathJax Consortium and Martin Hensel) is read from the file's header by `npm run notices`, with the header's hash pinned in a test. The full Apache-2.0 text is not shipped (G129).
+- **The example** (`examples/chemistry/`, `vi`, 9 questions, 17 points, a molar-mass sheet, ethanol's skeletal formula as an SVG on a white card so it reads in dark themes) is chemically right, read in review: the balance 4, 3, 2; 10 g of CaCO₃ to 4,4 g of CO₂; Le Chatelier (pressure, removing NH₃, adding N₂; not heat, not a catalyst); the hydrate, the states, the carboxyl group, ΔH. Two things change in the next catalog slice: the names are the older Vietnamese ones ("axit sunfuric", "hiđro", "etanol"), and the owner decided IUPAC-based names (G128); and the skeletal formula's explanation says every end of a line is a carbon and "two lines give two carbons", which does not fit the end that carries the OH: it should say the unlabelled end and the bend are the two carbons.
+- **Done differently, accepted:** `test/attempt/plan-order.test.ts` compares only the plans recorded before 2k3 (a new example's plans cannot be in a "before" record); the example counts in two tests; the `stacked` flag removed, the facts always stacked (header and study sheet alike). The balance question's blanks sit outside the maths, as blanks must, so the arrow can wrap at a narrow width; acceptable.
