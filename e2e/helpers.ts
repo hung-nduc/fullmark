@@ -277,8 +277,8 @@ export function expectGolden(name: string, text: string): void {
 
 /** The one time every screens spec starts at, in the screens' time zone: 2026-10-23 09:00. */
 export const SCREENS_TIME = "2026-10-23T09:00:00+07:00";
-/** The time zone and locale of every screen, so another machine's settings do not move a date. */
-export const SCREENS_USE = { timezoneId: "Asia/Ho_Chi_Minh", locale: "en-US" } as const;
+/** The time zone and locale of every screen, so another machine's settings do not move a date; and reduced motion, so no transition is caught half way. */
+export const SCREENS_USE = { timezoneId: "Asia/Ho_Chi_Minh", locale: "en-US", reducedMotion: "reduce" } as const;
 
 /**
  * Fixes what would make a screen differ from one run to the next, before the page loads: the clock (every `Date` reads
