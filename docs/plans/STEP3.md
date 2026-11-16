@@ -54,7 +54,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G148, below (raised by the owner; for step 4's first slice).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -100,7 +100,12 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G148. `check` warns when quiz text names a page control (raised by the owner, 2026-11-16).** QUIZ_SYNTAX.md, section 8, now says a quiz's text holds on the page and the paper alike; nothing enforces it, and G146 and G147 were found by reading. **Recommendation:** a warning rule `content.names-control` in `quiz check`, for step 4's first slice (not step 3, which waits only on the owner's samples run):
+- **Where:** every text a learner reads (description, section intros, questions, choices, hints, explanations, rubrics, materials); never in code, inline code or maths.
+- **What:** a word list for each language. (a) The page's control labels, read from the catalogs (`en` "Check", "Submit", "Flag", "Hint"; `vi` "Kiểm tra", "Nộp bài", "Gắn cờ", "Gợi ý"), matched only where they read as a control: in bold, or next to "button" / "nút". (b) A short hand list of words about working a screen (`en` "button", "click", "tap", "press", "sidebar", "scroll"; `vi` "nút", "bấm", "nhấn", "thanh bên", "cuộn"), kept next to the catalogs. The language is the quiz's `lang`.
+- **Tests:** each entry with one sentence it flags and one it leaves ("Check your units."); every example and template passes with no warning.
+- **Level:** a warning, with the line and "names a control of the page; the paper has none (QUIZ_SYNTAX.md, section 8)". A false positive is silenced by the author with `check-ignore`; the rules for agents already forbid an agent to add one, so an agent rewords.
+
 
 ## Slices
 
