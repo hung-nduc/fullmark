@@ -145,6 +145,18 @@
     border-left: 1px solid var(--line);
   }
 
+  /* a phone: "By part" is under the tiles, so no rule and no wide gap between them, and it starts at the left edge */
+  @media (max-width: 519px) {
+    .fm-results-top {
+      row-gap: 12px;
+    }
+
+    .fm-by-part {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
   .fm-part-rows {
     display: flex;
     flex-direction: column;

@@ -604,4 +604,20 @@
   .fm-topbar .fm-primary {
     padding: 0 22px;
   }
+
+  /* a phone (foundation 8, "An option's label on a phone"): the result label is on a line of its own under the option's
+     text, which has the whole width; it starts where the text does (the 32 px letter and the 14 px gap) */
+  @media (max-width: 519px) {
+    .fm-choice label {
+      flex-wrap: wrap;
+    }
+
+    .fm-choice label .fm-badge {
+      flex: 0 0 100%;
+      height: auto;
+      min-height: 24px;
+      padding-left: 46px;
+      margin-left: 0;
+    }
+  }
 }

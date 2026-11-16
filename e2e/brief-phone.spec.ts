@@ -110,6 +110,13 @@ test("answering every question by touch, then Write from the foot bar: the wide 
   await press(page, choice(page, "mode", "timed-exam"));
   await press(page, choice(page, "language", "vi"));
   await press(page, choice(page, "weak_topics", "yes"));
+  await card(page, "commitment").scrollIntoViewIfNeeded();
+  // the choice just tapped still has the focus: its blur (on the next touch) must not move the button under the finger
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+  // the first touch on the button moves the card (the choice above it loses its focus): settle before the tap
+  await card(page, "commitment").locator("[data-action=inc]").focus();
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
   await press(page, card(page, "commitment").locator("[data-action=inc]"));
   await card(page, "request").locator("textarea").fill("Match the 2024 midterm.\nNo proofs. # not a comment");
   await press(page, page.locator("[data-action=more]"));

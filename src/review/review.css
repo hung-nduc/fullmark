@@ -634,4 +634,16 @@
       padding: 20px 18px;
     }
   }
+
+  /* a phone: the verdict ("Not judged", Keep, Fix, Drop) is on a line of its own under the head line, at the left */
+  @media (max-width: 519px) {
+    .fm-review-card .fm-question-head {
+      justify-content: flex-start;
+    }
+
+    .fm-review-card .fm-question-end {
+      flex: 0 0 100%;
+      text-align: left;
+    }
+  }
 }

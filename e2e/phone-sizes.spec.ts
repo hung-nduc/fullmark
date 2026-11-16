@@ -95,6 +95,13 @@ for (const phone of PHONES) {
     if (fromTop) expect(box.y).toBeCloseTo(0, 0);
   };
 
+  /** The phone gutter (foundation 8): a card is 8 px from each edge of the screen. */
+  const gutter = async (page: Page, selector: string): Promise<void> => {
+    const box = (await page.locator(selector).first().boundingBox()) as { x: number; width: number };
+    expect(box.x).toBeCloseTo(8, 0);
+    expect(box.x + box.width).toBeCloseTo(phone.width - 8, 0);
+  };
+
   const all = async (page: Page): Promise<void> => {
     await noSideways(page);
     await targets(page);
@@ -112,12 +119,32 @@ for (const phone of PHONES) {
       const seen = watch(page);
       await page.goto(quiz.url);
       await all(page);
+      await gutter(page, ".fm-parts");
+      // "The whole quiz": the title whole on its own line, "Recommended" under it, then the counts
+      const rows = await page.locator(".fm-part-whole").evaluate((el) => {
+        const box = (sel: string) => {
+          const e = el.querySelector(sel) as HTMLElement;
+          const r = e.getBoundingClientRect();
+          return { top: r.top, bottom: r.bottom, scrollW: e.scrollWidth, clientW: e.clientWidth };
+        };
+        return {
+          title: box(".fm-part-name strong"),
+          rec: box(".fm-recommend"),
+          meta: box(".fm-part-meta"),
+          row: el.scrollHeight <= el.clientHeight,
+        };
+      });
+      expect(rows.row).toBe(true);
+      expect(rows.title.scrollW).toBeLessThanOrEqual(rows.title.clientW + 1);
+      expect(rows.rec.top).toBeGreaterThanOrEqual(rows.title.bottom - 1);
+      expect(rows.meta.top).toBeGreaterThanOrEqual(rows.rec.bottom - 1);
       await press(page, page.locator("[data-action=materials]"));
       await fills(page, "dialog.fm-materials-dialog", true);
       await all(page);
       await press(page, page.locator("[data-action=close-materials]"));
       await page.getByRole("button", { name: "Start" }).click();
       await all(page);
+      await gutter(page, "article[data-qid]");
       // the page's foot is in the flow: the last card ends above it
       const foot = (await page.locator("[data-action=licences]").boundingBox()) as { y: number };
       await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -135,6 +162,19 @@ for (const phone of PHONES) {
       await submitAttempt(page);
       await expect(page.locator(".fm-results")).toBeVisible();
       await all(page);
+      await gutter(page, ".fm-results");
+      // "By part" is close under the tiles, at the left edge, with no rule beside it
+      const part = await page.locator(".fm-by-part").evaluate((el) => ({
+        border: getComputedStyle(el).borderLeftWidth,
+        pad: getComputedStyle(el).paddingLeft,
+        x: el.getBoundingClientRect().x,
+        top: el.getBoundingClientRect().top,
+      }));
+      const facts = (await page.locator(".fm-facts").boundingBox()) as { x: number; y: number; height: number };
+      expect(part.border).toBe("0px");
+      expect(part.pad).toBe("0px");
+      expect(part.x).toBeCloseTo(facts.x, 0);
+      expect(part.top - (facts.y + facts.height)).toBeLessThanOrEqual(16);
       await press(page, toggle(page));
       await fills(page, "aside.fm-side");
       await all(page);
@@ -170,7 +210,18 @@ for (const phone of PHONES) {
       cpSync(join(root, "test/fixtures/page/materials"), join(dir, "materials"), { recursive: true });
       await serve(dir, ["review", "quiz.md"], page, "[data-quiz]");
       await all(page);
+      await gutter(page, "article[data-qid]");
       await footClear(page, "article[data-qid]");
+      // the verdict is on a line of its own under the head line, at the left; the option's label under its text
+      const first = page.locator("article[data-qid]").first();
+      const meta = (await first.locator(".fm-question-meta").boundingBox()) as { x: number; y: number; height: number };
+      const verdict = (await first.locator(".fm-review-status").boundingBox()) as { x: number; y: number };
+      expect(verdict.y).toBeGreaterThanOrEqual(meta.y + meta.height - 1);
+      expect(verdict.x).toBeCloseTo(meta.x, 0);
+      const opt = first.locator(".fm-choice[data-correct=true] label");
+      const text = (await opt.locator(".fm-choice-text").boundingBox()) as { y: number; height: number };
+      const badge = (await opt.locator(".fm-badge").boundingBox()) as { y: number };
+      expect(badge.y).toBeGreaterThanOrEqual(text.y + text.height - 1);
       await page.locator("article[data-qid]").first().locator("[data-pick=fix]").tap();
       await all(page);
       await press(page, page.locator("[data-action=sidebar]"));
@@ -205,6 +256,7 @@ for (const phone of PHONES) {
         if (withGrades) args.push("--grades", "agent.json", "--name", "Lan");
         await serve(gradeFolder(withGrades), args, page, "[data-quiz]");
         await all(page);
+        await gutter(page, "article.fm-grade-card");
         await footClear(page, "article.fm-grade-card");
         await press(page, page.locator("[data-action=sidebar]"));
         await fills(page, "aside.fm-side");
@@ -232,6 +284,7 @@ for (const phone of PHONES) {
         ".bf",
       );
       await all(page);
+      await gutter(page, ".bf section[data-qkey]");
       await footClear(page, ".bf section[data-qkey]");
       await press(page, page.locator("[data-action=sidebar]"));
       await fills(page, ".bf-side");

@@ -1283,4 +1283,11 @@
       margin-top: 16px;
     }
   }
+
+  /* the phone gutter (foundation 8): 8 px between the screen's edge and a card */
+  @media (max-width: 519px) {
+    .fm-grade .fm-body .fm-main > * {
+      width: calc(100% - 16px);
+    }
+  }
 }

@@ -679,4 +679,11 @@
     cursor: not-allowed;
     opacity: 0.6;
   }
+
+  /* the phone gutter (foundation 8): 8 px between the screen's edge and a card; the review form shares this rule */
+  @media (max-width: 519px) {
+    .fm-body .fm-main > * {
+      width: calc(100% - 16px);
+    }
+  }
 }

@@ -1349,4 +1349,11 @@
       padding: 6px 12px 10px;
     }
   }
+
+  /* the phone gutter (foundation 8): 8 px between the screen's edge and a card */
+  @media (max-width: 519px) {
+    .bf-main {
+      padding: 16px 8px;
+    }
+  }
 }

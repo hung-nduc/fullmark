@@ -400,6 +400,36 @@
     color: var(--muted);
   }
 
+  /* a phone: a row grows to fit its title, which wraps on its own full-width line; "Recommended" is on a line of its
+     own under it, then the counts (and the time on a last line) */
+  @media (max-width: 519px) {
+    .fm-quiz[data-phase="start"] .fm-main > * {
+      width: calc(100% - 16px);
+    }
+
+    .fm-part {
+      height: auto;
+      min-height: 4.2em;
+      padding-block: 10px;
+    }
+
+    .fm-part-whole {
+      flex-wrap: wrap;
+      min-height: 4.6em;
+    }
+
+    .fm-part-name {
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .fm-part-whole .fm-part-time {
+      flex: 0 0 100%;
+      padding-left: 34px;
+    }
+  }
+
   @media (max-width: 640px) {
     .fm-start-facts {
       grid-template-columns: repeat(2, minmax(0, 1fr));
