@@ -13,7 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { expectGolden, noViolations, PHONE, root, type Served, serveProcess, watch } from "./helpers";
+import { expectGolden, expectWholeDock, noViolations, PHONE, root, type Served, serveProcess, watch } from "./helpers";
 
 /**
  * `quiz review` as a subprocess (STEP3.md, slice 3k, "Done when"): the form driven by Playwright through the keys and
@@ -1130,3 +1130,11 @@ for (const scheme of ["light", "dark"] as const) {
     server.child.kill("SIGKILL");
   });
 }
+
+test("the dock is a whole number of pixels tall and the sidebar's top is its bottom, at fractional text sizes", async ({
+  page,
+}) => {
+  const server = await review(folder(RUST));
+  await open(page, server);
+  await expectWholeDock(page, "aside[data-review-side]");
+});

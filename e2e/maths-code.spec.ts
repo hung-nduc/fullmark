@@ -16,9 +16,9 @@ test("examples/calculus shows KaTeX maths from fonts inside the file, and axe is
   await page.goto(calculus.url);
   await page.getByRole("button", { name: "Start" }).click();
   await expect(page.locator(".katex").first()).toBeVisible();
-  // a style attribute would be blocked by the CSP: KaTeX's layout is classes (the quiz's own `--dock-h`, set from
+  // a style attribute would be blocked by the CSP: KaTeX's layout is classes (the quiz's own `--dock-h` and the dock's own `min-height`, set from
   // script, is the one custom property the page keeps on its root)
-  expect(await page.locator("[style]:not(.fm-quiz)").count()).toBe(0);
+  expect(await page.locator("[style]:not(.fm-quiz):not([data-dock])").count()).toBe(0);
   // the fonts load from data: URIs, so the maths is set in KaTeX's own faces
   await expect
     .poll(() =>

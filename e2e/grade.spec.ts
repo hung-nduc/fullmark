@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { expectGolden, noViolations, root, run, type Served, serveProcess, watch } from "./helpers";
+import { expectGolden, expectWholeDock, noViolations, root, run, type Served, serveProcess, watch } from "./helpers";
 
 /**
  * `quiz grade --web` as a subprocess (STEP3.md, slice 3f): the form driven by Playwright with the mouse and by typing a
@@ -898,4 +898,12 @@ test("G104: the form's main is named while the frame shows and has no name other
   await expect(page.locator("iframe[data-frame=marked]")).toHaveAttribute("title", /^Marked by fullmark/);
   await page.locator(".fm-grade-side [data-row=holistic]").click();
   await expect(page.locator("main.fm-main")).not.toHaveAttribute("aria-label", /.*/);
+});
+
+test("the dock is a whole number of pixels tall and the sidebar's top is its bottom, at fractional text sizes", async ({
+  page,
+}) => {
+  const server = await web(folder());
+  await open(page, server);
+  await expectWholeDock(page, "aside.fm-grade-side");
 });

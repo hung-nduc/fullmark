@@ -360,3 +360,30 @@ export async function shotOf(locator: Locator, path: string): Promise<void> {
     await hide("");
   }
 }
+
+/**
+ * The dock is a whole number of pixels tall (TECHNICAL_DESIGN.md, section 7, foundation 8): at a root size that makes it
+ * fractional before the fix, its height is a whole number, and the stuck sidebar's top is the dock's bottom.
+ */
+export async function expectWholeDock(page: Page, side: string): Promise<void> {
+  for (const size of ["15.3px", "17.37px", "19.61px", "22.45px"]) {
+    await page.evaluate((s) => {
+      document.documentElement.style.fontSize = s;
+    }, size);
+    await page.evaluate(() => window.scrollTo(0, 150));
+    await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+    const m = await page.evaluate((sel) => {
+      const dock = document.querySelector<HTMLElement>("[data-dock]");
+      const aside = document.querySelector<HTMLElement>(sel);
+      if (!dock || !aside) return null;
+      return {
+        height: dock.getBoundingClientRect().height,
+        bottom: dock.getBoundingClientRect().bottom,
+        top: aside.getBoundingClientRect().top,
+      };
+    }, side);
+    expect(m, `${size}: dock and sidebar are there`).not.toBeNull();
+    expect(Number.isInteger(m?.height), `${size}: dock height ${m?.height}`).toBe(true);
+    expect(m?.top, `${size}: sidebar top against the dock's bottom`).toBe(m?.bottom);
+  }
+}

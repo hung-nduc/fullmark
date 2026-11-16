@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildIn, card, noViolations, run, submitAttempt, watch } from "./helpers";
+import { buildIn, card, expectWholeDock, noViolations, run, submitAttempt, watch } from "./helpers";
 
 /**
  * The sidebar and the question map (TECHNICAL_DESIGN.md, section 8, rows "Sidebar" and "Question map"). The test that
@@ -310,4 +310,11 @@ test("axe is clean with the sidebar open, while answering and after Submit", asy
   await submit(page);
   await expect(side(page).locator("[data-state]").first()).toBeVisible();
   await noViolations(page);
+});
+
+test("the dock is a whole number of pixels tall and the sidebar's top is its bottom, at fractional text sizes", async ({
+  page,
+}) => {
+  await start(page);
+  await expectWholeDock(page, "aside.fm-side");
 });
