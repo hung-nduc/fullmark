@@ -302,14 +302,12 @@ for (const phone of PHONES) {
       const n = await heads.count();
       expect(n).toBeGreaterThan(10);
       for (let i = 0; i < n; i++) {
-        const [line, mark, head] = await heads.nth(i).evaluate((h) => {
-          const r = (e: Element | null) => (e as Element).getBoundingClientRect();
-          return [r(h.querySelector(".bf-card-name")), r(h.querySelector(".bf-mark")), r(h)].map((b) => ({
-            left: b.left,
-            top: b.top,
-            bottom: b.bottom,
-            width: b.width,
-          }));
+        const { line, mark, head } = await heads.nth(i).evaluate((h) => {
+          const r = (e: Element | null) => {
+            const b = (e as Element).getBoundingClientRect();
+            return { left: b.left, top: b.top, bottom: b.bottom, width: b.width };
+          };
+          return { line: r(h.querySelector(".bf-card-name")), mark: r(h.querySelector(".bf-mark")), head: r(h) };
         });
         expect(mark.top).toBeGreaterThanOrEqual(line.bottom - 0.5);
         expect(mark.left).toBeCloseTo(line.left, 0);
