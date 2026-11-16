@@ -1184,6 +1184,11 @@
       margin-top: 12px;
     }
 
+    /* the "AI's" restore beside a note is a target: 44 px tall on a phone (foundation 8, "Phone sizes") */
+    .fm-box .fm-given[data-kind="text"] {
+      height: 44px;
+    }
+
     /* --grades (G111): each pre-filled box on a line of its own above its control, left-aligned at its own size */
     .fm-grade .fm-ctl > .fm-given {
       grid-column: 1 / -1;

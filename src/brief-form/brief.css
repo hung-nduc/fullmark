@@ -1250,6 +1250,11 @@
       padding-inline: 16px;
     }
 
+    /* the sidebar's group heads are targets: 44 px tall on a phone (foundation 8, "Phone sizes") */
+    .bf-group-head {
+      min-height: 44px;
+    }
+
     .bf-prof-row {
       grid-template-columns: minmax(0, 1fr);
       gap: 8px;
