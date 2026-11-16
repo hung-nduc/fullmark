@@ -53,7 +53,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G146, below (the owner's samples run).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -99,7 +99,8 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G146. A section's intro that only fits the page (raised by the owner on the samples, 2026-11-16).** The chemistry example's first section says "Chọn đáp án đúng. Dùng nút **Kiểm tra** để xem kết quả của từng câu.", and the calculus example's says "Use the **Check** button to see feedback after each question." Both are printed on the paper too (`paper-chemistry`), which has no Check button and never gives feedback. The text is the author's, not the page's chrome: the page already says how feedback works in its own rules box. **Recommendation:** fix the two examples (and any template made from them): the intros say only what holds on both, "Chọn đáp án đúng." and "Work through these first.", since the page explains the Check button itself. No new syntax for page-only text now; if the owner wants one later (a `:::page` / `:::paper` block), it is written as a proposal in `docs/design/proposals/`.
+
 
 ## Slices
 
