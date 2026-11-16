@@ -278,6 +278,8 @@ A review file whose `fix` or `drop` entry lacks its `source` is refused (exit 2 
 
 **The submit** is `{quizId, quizHash, judged}` with one verdict for every question; the server answers 400, and keeps waiting, for another version of the quiz, a missing or unknown id or an incomplete verdict (a fix or drop with no reason, `other` with no note, a rubric reason on a question that is neither essay nor code). It then merges into the review file as it is at that moment and writes it atomically, and ends.
 
+**A refused submit**, in the `review` form and the `grade --web` form, shows the server's message after the form's own words ("Chưa lưu được bản rà soát:", "Chưa lưu được điểm:" in Vietnamese), in English, as the terminal prints it.
+
 **Output.** Human: `review.json written: 26 keep (14 not looked at), 3 fix, 1 drop` (the parenthesis only when some were kept without being looked at) and the next command, `next: quiz check FILE --review review.json`. `--json`: first the `listening` line (as `serve`), then `{"status":"written","review":PATH,"keep","fix","drop"}`, counted over the quiz's current questions as `inspect --review` counts them (`keep` includes the assumed ones); `{"status":"timeout"}` (exit 2) and `{"status":"interrupted"}` (Ctrl+C, exit 2) leave an existing `--out` file byte for byte.
 
 Exit: `0` written, `1` check errors in `FILE`, or a question without an id (nothing is served; the message says to run `quiz ids FILE` first, since a verdict follows its question by id), `2` timeout, Ctrl+C or usage error (a built page, `--since` beside another `--out`, a survey, a refused or missing review file).

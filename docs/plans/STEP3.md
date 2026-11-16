@@ -37,7 +37,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3p3 the pre-filled form on a phone | done, reviewed (2026-11-15), no gaps | `9014690`..`2eea084`, review |
 | 3h `brief --web` at 1280 px | done, reviewed (2026-11-16), two board changes made in review; G116 decided | `10ea547`..`74a00a6`, review |
 | 3h2 G116, `brief --web` on a phone | done, reviewed (2026-11-16), one fix in review, no gaps | `fd2d50a`..`0247344`, and the commit that holds this row |
-| 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 for the owner; then the acceptance | `c3a108d`..`d5293f2`, review |
+| 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
+| 3z2 G119, the grades schema's entries | brief written (2026-11-16), for the owner | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
@@ -53,7 +54,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
 4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2** (G116, then the phone, G117) is **built and reviewed** ("Slice 3h2", its Review), with no new gap: every slice of step 3 but 3z is done. Then **3z**, acceptance.
-5. **3z**'s tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) are **built and reviewed** ("Slice 3z", its Review). **G119** (the grades schema holds only the envelope) and **G120** (a refused submit's detail is English in a `vi` form) wait for the owner. Then the acceptance run (the planner) and the samples (the owner).
+5. **3z**'s tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) are **built and reviewed** ("Slice 3z", its Review). **G119** (the grades schema holds only the envelope) and **G120** (a refused submit's detail is English in a `vi` form) are decided (2026-11-16), as recommended: G120 is written into COMMANDS.md and needs no code; G119 into TECHNICAL_DESIGN.md, and **3z2** builds it. Next: the owner approves 3z2's brief, an implementing agent builds it, then the acceptance run (the planner) and the samples (the owner).
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
 
@@ -85,9 +86,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G119. The grades schema holds only the file's envelope (3z's review).** `GradesFileSchema` (`src/core/rubric/grades.ts`) is a loose object: `grader` is `unknown` and each entry of `grades` is `unknown`, because `applyGrades` checks the entries by hand against the quiz's rubric. So `schemas/grades-v2.schema.json` accepts a file with no grader and an entry `{ "mode": "banana", "criteria": 42 }`, though TECHNICAL_DESIGN.md, section 6, says `grades-v2` has a **required** grader and gives each entry's shape. The grades file is the one an AI grader writes, so it is the schema an agent needs most. **Recommendation:** a zod schema for a grades entry's shape (`mode`, `rubric_hash`, `points`, `step` or `scale` and `round`, `criteria` keyed by id with `text`, `max` or `weight`, `score`, `band`, `verdict`, `note`, then `justification` and `improvement`) and for `grader` (as `GraderSchema` in the report), used by `GradesFileSchema` for the JSON Schema only: `parseGrades` and `applyGrades` keep their own checks and messages, so no golden moves and `quiz grade` refuses nothing new. The test already checks every grades file in the tests and examples, the templates `quiz grade --json` writes among them, against the schema, so the shape cannot drift from what the tool writes. Built in a short slice, 3z2, before the acceptance.
-
-**G120. A refused submit's detail is English in a `vi` form (3z's review).** When the server refuses a submit (for example the `--out` review file was broken between start and Finish), the `review` form shows `saveFailed` ("Chưa lưu được bản rà soát: …") and the grading form `refused` ("Chưa lưu được điểm:"), each followed by the server's own message, which is English (`review.json is not a usable review`), as terminal output is (section 9: terminal output in English only). It is rare, and the same message is printed in the terminal. **Recommendation:** keep it, and say so in COMMANDS.md: "A refused submit shows the server's message after the form's own words, in English, as the terminal prints it." No code changes.
+None open.
 
 ## Slices
 
@@ -117,6 +116,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3h** | `brief --web` at 1280 px: the form from the question file and the Brief boards, the detail rules, the Finish summary, pre-fills and the way back to them, Cancel, `--language` for the form; the three-way byte-identity test (flags, `--web`, `--tui`) that closes step 3's criterion | G11, G112 to G115, boards |
 | **3h2** | G116; `brief --web` on a phone (BriefPhone, BriefPhoneSide, BriefPhoneFinish) | G116, G117, 3h |
 | **3z** | G118 (the JSON Schemas); a `vi` scan of the `review` and `grade` forms; then acceptance: every "Done when" item checked in Chromium and Firefox, the samples tried by the owner, step 3 closed | G118 |
+| **3z2** | G119: the grades schema describes each entry and the grader | G119, 3z |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1434,3 +1434,30 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 - **Done differently, accepted:** the schemas are made with `io: "input"`, as a reader reads a file, so they forbid no unknown key; TECHNICAL_DESIGN.md says consumers ignore keys they do not know, so this is the right mode. `REPORT_FORMAT` and `REPORT_VERSION` moved to `src/core/report/format.ts`; the unused `ReportScore` export went. The grading scan counts the learner's answers and the AI grader's file as the author's own, as the replay's scan already does.
 - **Tried by hand:** the report schema refuses a report with no `score`; the grades schema accepts a file with no grader and an entry `{ "mode": "banana", "criteria": 42 }` (G119).
 - **Gaps:** G119 (the grades schema holds only the envelope) and G120 (a refused submit's English detail in a `vi` form), under "Gaps" above. The acceptance waits for them.
+
+## Slice 3z2: G119, the grades schema's entries
+
+**Brief written on 2026-11-16, for the owner's approval.** One short task, then 3z's acceptance runs. G119 (STEP3-GAPS.md) is decided; TECHNICAL_DESIGN.md, section 6, `grades-v2`, "Its JSON Schema", says what is wanted.
+
+### Read first
+
+- This plan: "Rules for every slice", G118 and G119 (STEP3-GAPS.md), and 3z's Review.
+- TECHNICAL_DESIGN.md, section 6: `grades-v2` whole (the template, the three modes' entries, holistic's `bullets`, the grader identity, a question's own `grader`, `reviewed`), and the JSON Schemas row of the 0.x-to-1.0 table.
+- Code: `src/core/rubric/grades.ts` (`GradesFileSchema`, `parseGrades`, the template, `applyGrades` and every check it makes by hand), `src/core/report/schema.ts` (`GraderSchema`), `src/core/json-schemas.ts`, `test/json-schemas.test.ts`, `schemas/grades-v2.schema.json`.
+
+### Decided for this slice
+
+- **A zod schema of a grades entry and of the grader**, in `src/core/rubric/grades.ts`, the three modes as a union on `mode`, each field as section 6 and `applyGrades` have it: `rubric_hash`, `points`, `step` or `scale` and `round`, `criteria` (additive and banded) or `bullets` (holistic) keyed by id, each with what its mode carries (`text`, `max` or `weight`, `score`, `band`, `verdict`, `note`), the question's own `score` (holistic), `justification`, `improvement`, and the optional `grader` and `reviewed`. Nulls are allowed wherever the template writes `null`; the file's `grader` is a grader or `null` (the template's). One grader shape for both: the report's `GraderSchema` is reused or moved, not copied.
+- **Used only for the JSON Schema.** `parseGrades` and `applyGrades` keep their own checks and messages: `quiz grade` accepts and refuses exactly what it does now, and **no golden moves**. If wiring the new schema into `GradesFileSchema` would change what `parseGrades` accepts or says, keep `GradesFileSchema` as it is and give `src/core/json-schemas.ts` the new schema instead; report which was done.
+- **The rule for the shape:** the schema accepts every grades file `quiz grade` accepts and every template it writes; it refuses a shape no rubric can take (an unknown `mode`, `criteria` that is not an object, a grader with no `name` or an unknown `kind`). What depends on the quiz (a criterion id that does not exist, a score over its maximum or off the step) stays `applyGrades`'s, not the schema's. Unknown keys stay allowed (`io: "input"`, as 3z did).
+- **The test:** `test/json-schemas.test.ts` already checks every grades file in the tests and examples. It gains cases the schema must refuse (the four examples above, written inline), and the `REFUSED` list is checked again: a file there that the new schema now refuses for the right reason stays; a grades file `quiz grade` refuses only for a quiz-dependent reason, and that the schema accepts, is moved out of `REFUSED` with a comment. Each change to `REFUSED` is named in the report.
+- **No loading change:** no command loads the new schema at run time beyond what it loads now (`test/cli-graph.test.ts`, the startup tests, the `dist/` chunk check).
+
+### Tasks
+
+1. **G119** (one commit): the schemas, `npm run schemas` run and the new `schemas/grades-v2.schema.json` committed (its `description` loses "The schema holds the file's envelope"), the test's new cases.
+2. **The slice table's 3z2 row** (one commit). The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; `npm run schemas` leaves the tree unchanged; no golden moves; the schema refuses the four inline cases and accepts every grades file in the tests and examples that `quiz grade` accepts. Then 3z's acceptance.
