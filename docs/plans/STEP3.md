@@ -40,7 +40,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
-| 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 for the owner | `1e9c888`..`0844b96`, review |
+| 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
 | 3z5 G124, mhchem and the chemistry example | brief written (2026-11-16), for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
@@ -90,7 +90,6 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G125. The study sheet's facts line (3z4's review).** 3z4 put the header's time, total and version on three lines (G123). The study sheet (`--answers inline`) has no header table: its head (`StudyHead`) still joins them, "Time allowed: 45 minutes · Total: 37 points · Version 3f2a", which G123 did not name. **Recommendation:** three lines there too, as in the header, so the two papers read alike; one flag (`stacked`) and the `print-inline` goldens. Built in 3z5.
 
 **G126. Materials too wide for their panel (raised by the owner, 2026-11-16, trying the samples).** On the start screen the Materials panel (380 px) cuts off a wide sheet: a four-column table loses its last column, and maths wraps inside an expression. The phone board (MaterialsPhone) already says "a wide table scrolls sideways in its box", which the page does not do. **Recommendation**, drawn on the canvas under "Materials: the wide view (G126)" (MaterialsWide, interactive, with MaterialsWideSidebar, MaterialsWideExpanded and MaterialsWidePhone): (1) everywhere a sheet shows, a table or display formula wider than its space scrolls sideways in its own box, keyboard-focusable, with a fade at the edge and the words "Scroll sideways for the rest of the table, or Expand"; (2) the start screen's **Materials** opens a pop-up, not a side panel: 960 px wide or the window less 64 px, 40 px from the top and bottom, the sheet chips along its top, the sheet scrolling inside, closed by **Close**, Esc or a click outside, focus back on **Materials**, "The clock has not started" at its foot; on a phone it takes the screen; (3) while answering, the stacked sidebar keeps the sheet, and each sheet's heading has an **Expand** button that opens the same pop-up over the question, "The clock keeps running" at its foot. Words in `vi` from the catalogs, as every form's. A slice after the boards are approved.
 
@@ -1570,7 +1569,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z5: G124, chemistry with mhchem, and the chemistry example
 
-**Brief written on 2026-11-16, for the owner's approval.** G124 is decided: the owner asked for mhchem on 2026-11-16. G125 (the study sheet's three lines) is built here too if the owner decides it as recommended.
+**Brief written on 2026-11-16, for the owner's approval.** G124 is decided: the owner asked for mhchem on 2026-11-16. G125 (the study sheet's three lines) is decided and built here too. **The owner, 2026-11-16:** the example is in Vietnamese.
 
 ### Read first
 
@@ -1584,15 +1583,15 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 - **Notices:** mhchem is listed in `quiz --acknowledgements` and `THIRD_PARTY_NOTICES.md` as its own entry: "mhchem for KaTeX", its version (KaTeX's), licence Apache-2.0 (the file's header; it is also under KaTeX's MIT), the copyright lines from its header (The MathJax Consortium, Martin Hensel), and the Apache-2.0 text once. Read from the file's own header by `npm run notices`, with a test that fails if the header changes, as for Source Serif 4's line.
 - **Docs:** QUIZ_SYNTAX.md's maths row gains "chemistry with `\ce{…}` (formulas, equations, states) and `\pu{…}` (units), KaTeX's mhchem"; COMMANDS.md needs nothing.
 - **Tests:** `test/math.test.ts`: `\ce{H2SO4}`, `\ce{CuSO4.5H2O}`, `\ce{N2 + 3H2 <=> 2NH3}`, `\ce{SO4^2-}`, `\pu{123 kJ/mol}` pass `check`; a broken `\ce{` is `math.syntax` with KaTeX's message. A `check` golden of the chemistry example.
-- **The example, `examples/chemistry/`**, in English, `time_limit` 30 minutes, its own `build.toml` entry like the others, with: single choice on formulas and ions (`\ce{H2SO4}`, `\ce{H2SO3}`, `\ce{HSO4-}`, `\ce{SO4^2-}`); blanks to balance `\ce{Fe + O2 -> Fe2O3}` (the coefficients); multi on what shifts `\ce{N2 + 3H2 <=> 2NH3}`; numeric stoichiometry (the mass of `\ce{CO2}` from 10 g of `\ce{CaCO3}`, with a tolerance, in `\pu{g}`); matching with `\ce{CuSO4.5H2O}` and states such as `\ce{NaCl(aq)}`; a short answer on the functional group of `\ce{CH3COOH}`; one structure as an SVG in `assets/` (ethanol's skeletal formula, drawn by hand as plain lines and labels, with alt text), the way structures are shown until the SMILES proposal; explanations using `\ce`; a materials sheet `materials/molar-masses.md` with a short table. Every answer and explanation chemically right. A line in `TRY` (`example-chemistry`) and a printed paper with its key in the samples.
-- **G125, if decided as recommended:** the study sheet's head gets the header's three lines (`stacked`), and its goldens change in that head only.
+- **The example, `examples/chemistry/`**, **in Vietnamese** (`lang: vi`, `ui_lang: vi`: the questions, choices, explanations, the sheet and the alt text in Vietnamese, the chemistry in `\\ce` as anywhere; numeric answers with the decimal comma, as `vi` takes them), `time_limit` 30 minutes, its own `build.toml` entry like the others, with: single choice on formulas and ions (`\ce{H2SO4}`, `\ce{H2SO3}`, `\ce{HSO4-}`, `\ce{SO4^2-}`); blanks to balance `\ce{Fe + O2 -> Fe2O3}` (the coefficients); multi on what shifts `\ce{N2 + 3H2 <=> 2NH3}`; numeric stoichiometry (the mass of `\ce{CO2}` from 10 g of `\ce{CaCO3}`, with a tolerance, in `\pu{g}`); matching with `\ce{CuSO4.5H2O}` and states such as `\ce{NaCl(aq)}`; a short answer on the functional group of `\ce{CH3COOH}`; one structure as an SVG in `assets/` (ethanol's skeletal formula, drawn by hand as plain lines and labels, with alt text), the way structures are shown until the SMILES proposal; explanations using `\ce`; a materials sheet `materials/molar-masses.md` with a short table. Every answer and explanation chemically right. A line in `TRY` (`example-chemistry`, said in English as the other lines are) and a printed paper with its key in the samples.
+- **G125:** the study sheet's head gets the header's three lines (`stacked`), and its goldens change in that head only.
 - **Goldens:** new ones for the example (and its paper); none other changes unless a golden lists the examples (counted and explained), and G125's `print-inline` ones.
 
 ### Tasks
 
 1. **mhchem** (one commit): `tex.ts`, the notices, the tests, QUIZ_SYNTAX.md.
 2. **The example** (one commit): `examples/chemistry/`, its goldens, `TRY`.
-3. **G125** (one commit, if decided).
+3. **G125** (one commit).
 4. **The slice table's 3z5 row** (one commit). The agent's report as for every slice.
 
 ### Done when
