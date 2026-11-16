@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ResultsSchema } from "./attempt/results";
 import { ReportSchema } from "./report/schema";
 import { ReviewSchema } from "./review/schema";
-import { GradesFileSchema } from "./rubric/grades";
+import { GradesFileShapeSchema } from "./rubric/grades";
 
 /**
  * The JSON Schemas of the four 1.0 file formats (TECHNICAL_DESIGN.md, the 0.x-to-1.0 table, "JSON Schemas"), made from
@@ -25,9 +25,9 @@ const FORMATS = {
       "fullmark-report, version 2: an attempt graded, as `quiz grade --json` writes it (TECHNICAL_DESIGN.md, section 6).",
   },
   grades: {
-    schema: GradesFileSchema,
+    schema: GradesFileShapeSchema,
     description:
-      "fullmark-grades, version 2: the grades of an attempt's open questions, by a person or an AI (TECHNICAL_DESIGN.md, section 6, grades-v2). The schema holds the file's envelope; `quiz grade` checks each question's entry against the quiz's rubric.",
+      "fullmark-grades, version 2: the grades of an attempt's open questions, by a person or an AI (TECHNICAL_DESIGN.md, section 6, grades-v2). The schema holds each entry's shape and the grader's; `quiz grade` checks them against the quiz's rubric.",
   },
   review: {
     schema: ReviewSchema,

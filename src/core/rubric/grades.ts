@@ -12,9 +12,77 @@ export const GRADES_VERSION = 2;
 export const VERDICTS = ["met", "partly", "missed"] as const;
 export type Verdict = (typeof VERDICTS)[number];
 
+/** Who graded: an AI or a person, by name. One shape for the file's grader, a question's, `reviewed` and the report's. */
+export const GraderSchema = z.object({
+  kind: z.enum(["ai", "human"]),
+  name: z.string(),
+  model: z.string().optional(),
+  at: z.string().optional(),
+});
 export type Grader = { kind: "ai" | "human"; name: string; model?: string; at?: string };
 
-/** The file as a reader takes it: the envelope is fixed, a question's entry is judged by `applyGrades`. */
+const note = z.string().nullable().optional();
+const own = {
+  rubric_hash: z.string(),
+  points: z.number(),
+  grader: GraderSchema.optional(),
+  reviewed: GraderSchema.optional(),
+};
+const words = { justification: z.string().nullable().optional(), improvement: z.string().nullable().optional() };
+
+/**
+ * One question's entry, by its mode, as section 6 of TECHNICAL_DESIGN.md has it (the template's `null` cells allowed).
+ * Used only for the JSON Schema (`GradesFileShapeSchema`): `applyGrades` makes its own checks against the quiz's
+ * rubric, with their own messages, and what depends on the quiz (a criterion id, a score over its maximum) stays there.
+ */
+export const GradesEntrySchema = z.discriminatedUnion("mode", [
+  z.looseObject({
+    mode: z.literal("additive"),
+    ...own,
+    ...words,
+    step: z.number().optional(),
+    criteria: z.record(
+      z.string(),
+      z.looseObject({ text: z.string().optional(), max: z.number(), score: z.number().nullable().optional(), note }),
+    ),
+  }),
+  z.looseObject({
+    mode: z.literal("banded"),
+    ...own,
+    ...words,
+    scale: z.looseObject({ min: z.number(), max: z.number(), step: z.number() }),
+    round: z.enum(["nearest-step", "down", "ielts"]),
+    criteria: z.record(
+      z.string(),
+      z.looseObject({ text: z.string().optional(), weight: z.number(), band: z.number().nullable().optional(), note }),
+    ),
+  }),
+  z.looseObject({
+    mode: z.literal("holistic"),
+    ...own,
+    ...words,
+    step: z.number().nullable().optional(),
+    score: z.number().nullable().optional(),
+    bullets: z.record(
+      z.string(),
+      z.looseObject({
+        text: z.string().optional(),
+        verdict: z.enum(["met", "partly", "missed"]).nullable().optional(),
+      }),
+    ),
+  }),
+]);
+
+/** The whole file, entries included: what the grades JSON Schema is made from. `parseGrades` uses `GradesFileSchema`. */
+export const GradesFileShapeSchema = z.looseObject({
+  format: z.literal(GRADES_FORMAT),
+  version: z.literal(GRADES_VERSION),
+  results_hash: z.string().nullable().optional(),
+  grader: GraderSchema.nullable().optional(),
+  grades: z.record(z.string(), GradesEntrySchema),
+});
+
+/** The file as `quiz grade` takes it: the envelope is fixed, a question's entry is judged by `applyGrades`. */
 export const GradesFileSchema = z.looseObject({
   format: z.literal(GRADES_FORMAT),
   version: z.literal(GRADES_VERSION),

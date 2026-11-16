@@ -21,6 +21,12 @@ const UNMASK: Record<string, string> = { "<time>": "2026-11-16T09:30:00+07:00", 
 /**
  * The inputs that exist to be refused, each by the command its golden runs (a 0.x file, a missing key, a broken rule):
  * their schema refuses them too. Every other file of the four formats is valid.
+ *
+ * The grades schema holds each entry's shape (3z2), so four more grades inputs of the `rubrics-grades-invalid-*` goldens
+ * are refused by it, each for a shape no rubric can take: a grader of kind "robot" and a nameless one (`everything`), an
+ * entry with no `rubric_hash` (`no-rubric-hash`), an entry with no `rubric_hash` or `criteria` (`unknown-question`,
+ * which `quiz grade` refuses for its id, a quiz-dependent reason, but whose entry is a shape no rubric can take too),
+ * and an additive entry with `bullets` and no `criteria` (`wrong-mode`). `quiz grade` refuses all four.
  */
 const REFUSED = [
   "test/golden/check/review-invalid-json/input/review.json",
@@ -28,6 +34,10 @@ const REFUSED = [
   "test/golden/grade/results-malformed/input/results.json",
   "test/golden/grade/results-v1/input/results.json",
   "test/golden/grade/rubrics-grades-v1/input/grades.json",
+  "test/golden/grade/rubrics-grades-invalid-everything/input/grades.json",
+  "test/golden/grade/rubrics-grades-invalid-no-rubric-hash/input/grades.json",
+  "test/golden/grade/rubrics-grades-invalid-unknown-question/input/grades.json",
+  "test/golden/grade/rubrics-grades-invalid-wrong-mode/input/grades.json",
   "test/golden/grade/several-with-grades/input/grades.json",
   "test/golden/grade/web-grades-v1/input/grades.json",
   "test/golden/review/out-invalid-json/input/review.json",
@@ -128,5 +138,48 @@ describe("every results, report, grades and review file in the tests and example
     const f = files.find((x) => x.file === file);
     expect(f, `${file} is not found as a file of the four formats`).toBeDefined();
     if (f) expect(validators[f.name](f.json)).toBe(false);
+  });
+});
+
+describe("the grades schema refuses a shape no rubric can take", () => {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  const validate = ajv.compile(JSON.parse(readFileSync(join(root, "schemas", schemaFile("grades")), "utf8")));
+  const entry = {
+    mode: "additive",
+    rubric_hash: "abc",
+    points: 1,
+    step: 0.5,
+    criteria: { a: { text: "A", max: 1, score: null, note: null } },
+    justification: null,
+    improvement: null,
+  };
+  const file = (grader: unknown, grades: unknown) => ({
+    format: "fullmark-grades",
+    version: 2,
+    results_hash: "x",
+    grader,
+    grades,
+  });
+  const ai = { kind: "ai", name: "Claude", model: "claude-opus-5-5" };
+
+  it("accepts a template (a null grader and null cells) and a filled file with a grader on a question", () => {
+    expect(validate(file(null, { q: entry })), "template").toBe(true);
+    expect(validate(file(ai, { q: { ...entry, grader: { kind: "human", name: "Ana" } } })), "own grader").toBe(true);
+  });
+
+  it("refuses an unknown mode", () => {
+    expect(validate(file(ai, { q: { ...entry, mode: "banana" } }))).toBe(false);
+  });
+
+  it("refuses criteria that is not an object", () => {
+    expect(validate(file(ai, { q: { ...entry, criteria: 42 } }))).toBe(false);
+  });
+
+  it("refuses a grader with no name", () => {
+    expect(validate(file({ kind: "ai", model: "m" }, { q: entry }))).toBe(false);
+  });
+
+  it("refuses a grader of an unknown kind", () => {
+    expect(validate(file({ kind: "robot", name: "R" }, { q: entry }))).toBe(false);
   });
 });

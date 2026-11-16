@@ -2,6 +2,7 @@ import { z } from "zod";
 import { PHASES, PLAN_SOURCES } from "../attempt/schema";
 import type { QuestionStatus } from "../grade";
 import { QUESTION_TYPES } from "../ir";
+import { GraderSchema } from "../rubric/grades";
 import { REPORT_FORMAT, REPORT_VERSION } from "./format";
 
 /**
@@ -85,14 +86,6 @@ export const ResolvedRubricSchema = z.discriminatedUnion("mode", [
     criteria: z.array(z.object({ ...criterion, weight: z.number() })),
   }),
 ]);
-
-/** Who graded: an AI or a person, by name. */
-export const GraderSchema = z.object({
-  kind: z.enum(["ai", "human"]),
-  name: z.string(),
-  model: z.string().optional(),
-  at: z.string().optional(),
-});
 
 export const CriterionResultSchema = z.object({
   id: z.string(),

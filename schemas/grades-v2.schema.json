@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "fullmark-grades-v2",
   "title": "fullmark grades, version 2",
-  "description": "fullmark-grades, version 2: the grades of an attempt's open questions, by a person or an AI (TECHNICAL_DESIGN.md, section 6, grades-v2). The schema holds the file's envelope; `quiz grade` checks each question's entry against the quiz's rubric.",
+  "description": "fullmark-grades, version 2: the grades of an attempt's open questions, by a person or an AI (TECHNICAL_DESIGN.md, section 6, grades-v2). The schema holds each entry's shape and the grader's; `quiz grade` checks them against the quiz's rubric.",
   "type": "object",
   "properties": {
     "format": {
@@ -19,13 +19,440 @@
         "null"
       ]
     },
-    "grader": {},
+    "grader": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "ai",
+                "human"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "at": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "grades": {
       "type": "object",
       "propertyNames": {
         "type": "string"
       },
-      "additionalProperties": {}
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "const": "additive"
+              },
+              "rubric_hash": {
+                "type": "string"
+              },
+              "points": {
+                "type": "number"
+              },
+              "grader": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "reviewed": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "justification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "improvement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "step": {
+                "type": "number"
+              },
+              "criteria": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "max": {
+                      "type": "number"
+                    },
+                    "score": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "max"
+                  ],
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "required": [
+              "mode",
+              "rubric_hash",
+              "points",
+              "criteria"
+            ],
+            "additionalProperties": {}
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "const": "banded"
+              },
+              "rubric_hash": {
+                "type": "string"
+              },
+              "points": {
+                "type": "number"
+              },
+              "grader": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "reviewed": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "justification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "improvement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scale": {
+                "type": "object",
+                "properties": {
+                  "min": {
+                    "type": "number"
+                  },
+                  "max": {
+                    "type": "number"
+                  },
+                  "step": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "min",
+                  "max",
+                  "step"
+                ],
+                "additionalProperties": {}
+              },
+              "round": {
+                "type": "string",
+                "enum": [
+                  "nearest-step",
+                  "down",
+                  "ielts"
+                ]
+              },
+              "criteria": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "weight": {
+                      "type": "number"
+                    },
+                    "band": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "weight"
+                  ],
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "required": [
+              "mode",
+              "rubric_hash",
+              "points",
+              "scale",
+              "round",
+              "criteria"
+            ],
+            "additionalProperties": {}
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "const": "holistic"
+              },
+              "rubric_hash": {
+                "type": "string"
+              },
+              "points": {
+                "type": "number"
+              },
+              "grader": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "reviewed": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "ai",
+                      "human"
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "name"
+                ]
+              },
+              "justification": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "improvement": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "step": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "score": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "bullets": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    },
+                    "verdict": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "met",
+                            "partly",
+                            "missed"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "required": [
+              "mode",
+              "rubric_hash",
+              "points",
+              "bullets"
+            ],
+            "additionalProperties": {}
+          }
+        ]
+      }
     }
   },
   "required": [
