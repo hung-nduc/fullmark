@@ -1538,9 +1538,9 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Decided for this slice
 
 - **Three lines, always.** Under the title, the time, the total and the version each on its own line, in that order, never joined with " · " (no `time_limit`: two lines, the total and the version). Then "Paper code" / "Mã đề" with `--seed`, as now. The same in `en` and `vi`, on every paper with a header.
-- **Student ID under Name.** The right side's boxes in rows: Name; Student ID on the row right under it; Class and Date; Signature. The left side's bottom cell that held Student ID goes; the title cell spans the header's height. Lines and spacing as the other boxes have them.
-- **"MSSV" in Vietnamese**: `studentId` in `src/core/i18n/paper.ts` becomes "MSSV" (in place of "Số báo danh"); English stays "Student ID".
-- **Goldens:** every `print-*` golden with a header changes; count them and say why in the report (the header's markup, and the `vi` label). Nothing else in a paper may change: the rest of each golden's diff is empty. The answer sheet's own Student ID box, if it has one, follows the same label; report it either way.
+- **Student ID under Name, a new box.** The right side's boxes in rows: Name; Student ID on the row right under it; Class and Date; Signature. Lines and spacing as the other boxes have them.
+- **Two labels:** the new box is `studentId`, "Student ID" / "MSSV". The left side's bottom box stays where it is and becomes the candidate number: a new key, "Candidate number" / "Số báo danh" (the `vi` text it has now). Every place that used `studentId` for that box moves to the new key.
+- **Goldens:** every `print-*` golden with a header changes; count them and say why in the report (the header's markup, and the `vi` label). Nothing else in a paper may change: the rest of each golden's diff is empty. The answer sheet's own Student ID box, if it has one, stays as it is (its label and meaning); report what it is.
 - **Tests:** a Playwright check, in both browsers, that the three items are on three different lines and that the Student ID box is directly under Name, in `en` and `vi`; the page-break and no-answer tests still pass.
 - **Screens:** 2k's, 2k2's and 2k3's screens taken again, the headers checked by eye.
 
@@ -1552,4 +1552,4 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ### Done when
 
-`npm run check` passes in Chromium and Firefox; the changed goldens are only the headers'; the screens show three lines and MSSV under Họ và tên. Then the owner's samples run goes on.
+`npm run check` passes in Chromium and Firefox; the changed goldens are only the headers'; the screens show three lines, MSSV under Họ và tên, and Số báo danh where it was. Then the owner's samples run goes on.
