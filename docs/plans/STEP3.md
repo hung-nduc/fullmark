@@ -46,12 +46,13 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
-| 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 open | `025f4bb`..`c018df3`, review |
+| 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
+| 3z11 G144: the dock's whole-pixel height | brief written (2026-11-16); waits for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-G144, below (3z10's review).
+None open.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -97,8 +98,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G144. Five screens still differ from run to run (3z10's review).** With the clock, the random bytes, the time zone, the locale and the PDF dates fixed, a second run of every screens spec changes 5 of 257 screens, all wide viewport shots of the `review` and `grade --web` forms (`3l/since-*`, `3m/since-*`, `3p/2-finish-wide`; which five varies a little between runs): the sticky Questions sidebar is drawn one pixel higher or lower (3 700 to 7 700 pixels). The dock measures 98.125 px, while `--dock-h`, the sidebar's sticky top, is a whole 98 px. **Recommendation:** make the measured dock height whole in `src/` (the dock's height rounded up and set, so the dock and `--dock-h` agree), and prove it with two screens runs that change no screen; this is also a 1/8 px overlap of the sidebar under the dock on the page itself. If the proof still fails, accept the remaining screens and say so in foundation 8 ("every screen is identical between runs, except …"), no further tries.
-
+None open.
 
 ## Slices
 
@@ -137,6 +137,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen; added by the owner during the build: the whole-quiz row and By part on a phone, G136, G137, G138 | G135 to G138 |
 | **3z9** | G139 (the brief's "+" tap on a phone), G140 (the brief card's head on a phone) | G139, G140 |
 | **3z10** | G142 (reproducible screens), G143 (tall element shots on a phone) | G142, G143 |
+| **3z11** | G144 (the dock a whole number of pixels tall; the last five screens) | G144 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1853,4 +1854,29 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 **Done differently, accepted:** `reducedMotion`, `--disable-partial-raster`, `workers: 1` and the font wait, each only for the screens (the screens run takes 3.2 min instead of about 52 s); no form needed its command's clock injected. The agent took about an hour on the last five screens before being told to stop and report them; that is G144.
 
 **Gaps:** G144, open in "Gaps".
+
+## Slice 3z11: the dock's whole-pixel height
+
+**Brief written on 2026-11-16; waits for the owner's approval.** G144 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **The dock is a whole number of pixels tall**, says what is wanted. A small slice with a fixed end: if the proof fails once the fix is in, the screens that still differ are reported and accepted, not chased.
+
+### Read first
+
+- This plan: "Rules for every slice"; 3z10's review; STEP3-GAPS.md, G142 to G144.
+- Code: where `--dock-h` is measured: `src/page/App.tsx` (about line 436), `src/review/Form.tsx` (about line 56), `src/grade-form/Form.tsx` (about line 922), each from `el.offsetHeight`, which rounds; the CSS that reads `--dock-h` (`src/page/styles/25-sidebar.css`, `src/grade-form/grade.css`, `src/review/review.css`).
+
+### Decided for this slice
+
+- **One rule in three places:** the measure reads the dock's real height (`getBoundingClientRect().height`), rounds it up to a whole pixel, sets the dock's own `min-height` to that number and `--dock-h` to the same number, so the dock and the sidebar's sticky top agree to the pixel. The measure runs where it runs now (the existing resize observer); a dock that grows (a wrapped line, a larger text size) is measured again as today. One small shared helper if the three can share it; otherwise the same three lines in each.
+- **A test** for each of the three (the page, `review`, `grade --web`), at 1280 × 940 and at a text size that makes the dock fractional before the fix: the dock's height is a whole number, and the sidebar's top equals the dock's bottom.
+- **Goldens:** the page's goldens change in the script (and its CSP hash) only; count and explain them. No markup or style change is expected.
+- **The proof:** run every screens spec, commit the screens, run them again: no screen changes. **If any still changes, stop:** do not try other fixes; put those files back, list them (path, pixels differing, max channel difference) and report. The planner names them in the design doc as accepted.
+
+### Tasks
+
+1. **The fix and the tests** (one commit, with its goldens, counted).
+2. **The screens and the proof** (one commit). Do not edit `docs/plans/` or `docs/design/`. The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; two screens runs on the same commit give the same bytes, or the screens that do not are listed. Then the owner tries the samples and step 3 is closed.
 
