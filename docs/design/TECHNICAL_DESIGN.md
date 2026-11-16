@@ -818,6 +818,7 @@ English is the source. Each Vietnamese document starts with the commit of the En
 4. **Stacked diacritics** (ệ, ở) clip under a tight line height. Every token set keeps line height at 1.4 or more for text, and a screenshot test of a Vietnamese example covers it. Embedded fonts must carry the Vietnamese subset.
 5. **Longer strings.** Vietnamese labels run about 30 % longer than English. Buttons, the status line and the sidebar wrap instead of truncating, checked by the same screenshot test.
 6. **Sorting** of section titles, tags and quiz names in lists uses a fixed comparison, not the OS locale, so output is deterministic.
+7. **One word for one thing, in every catalog** (the page, the forms, the paper). Spelling with the modern tone marks: "hủy", "xóa", "khóa". The brand is "fullmark", lowercase, also at the start of a phrase. An essay is "Tự luận", code "Lập trình", a sample answer "Bài mẫu" ("Hiện bài mẫu", "Ẩn bài mẫu"). The font names are "Hệ thống", "Sans", "Serif", "Dễ đọc": Sans and Serif stay as names, as OLED does, and each choice is drawn in its own font. Labels are whole: "Phông chữ" (not "Phông"), "Màu nền" (the theme, not "Nền"), "Danh sách câu hỏi" (the sidebar's grid, not "Bản đồ câu hỏi"), "Bộ quy tắc kiểm tra" (a check profile, not "Hồ sơ kiểm tra"), "Các đáp án được chấp nhận", "Nhập câu trả lời" (a box's placeholder), "điền khuyết" and "điền số" (the grading form's kinds).
 
 ## 10. Features by area
 
