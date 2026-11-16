@@ -1,91 +1,15 @@
 import type { Attempt } from "../attempt";
-import { type Graded, type GradedQuestion, grade, type QuestionStatus, type Tally } from "../grade";
+import { type Graded, type GradedQuestion, grade, type Tally } from "../grade";
 import type { Messages } from "../i18n";
 import type { Question, Quiz } from "../ir";
-import type { AppliedGrades, GradeDetail, Grader } from "../rubric/grades";
-import { type ResolvedRubric, resolveRubric } from "../rubric/model";
+import type { AppliedGrades } from "../rubric/grades";
+import { resolveRubric } from "../rubric/model";
 import { describeAnswer, describeKey } from "./describe";
+import { REPORT_FORMAT, REPORT_VERSION } from "./format";
+import type { Report, ReportGroup, ReportOpen, ReportQuestion } from "./schema";
 
-export const REPORT_FORMAT = "fullmark-report";
-export const REPORT_VERSION = 2;
-
-export type ReportScore = {
-  earned: number;
-  points: number;
-  percent: number | null;
-  pending: number;
-  pass: { mark: number | null; passed: boolean | null };
-};
-
-export type ReportGroup = {
-  id: string;
-  title: string | null;
-  earned: number;
-  points: number;
-  percent: number | null;
-  pending: number;
-  questions: number;
-};
-
-export type ReportQuestion = {
-  id: string;
-  /** the question hash: the version of this question, which `stats` compares across versions (foundation 1) */
-  hash: string;
-  section: string;
-  type: Question["type"];
-  tags: string[];
-  points: number;
-  earned: number | null;
-  status: QuestionStatus;
-  prompt: string;
-  /** the learner's answer as text; null when there is none */
-  answer: string | null;
-  /** the right answer as text; null for essays, code, scales and ungraded questions */
-  key: string | null;
-  explanation: string | null;
-  words: number | null;
-};
-
-export type ReportOpen = {
-  id: string;
-  type: "essay" | "code";
-  points: number;
-  prompt: string;
-  answer: string;
-  words: number | null;
-  language: string | null;
-  rubric: ResolvedRubric;
-  sample_answer: string | null;
-  /** true while no grade has been applied */
-  pending: boolean;
-  grade: (GradeDetail & { status: QuestionStatus }) | null;
-};
-
-export type Report = {
-  format: typeof REPORT_FORMAT;
-  version: typeof REPORT_VERSION;
-  quiz: { title: string; id: string; hash: string; kind: "quiz" | "survey"; lang: "en" | "vi" };
-  attempt: {
-    phase: Attempt["phase"];
-    source: string;
-    questions: number;
-    started: string | null;
-    submitted: string | null;
-    time_used: number;
-    timed_out: boolean;
-  };
-  /** null for a survey: it has no score */
-  score: ReportScore | null;
-  sections: ReportGroup[];
-  tags: ReportGroup[];
-  questions: ReportQuestion[];
-  /** the ids of scored questions that are wrong or only partly right */
-  wrong: string[];
-  /** the answered essays and code, laid out for a grader */
-  open: ReportOpen[];
-  grades: { grader: Grader | null; warnings: string[] } | null;
-  unknown: string[];
-};
+export { REPORT_FORMAT, REPORT_VERSION } from "./format";
+export type { Report, ReportGroup, ReportOpen, ReportQuestion } from "./schema";
 
 const pct = (earned: number, points: number): number | null =>
   points > 0 ? Math.round((earned / points) * 10000) / 100 : null;

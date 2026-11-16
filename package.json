@@ -16,13 +16,14 @@
     "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
-    "build": "tsup && node scripts/build-page.mjs && node scripts/build-templates.mjs && node scripts/build-brief.mjs",
+    "build": "tsup && node scripts/build-page.mjs && node scripts/build-templates.mjs && node scripts/build-brief.mjs && node scripts/build-schemas.mjs",
     "test": "vitest run test/startup.test.ts && vitest run --exclude test/startup.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
     "knip": "knip",
     "samples": "npm run build && node scripts/samples.mjs",
     "notices": "node scripts/notices.mjs",
+    "schemas": "node scripts/schemas.mjs",
     "golden:update": "node scripts/golden-update.mjs",
     "check": "npm run typecheck && npm run lint && npm run knip && npm run test && npm run test:e2e",
     "test:e2e": "npm run build && playwright test"
@@ -32,6 +33,7 @@
     "@biomejs/biome": "2.6.3",
     "@playwright/test": "1.64.1",
     "@types/node": "24.19.2",
+    "ajv": "8.20.0",
     "axe-core": "4.14.0",
     "esbuild": "0.28.2",
     "knip": "6.42.1",

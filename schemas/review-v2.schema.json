@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fullmark-review-v2",
+  "title": "fullmark review, version 2",
+  "description": "fullmark-review, version 2: the learner's verdict on each question, written by `quiz review` (TECHNICAL_DESIGN.md, section 4, review-v2).",
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "const": "fullmark-review"
+    },
+    "version": {
+      "type": "number",
+      "const": 2
+    },
+    "quizId": {
+      "type": "string"
+    },
+    "quizHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d(?:\\.\\d+)?(?:Z|[+-]\\d\\d:\\d\\d)?$"
+    },
+    "questions": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "keep",
+              "fix",
+              "drop"
+            ]
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "key-wrong",
+                "unclear",
+                "other",
+                "rubric-loose",
+                "points-misallocated",
+                "criterion-unclear",
+                "duplicate",
+                "off-scope",
+                "too-easy"
+              ]
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "string"
+          },
+          "assumed": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "verdict",
+          "reasons",
+          "note",
+          "hash"
+        ]
+      }
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "quizId",
+    "quizHash",
+    "reviewedAt",
+    "questions"
+  ]
+}
