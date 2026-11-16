@@ -45,6 +45,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
+| 3z9 G139, G140: the brief form on a phone | brief written (2026-11-16); waits for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -132,6 +133,7 @@ None open.
 | **3z6** | G127 (the `vi` words), G128 (the example's IUPAC names), G130 to G132 (the Information & Licences dialog, the ⓘ at the window's bottom) | G127, G128, G130 to G132 |
 | **3z7** | G126 (Materials as a pop-up on the start screen), G134 (the example's tone marks), G127's last word | G126, G134 |
 | **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen; added by the owner during the build: the whole-quiz row and By part on a phone, G136, G137, G138 | G135 to G138 |
+| **3z9** | G139 (the brief's "+" tap on a phone), G140 (the brief card's head on a phone) | G139, G140 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1747,4 +1749,33 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 **Done differently, accepted:** one new spec runs the layout checks at the three sizes instead of a loop in each behaviour spec, and the old narrow loops run over `PHONES`; `foot.spec.ts` at 360 allows a start screen taller than the window (it wraps to 862 px) and checks that the ⓘ is at the page's end; `brief-phone.spec.ts` focuses the commitment "+" before the tap (G139); the new By part rule is in `40-results.css`, and the older one in `25-sidebar.css` is left, now partly redundant.
 
 **Gaps:** G139 (the missed tap on the brief's "+"), G140 (the brief card's head on a phone), G141 (the older phone screens), open in "Gaps".
+
+## Slice 3z9: the brief form on a phone
+
+**Brief written on 2026-11-16; waits for the owner's approval.** G139 and G140 are decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8 (**The brief card's head on a phone**, **A choice never moves what is below it**) says what is wanted. After 3z9, step 3's acceptance is run again (the planner), taking every phone screen again (G141), and the owner tries the samples.
+
+### Read first
+
+- This plan: "Rules for every slice"; the reviews of 3h, 3p3 and 3z8; STEP3-GAPS.md, G137 to G140.
+- TECHNICAL_DESIGN.md, foundation 8 (the phone paragraphs); COMMANDS.md, `quiz brief --web`.
+- Code: `src/brief-form/Form.tsx` (the card head, the `bf-mark`, the slot with `data-action=inc`), `src/brief-form/brief.css`; `e2e/brief-phone.spec.ts` ("answering every question by touch", lines 113 to 119: the blur, the settle and the `focus()` before the tap), `e2e/phone-sizes.spec.ts`, `e2e/helpers.ts` (`PHONES`, `PHONE`).
+
+### Decided for this slice
+
+- **G139, the cause first.** Find what moves the commitment card's "+" by about 24 px between pointerdown and click after a choice in the card above (on a phone, 390 × 844): a style on focus or `:has(:focus-visible)`, a follow-up field or a note that appears or goes on blur, a mark that changes its line count, the foot bar or the scroll. Say in the report what it was, with the evidence (the element and the property, and the box before and after).
+- **G139, the fix** is in CSS (or the smallest markup change) so that nothing above a control moves when the focus leaves a choice: the layout of a card is the same focused and not. Not a test workaround, not a delay, not a JavaScript re-scroll.
+- **G139, the test.** `brief-phone.spec.ts` loses its blur, settle and `focus()` steps before the "+": after the tap on the last choice it taps the "+" at once, as a finger would, and the count goes up. A new test in `phone-sizes.spec.ts`, at the three phones, taps a choice and then the next card's first control at once and checks that the control's box did not move between the two (measured before the first tap and at the second).
+- **G140.** Under 520 px the card's mark ("✎ Pre-filled for you", and the other marks in that place: "Missing", "Yours", "Default", "No goal") goes on its own line under the head line, aligned left; the head line keeps the full width. Above 520 px nothing changes. A check in `phone-sizes.spec.ts` at the three phones: the mark's top is below the head line's bottom, and their left edges match.
+- **Goldens:** none should change (the brief form is not in the page goldens); if one does, explain and count it.
+- **Screens:** `docs/screens/3z9/`, `en`, light, at 360 × 780 and 390 × 844: the pre-filled `brief --web` form's first card (the head and its mark), and a card with "Missing" after a refused Finish.
+
+### Tasks
+
+1. **G139** (one commit): the cause, the fix and the tests.
+2. **G140** (one commit): the mark under the head line on a phone, and its check.
+3. **Screens** (one commit). Do not edit `docs/plans/` or `docs/design/`; the planner adds the slice table's row and the review. The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; the "+" is tapped right after a choice with no settle step in any test; the screens show the mark on its own line at 360 and 390 px. Then step 3's acceptance is run again.
 
