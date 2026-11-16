@@ -10,8 +10,15 @@ export type Katex = {
 
 const nodeRequire = createRequire(import.meta.url);
 
-/** KaTeX, loaded on first use from `node_modules` (it is external to the bundle, and ships a CommonJS build). */
-export const loadKatex = (): Katex => nodeRequire("katex") as Katex;
+/**
+ * KaTeX, loaded on first use from `node_modules` (it is external to the bundle, and ships a CommonJS build), with its
+ * mhchem extension (`\ce{…}` and `\pu{…}`), which adds its macros to the KaTeX it is loaded after.
+ */
+export const loadKatex = (): Katex => {
+  const katex = nodeRequire("katex") as Katex;
+  nodeRequire("katex/contrib/mhchem");
+  return katex;
+};
 
 /**
  * A `ParseTex` over KaTeX that loads KaTeX on the first span it is asked about, so a quiz without maths never loads

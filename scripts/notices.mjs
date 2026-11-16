@@ -24,9 +24,14 @@ const root = resolve(import.meta.dirname, "..");
 /** The licences fullmark accepts in what it ships. */
 export const ALLOWED = ["MIT", "ISC", "BSD-2-Clause", "BSD-3-Clause", "Apache-2.0", "OFL-1.1"];
 
+/** The entry for KaTeX's mhchem (`katex/contrib/mhchem`): not a package, so its notice is read from the file's header. */
+const MHCHEM = "mhchem";
+
 /** Packages a page embeds without bundling them: KaTeX's CSS and fonts, and the font files. */
 const EMBEDDED = [
   { name: "katex", where: "maths", title: "KaTeX" },
+  // KaTeX's chemistry extension: a file of KaTeX's package under its own licence, so it has an entry of its own
+  { name: MHCHEM, where: "maths", title: "mhchem for KaTeX" },
   // not bundled and nothing of it is embedded: the page's colours come from its grammars; the Information tab names it
   { name: "shiki", where: "code", title: "Shiki" },
   { name: "@fontsource/be-vietnam-pro", where: "font", title: "Be Vietnam Pro" },
@@ -101,7 +106,31 @@ async function bundled() {
 
 const normalise = (text) => text.replace(/\r\n/g, "\n");
 
+/** mhchem's notice, from the header of its file: the version is KaTeX's, the licence, the copyright lines and the text are the header's. */
+function readMhchem() {
+  const dir = join(root, "node_modules", "katex");
+  const version = JSON.parse(readFileSync(join(dir, "package.json"), "utf8")).version;
+  const header = normalise(readFileSync(join(dir, "contrib/mhchem/mhchem.js"), "utf8"))
+    .split("\n")
+    .map((l) => l.replace(/^\s*\*\s*/, ""));
+  const copyright = header
+    .filter((l) => /^Copyright \(c\)/.test(l.trim()))
+    .map((l) => l.trim())
+    .join("; ");
+  const from = header.findIndex((l) => l.startsWith("Licensed under the Apache License, Version 2.0"));
+  const to = header.findIndex((l) => l.trim() === "limitations under the License.");
+  if (copyright === "" || from < 0 || to < from)
+    throw new Error("katex/contrib/mhchem/mhchem.js: its header no longer has the Apache-2.0 notice and copyright lines");
+  const body = header
+    .slice(from, to + 1)
+    .map((l) => l.trimEnd())
+    .join("\n")
+    .trim();
+  return { version, licence: "Apache-2.0", copyright, body };
+}
+
 function readPackage(name) {
+  if (name === MHCHEM) return readMhchem();
   const dir = join(root, "node_modules", name);
   const json = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
   const file = readdirSync(dir).find((f) => /^(licen[cs]e|copying)/i.test(f));

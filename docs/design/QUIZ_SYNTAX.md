@@ -377,7 +377,7 @@ In a survey, `[x]`, `pass_mark`, `pick`, `feedback: instant` and `partial` are e
 
 | Need | Syntax |
 |---|---|
-| maths | `$inline$`, `$$display$$`, anywhere text is allowed (choices, labels, explanations), never in code |
+| maths | `$inline$`, `$$display$$`, anywhere text is allowed (choices, labels, explanations), never in code; chemistry with `\ce{…}` (formulas, equations, states) and `\pu{…}` (units), KaTeX's mhchem |
 | code | fenced blocks with a language, highlighted |
 | image | `![alt text](assets/chart.png)`, optionally `{width=300}`. Alt text is required. png, jpg, gif, webp, svg |
 | audio | `![Track 1](track1.mp3)`: an audio player; the alt text is the caption. mp3, ogg, wav, m4a |

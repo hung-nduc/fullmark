@@ -179,6 +179,37 @@ describe("Source Serif 4's copyright line", () => {
   });
 });
 
+describe("mhchem's notice", () => {
+  // Its entry is read from the header of its file in KaTeX's package (scripts/notices.mjs, readMhchem).
+  const file = join(root, "node_modules/katex/contrib/mhchem/mhchem.js");
+
+  it("names Apache-2.0 and the two copyright lines of the file's header, with KaTeX's version", () => {
+    const mhchem = NOTICE_PACKAGES.find((p) => p.name === "mhchem");
+    expect(mhchem).toMatchObject({
+      title: "mhchem for KaTeX",
+      licence: "Apache-2.0",
+      where: ["maths"],
+      copyright: "Copyright (c) 2011-2015 The MathJax Consortium; Copyright (c) 2015-2018 Martin Hensel",
+    });
+    const katex = JSON.parse(readFileSync(join(root, "node_modules/katex/package.json"), "utf8")) as {
+      version: string;
+    };
+    expect(mhchem?.version).toBe(katex.version);
+    expect(ACKNOWLEDGEMENTS).toContain("**mhchem** ");
+  });
+
+  it("is checked again when the file's header changes", () => {
+    const text = readFileSync(file, "utf8");
+    const hash = createHash("sha256")
+      .update(text.slice(0, text.indexOf("// Coding Style")))
+      .digest("hex");
+    expect(
+      hash,
+      "the header of katex/contrib/mhchem/mhchem.js changed: check the licence and copyright lines scripts/notices.mjs reads from it, then update this hash",
+    ).toBe("538954aa0bb46af6b6c9caf5c1f4b0dc575dc68af0ee4b37ad9b9900c22dde0e");
+  });
+});
+
 describe("the built CLI", () => {
   const dist = join(root, "dist");
   it("has a notice for every package esbuild bundled into a chunk", () => {

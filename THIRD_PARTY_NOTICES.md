@@ -49,6 +49,7 @@ SOFTWARE.
 - **markdown-it** 15.0.3, MIT. Copyright (c) 2014 Vitaly Puzrin, Alex Kocharin. (in: the CLI)
 - **markdown-it-container** 4.0.0, MIT. Copyright (c) 2015 Vitaly Puzrin, Alex Kocharin. (in: the CLI)
 - **mdurl** 2.1.0, MIT. Copyright (c) 2015 Vitaly Puzrin, Alex Kocharin. (in: the CLI)
+- **mhchem** 0.19.1, Apache-2.0. Copyright (c) 2011-2015 The MathJax Consortium; Copyright (c) 2015-2018 Martin Hensel (in: pages with maths)
 - **picocolors** 1.1.1, ISC. Copyright (c) 2021-2024 Oleksii Raspopov, Kostiantyn Denysov, Anton Verinov (in: the CLI)
 - **preact** 11.1.0, MIT. Copyright (c) 2015-present Jason Miller (in: the CLI, every page)
 - **preact-render-to-string** 6.8.2, MIT. Copyright (c) 2015 Jason Miller (in: the CLI)
@@ -290,6 +291,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
+```
+
+### Apache-2.0
+
+Applies to: mhchem.
+
+```text
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
 
 ### ISC

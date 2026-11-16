@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { lazyParseTex } from "../src/build/tex";
+import { katexTools, lazyParseTex } from "../src/build/tex";
 import { checkFile } from "../src/cli/check";
 import { parse } from "../src/core/parse";
 import { mathParts } from "../src/core/parse/tex";
@@ -47,6 +47,33 @@ describe("math.syntax", () => {
 
   it("is not raised when no parser is given", () => {
     expect(parse(quiz("$\\badmacro$"), "q.md").issues).toEqual([]);
+  });
+});
+
+describe("chemistry (KaTeX's mhchem)", () => {
+  const parseTex = lazyParseTex();
+  const rules = (text: string) =>
+    parse(text, "q.md", { parseTex }).issues.map((i) => `${i.rule}@${i.line}: ${i.message}`);
+
+  it("parses \\ce and \\pu", () => {
+    for (const tex of [
+      "\\ce{H2SO4}",
+      "\\ce{CuSO4.5H2O}",
+      "\\ce{N2 + 3H2 <=> 2NH3}",
+      "\\ce{SO4^2-}",
+      "\\pu{123 kJ/mol}",
+    ]) {
+      expect(rules(quiz(`Is $${tex}$ fine?`)), tex).toEqual([]);
+    }
+  });
+
+  it("renders \\ce at build, and a broken \\ce{ is math.syntax with KaTeX's message", () => {
+    const html = katexTools().start().render("\\ce{H2SO4}", false);
+    expect(html).toContain('class="katex"');
+    const issues = rules(quiz("Broken $\\ce{H2SO4$ here."));
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toMatch(/^math\.syntax@7: the maths does not parse: /);
+    expect(issues[0]).not.toContain("KaTeX parse error");
   });
 });
 
