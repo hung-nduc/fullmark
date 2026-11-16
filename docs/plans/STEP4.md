@@ -6,9 +6,9 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered on from step 3: **G149** onward; decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md) (made with the first decision).
+As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](archive/STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
 
-**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G149 to G156, below), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
+**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G7, below), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
 
 **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
 
@@ -16,18 +16,18 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-16); waits for the owner: the plan, the slice order and G149 to G156 | this file |
+| plan | written (2026-11-16); waits for the owner: the plan, the slice order and G1 to G7 | this file |
 
 ### Next
 
-1. The owner approves this plan and decides G149 to G156.
+1. The owner approves this plan and decides G1 to G7.
 2. The planner writes the decisions into `docs/design/`, then **4a**'s brief.
 
 ## Goal
 
 The library: one folder under git that keeps each quiz's versions, the attempts at them and their reports, and the commands over it. TECHNICAL_DESIGN.md section 12, step 4: "Library: init, register, take (with `--section` and `--missed`), replay and the rest"; COMMANDS.md, "Library commands", every command up to and not including `publish` and `import`; USER_DESIGN.md, 4.4.
 
-**Done when** (section 12): **history-based tests pass.** Read here as (G155): a test helper builds a library with a scripted history (registered versions, attempts on old and new versions, grades and regrades, a question changed after it was missed, an essay left ungraded), and the goldens of `list`, `info`, `stats`, `take --missed` (the plan it would serve) and `replay` over it are reviewed and committed. **And:** every library command has a contract test run as a subprocess with `--json`; every command that changes the library commits once and takes the lock (foundation, "Library and shelf writes take a lock"); `check` and the core commands still load nothing from `src/library/` (the command-graph test); `npm run samples` gains a scripted library and a line for `library take`, `library grade --web` and `library replay`, and the owner has tried them.
+**Done when** (section 12): **history-based tests pass.** Read here as (G6): a test helper builds a library with a scripted history (registered versions, attempts on old and new versions, grades and regrades, a question changed after it was missed, an essay left ungraded), and the goldens of `list`, `info`, `stats`, `take --missed` (the plan it would serve) and `replay` over it are reviewed and committed. **And:** every library command has a contract test run as a subprocess with `--json`; every command that changes the library commits once and takes the lock (foundation, "Library and shelf writes take a lock"); `check` and the core commands still load nothing from `src/library/` (the command-graph test); `npm run samples` gains a scripted library and a line for `library take`, `library grade --web` and `library replay`, and the owner has tried them.
 
 **Not in step 4:** `library publish` and `library import`, and shelves beyond the reserved `shelves` field and the `public` column (step 5); moving the owner's 0.x history in (step 6); `--background`; the proposals in `docs/design/proposals/`, unless the owner picks one.
 
@@ -44,12 +44,10 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-**G149. 1.0 and 0.x share `config.toml`.** **Decided by the owner on 2026-11-16:** 1.0 makes no provision for 0.x: it reads and writes its own `config.toml` and its own library (`library.toml` version 2), and a 0.x library is refused like any other foreign folder (TECHNICAL_DESIGN.md, section 1, "No compatibility with 0.x"). Nothing to build beyond that.
-
-**G150. The library's folder layout.** COMMANDS.md names `library.toml`, `check.json` and `quizzes/<id>/reports/`, but no layout. **Recommendation:** 0.x's layout, made simpler by one folder per version:
+**G1. The library's folder layout.** COMMANDS.md names `library.toml`, `check.json` and `quizzes/<id>/reports/`, but no layout. **Recommendation:** 0.x's layout, made simpler by one folder per version:
 
 ```text
-library.toml                        index (G151)
+library.toml                        index (G2)
 .gitignore                          .fullmark.lock, progress files, *.tmp
 quizzes/<id>/
   versions/<hash>/                  one per version, never changed once written
@@ -65,26 +63,26 @@ quizzes/<id>/
 
 Folders are named by the quiz's `id`, never its name (so `rename` moves nothing). Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
 
-**G151. What `library.toml` holds.** **Recommendation:** `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added }]` in order, `shelves = []` (step 5). No scores or counts: results files are the truth, and `list` reads them (0.x did, in milliseconds at this scale). Written atomically, sorted by name, so its diff reads well.
+**G2. What `library.toml` holds.** **Recommendation:** `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added }]` in order, `shelves = []` (step 5). No scores or counts: results files are the truth, and `list` reads them (0.x did, in milliseconds at this scale). Written atomically, sorted by name, so its diff reads well.
 
-**G152. Git.** **Recommendation:** fullmark runs the `git` on the path through one small runner (`src/library/git.ts`), passing names after `--`; each changing command makes **one** commit, message `fullmark: <command> <name>` (e.g. `fullmark: take signals`), with the user's own git identity, falling back to `fullmark <fullmark@localhost>` when none is set. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes. No `git` on the path: `init` makes the folder without a repository, as `--no-git` does, with a warning; `rm` then needs `--force`, as designed.
+**G3. Git.** **Recommendation:** fullmark runs the `git` on the path through one small runner (`src/library/git.ts`), passing names after `--`; each changing command makes **one** commit, message `fullmark: <command> <name>` (e.g. `fullmark: take signals`), with the user's own git identity, falling back to `fullmark <fullmark@localhost>` when none is set. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes. No `git` on the path: `init` makes the folder without a repository, as `--no-git` does, with a warning; `rm` then needs `--force`, as designed.
 
-**G153. The attempt in progress.** `take` "autosaves, so closing the tab or the server resumes the attempt"; `serve --autosave` (3b) writes progress to a file. **Recommendation:** `take` serves with autosave to `quizzes/<id>/progress/<version>.json` (git-ignored); the next `take` of the same version without `--section` or `--missed` resumes it, as the page's Continue does; the file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone. `register --update` warns about a saved attempt, as designed.
+**G4. The attempt in progress.** `take` "autosaves, so closing the tab or the server resumes the attempt"; `serve --autosave` (3b) writes progress to a file. **Recommendation:** `take` serves with autosave to `quizzes/<id>/progress/<version>.json` (git-ignored); the next `take` of the same version without `--section` or `--missed` resumes it, as the page's Continue does; the file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone. `register --update` warns about a saved attempt, as designed.
 
-**G154. `--missed` across versions.** COMMANDS.md says which questions; not how a missed question of an old version is served. **Recommendation:** questions are matched by `id` across versions. A question missed on an old version and still in the current one is served **as it is now**; when its hash differs from the one missed, the page marks it "changed since you missed it" (one label in both catalogs, next to the question's number). A missed question no longer in the current version is left out and counted in the `--json` output (`"gone": N`). The plan's `source` is `"missed"`.
+**G5. `--missed` across versions.** COMMANDS.md says which questions; not how a missed question of an old version is served. **Recommendation:** questions are matched by `id` across versions. A question missed on an old version and still in the current one is served **as it is now**; when its hash differs from the one missed, the page marks it "changed since you missed it" (one label in both catalogs, next to the question's number). A missed question no longer in the current version is left out and counted in the `--json` output (`"gone": N`). The plan's `source` is `"missed"`.
 
-**G155. "History-based tests".** **Recommendation:** as the Goal says: one helper, `test/helpers/library-history.ts`, that builds a library through the real commands (register, update, files results and grades as `take` and `grade` would, with a fixed clock), used by the unit tests and the samples; its goldens are the step's acceptance.
+**G6. "History-based tests".** **Recommendation:** as the Goal says: one helper, `test/helpers/library-history.ts`, that builds a library through the real commands (register, update, files results and grades as `take` and `grade` would, with a fixed clock), used by the unit tests and the samples; its goldens are the step's acceptance.
 
-**G156. The output of the reading commands.** `list`, `info` and `status` have `--plain` and `--json`; their terminal look is not drawn. **Recommendation:** the look of `stats` and `inspect` (step 3): a heading line, aligned columns, `--plain` with no colour; `list` one row per quiz, sorted by name, columns name, title, versions, attempts, last, best, taken, with `changed` and `ungraded` as marks after the name. No board: the goldens are the review.
+**G7. The output of the reading commands.** `list`, `info` and `status` have `--plain` and `--json`; their terminal look is not drawn. **Recommendation:** the look of `stats` and `inspect` (step 3): a heading line, aligned columns, `--plain` with no colour; `list` one row per quiz, sorted by name, columns name, title, versions, attempts, last, best, taken, with `changed` and `ungraded` as marks after the name. No board: the goldens are the review.
 
 ## Slices
 
 | Slice | Content | Needs |
 |---|---|---|
-| **4a** | `content.names-control` (G148, decided): the rule, the word lists from the catalogs, the tests, every example passing | nothing open |
-| **4b** | The store: config read and write (the `library` key), `library init`, `status`, `path`, `library.toml` (G151), the layout (G150), the lock, the git runner (G152), the lint boundary; contract tests | G150 to G152 |
-| **4c** | `library register` (one file, several, `--update`, `--build-file`, `check.json`, surveys refused), `list` (with `changed`, `ungraded`, the `public` column empty), `info`; the history helper started (G155) | 4b |
-| **4d** | `library take` (with `--section`, `--missed`, `--focus`, resume; G153, G154), `replay` | 4c |
+| **4a** | `content.names-control` (step 3's G148, decided): the rule, the word lists from the catalogs, the tests, every example passing | nothing open |
+| **4b** | The store: config read and write (the `library` key), `library init`, `status`, `path`, `library.toml` (G2), the layout (G1), the lock, the git runner (G3), the lint boundary; contract tests | G1 to G3 |
+| **4c** | `library register` (one file, several, `--update`, `--build-file`, `check.json`, surveys refused), `list` (with `changed`, `ungraded`, the `public` column empty), `info`; the history helper started (G6) | 4b |
+| **4d** | `library take` (with `--section`, `--missed`, `--focus`, resume; G4, G5), `replay` | 4c |
 | **4e** | `library grade` (with `--grades`, `--json` and `--web`, every grades file kept), `stats` | 4d |
 | **4f** | `share`, `template add`, `rename`, `rm`; the history goldens complete; the samples' library; acceptance | 4e |
 
