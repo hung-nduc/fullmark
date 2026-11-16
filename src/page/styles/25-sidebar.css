@@ -652,6 +652,12 @@
     width: fit-content;
   }
 
+  /* a formula in a table cell stays on one line, so a narrow window scrolls the table in its box instead of breaking
+     the maths (MaterialsWidePhone) */
+  .fm-materials-dialog .fm-sheet td .katex {
+    white-space: nowrap;
+  }
+
   .fm-materials-foot {
     flex: none;
     padding: 10px 24px;
@@ -865,6 +871,11 @@
 
     .fm-materials-dialog .fm-sheet-panel {
       padding: 16px;
+    }
+
+    /* prose in a cell wraps at a readable width, not into a strip: the table scrolls sideways in its box instead */
+    .fm-materials-dialog .fm-sheet td {
+      min-width: 12em;
     }
 
     .fm-materials-foot {
