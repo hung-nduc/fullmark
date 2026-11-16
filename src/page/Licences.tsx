@@ -23,7 +23,7 @@ export type BuildInfo = {
   /** what shapes the page: Preact, KaTeX with maths, Shiki with highlighted code, each embedded font */
   packages: readonly { name: string; version: string }[];
   options: {
-    /** each option's value as used, with the value it has when not given */
+    /** each option's value as used; a profile not given is the built-in `default`, shown as the word "default" */
     profile: string;
     fonts: string;
     uiLang: string;
@@ -132,7 +132,7 @@ function InfoPanel({ t, info }: { t: PageMessages; info: BuildInfo }) {
         <dl class="fm-info-list">
           <Row label={t.infoFullmark} value={info.fullmark} />
           <Row label={t.infoMadeWith} value={info.packages.map((p) => `${p.name} ${p.version}`).join(", ")} />
-          <Row label={t.infoProfile} value={orDefault(o.profile, "default")} />
+          <Row label={t.infoProfile} value={o.profile === "default" ? t.infoDefault : o.profile} />
           <Row label={t.infoStrict} value={o.strict ? t.infoOn : `${t.infoOff} (${t.infoDefault})`} />
         </dl>
       </section>

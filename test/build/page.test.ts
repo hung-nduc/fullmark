@@ -45,7 +45,8 @@ describe("build page: determinism", () => {
     const b = buildPage([singles], { ...options, builtAt: "2026-10-29T10:00:00+07:00" });
     expect(a).toContain('<meta name="generator" content="fullmark 1.0.0-test; built 2026-10-28T10:00:00+07:00">');
     expect(a.replaceAll("2026-10-28", "2026-10-29")).toBe(b);
-    expect(a.split("2026-10-28")).toHaveLength(3);
+    // the meta, the Information tab's row (the ISO text a script-less page shows) and the attribute the page formats it from
+    expect(a.split("2026-10-28")).toHaveLength(4);
   });
 });
 

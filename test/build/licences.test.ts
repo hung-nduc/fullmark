@@ -127,7 +127,7 @@ describe("the Information tab", () => {
     // the page's bytes keep the ISO string; the page formats it when the dialog opens
     expect(t).toContain("Built at 2026-10-28T10:00:00+07:00");
     expect(infoOf(html)).toContain('data-built-at="2026-10-28T10:00:00+07:00"');
-    expect(t).toContain("Profile default (default)");
+    expect(t).toContain("Profile default");
     expect(t).toContain("Fonts quiz (default)");
     expect(t).toContain("Interface language en (default)");
     expect(t).toContain("Strict off (default)");

@@ -157,7 +157,7 @@ test("Information lists build inputs only, in two groups: this quiz, and how it 
   expect(built[1]).toMatch(/Preact 1\d\.\d+\.\d+/);
   expect(built[1]).toContain("Source Serif 4");
   expect(built[1]).not.toContain("KaTeX");
-  expect(built.slice(2)).toEqual(["Profile default (default)", "Strict off (default)"]);
+  expect(built.slice(2)).toEqual(["Profile default", "Strict off (default)"]);
   // a rule between the groups
   const [g1, rule, g2] = await Promise.all([
     dialog(page).locator(".fm-info-group").first().boundingBox(),
