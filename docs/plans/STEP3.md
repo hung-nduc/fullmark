@@ -44,12 +44,12 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
-| 3z8 G135, the three phone sizes | brief approved (2026-11-16); to build | |
+| 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 open | `e6c1ef3`..`ef218d3`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G139 to G141, below (3z8's review).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -95,7 +95,11 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G139. A tap on the brief form's commitment "+" can miss on a phone (3z8's review).** After a choice in the card above, the first tap on the "+" moved the button about 24 px between pointerdown and click, so the click landed on the card; the test now focuses the button first. The cause is not found. **Recommendation:** treat it as a bug, not test timing: the next slice finds which focus or blur change moves the layout above the "+" and fixes it in CSS, with a phone test that taps (not focuses) the "+" right after a choice.
+
+**G140. The brief card's head on a phone (3z8's review, screen 06).** At 360 px "Question 1 of 14 · only you can answer" wraps into a narrow column beside "✎ Pre-filled for you". **Recommendation:** as G137 and G138: under 520 px the "Pre-filled for you" mark goes on its own line under the head line, aligned left, and the head line keeps the full width.
+
+**G141. Older phone screens after the gutter and the labels (3z8's review).** G136 to G138 change every phone layout, but only the 360 × 780 screens were taken again; the 390 × 844 screens in older slice folders show the 16 px gutter. **Recommendation:** the acceptance re-run takes every phone screen again at its size and commits them, as G122 did, counted.
 
 ## Slices
 
@@ -131,7 +135,7 @@ None open.
 | **3z5** | G124: chemistry with KaTeX's mhchem (`\ce`, `\pu`), and `examples/chemistry/` | G124 |
 | **3z6** | G127 (the `vi` words), G128 (the example's IUPAC names), G130 to G132 (the Information & Licences dialog, the ⓘ at the window's bottom) | G127, G128, G130 to G132 |
 | **3z7** | G126 (Materials as a pop-up on the start screen), G134 (the example's tone marks), G127's last word | G126, G134 |
-| **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen | G135 |
+| **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen; added by the owner during the build: the whole-quiz row and By part on a phone, G136, G137, G138 | G135 to G138 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1731,3 +1735,20 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox with the layout checks at the three sizes; the 360 × 780 screens show no cut-off or overlap. Then step 3's acceptance is run again.
+
+### Review (2026-11-16)
+
+**Built** in `e6c1ef3` (`PHONES` and `PHONE` in `e2e/helpers.ts`, every phone viewport from them; 360 × 740 is now 360 × 780), `02482a0` (`e2e/phone-sizes.spec.ts`, 20 tests per browser, one per phone and screen; two 44 px fixes), `fab4296` (the owner's additions, below), `ef218d3` (the screens). The agent did not add the slice table's row, being told not to edit the plan; the planner added it here.
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 813 passed and 511 skipped in Chromium and Firefox (4.7 min, as before the slice), tsc and Biome clean. The six 360 × 780 screens in `docs/screens/3z8/` show no cut-off or overlap: the whole-quiz row is the title, Recommended and the counts on three lines; By part sits under the tiles at the left; in `review` "Not judged" is under the head line and "Correct answer" under the option's text; the 8 px gutter shows on every screen.
+
+**Added by the owner during the build** (each decided, in the design docs): the whole-quiz row on a phone (the title whole on its line, Recommended under it, then the counts); By part under the tiles, with no rule, at the left; the 8 px phone gutter (G136); the verdict label under the head line in `review` (G137); an option's result label under its text (G138).
+
+**Goldens:** 14 change, all from the CSS: 12 pages (`build/*`, `replay/good`) in the `<style>` line and its CSP hash only, and 2 `--json` stdouts in the byte count only (251213 to 251860). No markup changed.
+
+**CSS fixes found by the new checks:** the brief sidebar's group heads (40 to 44 px under 760 px) and the grade form's "✦ AI's" restore chip (30 to 44 px under 760 px).
+
+**Done differently, accepted:** one new spec runs the layout checks at the three sizes instead of a loop in each behaviour spec, and the old narrow loops run over `PHONES`; `foot.spec.ts` at 360 allows a start screen taller than the window (it wraps to 862 px) and checks that the ⓘ is at the page's end; `brief-phone.spec.ts` focuses the commitment "+" before the tap (G139); the new By part rule is in `40-results.css`, and the older one in `25-sidebar.css` is left, now partly redundant.
+
+**Gaps:** G139 (the missed tap on the brief's "+"), G140 (the brief card's head on a phone), G141 (the older phone screens), open in "Gaps".
+
