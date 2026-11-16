@@ -43,7 +43,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
-| 3z7 G126, G134: the start screen's Materials pop-up | built (2026-11-16), to review; the review is the planner's | `3a04980`..`588a6a9`, and the commit that holds this row |
+| 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1692,3 +1692,11 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; the changed goldens are only the ones named above; the screens show the pop-up and a wide sheet whole.
+
+### Review
+
+**3z7's review (2026-11-16).** Built by a Sonnet implementing agent in `3a04980` (the boards), `9c10efc` (G126), `7df20aa` (G134, `missedHint`), `fc50613` (a table's rules end with its last column), `588a6a9` (screens) and `087a87b` (the slice table's row). Run in review after a fresh `npm run build` on `087a87b`: `npm run notices` and `npm run schemas` leave the tree unchanged; `npm run check` exits 0: Vitest, the 2 startup tests alone, then **118 files, 3102 of 3102**; Playwright **753 passed**, 503 skipped, none failed, **in Chromium and Firefox**. Goldens: 12 pages and 2 byte counts (the script, the style and their hashes), `print-example-chemistry` (the tone marks, and the version they change); no other.
+
+- **The pop-up** is a native `<dialog>` with `showModal()`: the heading and **Close**, the sidebar's own `Sheets` (chips and panel), and the foot; Esc, **Close** or the scrim close it and the focus returns to **Materials**. 960 px or the window less 64 px, 40 px from top and bottom; the whole screen under 520 px. The start screen's side panel is gone; the sidebar while answering, review and replay are unchanged. Looked at in review: `docs/screens/3z7/popup-en-dark.png` (the four-column table whole).
+- **Fixed in review:** on a phone the pop-up's table squeezed its columns, breaking formulas mid-expression and making every row a tall strip, where MaterialsWidePhone keeps formulas whole and scrolls the table. In the pop-up a formula in a cell no longer breaks, and on a phone a cell is at least 12em; the table scrolls sideways in its box. 14 goldens in the style and its hash; the two phone screens taken again; `npm run check` passes again in both browsers (Vitest 3102 of 3102, Playwright 753).
+- **Done differently, accepted:** the scrim is the other dialogs' `rgb(0 0 0 / 45%)`, there being no scrim token; the foot shows on a phone too; between 520 and 759 px the pop-up is a dialog, no longer a full-screen panel; the Tab test checks the focus never reaches the page behind (a modal hands Tab to the browser's chrome after its last control).
