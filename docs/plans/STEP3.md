@@ -41,7 +41,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
-| 3z5 G124, mhchem and the chemistry example | brief written (2026-11-16), for the owner | |
+| 3z5 G124, mhchem and the chemistry example | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1569,7 +1569,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z5: G124, chemistry with mhchem, and the chemistry example
 
-**Brief written on 2026-11-16, for the owner's approval.** G124 is decided: the owner asked for mhchem on 2026-11-16. G125 (the study sheet's three lines) is decided and built here too. **The owner, 2026-11-16:** the example is in Vietnamese.
+**Approved by the owner on 2026-11-16.** G124 is decided: the owner asked for mhchem on 2026-11-16. G125 (the study sheet's three lines) is decided and built here too. **The owner, 2026-11-16:** the example is in Vietnamese.
 
 ### Read first
 
