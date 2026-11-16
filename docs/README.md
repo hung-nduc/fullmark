@@ -4,7 +4,7 @@ The design of fullmark 1.0 (the TypeScript rewrite) and the plans it is built fr
 
 ## Where to start
 
-- **Working on the code:** read the Handoff at the top of the current step's plan first: step 4's is not written yet, so start from the note at the top of [plans/archive/STEP3.md](plans/archive/STEP3.md). It says what is done, what waits for the owner and what comes next.
+- **Working on the code:** read the Handoff at the top of the current step's plan ([plans/STEP4.md](plans/STEP4.md)) first. It says what is done, what waits for the owner and what comes next.
 - **Learning the design:** [USER_DESIGN.md](design/USER_DESIGN.md) (why), then [TECHNICAL_DESIGN.md](design/TECHNICAL_DESIGN.md) (how), then [COMMANDS.md](design/COMMANDS.md) and [QUIZ_SYNTAX.md](design/QUIZ_SYNTAX.md) as references.
 
 ## Design (`design/`)
@@ -29,7 +29,7 @@ The full table, with what each step contains and when it is done, is [TECHNICAL_
 | 1 | The core: parser, rules and profiles, grader and rubrics; `check`, `rules`, `grade`, `ids` | done, archived: [plans/archive/STEP1.md](plans/archive/STEP1.md) |
 | 2 | `build`, the page runtime, themes and fonts, `replay`, the printable paper | done, archived: [plans/archive/STEP2.md](plans/archive/STEP2.md) |
 | 3 | `serve`, `review`, `grade --web`, `brief`, `stats`, `inspect`, `new`, `template`, `build --watch` | done, archived: [plans/archive/STEP3.md](plans/archive/STEP3.md), its decided gaps in [plans/archive/STEP3-GAPS.md](plans/archive/STEP3-GAPS.md) |
-| 4 | The library | next; plan not written yet |
+| 4 | The library | planned: [plans/STEP4.md](plans/STEP4.md), waiting for the owner's approval |
 | 5 | `publish` and `import` | not written yet |
 | 6 | Moving the owner's 0.x history into a 1.0 library | not written yet |
 
