@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
+import { buildIn, fixScreens, root, SCREENS_TIME, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2d for the owner to compare with the Design canvas. Not part of `npm run check`: run with

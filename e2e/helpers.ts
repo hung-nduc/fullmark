@@ -327,12 +327,18 @@ export async function savePdf(page: Page, path: string): Promise<Buffer> {
  */
 export async function shotOf(locator: Locator, path: string): Promise<void> {
   const page = locator.page();
-  const style = await page.addStyleTag({
-    content: ".fm-dock,.fm-footbar{visibility:hidden!important}",
-  });
+  // set on the elements, not as a style sheet: the pages' CSP refuses an injected `<style>`
+  const hide = (value: string) =>
+    page.evaluate((v) => {
+      for (const el of document.querySelectorAll<HTMLElement>(".fm-dock, .fm-footbar")) {
+        if (v) el.style.setProperty("visibility", v, "important");
+        else el.style.removeProperty("visibility");
+      }
+    }, value);
+  await hide("hidden");
   try {
     await locator.screenshot({ path });
   } finally {
-    await style.evaluate((el) => el.remove());
+    await hide("");
   }
 }
