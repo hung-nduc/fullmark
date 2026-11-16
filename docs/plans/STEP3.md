@@ -46,12 +46,12 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
-| 3z10 G142, G143: reproducible screens | brief approved (2026-11-16); to build | |
+| 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 open | `025f4bb`..`c018df3`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G144, below (3z10's review).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -97,7 +97,8 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G144. Five screens still differ from run to run (3z10's review).** With the clock, the random bytes, the time zone, the locale and the PDF dates fixed, a second run of every screens spec changes 5 of 257 screens, all wide viewport shots of the `review` and `grade --web` forms (`3l/since-*`, `3m/since-*`, `3p/2-finish-wide`; which five varies a little between runs): the sticky Questions sidebar is drawn one pixel higher or lower (3 700 to 7 700 pixels). The dock measures 98.125 px, while `--dock-h`, the sidebar's sticky top, is a whole 98 px. **Recommendation:** make the measured dock height whole in `src/` (the dock's height rounded up and set, so the dock and `--dock-h` agree), and prove it with two screens runs that change no screen; this is also a 1/8 px overlap of the sidebar under the dock on the page itself. If the proof still fails, accept the remaining screens and say so in foundation 8 ("every screen is identical between runs, except …"), no further tries.
+
 
 ## Slices
 
@@ -1840,4 +1841,16 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; two runs of every screens spec on the same commit give the same bytes; the phone element shots show the card whole. Then the owner tries the samples and step 3 is closed.
+
+### Review (2026-11-16)
+
+**Built** in `025f4bb` (`fixScreens(page)` in all 38 screens specs: `page.clock` at 2026-10-23 09:00 +07:00, `crypto.getRandomValues` replaced by a seeded generator in an init script, `timezoneId` Asia/Ho_Chi_Minh and `locale` en-US; `savePdf` fixes the PDFs' dates), `f23c34d` (`shotOf(locator, path)` hides the dock and the foot bar by element style for the capture, since the pages' CSP refuses an injected style sheet; spec 2d moves the fixed clock itself), `6446679`, `7e4e2c3` and `c018df3` (rendering: reduced motion, Chromium's `--disable-partial-raster`, a wait for the fonts, one worker, all only under `FULLMARK_SCREENS`), with the screens of each run; `c45a9c4`'s viewport nudge was tried and taken out. Nothing in `src/` changed.
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 825 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean; goldens: none changed. A second screens run on `c018df3` (257 passed, 3.2 min, one worker) changes 5 screens, the wide `review` and `grade --web` shots with the sticky sidebar (G144), and nothing else; the five were put back. `2j3/graded-phone-light` shows the card whole, without the sticky bars.
+
+**First run's changes:** 107 screens against the acceptance's, from the fixed clock (about 40), the fixed order (the ordering screens), the element shots without the sticky bars (`2j3`, `3q`) and anti-aliasing; later runs moved more by the rendering flags only.
+
+**Done differently, accepted:** `reducedMotion`, `--disable-partial-raster`, `workers: 1` and the font wait, each only for the screens (the screens run takes 3.2 min instead of about 52 s); no form needed its command's clock injected. The agent took about an hour on the last five screens before being told to stop and report them; that is G144.
+
+**Gaps:** G144, open in "Gaps".
 
