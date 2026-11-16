@@ -1,5 +1,5 @@
 import { test as base, expect, type Page } from "@playwright/test";
-import { buildIn, card, submitAttempt } from "./helpers";
+import { buildIn, card, PHONE, submitAttempt } from "./helpers";
 
 /**
  * The result badge is a pill (G94; TECHNICAL_DESIGN.md section 8, "Results (after Submit)"): the state's icon, the
@@ -13,7 +13,7 @@ const test = base;
 const phone = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },

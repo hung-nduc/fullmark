@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { THEME_NAMES } from "../src/core/themes";
-import { noViolations, replayOf } from "./helpers";
+import { noViolations, PHONE, replayOf } from "./helpers";
 
 /**
  * The explanation panel, the rubric box's frame, and the box on a phone (3o) (STEP2.md, slice 2j3; TECHNICAL_DESIGN.md,
@@ -68,7 +68,7 @@ for (const theme of THEME_NAMES) {
 }
 
 test.describe("the rubric box on a 390 px phone", () => {
-  test.use({ viewport: { width: 390, height: 844 } });
+  test.use({ viewport: PHONE });
 
   test("each section stacks, nothing is cut or scrolls sideways, and the slots are named in words", async ({
     page,

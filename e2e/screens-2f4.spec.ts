@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildFolder, card, root, submitAttempt } from "./helpers";
+import { buildFolder, card, PHONE, root, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2f4 for the owner to compare with the MaterialsPhone board's source (the board has no image
@@ -8,7 +8,7 @@ import { buildFolder, card, root, submitAttempt } from "./helpers";
  * --project=chromium. They land in docs/screens/2f4/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
 const quiz = buildFolder("test/fixtures/page", "materials.md");
 const out = (name: string) => join(root, "docs", "screens", "2f4", `${name}.png`);

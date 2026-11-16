@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, root } from "./helpers";
+import { buildWith, card, PHONE, root } from "./helpers";
 
 /**
  * Screenshots of slice 2h3: the Vietnamese example in each of the four fonts (stacked diacritics, none clipped), one
@@ -71,7 +71,7 @@ test("the Appearance menu with the Font row, wide", async ({ page }) => {
 });
 
 test.describe("the phone, 390 x 844", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   test("the Appearance menu with the Font row", async ({ page }) => {
     await page.goto(all().url);

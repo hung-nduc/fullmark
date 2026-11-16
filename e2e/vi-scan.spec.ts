@@ -5,7 +5,7 @@ import { expect, type FrameLocator, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
 import { formCatalogStrings, leaksIn, own } from "../test/helpers/vi-scan";
-import { buildWith, root, run, type Served, serveProcess, submitAttempt } from "./helpers";
+import { buildWith, PHONE, root, run, type Served, serveProcess, submitAttempt } from "./helpers";
 
 /**
  * The `vi` scan after Submit (STEP2.md, slice 2i2): `test/build/vi-scan.test.ts` reads the page as built, which is the
@@ -162,7 +162,6 @@ async function serveForm(dir: string, args: string[]): Promise<Served> {
 }
 
 const WIDE = { width: 1280, height: 940 };
-const PHONE = { width: 390, height: 844 };
 
 async function openForm(page: Page, server: Served, size = WIDE): Promise<void> {
   await page.emulateMedia({ reducedMotion: "reduce" });

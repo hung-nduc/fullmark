@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess } from "./helpers";
+import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3h2 (`quiz brief --web` on a phone, 390 x 844), for the owner to set beside the BriefPhone,
@@ -11,7 +11,7 @@ import { root, type Served, serveProcess } from "./helpers";
  * with FULLMARK_SCREENS=1 npx playwright test e2e/screens-3h2.spec.ts --project=chromium. They land in docs/screens/3h2/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
 
 const out = (name: string) => join(root, "docs", "screens", "3h2", `${name}.png`);
 const served: Served[] = [];
@@ -123,7 +123,7 @@ test("Vietnamese: the form and the summary", async ({ page }) => {
 });
 
 test("360 px: the form and the Cancelled card", async ({ page }) => {
-  await open(page, AGENT, { size: { width: 360, height: 740 } });
+  await open(page, AGENT, { size: PHONES[0] });
   await shot(page, "10-phone-360");
   await page.locator("[data-footbar] [data-action=cancel]").tap();
   await page.locator("[data-ended=cancelled]").waitFor();

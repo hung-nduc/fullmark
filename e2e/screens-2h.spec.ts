@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, root, submitAttempt } from "./helpers";
+import { buildWith, card, PHONE, root, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2h: the question card's new header and choice rows, A- / A+, the phone bar and its menu. Not part
@@ -53,7 +53,7 @@ test("light at 23 px", async ({ page }) => {
 });
 
 test.describe("the phone, 390 x 844", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   test("the bar at 17 px and at 23 px, the menu open (free and locked)", async ({ page }) => {
     await answer(page, quiz("light").url);

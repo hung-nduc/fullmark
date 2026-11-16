@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { root, type Served, serveProcess } from "./helpers";
+import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p3 (`grade --web --grades` on a phone), for the owner to set beside RubricPhone (the stacked box)
@@ -15,7 +15,7 @@ import { root, type Served, serveProcess } from "./helpers";
  * in docs/screens/3p3/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
-test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
 const out = (name: string) => join(root, "docs", "screens", "3p3", `${name}.png`);
 const INPUT = join(root, "test", "golden", "grade", "rubrics-grades-all", "input");
@@ -156,7 +156,7 @@ test("vi, additive adjusted, and its sidebar", async ({ page }) => {
 });
 
 test.describe("360 px", () => {
-  test.use({ viewport: { width: 360, height: 740 } });
+  test.use({ viewport: PHONES[0] });
   test("holistic, adjusted", async ({ page }) => {
     await open(page, { q: "holistic", adjusted: true });
     await shots(page, "13-360-holistic-adjusted");

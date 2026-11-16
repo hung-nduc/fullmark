@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { card, replayOf, root, run } from "./helpers";
+import { card, PHONE, replayOf, root, run } from "./helpers";
 
 /**
  * Screenshots of slice 2j3 for the owner: the explanation, the grader's feedback panel and the hint (to show it
@@ -79,7 +79,7 @@ for (const size of SIZES) {
 }
 
 test("the explanation on a replay, and the banded and holistic tables on a phone", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await page.goto(replayOf([], "phone-all"));
   await card(page, "prime").screenshot({ path: out("explanation-replay-phone") });
   await card(page, "ielts").screenshot({ path: out("banded-phone") });

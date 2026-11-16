@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
-import { noViolations, root, type Served, serveProcess, watch } from "./helpers";
+import { noViolations, PHONE, PHONES, root, type Served, serveProcess, watch } from "./helpers";
 
 /**
  * The brief form on a phone, below 760 px (STEP3.md, slice 3h2; G112 to G117, the BriefPhone, BriefPhoneSide and
@@ -15,7 +15,7 @@ import { noViolations, root, type Served, serveProcess, watch } from "./helpers"
 const test = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },
@@ -34,7 +34,12 @@ function folder(): string {
   return dir;
 }
 
-async function open(page: Page, dir: string, args: string[] = [], size = { width: 390, height: 844 }): Promise<Served> {
+async function open(
+  page: Page,
+  dir: string,
+  args: string[] = [],
+  size: { width: number; height: number } = PHONE,
+): Promise<Served> {
   const server = await serveProcess(dir, ["brief", "d", "--web", "--no-open", ...args]);
   served.push(server);
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -310,11 +315,8 @@ test("the foot bar never covers the last card's control, and every control is 44
   await server.end();
 });
 
-for (const size of [
-  { width: 390, height: 844 },
-  { width: 360, height: 740 },
-]) {
-  test(`nothing scrolls sideways at ${size.width} px, in the form, its dialogs and its end cards (en and vi)`, async ({
+for (const size of PHONES) {
+  test(`nothing scrolls sideways at ${size.width} px (${size.name}), in the form, its dialogs and its end cards (en and vi)`, async ({
     page,
   }) => {
     for (const lang of ["en", "vi"]) {

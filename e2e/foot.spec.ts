@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { buildWith } from "./helpers";
+import { buildWith, PHONES } from "./helpers";
 
 /**
  * The page's foot (TECHNICAL_DESIGN.md, section 3, "Licences"; G131): the page fills the window's height and the
@@ -11,10 +11,7 @@ const long = buildWith("test/fixtures/page/types.md", "foot-long.md", []);
 
 const button = (page: import("@playwright/test").Page) => page.locator("[data-action=licences]");
 
-for (const size of [
-  { width: 1280, height: 940 },
-  { width: 390, height: 844 },
-]) {
+for (const size of [{ width: 1280, height: 940 }, ...PHONES]) {
   test.describe(`${size.width} x ${size.height}`, () => {
     test.use({ viewport: size });
 

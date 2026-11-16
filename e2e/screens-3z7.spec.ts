@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { root, run } from "./helpers";
+import { PHONE, root, run } from "./helpers";
 
 /**
  * Screenshots of slice 3z7: the start screen's Materials pop-up (G126) open at 1280 x 940, dark and light, and on a
@@ -37,7 +37,7 @@ for (const lang of ["en", "vi"] as const) {
     });
   }
   test(`the pop-up on a phone, ${lang}`, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize(PHONE);
     await page.goto(url);
     await page.locator("[data-action=materials]").click();
     await expect(page.locator("dialog.fm-materials-dialog")).toBeVisible();

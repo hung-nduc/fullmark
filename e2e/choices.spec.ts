@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { buildIn, card, noViolations, submitAttempt, watch } from "./helpers";
+import { buildIn, card, noViolations, PHONE, submitAttempt, watch } from "./helpers";
 
 /**
  * One answer or several, and the letter badge's even inset (TECHNICAL_DESIGN.md, section 8, row "Question card"): round
@@ -82,7 +82,7 @@ test("the badge sits 12px from the top, bottom and left of a one-line row (56 px
 });
 
 test("when the text wraps the badge stays at the top, and the first line is centred on it", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await page.goto(oneq.url);
   await page.getByRole("button", { name: "Start" }).click();
   const wrapped = await insets(page, "b1", 1);

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildFolder, card, noViolations, submitAttempt, watch } from "./helpers";
+import { buildFolder, card, noViolations, PHONE, submitAttempt, watch } from "./helpers";
 
 /**
  * The materials (TECHNICAL_DESIGN.md, section 8, rows "Sidebar", "Question map" and "Materials"). The test that matters:
@@ -233,7 +233,7 @@ test("a wide table is shown whole in the pop-up at 1280 x 940: no column cut off
 });
 
 test("at 390 x 844 the pop-up takes the whole screen, with Close at its top", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await page.goto(quiz.url);
   await page.getByRole("button", { name: "Materials", exact: true }).click();
   const dialog = popup(page);

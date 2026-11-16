@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, root, run, submitAttempt } from "./helpers";
+import { buildWith, PHONE, root, run, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2j for the owner to compare with the ResultsReplay board. Not part of `npm run check`: run with
@@ -46,7 +46,7 @@ test("the replay on the board's theme and font, then light and dark", async ({ p
 
 test("the replay on a phone", async ({ page }) => {
   const url = await replayOf(page, [], "phone");
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await page.goto(url);
   await expect(page.locator("[data-replay-banner]")).toBeVisible();
   await page.screenshot({ path: out("4-replay-phone") });

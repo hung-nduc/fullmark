@@ -1,7 +1,7 @@
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildIn, noViolations, root, run, watch } from "./helpers";
+import { buildIn, noViolations, PHONE, root, run, watch } from "./helpers";
 
 /**
  * Grades on a replay page (STEP2.md, slice 2j2): the `essay` fixture is a quiz of one single, an additive essay, an
@@ -92,7 +92,7 @@ test.describe("grades on a replay page", () => {
   });
 
   test("on a phone the page does not scroll sideways", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize(PHONE);
     await page.goto(replay("phone", (g) => g).url);
     const wide = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     expect(wide).toBe(false);

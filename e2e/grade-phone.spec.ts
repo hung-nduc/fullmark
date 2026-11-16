@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { noViolations, root, type Served, serveProcess } from "./helpers";
+import { noViolations, PHONE, root, type Served, serveProcess } from "./helpers";
 
 /**
  * The grading form on a phone, below 760 px (STEP3.md, slice 3p; G79 and G89, the RubricPhone board): on a 390 x 844
@@ -14,7 +14,7 @@ import { noViolations, root, type Served, serveProcess } from "./helpers";
 const test = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },
@@ -283,7 +283,7 @@ test("resizing from 390 to 1280 gives the wide form, and back to 390 closes the 
   await expect(foot(page)).toHaveCount(0);
   await expect(page.locator(".fm-grade-foot")).toBeVisible();
   await expect(side(page)).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await expect(side(page)).toHaveCount(0);
   await expect(foot(page)).toBeVisible();
 });

@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildFolder, buildWith, card, root } from "./helpers";
+import { buildFolder, buildWith, card, PHONE, root } from "./helpers";
 
 /**
  * Screenshots of slice 2h4: the Licences icon at the foot, a hint closed and open and an explanation, the current card
@@ -67,7 +67,7 @@ test("the text size control at 100% and at 112%, in the bar", async ({ page }) =
 });
 
 test.describe("the phone, 390 x 844", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   test("the text size control in the phone menu at 100% and 112%", async ({ page }) => {
     await page.goto(buildWith(MAP, "size-phone.md", ["theme: light"]).url);

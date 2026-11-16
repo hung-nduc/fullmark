@@ -13,7 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { expectGolden, noViolations, root, type Served, serveProcess, watch } from "./helpers";
+import { expectGolden, noViolations, PHONE, root, type Served, serveProcess, watch } from "./helpers";
 
 /**
  * `quiz review` as a subprocess (STEP3.md, slice 3k, "Done when"): the form driven by Playwright through the keys and
@@ -866,8 +866,6 @@ for (const scheme of ["light", "dark"] as const) {
   });
 }
 // -- slice 3m: the phone (ReviewPhone board) ---------------------------------------------------------------------------
-
-const PHONE = { width: 390, height: 844 };
 
 /** Nothing is wider than the screen: the page does not scroll sideways. */
 const fits = (page: Page) =>

@@ -10,6 +10,15 @@ import { resultsHash } from "../src/core/rubric/grades";
 export const root = resolve(import.meta.dirname, "..");
 const cli = join(root, "dist", "cli.js");
 
+/** The three phone viewports every phone layout is tested at (TECHNICAL_DESIGN.md, foundation 8, "Phone sizes"). */
+export const PHONES = [
+  { name: "galaxy-s25", width: 360, height: 780 },
+  { name: "iphone-15", width: 390, height: 844 },
+  { name: "iphone-15-pro-max", width: 430, height: 932 },
+] as const;
+/** The one phone (iPhone 15, 390 x 844) for a test whose behaviour does not depend on the width. */
+export const PHONE = { width: 390, height: 844 } as const;
+
 export const run = (cwd: string, ...args: string[]): string =>
   execFileSync(process.execPath, [cli, ...args], {
     cwd,

@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { test as base, expect, type Page } from "@playwright/test";
-import { buildWith, card, replayOf, submitAttempt } from "./helpers";
+import { buildWith, card, PHONE, replayOf, submitAttempt } from "./helpers";
 
 /**
  * After Submit an essay's or a code question's answer is a "YOUR ANSWER" panel, not a text box (G94, G105;
@@ -9,7 +9,7 @@ import { buildWith, card, replayOf, submitAttempt } from "./helpers";
 const phone = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },

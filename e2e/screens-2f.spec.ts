@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, card, root, submitAttempt } from "./helpers";
+import { buildIn, card, PHONE, root, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2f for the owner to compare with the Design canvas. Not part of `npm run check`: run with
@@ -35,7 +35,7 @@ test("after Submit", async ({ page }) => {
 });
 
 test("on a phone", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await answering(page);
   await page.screenshot({ path: out("4-phone-answering") });
 });

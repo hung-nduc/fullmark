@@ -1,7 +1,7 @@
 import { appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { test as base, expect, type Page } from "@playwright/test";
-import { buildFolder, run } from "./helpers";
+import { buildFolder, PHONE, run } from "./helpers";
 
 /**
  * One map cell everywhere (TECHNICAL_DESIGN.md, section 8, row "Question map"): every cell is square, 40 px (44 px on a
@@ -11,7 +11,7 @@ const test = base;
 const phone = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },

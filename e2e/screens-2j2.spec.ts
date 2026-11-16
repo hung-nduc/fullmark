@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { root, run } from "./helpers";
+import { PHONE, root, run } from "./helpers";
 
 /**
  * Screenshots of slice 2j2 for the owner to compare with the ResultsReplay board (its criterion tables under the essay
@@ -53,7 +53,7 @@ test("the graded replay on the board's theme and font, then light and dark", asy
 });
 
 test("the graded replay on a phone", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await page.goto(replayOf([], "phone"));
   await page.locator('article[data-qid="add"]').scrollIntoViewIfNeeded();
   await page.locator('article[data-qid="add"] .fm-box').scrollIntoViewIfNeeded();

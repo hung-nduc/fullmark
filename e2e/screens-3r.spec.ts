@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { root, type Served, serveProcess } from "./helpers";
+import { PHONE, root, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3r (G101's states, G100's frame) as 3r2 has them (G103: the frame with no bar of its own, in the
@@ -130,7 +130,7 @@ test("G103: the frame in the form's dark", async ({ page }) => {
 
 // -- the phone -------------------------------------------------------------------------------------------------------
 
-const phone = { width: 390, height: 844 };
+const phone = PHONE;
 
 test("phone: a question waiting for a grade", async ({ page }) => {
   await page.setViewportSize(phone);

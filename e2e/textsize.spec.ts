@@ -2,7 +2,7 @@ import { test as base, expect, type Page } from "@playwright/test";
 
 const test = base;
 
-import { buildWith, noViolations, watch } from "./helpers";
+import { buildWith, noViolations, PHONE, watch } from "./helpers";
 
 /**
  * A− / A+ (TECHNICAL_DESIGN.md, section 8, "The look"): five sizes, 15 to 23 px. The test that matters: at every size the
@@ -100,7 +100,7 @@ test("Default look resets the theme and the size", async ({ page }) => {
 const phone = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },

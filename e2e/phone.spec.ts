@@ -1,5 +1,5 @@
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
-import { buildFolder, card, noViolations, submitAttempt, watch } from "./helpers";
+import { buildFolder, card, noViolations, PHONE, submitAttempt, watch } from "./helpers";
 
 /**
  * The page on a phone, below 760 px (TECHNICAL_DESIGN.md, section 8, rows "Top bar and status line", "Sidebar",
@@ -11,7 +11,7 @@ import { buildFolder, card, noViolations, submitAttempt, watch } from "./helpers
 const test = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: PHONE, ...touch });
     await use(await context.newPage());
     await context.close();
   },
@@ -258,7 +258,7 @@ test("resizing from 1280 to 390 and back keeps the tab and the sheet", async ({ 
   await begin(page);
   await press(page, chip(page, "Trigonometric identities"));
   await expect(side(page)).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize(PHONE);
   await expect(back(page)).toBeVisible();
   await press(page, chip(page, "Materials"));
   await expect(chip(page, "Trigonometric identities")).toHaveAttribute("aria-selected", "true");

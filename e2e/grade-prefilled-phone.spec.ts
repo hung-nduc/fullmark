@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { test as base, expect, type Locator, type Page } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { noViolations, root, type Served, serveProcess } from "./helpers";
+import { noViolations, PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
 
 /**
  * `quiz grade --web --grades` on a phone, below 760 px (STEP3.md, slice 3p3; G111): each pre-filled box is on a line of
@@ -14,15 +14,15 @@ import { noViolations, root, type Served, serveProcess } from "./helpers";
  * nothing and a press restores, as wide.
  */
 type Json = Record<string, any>;
-const WIDTHS = [390, 360] as const;
 const INPUT = join(root, "test", "golden", "grade", "rubrics-grades-all", "input");
 const OPUS = { kind: "ai", name: "Claude Opus 5.5", model: "claude-opus-5-5", at: "2026-10-24T09:00:00" };
 
-let width = 390;
+let width: number = PHONE.width;
+let height: number = PHONE.height;
 const test = base.extend({
   page: async ({ browser, browserName }, use) => {
     const touch = browserName === "chromium" ? { hasTouch: true, isMobile: true } : { hasTouch: true };
-    const context = await browser.newContext({ viewport: { width, height: 844 }, ...touch });
+    const context = await browser.newContext({ viewport: { width, height }, ...touch });
     await use(await context.newPage());
     await context.close();
   },
@@ -98,13 +98,15 @@ async function boxAbove(box: Locator, below: Locator, w: number): Promise<void> 
   expect(b?.x).toBeCloseTo(c?.x ?? 0, 0);
 }
 
-for (const w of WIDTHS) {
-  test.describe(`${w} px`, () => {
+for (const phone of PHONES) {
+  test.describe(`${phone.width} px (${phone.name})`, () => {
     test.beforeAll(() => {
-      width = w;
+      width = phone.width;
+      height = phone.height;
     });
     test.beforeEach(() => {
-      width = w;
+      width = phone.width;
+      height = phone.height;
     });
 
     test("additive: each box over its control, the max box 44 px, the total's box over the total, the foot stacked", async ({
@@ -240,7 +242,8 @@ for (const w of WIDTHS) {
 
 for (const scheme of ["light", "dark"] as const) {
   test(`axe passes on a phone in ${scheme}: as given, adjusted, the sidebar`, async ({ page }) => {
-    width = 390;
+    width = PHONE.width;
+    height = PHONE.height;
     await open(page);
     await page.emulateMedia({ colorScheme: scheme });
     await noViolations(page);

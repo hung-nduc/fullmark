@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, root, submitAttempt } from "./helpers";
+import { buildWith, card, PHONE, root, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2g, one per theme board, to lay beside docs/mockup/images/. Not part of `npm run check`: run
@@ -69,7 +69,7 @@ test("the Appearance menu open", async ({ page }) => {
 });
 
 test.describe("the phone, 390 x 844", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   test("the bar in one row, then the filter in one row", async ({ page }) => {
     await answer(page, quiz("light", "free").url);

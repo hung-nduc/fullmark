@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { root, type Served, serveProcess } from "./helpers";
+import { PHONE, root, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p for the owner to set beside the boards: at 1280 x 940 G98's states (GradeFinish, GradeDone,
@@ -91,7 +91,7 @@ test("G98: Finish tried with a note missing: the note turns red", async ({ page 
 
 // -- the phone -------------------------------------------------------------------------------------------------------
 
-const phone = { width: 390, height: 844 };
+const phone = PHONE;
 
 test("phone: an additive question, half graded (RubricPhone, additive)", async ({ page }) => {
   await page.setViewportSize(phone);

@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { buildIn, card, expectGradeMatches, noViolations, submitAttempt, watch } from "./helpers";
+import { buildIn, card, expectGradeMatches, noViolations, PHONE, submitAttempt, watch } from "./helpers";
 
 const types = buildIn("test/fixtures/page/types.md", "types.md");
 
@@ -108,7 +108,7 @@ test("an item can go to the top, and the page has no violations mid-drag", async
 
 test("a finger drags too (a touch screen, Chromium)", async ({ browser, browserName }) => {
   test.skip(browserName !== "chromium", "Playwright can drive touch moves only through the Chromium protocol");
-  const context = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 800 } });
+  const context = await browser.newContext({ hasTouch: true, isMobile: true, viewport: PHONE });
   const page = await context.newPage();
   const q = await begin(page);
   await q.scrollIntoViewIfNeeded();
@@ -199,7 +199,7 @@ test("the buttons are 32 px high with a mouse, and say Up and Down", async ({ pa
 
 test("on a touch screen the buttons are 44 px, and only the handle drags", async ({ browser, browserName }) => {
   test.skip(browserName !== "chromium", "Playwright can drive touch moves only through the Chromium protocol");
-  const context = await browser.newContext({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 800 } });
+  const context = await browser.newContext({ hasTouch: true, isMobile: true, viewport: PHONE });
   const page = await context.newPage();
   const q = await begin(page);
   await q.scrollIntoViewIfNeeded();

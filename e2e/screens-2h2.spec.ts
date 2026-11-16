@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, root, submitAttempt } from "./helpers";
+import { buildWith, card, PHONE, root, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2h2: the part list with a one-question part, an ordering question mid-drag and at rest, single
@@ -65,7 +65,7 @@ test("ordering at rest, and mid-drag by the row's text with a mouse", async ({ p
 });
 
 test.describe("the phone, 390 x 844", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
   test("ordering at rest on a touch screen: 44 px buttons", async ({ page }) => {
     await ordering(page);
