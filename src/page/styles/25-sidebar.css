@@ -647,6 +647,11 @@
     padding: 20px 24px 24px;
   }
 
+  /* a table keeps its own width (its rules end with its last column), and scrolls in its box only when it is wider */
+  .fm-materials-dialog .fm-sheet table {
+    width: fit-content;
+  }
+
   .fm-materials-foot {
     flex: none;
     padding: 10px 24px;
