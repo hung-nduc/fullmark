@@ -24,11 +24,11 @@ Text under a `#` heading is the section introduction.
 - [ ] Also wrong
 
 ::: hint
-Hints stay hidden behind a button.
+A hint for the learner, shown only when asked for.
 :::
 
 ::: explanation
-Shown after the question is checked or after submit.
+Why the answer is right, shown with the result.
 :::
 
 ## Multiple answer: two or more items are checked. {type=multi id=multiple-answer points=2}

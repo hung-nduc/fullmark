@@ -16,7 +16,7 @@ tags: [statistics]
 
 # Part A: Concepts {id=concepts time=8m}
 
-Answer all questions. You cannot see the correct answers until you submit.
+Answer all questions. The correct answers are shown only at the end.
 
 ## Which measure of centre is the least affected by extreme values? {type=single id=median tags=descriptive}
 
