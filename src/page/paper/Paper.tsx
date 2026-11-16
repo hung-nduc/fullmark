@@ -298,7 +298,7 @@ function StudyHead({ d, t }: { d: PaperData; t: T }) {
   return (
     <header class="study-head">
       <h1 class="title">{d.title}</h1>
-      <Facts d={d} t={t} />
+      <Facts d={d} t={t} stacked={false} />
     </header>
   );
 }
@@ -308,11 +308,14 @@ function Header({ d, t }: { d: PaperData; t: T }) {
     <table class="box-table head">
       <tbody>
         <tr>
-          <td rowSpan={2} class="title-cell">
+          <td rowSpan={3} class="title-cell">
             <h1 class="title">{d.title}</h1>
-            <Facts d={d} t={t} />
+            <Facts d={d} t={t} stacked />
           </td>
           <td>{t.name}:</td>
+        </tr>
+        <tr>
+          <td>{t.studentId}:</td>
         </tr>
         <tr>
           <td>
@@ -321,7 +324,7 @@ function Header({ d, t }: { d: PaperData; t: T }) {
           </td>
         </tr>
         <tr>
-          <td>{t.studentId}:</td>
+          <td>{t.candidateNumber}:</td>
           <td>{t.signature}:</td>
         </tr>
       </tbody>
@@ -329,7 +332,8 @@ function Header({ d, t }: { d: PaperData; t: T }) {
   );
 }
 
-function Facts({ d, t }: { d: PaperData; t: T }) {
+/** The time, the total and the version: on the paper's header each on its own line; a study sheet's head joins them. */
+function Facts({ d, t, stacked }: { d: PaperData; t: T; stacked: boolean }) {
   const facts = [
     d.time === null ? null : t.timeAllowed(d.time),
     d.total === null ? null : t.total(d.total),
@@ -337,7 +341,15 @@ function Facts({ d, t }: { d: PaperData; t: T }) {
   ].filter((x) => x !== null);
   return (
     <>
-      <div class="facts">{facts.join(" · ")}</div>
+      {stacked ? (
+        facts.map((f, i) => (
+          <div class="facts" key={i}>
+            {f}
+          </div>
+        ))
+      ) : (
+        <div class="facts">{facts.join(" · ")}</div>
+      )}
       {d.code === null ? null : (
         <div class="facts">
           {t.paperCode}: <b>{d.code}</b>

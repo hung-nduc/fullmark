@@ -159,9 +159,12 @@ describe("the header and the marker's table", () => {
   const text = visibleText(paper({ seed: "101" }).html);
   it("has the title, the time, the total, the version and the paper code", () => {
     expect(text).toContain("Signals and Systems: midterm practice");
-    expect(text).toContain(`Time allowed: 45 minutes · Total: 23 points · Version ${exam.hash.slice(0, 4)}`);
+    expect(text).toContain(
+      `Time allowed: 45 minutes Total: 23 points Version ${exam.hash.slice(0, 4)} Paper code: 101`,
+    );
     expect(text).toContain("Paper code: 101");
-    for (const label of ["Name:", "Class:", "Date:", "Student ID:", "Signature:"]) expect(text).toContain(label);
+    for (const label of ["Name:", "Class:", "Date:", "Student ID:", "Candidate number:", "Signature:"])
+      expect(text).toContain(label);
   });
   it("has one column per part, the points and a total", () => {
     expect(text).toContain("For the marker Signals Short answers Long answers Total Maximum 4 6 13 23 Score");
@@ -185,8 +188,9 @@ describe("the header and the marker's table", () => {
   });
   it("is in Vietnamese with the quiz's ui_lang or --ui-lang", () => {
     const t = visibleText(paper({ seed: "101" }, exam, "vi").html);
-    expect(t).toContain("Thời gian làm bài: 45 phút · Tổng: 23 điểm");
+    expect(t).toContain("Thời gian làm bài: 45 phút Tổng: 23 điểm Phiên bản");
     expect(t).toContain("Mã đề: 101");
+    expect(t).toContain("Họ và tên: MSSV: Lớp: Ngày: Số báo danh: Chữ ký:");
     expect(t).toContain("Câu 1.");
     expect(paper({}, exam, "vi").html).toContain('<html lang="vi">');
   });

@@ -161,6 +161,45 @@ test("every question, inner head and part heading asks not to be split (computed
   }
 });
 
+for (const [lang, labels] of [
+  ["en", paperEn],
+  ["vi", paperVi],
+] as const) {
+  test(`the header's time, total and version are on three lines, and Student ID is under Name (${lang})`, async ({
+    page,
+  }) => {
+    const { url } = paperOf("exam.md", ["--seed", "101", "--ui-lang", lang]);
+    await page.goto(url);
+    const box = async (label: string) => {
+      const b = await page
+        .locator(".head td", { hasText: new RegExp(`^${label}:`) })
+        .first()
+        .boundingBox();
+      expect(b, label).not.toBeNull();
+      return b as { x: number; y: number; width: number; height: number };
+    };
+    const facts = await page
+      .locator(".head .facts")
+      .evaluateAll((es) => es.map((e) => ({ text: e.textContent ?? "", top: e.getBoundingClientRect().top })));
+    const starts = [labels.timeAllowed(""), labels.total(""), `${labels.version} `, `${labels.paperCode}: `];
+    expect(facts).toHaveLength(starts.length);
+    facts.forEach((f, i) => {
+      expect(f.text.startsWith(starts[i] as string), f.text).toBe(true);
+      expect(f.text).not.toContain("·");
+    });
+    // three different lines: each item starts below the one before it
+    for (let i = 1; i < facts.length; i++) expect(facts[i]?.top).toBeGreaterThan((facts[i - 1]?.top ?? 0) + 1);
+    const name = await box(labels.name);
+    const id = await box(labels.studentId);
+    expect(id.x).toBeCloseTo(name.x, 0);
+    expect(id.width).toBeCloseTo(name.width, 0);
+    expect(id.y).toBeCloseTo(name.y + name.height, 0);
+    const date = await box(labels.class);
+    expect(date.y).toBeCloseTo(id.y + id.height, 0);
+    expect((await box(labels.candidateNumber)).x).toBeLessThan(name.x);
+  });
+}
+
 test("the paper has no script, and a CSP with neither a script nor a style attribute", async ({ page }) => {
   const { dir, url } = paperOf("exam.md", ["--seed", "101", "--answer-sheet"]);
   const html = readFileSync(join(dir, "quiz-print.html"), "utf8");
