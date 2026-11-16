@@ -5,6 +5,10 @@ import { defineConfig } from "@playwright/test";
 // (`%APPDATA%\fullmark\config.toml` or `~/.config/fullmark/config.toml`), so a teacher's own settings cannot change a test
 process.env.FULLMARK_CONFIG = resolve(import.meta.dirname, "e2e", "machine-config.toml");
 
+// the screens are rasterised whole on every frame: with partial raster, which tiles were redrawn when the frame was
+// captured moved a line of text by a pixel from one run to the next
+const screens = process.env.FULLMARK_SCREENS ? { launchOptions: { args: ["--disable-partial-raster"] } } : {};
+
 /**
  * Browser tests (TECHNICAL_DESIGN.md, section 11): Chromium and Firefox. Firefox isolates `file://` storage per file
  * (foundation 2), which is what resume has to work with; a test that cannot run in one of them says why in a `test.skip`.
@@ -29,7 +33,7 @@ export default defineConfig({
       name: "chromium",
       testIgnore: "**/budget.spec.ts",
       dependencies: ["budget-chromium", "budget-firefox"],
-      use: { browserName: "chromium" },
+      use: { browserName: "chromium", ...screens },
     },
     // axe is slow in Firefox under parallel load: it gets 60 s a test; no retries
     {

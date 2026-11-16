@@ -287,6 +287,12 @@ export const SCREENS_USE = { timezoneId: "Asia/Ho_Chi_Minh", locale: "en-US", re
  * every screens spec in a `beforeEach`; the page is not changed.
  */
 export async function fixScreens(page: Page): Promise<void> {
+  // a screenshot waits until the page has settled: the fonts are ready
+  const take = page.screenshot.bind(page);
+  page.screenshot = async (options) => {
+    await settle(page);
+    return take(options);
+  };
   await page.clock.install({ time: new Date(SCREENS_TIME) });
   await page.clock.setFixedTime(new Date(SCREENS_TIME));
   await page.addInitScript(() => {
@@ -306,6 +312,13 @@ export async function fixScreens(page: Page): Promise<void> {
       return array;
     };
     Object.defineProperty(crypto, "getRandomValues", { value: fixed, configurable: true, writable: true });
+  });
+}
+
+/** Waits for the fonts (not for a frame: a spec that pauses the clock stops frames too). */
+export async function settle(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await document.fonts.ready;
   });
 }
 
@@ -335,6 +348,7 @@ export async function shotOf(locator: Locator, path: string): Promise<void> {
         else el.style.removeProperty("visibility");
       }
     }, value);
+  await settle(page);
   await hide("hidden");
   try {
     await locator.screenshot({ path });
