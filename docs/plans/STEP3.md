@@ -46,11 +46,11 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
-| acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 open; the owner's samples run left | review |
+| acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-G142, G143, below (the acceptance re-run).
+None open.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -96,10 +96,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G142. The screens are not reproducible (the acceptance re-run).** The screens specs read the real clock and the real shuffle, so every run changes screens no slice changed: the time in "Submitted 16 Nov, 16:33" and the order of the ordering items. A reviewer cannot tell, from a diff, what a slice changed. **Recommendation:** the screens specs fix the clock (Playwright's `page.clock`, at one date and time for every spec) and the shuffle's seed, so a run on the same commit and machine takes the same screens; the next slice does it and takes every screen once, counted.
-
-**G143. Tall element shots on a phone (the acceptance re-run).** A screen taken of one tall card on a phone (`2j3/graded-phone-light`, `-dark`, `banded-phone`, `holistic-phone`, `3q/11`, `12`) shows the page's sticky top bar, the replay banner and the filter tabs across the middle of the card, where Playwright scrolled while capturing. **Recommendation:** those shots are taken with the page's sticky parts hidden for the capture (a style the spec adds, never in the page), so the card shows whole; in the same slice as G142.
-
+None open.
 
 ## Slices
 
