@@ -375,6 +375,8 @@ In a survey, `[x]`, `pass_mark`, `pick`, `feedback: instant` and `partial` are e
 
 ## 8. Markdown inside a quiz
 
+**Write for the page and the paper alike.** A quiz becomes a page and, with `build --print`, a paper, from the same text. The description, the section intros, the questions, the choices, hints, explanations, rubrics and materials say only what holds on both: they never name a control of the page (the Check or Submit button, Flag, Hint, the sidebar, a key) or say when the page shows something ("after you submit", "click to reveal"). The page explains its own controls, in its own words and in the learner's language; the paper has none. Write what a thing is ("A hint for the learner", "The correct answers are shown only at the end"), not which control shows it. No question type needs the page: each has a paper form (TECHNICAL_DESIGN.md, section 8, the printable paper), so a quiz never asks for an interaction the paper cannot give.
+
 | Need | Syntax |
 |---|---|
 | maths | `$inline$`, `$$display$$`, anywhere text is allowed (choices, labels, explanations), never in code; chemistry with `\ce{…}` (formulas, equations, states) and `\pu{…}` (units), KaTeX's mhchem |
