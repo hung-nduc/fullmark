@@ -48,7 +48,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
 | 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
-| 3z12 G145: full-page shots without the bars | brief approved (2026-11-16); to build | |
+| 3z12 G145: full-page shots without the bars | built and reviewed (2026-11-16), one fix in review, no gaps | `cc5ccd8`..`5359380`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1917,4 +1917,16 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; no full-page screen shows a bar across its content; two screens runs on the same commit give the same bytes, or the screens that do not are listed. Then the owner tries the samples and step 3 is closed.
+
+### Review (2026-11-16)
+
+**Built** in `cc5ccd8` (`pageShot(page, path)` in `e2e/helpers.ts`, sharing `withoutBars` with `shotOf`: `.fm-dock`, `.fm-footbar`, `[data-dock]`, `[data-footbar]` hidden by element style for the capture; the replay banner and the filter tabs are inside the dock; all 24 full-page screenshots in nine specs use it) and `5359380` (29 screens, each changed only by the bars being gone).
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 831 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean; goldens: none changed. `3p3/06-holistic-adjusted-whole`, `3p/10b-phone-holistic-whole` and `2e/1-results-card` show the content whole, with no bar across it; on the wide full-page shots the sticky Questions sidebar is one window tall and stops part way down, as it always has in a full-page capture of a sticky element: left as it is.
+
+**The proof:** a second run changed one screen in the agent's run (`3p3/09-person-adjusted-foot`, 61 990 pixels) and one in the planner's (`3p3/02-additive-adjusted-foot`, 61 905 pixels): phone viewport shots scrolled to the foot bar, where Chromium sometimes captures before it has drawn the whole window. The committed `02` was the half-drawn one (the right side of the card missing): **fix in review**, it is taken again from the planner's run. As foundation 8 says, the three `3p3/*-foot` shots are named there as accepted, and no more tries are made.
+
+**Done differently, accepted:** `pageShot` waits for the fonts, as `shotOf` does; `.fm-side`, the brief summary's sticky table head and a lifted ordering item are content and stay in the shots.
+
+**Gaps:** none.
 
