@@ -46,11 +46,11 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
-| acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
+| acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 open; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G142, G143, below (the acceptance re-run).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -96,7 +96,10 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G142. The screens are not reproducible (the acceptance re-run).** The screens specs read the real clock and the real shuffle, so every run changes screens no slice changed: the time in "Submitted 16 Nov, 16:33" and the order of the ordering items. A reviewer cannot tell, from a diff, what a slice changed. **Recommendation:** the screens specs fix the clock (Playwright's `page.clock`, at one date and time for every spec) and the shuffle's seed, so a run on the same commit and machine takes the same screens; the next slice does it and takes every screen once, counted.
+
+**G143. Tall element shots on a phone (the acceptance re-run).** A screen taken of one tall card on a phone (`2j3/graded-phone-light`, `-dark`, `banded-phone`, `holistic-phone`, `3q/11`, `12`) shows the page's sticky top bar, the replay banner and the filter tabs across the middle of the card, where Playwright scrolled while capturing. **Recommendation:** those shots are taken with the page's sticky parts hidden for the capture (a style the spec adds, never in the page), so the card shows whole; in the same slice as G142.
+
 
 ## Slices
 
@@ -1536,6 +1539,18 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
    - **Every screens spec run once** (`FULLMARK_SCREENS=1`, Chromium): 238 passed. **273 committed screens differ** (268 PNGs, 5 PDFs); 3h's and 3h2's, taken on this machine today, are unchanged. Two causes, shown: (a) **later slices changed what an earlier slice's screen shows**, and those screens were not taken again (for example 3f's blocked dialog: the card head, the Questions button's icon, the dialog's place and "Graded by you", from 3f2, 3p and 3r); (b) **text rendering**: the same page with one line wrapped at a different width (2d's start screen: the Focus mode line, 23 px taller). 36 changed size, 188 differ in more than 0.5 % of their pixels, 44 in less. None shows a bug, in the ones looked at. G122 decided (2026-11-16): committed, as the acceptance's screens.
    - **Left:** **the owner's run of the samples** by hand. Then step 3 is closed (item 2).
 2. **The owner, trying the samples (2026-11-16),** found the `vi` paper's header line broken inside an item: G123, decided the same day; **3z4** builds it, then the samples run goes on.
+
+3. **Step 3's acceptance, run again by Opus on 2026-11-16**, after 3z4 to 3z9, on commit `e195f25`, on Linux, Playwright 1.64.1 with Chromium 1248 and Firefox 1555:
+   - **`npm run check`**, the whole of it, exits 0: typecheck, Biome, knip clean; Vitest, the 2 startup tests alone, then 118 files, 3102 of 3102; Playwright 825 passed, 519 skipped, none failed, **in Chromium and Firefox**. The contract tests, the byte-identical `brief.yaml` cases, the server's token, `Host` and `Origin` checks, the shared page without server code, the two-quiz seam and the forms' axe and `vi` scans are all in that run, as in item 1, and pass. `npm run schemas` leaves the tree unchanged.
+   - **`npm run samples`** builds (exit 0).
+   - **Every screens spec run once** (`FULLMARK_SCREENS=1`, Chromium, 38 specs): 257 passed. **210 committed screens differ** (205 PNGs, 5 PDFs), committed as G141 asks (the commit after this item's). The causes, from a pixel diff of each against `e195f25`:
+     - **What 3z4 to 3z9 changed** (about 150): the phone screens at 390 × 844 and the element shots (80, and 20 whose width grew from 358 to 374 px) show the 8 px gutter (G136), the labels under their text (G137, G138) and the whole-quiz row; the `grade --web` sidebar's current row (24 wide screens, the box only: 3z9's review fix); the wide `brief --web` cards (3h, the current card's edge, G139); the paper's header (`2k2`'s PDFs and inline screens, G123); the information and licences dialogs on a phone (`2i3`, `2i4`, 3z6); `3z8/06-brief` (G140).
+     - **The wall clock** (7 alone, and part of most submitted screens): "Submitted 16 Nov, 12:24" is now "16:33"; the screens specs read the real time.
+     - **The shuffle** (the ordering screens of `2c4`, `2f2`, `2h2`, `3q`): the items start in another order on each run ("zq-check, zq-render" against "zq-render, zq-check").
+     - **Rendering alone** (23): no pixel differs by more than 60 of 255 (anti-aliasing at text edges); the screens read the same.
+   - **Looked at:** `2f/4-phone-answering`, `3p/10-phone-holistic-top` (the 8 px gutter), `3z8` and `3z9`'s screens. The phone element shots of a tall card (`2j3/graded-phone-*`) show the page's sticky top bar, the replay banner and the filter tabs drawn across the middle of the card, as they did before this run: the capture, not the page.
+   - **Gaps:** G142 (the screens are not reproducible), G143 (the tall element shots), open in "Gaps".
+   - **Left:** **the owner's run of the samples** by hand. Then step 3 is closed.
 
 ## Slice 3z4: G123, the paper's header
 
