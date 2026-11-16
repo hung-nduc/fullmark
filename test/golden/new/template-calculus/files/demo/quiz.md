@@ -10,7 +10,7 @@ id: demo
 
 # Limits and continuity
 
-Work through these first. Use the **Check** button to see feedback after each question.
+Work through these first.
 
 ## What is $\lim_{x \to 0} \dfrac{\sin x}{x}$? {type=single tags=limits}
 

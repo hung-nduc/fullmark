@@ -9,7 +9,7 @@ id: demo
 
 # Limits and continuity
 
-Work through these first. Use the **Check** button to see feedback after each question.
+Work through these first.
 
 ## {type=single tags=limits}
 

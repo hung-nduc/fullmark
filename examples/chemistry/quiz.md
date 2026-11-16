@@ -15,7 +15,7 @@ materials:
 
 # Công thức và ion
 
-Chọn đáp án đúng. Dùng nút **Kiểm tra** để xem kết quả của từng câu.
+Chọn đáp án đúng.
 
 ## Công thức hóa học của sulfuric acid là gì? {type=single id=axit-sunfuric tags=cong-thuc}
 
