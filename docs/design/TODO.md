@@ -6,4 +6,6 @@ The quiz syntax and `new --skeleton` are settled in [QUIZ_SYNTAX.md](QUIZ_SYNTAX
 
 ## Before step 4 (library)
 
+- [ ] **Build `content.names-control` in step 4's first slice** (G148, decided 2026-11-16; TECHNICAL_DESIGN.md, section 5). Not a design gap: a decided rule waiting for its slice, listed here so step 4's plan starts with it.
+
 - [ ] **1.0 and 0.x share a config file.** Both read `%APPDATA%\fullmark\config.toml` (`~/.config/fullmark/config.toml` on Linux). `quiz check` already reads the owner's 0.x config; it parses, so nothing breaks yet. In step 4 a 0.x `library` path there would point 1.0 at a 0.x library it cannot read. Decide before step 4: a different folder for 1.0, or let the step 6 migration script rewrite the file.
