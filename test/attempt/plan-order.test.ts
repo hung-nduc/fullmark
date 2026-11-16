@@ -36,7 +36,9 @@ const SEEDS = Array.from({ length: 50 }, (_, i) => `s${i}`);
 
 describe("a quiz without type_order keeps today's plans", () => {
   it("gives, for every quiz of the repository with shuffle_questions on, two seeds and every source, the plans recorded before 2k3", () => {
-    const now = plansOfCorpus();
+    const all = plansOfCorpus();
+    // a quiz added since (the chemistry example, 3z5) has no plans recorded before 2k3: only the recorded ones are compared
+    const now = Object.fromEntries(Object.entries(all).filter(([key]) => key in before));
     expect(Object.keys(now).length).toBeGreaterThan(80);
     expect(now).toEqual(before);
   });
