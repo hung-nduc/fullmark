@@ -1,12 +1,15 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { katexTools, lazyParseTex } from "../src/build/tex";
 import { checkFile } from "../src/cli/check";
+import { grade } from "../src/core/grade";
+import type { Quiz } from "../src/core/ir";
 import { parse } from "../src/core/parse";
 import { mathParts } from "../src/core/parse/tex";
 import { capture } from "./helpers/cli";
+import { attemptFor } from "./helpers/grading";
 
 const quiz = (body: string) => `---\ntitle: T\n---\n\n## Q {type=single id=q}\n\n${body}\n\n- [x] a\n- [ ] b\n`;
 const opts = { profile: null, config: null, strict: false, review: null, json: true, plain: true };
@@ -155,5 +158,17 @@ describe("math.syntax in the description", () => {
     const issues = parse(text, "q.md", { parseTex }).issues.filter((i) => i.rule === "math.syntax");
     expect(issues.map((i) => i.line)).toEqual([3]);
     expect(parse(text.replace("\badmacro", "x^2"), "q.md", { parseTex }).issues).toEqual([]);
+  });
+});
+
+describe("the chemistry example's short answer (G128)", () => {
+  it("accepts the IUPAC-based names and the older Vietnamese ones", () => {
+    const text = readFileSync(join(import.meta.dirname, "..", "examples", "chemistry", "quiz.md"), "utf8");
+    const q = parse(text, "quiz.md").quiz as Quiz;
+    const marks = (answer: string) =>
+      grade(q, attemptFor({ "nhom-chuc": { text: answer } }, ["nhom-chuc"])).questions[0]?.status;
+    for (const ok of ["carboxyl", "Nhóm carboxyl", "cacboxyl", "nhóm cacboxyl", "-COOH"])
+      expect(marks(ok), ok).toBe("correct");
+    expect(marks("hydroxyl")).toBe("incorrect");
   });
 });
