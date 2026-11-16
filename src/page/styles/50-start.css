@@ -421,7 +421,32 @@
   .fm-foot {
     display: flex;
     justify-content: flex-end;
-    padding: 24px 16px 32px;
+    padding: 16px 16px 12px;
+    margin-top: auto;
+  }
+
+  /* the page fills the window's height and the foot follows the content: on a short page (the start screen, a short
+     quiz) the button is at the window's bottom right; on a long one it follows the last question (G131) */
+  .fm-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  .fm-page > .fm-quiz:last-child {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+  }
+
+  .fm-page > .fm-quiz:last-child > .fm-body {
+    flex: 1 0 auto;
+  }
+
+  .fm-main:has(> .fm-foot) {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
   }
 
   /* the foot spans the main area, not the question column: the button sits at the page's right edge (left of an open
