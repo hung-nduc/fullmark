@@ -218,6 +218,28 @@ describe("what makes a grades file invalid", () => {
     expect(problemsOf((t) => (t.grades.tf = {}))).toEqual([expect.stringContaining("grades.tf")]);
   });
 
+  it("reads only the mode's own key (G121): the other key alone is named, beside the own key it is ignored", () => {
+    const swap = (id: string, from: string, to: string) => (t: Json) => {
+      t.grades[id][to] = t.grades[id][from];
+      delete t.grades[id][from];
+    };
+    expect(problemsOf(swap("alias", "bullets", "criteria"))).toEqual([
+      "grades.alias: `criteria` is for additive and banded rubrics: a holistic entry uses `bullets`",
+    ]);
+    expect(problemsOf(swap("laplace", "criteria", "bullets"))).toEqual([
+      "grades.laplace: `bullets` is for holistic rubrics: an additive entry uses `criteria`",
+    ]);
+    expect(problemsOf(swap("task2", "criteria", "bullets"))).toEqual([
+      "grades.task2: `bullets` is for holistic rubrics: a banded entry uses `criteria`",
+    ]);
+    // neither key: the message stays as it was
+    expect(problemsOf((t) => delete t.grades.alias.bullets)).toEqual(["grades.alias: `bullets` is missing"]);
+    expect(problemsOf((t) => delete t.grades.laplace.criteria)).toEqual(["grades.laplace: `criteria` is missing"]);
+    // both keys: the other one is an unknown key, ignored
+    expect(problemsOf((t) => (t.grades.alias.criteria = { junk: {} }))).toEqual([]);
+    expect(problemsOf((t) => (t.grades.laplace.bullets = { junk: {} }))).toEqual([]);
+  });
+
   it("a changed maximum, weight, scale, points or mode", () => {
     expect(problemsOf((t) => (t.grades.laplace.criteria.defs.max = 5))).toEqual([
       expect.stringContaining("max changed"),

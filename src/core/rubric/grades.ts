@@ -350,10 +350,17 @@ function gradeEntry(
 
   const justification = text(entry.justification);
   const improvement = text(entry.improvement);
-  const cells = isObject(entry.criteria) ? entry.criteria : isObject(entry.bullets) ? entry.bullets : null;
   const kind = rubric.mode === "holistic" ? "bullets" : "criteria";
+  const other = kind === "bullets" ? "criteria" : "bullets";
+  const cells = isObject(entry[kind]) ? entry[kind] : null;
   if (cells === null) {
-    fail(`\`${kind}\` is missing`);
+    if (isObject(entry[other])) {
+      fail(
+        kind === "bullets"
+          ? "`criteria` is for additive and banded rubrics: a holistic entry uses `bullets`"
+          : `\`bullets\` is for holistic rubrics: ${rubric.mode === "additive" ? "an additive" : "a banded"} entry uses \`criteria\``,
+      );
+    } else fail(`\`${kind}\` is missing`);
     return null;
   }
   const known = new Set(rubric.criteria.map((c) => c.id));

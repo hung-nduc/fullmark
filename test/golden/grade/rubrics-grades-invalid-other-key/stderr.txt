@@ -1,0 +1,1 @@
+results.json: grades.holistic: `criteria` is for additive and banded rubrics: a holistic entry uses `bullets`

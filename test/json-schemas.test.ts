@@ -26,7 +26,8 @@ const UNMASK: Record<string, string> = { "<time>": "2026-11-16T09:30:00+07:00", 
  * are refused by it, each for a shape no rubric can take: a grader of kind "robot" and a nameless one (`everything`), an
  * entry with no `rubric_hash` (`no-rubric-hash`), an entry with no `rubric_hash` or `criteria` (`unknown-question`,
  * which `quiz grade` refuses for its id, a quiz-dependent reason, but whose entry is a shape no rubric can take too),
- * and an additive entry with `bullets` and no `criteria` (`wrong-mode`). `quiz grade` refuses all four.
+ * and an additive entry with `bullets` and no `criteria` (`wrong-mode`). `quiz grade` refuses all four. `other-key` (G121) is a holistic entry with `criteria` and no `bullets`:
+ * the schema refuses it too, as the two now take the same files.
  */
 const REFUSED = [
   "test/golden/check/review-invalid-json/input/review.json",
@@ -36,6 +37,7 @@ const REFUSED = [
   "test/golden/grade/rubrics-grades-v1/input/grades.json",
   "test/golden/grade/rubrics-grades-invalid-everything/input/grades.json",
   "test/golden/grade/rubrics-grades-invalid-no-rubric-hash/input/grades.json",
+  "test/golden/grade/rubrics-grades-invalid-other-key/input/grades.json",
   "test/golden/grade/rubrics-grades-invalid-unknown-question/input/grades.json",
   "test/golden/grade/rubrics-grades-invalid-wrong-mode/input/grades.json",
   "test/golden/grade/several-with-grades/input/grades.json",
