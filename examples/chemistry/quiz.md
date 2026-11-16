@@ -1,14 +1,14 @@
 ---
-title: "Hoá học đại cương: công thức, phản ứng và tính toán"
+title: "Hóa học đại cương: công thức, phản ứng và tính toán"
 description: |
-  Bài kiểm tra ngắn về công thức hoá học, ion, cân bằng phương trình, cân bằng hoá học và tính theo phương trình. Công thức viết bằng `\ce{…}` và đơn vị bằng `\pu{…}` (mhchem của KaTeX); công thức cấu tạo là một hình SVG trong `assets/`. Bảng khối lượng mol có trong phần Tài liệu.
+  Bài kiểm tra ngắn về công thức hóa học, ion, cân bằng phương trình, cân bằng hóa học và tính theo phương trình. Công thức viết bằng `\ce{…}` và đơn vị bằng `\pu{…}` (mhchem của KaTeX); công thức cấu tạo là một hình SVG trong `assets/`. Bảng khối lượng mol có trong phần Tài liệu.
 id: hoa-hoc-dai-cuong
 lang: vi
 ui_lang: vi
 time_limit: 30m
 feedback: instant
 pass_mark: 60
-tags: [hoá học]
+tags: [hóa học]
 materials:
   - materials/molar-masses.md
 ---
@@ -17,7 +17,7 @@ materials:
 
 Chọn đáp án đúng. Dùng nút **Kiểm tra** để xem kết quả của từng câu.
 
-## Công thức hoá học của sulfuric acid là gì? {type=single id=axit-sunfuric tags=cong-thuc}
+## Công thức hóa học của sulfuric acid là gì? {type=single id=axit-sunfuric tags=cong-thuc}
 
 - [ ] $\ce{H2SO3}$
 - [x] $\ce{H2SO4}$
@@ -53,7 +53,7 @@ Ion sulfate là $\ce{SO4^2-}$: một nguyên tử sulfur, bốn nguyên tử oxy
 - [ ] Dimethyl ether, $\ce{CH3OCH3}$
 
 ::: explanation
-Trong công thức khung, đầu đoạn thẳng không ghi gì và chỗ gấp khúc đều là nguyên tử carbon, kèm các nguyên tử hydrogen cho đủ hoá trị. Đầu bên trái và chỗ gấp khúc là hai nguyên tử carbon; đầu bên phải ghi $\ce{-OH}$, nhóm này gắn vào carbon thứ hai: $\ce{CH3-CH2-OH}$, tức là ethanol, $\ce{C2H5OH}$.
+Trong công thức khung, đầu đoạn thẳng không ghi gì và chỗ gấp khúc đều là nguyên tử carbon, kèm các nguyên tử hydrogen cho đủ hóa trị. Đầu bên trái và chỗ gấp khúc là hai nguyên tử carbon; đầu bên phải ghi $\ce{-OH}$, nhóm này gắn vào carbon thứ hai: $\ce{CH3-CH2-OH}$, tức là ethanol, $\ce{C2H5OH}$.
 :::
 
 ## Nối mỗi kí hiệu với ý nghĩa của nó. {type=matching id=trang-thai points=4 tags=cong-thuc}
@@ -104,7 +104,7 @@ Tính số mol $\ce{CaCO3}$ bằng $n = m / M$, rồi dùng tỉ lệ 1 : 1 củ
 $M(\ce{CaCO3}) = \pu{100 g/mol}$ nên $n(\ce{CaCO3}) = 10 / 100 = \pu{0,1 mol}$. Phương trình cho tỉ lệ 1 : 1, vậy $n(\ce{CO2}) = \pu{0,1 mol}$. Với $M(\ce{CO2}) = \pu{44 g/mol}$, khối lượng là $m(\ce{CO2}) = 0{,}1 \times 44 = \pu{4,4 g}$.
 :::
 
-## Phản ứng tổng hợp ammonia $\ce{N2 + 3H2 <=> 2NH3}$ toả nhiệt. Những tác động nào làm cân bằng chuyển dịch theo chiều thuận, tạo thêm $\ce{NH3}$? {type=multi id=can-bang-hoa-hoc points=3 tags=can-bang}
+## Phản ứng tổng hợp ammonia $\ce{N2 + 3H2 <=> 2NH3}$ tỏa nhiệt. Những tác động nào làm cân bằng chuyển dịch theo chiều thuận, tạo thêm $\ce{NH3}$? {type=multi id=can-bang-hoa-hoc points=3 tags=can-bang}
 
 - [x] Tăng áp suất của hệ
 - [ ] Tăng nhiệt độ
@@ -113,15 +113,15 @@ $M(\ce{CaCO3}) = \pu{100 g/mol}$ nên $n(\ce{CaCO3}) = 10 / 100 = \pu{0,1 mol}$.
 - [x] Thêm $\ce{N2}$
 
 ::: explanation
-Theo nguyên lí Le Chatelier, cân bằng chuyển dịch để làm giảm tác động. Tăng áp suất thì cân bằng chuyển về phía có ít mol khí hơn: 4 mol khí ở vế trái, 2 mol ở vế phải, nên chuyển theo chiều thuận. Tách $\ce{NH3}$ hoặc thêm $\ce{N2}$ cũng làm cân bằng chuyển theo chiều thuận. Phản ứng toả nhiệt, nên tăng nhiệt độ làm cân bằng chuyển theo chiều nghịch. Chất xúc tác làm phản ứng nhanh đạt cân bằng hơn nhưng không làm cân bằng chuyển dịch.
+Theo nguyên lí Le Chatelier, cân bằng chuyển dịch để làm giảm tác động. Tăng áp suất thì cân bằng chuyển về phía có ít mol khí hơn: 4 mol khí ở vế trái, 2 mol ở vế phải, nên chuyển theo chiều thuận. Tách $\ce{NH3}$ hoặc thêm $\ce{N2}$ cũng làm cân bằng chuyển theo chiều thuận. Phản ứng tỏa nhiệt, nên tăng nhiệt độ làm cân bằng chuyển theo chiều nghịch. Chất xúc tác làm phản ứng nhanh đạt cân bằng hơn nhưng không làm cân bằng chuyển dịch.
 :::
 
-## Với $\Delta H = \pu{-92 kJ/mol}$ (tính theo phương trình đã viết), phản ứng $\ce{N2 + 3H2 <=> 2NH3}$ là phản ứng toả nhiệt. {type=truefalse id=toa-nhiet points=1 tags=can-bang}
+## Với $\Delta H = \pu{-92 kJ/mol}$ (tính theo phương trình đã viết), phản ứng $\ce{N2 + 3H2 <=> 2NH3}$ là phản ứng tỏa nhiệt. {type=truefalse id=toa-nhiet points=1 tags=can-bang}
 
 ```answer
 value: true
 ```
 
 ::: explanation
-$\Delta H$ âm nghĩa là hệ toả nhiệt ra môi trường, nên đây là phản ứng toả nhiệt.
+$\Delta H$ âm nghĩa là hệ tỏa nhiệt ra môi trường, nên đây là phản ứng tỏa nhiệt.
 :::

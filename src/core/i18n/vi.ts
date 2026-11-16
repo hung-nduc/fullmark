@@ -377,7 +377,7 @@ export const vi = {
     filterAll: "Tất cả",
     filterMissed: "Câu sai",
     filterFlagged: "Đã đánh dấu",
-    missedHint: "Sai, đúng một phần hoặc chưa trả lời. Bài luận tính khi đã chấm dưới điểm tối đa.",
+    missedHint: "Sai, đúng một phần hoặc chưa trả lời. Tự luận tính khi đã chấm dưới điểm tối đa.",
     check: "Kiểm tra",
     checkedSaid: (n: number, status: string) => `Câu ${n}: ${status}`,
     timedOutNote: "Đã hết giờ nên bài của bạn được nộp.",
