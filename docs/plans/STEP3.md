@@ -39,7 +39,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3h2 G116, `brief --web` on a phone | done, reviewed (2026-11-16), one fix in review, no gaps | `fd2d50a`..`0247344`, and the commit that holds this row |
 | 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
-| 3z3 G121, `quiz grade` takes each mode's own key | brief written (2026-11-16), for the owner | |
+| 3z3 G121, `quiz grade` takes each mode's own key | brief approved (2026-11-16); to build | |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
@@ -55,7 +55,7 @@ How each slice got here is in its own **Review**; the table above is the summary
 2. **3q** (the replay's answer panel and badge, G94, G105) is **built and reviewed** ("Slice 3q", its Review). **G106** (the sample answer's code block, not focusable while it scrolls) is decided (2026-11-15), as recommended, and written into TECHNICAL_DESIGN.md; it is 3p2's first task, with G104.
 3. **3p2** (G104, G106, then `grade --web --grades` at 1280 px, G75, G102, G107 to G110) is **built and reviewed** ("Slice 3p2", its Review), with no new gap. **3p3** (the pre-filled form on a phone, G111) is **built and reviewed** ("Slice 3p3", its Review), with no new gap. Next: **the `brief --web` boards** (3v), then **3h**.
 4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2** (G116, then the phone, G117) is **built and reviewed** ("Slice 3h2", its Review), with no new gap: every slice of step 3 but 3z is done. Then **3z**, acceptance.
-5. **3z**'s tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) are **built and reviewed** ("Slice 3z", its Review). **G119** (the grades schema holds only the envelope) and **G120** (a refused submit's detail is English in a `vi` form) are decided (2026-11-16), as recommended: G120 is written into COMMANDS.md and needs no code; G119 into TECHNICAL_DESIGN.md, and **3z2** builds it. **3z2** is **built and reviewed** ("Slice 3z2", its Review); **G121** (the schema asks for each mode's own key, `quiz grade` takes either) is decided (2026-11-16), not as recommended: `quiz grade` refuses the other key; **3z3** builds it. Next: the owner approves 3z3's brief, a Sonnet implementing agent builds it, then the acceptance run (the planner) and the samples (the owner).
+5. **3z**'s tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) are **built and reviewed** ("Slice 3z", its Review). **G119** (the grades schema holds only the envelope) and **G120** (a refused submit's detail is English in a `vi` form) are decided (2026-11-16), as recommended: G120 is written into COMMANDS.md and needs no code; G119 into TECHNICAL_DESIGN.md, and **3z2** builds it. **3z2** is **built and reviewed** ("Slice 3z2", its Review); **G121** (the schema asks for each mode's own key, `quiz grade` takes either) is decided (2026-11-16), not as recommended: `quiz grade` refuses the other key; **3z3** builds it. Next: 3z3's brief is approved (2026-11-16); a Sonnet implementing agent builds it, then the acceptance run (the planner) and the samples (the owner).
 
 The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
 
@@ -1475,7 +1475,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z3: G121, `quiz grade` takes each mode's own key
 
-**Brief written on 2026-11-16, for the owner's approval.** One short task, then 3z's acceptance. G121 (STEP3-GAPS.md) is decided; TECHNICAL_DESIGN.md, section 6, `grades-v2`, says what is wanted.
+**Approved by the owner on 2026-11-16.** One short task, then 3z's acceptance. G121 (STEP3-GAPS.md) is decided; TECHNICAL_DESIGN.md, section 6, `grades-v2`, says what is wanted.
 
 ### Read first
 
