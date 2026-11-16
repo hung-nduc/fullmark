@@ -120,7 +120,9 @@ function readMhchem() {
   const from = header.findIndex((l) => l.startsWith("Licensed under the Apache License, Version 2.0"));
   const to = header.findIndex((l) => l.trim() === "limitations under the License.");
   if (copyright === "" || from < 0 || to < from)
-    throw new Error("katex/contrib/mhchem/mhchem.js: its header no longer has the Apache-2.0 notice and copyright lines");
+    throw new Error(
+      "katex/contrib/mhchem/mhchem.js: its header no longer has the Apache-2.0 notice and copyright lines",
+    );
   const body = header
     .slice(from, to + 1)
     .map((l) => l.trimEnd())
