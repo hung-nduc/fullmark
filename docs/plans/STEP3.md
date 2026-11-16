@@ -48,7 +48,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
 | 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
-| 3z12 G145: full-page shots without the bars | brief written (2026-11-16); waits for the owner | |
+| 3z12 G145: full-page shots without the bars | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1894,7 +1894,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z12: full-page shots without the bars
 
-**Brief written on 2026-11-16; waits for the owner's approval.** G145 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, now says a whole-page screen hides the sticky parts too. Tests and screens only: nothing in `src/` changes. Same hard stop as 3z11.
+**Approved by the owner on 2026-11-16.** G145 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, now says a whole-page screen hides the sticky parts too. Tests and screens only: nothing in `src/` changes. Same hard stop as 3z11.
 
 ### Read first
 
