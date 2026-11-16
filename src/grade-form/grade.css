@@ -560,8 +560,11 @@
     border-color: var(--line-strong);
   }
 
+  /* the current row's 2 px edge is a 1 px border and a 1 px inset shadow, so its width never changes (as the brief
+     form's card, G139): a row's text does not rewrap when it becomes current */
   .fm-grade-row[aria-current="true"] {
-    border: 2px solid var(--text);
+    border-color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--text);
   }
 
   .fm-grade-row-text {
