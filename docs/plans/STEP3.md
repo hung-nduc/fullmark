@@ -42,7 +42,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
-| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built (2026-11-16), review to come | `5b05d1a`..the commit that holds this row |
+| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 for the owner | `5b05d1a`..`f596649`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -93,7 +93,9 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G126. Materials too wide for their panel (raised by the owner, 2026-11-16, trying the samples).** On the start screen the Materials panel (380 px) cuts off a wide sheet: a four-column table loses its last column, and maths wraps inside an expression. The phone board (MaterialsPhone) already says "a wide table scrolls sideways in its box", which the page does not do. **Recommendation**, drawn on the canvas under "Materials: the wide view (G126)" (MaterialsWide, interactive, with MaterialsWideSidebar, MaterialsWideExpanded and MaterialsWidePhone): (1) everywhere a sheet shows, a table or display formula wider than its space scrolls sideways in its own box, keyboard-focusable, with a fade at the edge and the words "Scroll sideways for the rest of the table, or Expand"; (2) the start screen's **Materials** opens a pop-up, not a side panel: 960 px wide or the window less 64 px, 40 px from the top and bottom, the sheet chips along its top, the sheet scrolling inside, closed by **Close**, Esc or a click outside, focus back on **Materials**, "The clock has not started" at its foot; on a phone it takes the screen; (3) while answering, the stacked sidebar keeps the sheet, and each sheet's heading has an **Expand** button that opens the same pop-up over the question, "The clock keeps running" at its foot. Words in `vi` from the catalogs, as every form's. A slice after the boards are approved.
+**G133. The Information tab's values in `vi` (3z6's review).** The `vi` dialog shows "Màu nền: dark", "Giao diện của bài: locked", "Phông chữ: quiz (mặc định)", "Ngôn ngữ giao diện: vi", while on and off are translated ("tắt (mặc định)"). **Recommendation:** keep them so: the tab is for debugging, and these are the values as an author writes them in the front matter and the flags (`theme: dark`, `look: locked`, `--fonts quiz`, `ui_lang: vi`), which is what a bug report needs; only words that are not option values (on, off, default) are translated.
+
+**G134. Tone marks in the chemistry example (3z6's review).** Section 9, item 7 sets "hủy, xóa, khóa" for the catalogs; the example's own text still writes "hoá", "toả", and the tag `hoá học`. **Recommendation:** the examples and templates follow item 7 too ("hóa", "tỏa", the tag `hóa học`), so what fullmark ships reads one way; a quiz author's own text is the author's.
 
 ## Slices
 
@@ -1646,3 +1648,15 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; the goldens that change are only the ones named above, each explained; the screens show the words, the groups and the button at the bottom.
+
+### Review
+
+**3z6's review (2026-11-16).** Built by a Sonnet implementing agent in `5b05d1a` (G127), `820f526` (G128), `1894ed7` and `bcd84ea` (G130, G132), `8f29b33` and `f21853b` (G131), `ead7a72` (screens) and `f596649` (the slice table's row). The agent amended the planner's `a7a58f5` (G126) by mistake while fixing `1894ed7`, and undid it: `a7a58f5` is in the history as the planner made it. Run in review after a fresh `npm run build` on `f596649`: `npm run notices` and `npm run schemas` leave the tree unchanged; `npm run check` exits 0: Vitest, the 2 startup tests alone, then **118 files, 3102 of 3102**; Playwright **741 passed**, 491 skipped (10 new screens specs), none failed, **in Chromium and Firefox**.
+
+- **G127:** every key as the brief named it, and the search for "huỷ", "xoá", "khoá" and "Fullmark" found only those (listed in the agent's report: `brief.ts` `closesIn`, `closesSoon`, `closesNever`, `cancelled`; `grade.ts` `half`). Left over: `vi.ts` `missedHint` still says "Bài luận tính khi…" where item 7 says "Tự luận"; it goes into the next page slice.
+- **G128:** the example in IUPAC-based names, the short answer taking old and new, the skeletal formula explained right (read in review).
+- **G130, G132:** two headed groups with a rule; `built_at` formatted by the page in the reader's time zone, the ISO string kept in the bytes, tested in two time zones; values with "(default)". Looked at in review: `docs/screens/3z6/information-vi-dark.png` and `licences-en-dark.png`.
+- **G131:** the foot is the body's second row and the page at least the window's height (`100dvh`); `e2e/foot.spec.ts` checks the button within 24 px of the window's bottom at 1280 × 940 and 390 × 844, below the last question on a long quiz, and absent in Focus mode. Looked at in review: `foot-start-desktop.png`.
+- **Goldens:** 14 page goldens (12 pages, 2 byte counts), each in the script, the style and their hashes (and the `vi` page's dialog markup); `print-example-chemistry`, the names. No other.
+- **Done differently, accepted:** a profile not given shows "default", not "default (default)"; the foot's padding 16/12 and the main column's bottom padding 24 px where a foot follows (was 64), so a short start screen fits a 390 × 844 window: pages are 60 to 90 px shorter at the end, 15 screens changed size; a new fixture `tiny.md`; the foot hidden while the phone's sidebar covers the page. Screens: all 34 specs taken again, 63 changed PNGs committed by a list, the rest (clock times, shuffles, pixel noise) left as they were.
+- **Gaps:** G133 (the dialog's values in `vi`), G134 (the example's tone marks).
