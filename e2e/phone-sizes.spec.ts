@@ -293,5 +293,34 @@ for (const phone of PHONES) {
       await press(page, page.locator("[data-footbar] [data-action=finish]"));
       await all(page);
     });
+
+    test("brief --web: a choice never moves the next card's first control (G139)", async ({ page }) => {
+      const dir = mkdtempSync(join(tmpdir(), "fm-sizes-brief-"));
+      mkdirSync(join(dir, ".git"));
+      await serve(dir, ["brief", "d", "--web", "--no-open"], page, ".bf");
+      const choice = page.locator('section[data-qkey="weak_topics"] [data-choice="no"]');
+      const next = page.locator('section[data-qkey="commitment"] [data-action=inc]');
+      await next.scrollIntoViewIfNeeded();
+      const box = (await next.boundingBox()) as { x: number; y: number };
+      const before = { x: box.x, y: box.y };
+      // the control's box at the moment of the second tap's click, before the form reacts to it
+      await page.evaluate(() => {
+        const w = window as unknown as { __at?: { x: number; y: number } };
+        document.addEventListener(
+          "click",
+          (e) => {
+            if ((e.target as HTMLElement).closest("[data-action=inc]")) {
+              const r = (e.target as HTMLElement).closest("[data-action=inc]")?.getBoundingClientRect() as DOMRect;
+              w.__at = { x: r.x, y: r.y };
+            }
+          },
+          true,
+        );
+      });
+      await press(page, choice);
+      await press(page, next);
+      const at = await page.evaluate(() => (window as unknown as { __at: { x: number; y: number } }).__at);
+      expect(at).toEqual(before);
+    });
   });
 }

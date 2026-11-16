@@ -238,8 +238,12 @@
     box-shadow: var(--shadow);
   }
 
+  /* the current card's 2 px accent edge is drawn inside the 1 px border, so its box and its text never change width */
   .bf-card[data-current="true"] {
-    border: 2px solid var(--accent);
+    border-color: var(--accent);
+    box-shadow:
+      inset 0 0 0 1px var(--accent),
+      var(--shadow);
   }
 
   .bf-card-head {
