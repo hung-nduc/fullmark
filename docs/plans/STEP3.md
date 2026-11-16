@@ -44,6 +44,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
+| 3z8 G135, the three phone sizes | brief written (2026-11-16), for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -130,6 +131,7 @@ None open.
 | **3z5** | G124: chemistry with KaTeX's mhchem (`\ce`, `\pu`), and `examples/chemistry/` | G124 |
 | **3z6** | G127 (the `vi` words), G128 (the example's IUPAC names), G130 to G132 (the Information & Licences dialog, the ⓘ at the window's bottom) | G127, G128, G130 to G132 |
 | **3z7** | G126 (Materials as a pop-up on the start screen), G134 (the example's tone marks), G127's last word | G126, G134 |
+| **3z8** | G135: every phone layout tested at 360 × 780, 390 × 844 and 430 × 932; 360 × 780 screens of each form and the start screen | G135 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1700,3 +1702,32 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 - **The pop-up** is a native `<dialog>` with `showModal()`: the heading and **Close**, the sidebar's own `Sheets` (chips and panel), and the foot; Esc, **Close** or the scrim close it and the focus returns to **Materials**. 960 px or the window less 64 px, 40 px from top and bottom; the whole screen under 520 px. The start screen's side panel is gone; the sidebar while answering, review and replay are unchanged. Looked at in review: `docs/screens/3z7/popup-en-dark.png` (the four-column table whole).
 - **Fixed in review:** on a phone the pop-up's table squeezed its columns, breaking formulas mid-expression and making every row a tall strip, where MaterialsWidePhone keeps formulas whole and scrolls the table. In the pop-up a formula in a cell no longer breaks, and on a phone a cell is at least 12em; the table scrolls sideways in its box. 14 goldens in the style and its hash; the two phone screens taken again; `npm run check` passes again in both browsers (Vitest 3102 of 3102, Playwright 753).
 - **Done differently, accepted:** the scrim is the other dialogs' `rgb(0 0 0 / 45%)`, there being no scrim token; the foot shows on a phone too; between 520 and 759 px the pop-up is a dialog, no longer a full-screen panel; the Tab test checks the focus never reaches the page behind (a modal hands Tab to the browser's chrome after its last control).
+
+## Slice 3z8: the three phone sizes
+
+**Brief written on 2026-11-16, for the owner's approval.** G135 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Phone sizes**, says what is wanted. After 3z8, step 3's acceptance is run again (the planner) and the owner tries the samples.
+
+### Read first
+
+- This plan: "Rules for every slice"; the reviews of 3h2, 3p, 3p3, 3m, 3z6 and 3z7 (the phone work); STEP3-GAPS.md, G135.
+- TECHNICAL_DESIGN.md, foundation 8 (**Phone sizes**), and the phone rules the specs check (section 8: the sidebar on a phone, the foot bar, 44 px targets, the materials pop-up).
+- Code: `e2e/helpers.ts`; the phone specs: `phone.spec.ts`, `review.spec.ts` (its phone part), `grade-phone.spec.ts`, `grade-prefilled-phone.spec.ts`, `brief-phone.spec.ts`, `materials.spec.ts` (its phone part), `foot.spec.ts`, `answer-panel.spec.ts`, `answer-panels.spec.ts`, `result-pill.spec.ts`, `choices.spec.ts`, `drag.spec.ts`, `mapcell.spec.ts`, `textsize.spec.ts`, `replay-grades.spec.ts`, `vi-scan.spec.ts`; the screens specs with a phone screen (3h2, 3p3 and 3z7 take one at 360 × 740 or 390 × 844).
+
+### Decided for this slice
+
+- **One list of phones**, in `e2e/helpers.ts`: `PHONES = [{ name: "galaxy-s25", width: 360, height: 780 }, { name: "iphone-15", width: 390, height: 844 }, { name: "iphone-15-pro-max", width: 430, height: 932 }]`, and `PHONE` (the 390 × 844 one) for tests that need one size. Every phone viewport in the specs comes from it; the 360 × 740 ones become 360 × 780.
+- **The layout checks run at the three sizes** (a test per phone, named by it): for the page (the start screen, answering with the sidebar shut and open, the results and the replay), the `review`, `grade --web` (with and without `--grades`) and `brief --web` forms, and the start screen's Materials pop-up: no sideways scroll of the page (`scrollWidth` ≤ the viewport), the foot bar never over the last card, every control at least 44 px, and the pop-up and the phone sidebar filling the screen. Where a spec already checks these at 390 × 844, it is looped over `PHONES`.
+- **Behaviour runs once, at `PHONE`**: a flow that does not depend on the width (answering, submitting, judging, grading, writing a brief) stays at 390 × 844, so the run grows by the layout checks only. Say in the report how much longer the Playwright run is.
+- **A failure at 360 or 430 is a bug to fix** in the CSS and named in the report; one that needs a design choice (a layout that cannot fit at 360 without changing what a board shows) is a gap, raised in the report, not decided.
+- **Screens:** at 360 × 780, for the start screen, the answering page with the sidebar open, the results, the `review` form, the `grade --web` form and the `brief --web` form, in `docs/screens/3z8/`, `en`, light; the existing 360 × 740 screens taken again at 360 × 780. Look at each and describe it.
+- **Goldens:** none should change (tests and screens only); if a CSS fix changes the page, its goldens change in the style and its hash only, counted.
+
+### Tasks
+
+1. **`PHONES`** (one commit): the list and every spec's viewport from it.
+2. **The layout checks at three sizes** (one commit or more), and any CSS fix with its goldens (each in its own commit, named).
+3. **Screens** (one commit), then **the slice table's 3z8 row** (one commit). The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox with the layout checks at the three sizes; the 360 × 780 screens show no cut-off or overlap. Then step 3's acceptance is run again.
