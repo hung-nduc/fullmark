@@ -41,10 +41,13 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
-| 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 decided, G129 for the owner | `e93672f`..`0ea5d86`, review |
+| 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
+| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | brief written (2026-11-16), for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
+
+None open.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -90,11 +93,6 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G129. mhchem's licence text (3z5's review).** 3z5 lists mhchem in the notices with the Apache-2.0 notice from its own header, not the whole licence, which KaTeX does not ship. **Recommendation:** keep it so. fullmark does not redistribute mhchem's code: it runs at build from the installed `katex` package (which carries its own files), and the page holds only KaTeX's rendered HTML, CSS and fonts. The entry is the cautious side, as Shiki's is.
-
-**G132. The Information tab's values (raised with G130, 2026-11-16).** "Built at" shows the raw `2026-11-16T03:58:40.516Z`, and Profile, Fonts and Interface language say only "default" where Theme says "auto (default)". **Recommendation:** "Built at" in the reader's local date and time, formatted by the page at display ("16 Nov 2026, 10:58"; `vi` "16 thg 11 2026, 10:58"), so the page's bytes do not change; every option shows the value it used, then "(default)" when it is one ("quiz (default)", "en (default)").
-
-
 **G126. Materials too wide for their panel (raised by the owner, 2026-11-16, trying the samples).** On the start screen the Materials panel (380 px) cuts off a wide sheet: a four-column table loses its last column, and maths wraps inside an expression. The phone board (MaterialsPhone) already says "a wide table scrolls sideways in its box", which the page does not do. **Recommendation**, drawn on the canvas under "Materials: the wide view (G126)" (MaterialsWide, interactive, with MaterialsWideSidebar, MaterialsWideExpanded and MaterialsWidePhone): (1) everywhere a sheet shows, a table or display formula wider than its space scrolls sideways in its own box, keyboard-focusable, with a fade at the edge and the words "Scroll sideways for the rest of the table, or Expand"; (2) the start screen's **Materials** opens a pop-up, not a side panel: 960 px wide or the window less 64 px, 40 px from the top and bottom, the sheet chips along its top, the sheet scrolling inside, closed by **Close**, Esc or a click outside, focus back on **Materials**, "The clock has not started" at its foot; on a phone it takes the screen; (3) while answering, the stacked sidebar keeps the sheet, and each sheet's heading has an **Expand** button that opens the same pop-up over the question, "The clock keeps running" at its foot. Words in `vi` from the catalogs, as every form's. A slice after the boards are approved.
 
 ## Slices
@@ -129,6 +127,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3z3** | G121: `quiz grade` refuses the other mode's key (`criteria` or `bullets`) | G121, 3z2 |
 | **3z4** | G123: the paper header's three lines and the Student ID row (MSSV) | G123 |
 | **3z5** | G124: chemistry with KaTeX's mhchem (`\ce`, `\pu`), and `examples/chemistry/` | G124 |
+| **3z6** | G127 (the `vi` words), G128 (the example's IUPAC names), G130 to G132 (the Information & Licences dialog, the ⓘ at the window's bottom) | G127, G128, G130 to G132 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1609,3 +1608,41 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 - **mhchem** loads with KaTeX in `loadKatex`, still lazy; `\ce` and `\pu` pass `check` and render. Its notice ("mhchem for KaTeX", 0.19.1, Apache-2.0, the MathJax Consortium and Martin Hensel) is read from the file's header by `npm run notices`, with the header's hash pinned in a test. The full Apache-2.0 text is not shipped (G129).
 - **The example** (`examples/chemistry/`, `vi`, 9 questions, 17 points, a molar-mass sheet, ethanol's skeletal formula as an SVG on a white card so it reads in dark themes) is chemically right, read in review: the balance 4, 3, 2; 10 g of CaCO₃ to 4,4 g of CO₂; Le Chatelier (pressure, removing NH₃, adding N₂; not heat, not a catalyst); the hydrate, the states, the carboxyl group, ΔH. Two things change in the next catalog slice: the names are the older Vietnamese ones ("axit sunfuric", "hiđro", "etanol"), and the owner decided IUPAC-based names (G128); and the skeletal formula's explanation says every end of a line is a carbon and "two lines give two carbons", which does not fit the end that carries the OH: it should say the unlabelled end and the bend are the two carbons.
 - **Done differently, accepted:** `test/attempt/plan-order.test.ts` compares only the plans recorded before 2k3 (a new example's plans cannot be in a "before" record); the example counts in two tests; the `stacked` flag removed, the facts always stacked (header and study sheet alike). The balance question's blanks sit outside the maths, as blanks must, so the arrow can wrap at a narrow width; acceptable.
+
+## Slice 3z6: the `vi` words, the example's names, the information dialog
+
+**Brief written on 2026-11-16, for the owner's approval.** Every gap in it is decided (STEP3-GAPS.md, G127, G128, G130 to G132). One slice so the page's script, the page goldens and the `vi` screens change once.
+
+### Read first
+
+- This plan: "Rules for every slice"; the reviews of 3z4 and 3z5; STEP3-GAPS.md, G127, G128, G130, G131, G132.
+- TECHNICAL_DESIGN.md: section 3, **Licences** (the ⓘ button, Information & Licences: the groups, the spacing, `built_at` and the values); section 8 (the Appearance menu's font names); section 9, "Vietnamese pitfalls", items 7 and 8. COMMANDS.md, `quiz grade --web`, **Words**.
+- Code: `src/core/i18n/vi.ts`, `review.ts`, `grade.ts`, `brief.ts`, `paper.ts` (the `vi` objects; `en` only where a new key needs its English); the Information & Licences dialog and the page's foot (find them from the `licences`, `infoTab` and `infoBuilt` keys); `examples/chemistry/`; the tests that hold these words (`e2e/vi-scan.spec.ts`, the forms' specs, the unit tests), the page goldens, and the `vi` screens specs.
+
+### Decided for this slice
+
+- **G127, the words** (TECHNICAL_DESIGN.md, section 9, item 7), each catalog key named:
+  - `vi.ts`: `fontLabel` "Phông chữ"; `themeLabel` and `infoTheme` "Màu nền"; `sidebarTitle` "Danh sách câu hỏi (Q)" and `sidebarTitleMaterials` "Danh sách câu hỏi và tài liệu (Q, M)"; `infoProfile` "Bộ quy tắc kiểm tra"; `acceptedAnswers` "Các đáp án được chấp nhận"; `inputPlaceholder` "Nhập câu trả lời"; `toGrade` "Tự luận và lập trình"; "hủy/xóa/khóa" spelled so (already). `fontName` stays "Hệ thống, Sans, Serif, Dễ đọc".
+  - `brief.ts` (`vi`): `font` "Phông chữ"; `theme` "Màu nền"; `fontName` sans "Sans", serif "Serif"; `cancel` "Hủy".
+  - `review.ts` (`vi`): `accepted` "Các đáp án được chấp nhận"; `cancel` "Hủy".
+  - `grade.ts` (`vi`): `autoHead` "fullmark chấm", `markedTitle` "fullmark đã chấm: N câu"; `sample` "Bài mẫu", `showSample` "Hiện bài mẫu", `hideSample` "Ẩn bài mẫu"; `erase` and `clearQuestion` with "Xóa"; the kinds `fillin` "điền khuyết", `numeric` "điền số".
+  - Search every `vi` catalog for "huỷ", "xoá", "khoá", "Fullmark" and fix each; report the list. The boards are not changed (the design docs win; the review notes the differences).
+- **G128, the example's names:** IUPAC-based names in `examples/chemistry/` (sulfuric acid, sulfurous acid, hydrogen sulfide, hydrogensulfate, sulfate, sulfite, sulfide, hydrogen, oxygen, sulfur, ethanol, acetic acid, acetaldehyde, dimethyl ether, carboxyl, acetate, ammonia, calcium carbonate where named, …), as the 2018 textbooks write them inside Vietnamese sentences ("axit" stays the Vietnamese word for acid where the textbooks keep it: write "sulfuric acid" as they do, and list the choice in the report). The short answer accepts both the IUPAC and the older names. **And the skeletal formula's explanation**: the unlabelled end and the bend are the two carbons; the other end carries the –OH. The question ids stay.
+- **G130, the dialog:** the Information tab in two groups, **This quiz** / "Bài kiểm tra này" (the quiz's version, built at, theme, look, fonts, interface language) and **How it was built** / "Cách tạo trang" (the fullmark version, the toolchain rows, profile, strict, seed), each under a heading, a rule between them; the Licences tab's first licence text 20 px below the list, 12 px between texts.
+- **G132, the values:** `built_at` formatted by the page when the dialog opens, in the reader's local time zone, "16 Nov 2026, 10:58" / "16 thg 11 2026, 10:58" (the page's bytes do not change: the data keeps the ISO string); each option shows its value, then "(default)" / "(mặc định)" when it is the default.
+- **G131, the ⓘ:** the page fills the window's height and the foot follows the content, so on a short page (the start screen, a short quiz, the results of a short quiz) the button is at the window's bottom right; on a long page it follows the last question as now. Still in the flow, never over content, at the page's right edge; not rendered in Focus mode, as now.
+- **Goldens:** the page goldens change through `page.js` and the catalogs (count them; each diff only the script, its CSP hash and the words); the chemistry goldens change with the names; the brief, review and grade goldens only where they print a changed word. Nothing else.
+- **Tests:** the existing `vi` scans pass; a Playwright check that the ⓘ's bottom is within 24 px of the window's bottom on the start screen at 1280 × 940 and at 390 × 844, and below the last question on a long quiz; a unit or Playwright check of the two groups and of "(default)" values; `built_at` formatted in a fixed time zone in the test.
+- **Screens:** every screens spec whose screen shows a changed word, the dialog or the ⓘ is taken again (Chromium); the dialog's Information and Licences tabs taken in `en` and `vi`, dark, as new screens in `docs/screens/3z6/`.
+
+### Tasks
+
+1. **G127** (one commit): the catalogs, the tests, the goldens.
+2. **G128** (one commit): the example and its goldens.
+3. **G130, G132** (one commit): the dialog.
+4. **G131** (one commit): the foot.
+5. **Screens** (one commit), then **the slice table's 3z6 row** (one commit). The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; the goldens that change are only the ones named above, each explained; the screens show the words, the groups and the button at the bottom.
