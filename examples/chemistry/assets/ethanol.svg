@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="120" viewBox="0 0 240 120" role="img" aria-label="Công thức khung của một chất hữu cơ: hai đoạn thẳng gấp khúc nối với nhóm OH">
+  <rect width="240" height="120" rx="10" fill="#ffffff"/>
+  <g fill="none" stroke="#1f2933" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 82 L90 52 L140 82"/>
+  </g>
+  <text x="152" y="95" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#1f2933">OH</text>
+</svg>

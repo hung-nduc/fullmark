@@ -358,7 +358,7 @@ describe("examples/build.toml", () => {
       const c = capture(root);
       const code = await runBuild([], { ...base, builtAt: null, buildFile: "examples/build.toml" }, c.io);
       expect(code).toBe(0);
-      const names = ["calculus", "exam", "ielts", "medical", "rust", "survey"];
+      const names = ["calculus", "chemistry", "exam", "ielts", "medical", "rust", "survey"];
       expect(readdirSync(out).sort()).toEqual(names);
       for (const name of names) {
         const one = tempTree({});
@@ -367,7 +367,7 @@ describe("examples/build.toml", () => {
         const r = capture(root);
         const rc = await runBuild(
           [`examples/${name}/quiz.md`],
-          { ...base, builtAt: AT, uiLang: name === "survey" ? "vi" : "en", output: target },
+          { ...base, builtAt: AT, uiLang: name === "survey" || name === "chemistry" ? "vi" : "en", output: target },
           r.io,
         );
         expect(rc).toBe(0);

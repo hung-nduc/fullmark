@@ -10,6 +10,8 @@ const CLI = join("dist", "cli.js");
 // what to try in each page; a page without a line here still builds and is listed
 const TRY = {
   "example-calculus": "instant feedback (Check on each question), maths, a 30-minute limit",
+  "example-chemistry":
+    "chemistry in Vietnamese (mhchem: \\ce and \\pu): formulas and ions, balancing blanks, a skeletal formula as an SVG, matching, stoichiometry with a decimal comma, a materials sheet, a 30-minute limit",
   "example-exam": "a 20-minute timed exam, feedback at the end",
   "example-ielts": "two essays with a rubric, a 60-minute limit, the Light theme",
   "example-medical": "instant feedback, almost every type: ordering (drag), matching, blanks, fields, numeric, essay",
@@ -45,6 +47,8 @@ const TRY = {
     "type_order: by-quiz with shuffle_questions: reload with New attempt a few times; the questions shuffle, but single choice, true/false, short answers and essays always keep their places",
   "paper-key-grouped":
     "quiz build --print --seed 101 --answers key on a quiz with its own type_order: the key's other answers in groups (Essays, Short answers and numeric answers, Single choice, Other)",
+  "paper-chemistry":
+    "quiz build --print --answers key on the chemistry example: the Vietnamese paper with \\ce formulas and the skeletal formula, the molar-mass sheet, then the answer key",
   "paper-exam-vi": "the paper with --ui-lang vi: Mã đề, Câu 1., Phiếu trả lời",
   "vi-fonts":
     "built with --fonts all: Vietnamese text with stacked diacritics; Appearance > Font offers all four fonts; the Licences button lists their notices",
@@ -183,6 +187,11 @@ const papers = [
     name: "paper-materials",
     file: join("test", "fixtures", "paper", "materials-quiz.md"),
     flags: ["--answers", "key"],
+  },
+  {
+    name: "paper-chemistry",
+    file: join("examples", "chemistry", "quiz.md"),
+    flags: ["--seed", "101", "--answers", "key"],
   },
   { name: "paper-mockup", file: join("test", "fixtures", "page", "mockup.md"), flags: [] },
   {

@@ -10,6 +10,11 @@ files = ["calculus/quiz.md"]        # maths
 out = "site/calculus"               # always a folder: the page is site/calculus/quiz.html
 
 [[build]]
+files = ["chemistry/quiz.md"]       # chemistry with \ce, an SVG structure, a sheet; the quiz is in Vietnamese
+out = "site/chemistry"
+ui-lang = "vi"
+
+[[build]]
 files = ["exam/quiz.md"]
 out = "site/exam"
 
