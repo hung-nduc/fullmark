@@ -344,18 +344,39 @@ export async function savePdf(page: Page, path: string): Promise<Buffer> {
  */
 export async function shotOf(locator: Locator, path: string): Promise<void> {
   const page = locator.page();
+  await settle(page);
+  await withoutBars(page, () => locator.screenshot({ path }));
+}
+
+/**
+ * A screen of the whole page (G145): the same sticky and fixed parts hidden for the capture as in `shotOf`, then
+ * restored. `options` is what `page.screenshot` takes besides the path (a `clip`); `fullPage` is always on.
+ */
+export async function pageShot(page: Page, path: string, options: { clip?: ScreenshotClip; fullPage?: boolean } = {}) {
+  await settle(page);
+  await withoutBars(page, () => page.screenshot({ ...options, path, fullPage: options.fullPage ?? true }));
+}
+
+type ScreenshotClip = { x: number; y: number; width: number; height: number };
+
+/** The page's sticky and fixed bars: the dock (top bar, replay banner) and the foot bar of the page and the forms. */
+const BARS = ".fm-dock, .fm-footbar, [data-dock], [data-footbar]";
+
+async function withoutBars(page: Page, take: () => Promise<unknown>): Promise<void> {
   // set on the elements, not as a style sheet: the pages' CSP refuses an injected `<style>`
   const hide = (value: string) =>
-    page.evaluate((v) => {
-      for (const el of document.querySelectorAll<HTMLElement>(".fm-dock, .fm-footbar")) {
-        if (v) el.style.setProperty("visibility", v, "important");
-        else el.style.removeProperty("visibility");
-      }
-    }, value);
-  await settle(page);
+    page.evaluate(
+      ([sel, v]) => {
+        for (const el of document.querySelectorAll<HTMLElement>(sel as string)) {
+          if (v) el.style.setProperty("visibility", v as string, "important");
+          else el.style.removeProperty("visibility");
+        }
+      },
+      [BARS, value],
+    );
   await hide("hidden");
   try {
-    await locator.screenshot({ path });
+    await take();
   } finally {
     await hide("");
   }

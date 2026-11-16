@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { fixScreens, PHONE, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
+import { fixScreens, PHONE, pageShot, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p for the owner to set beside the boards: at 1280 x 940 G98's states (GradeFinish, GradeDone,
@@ -108,7 +108,7 @@ test("phone: an additive question, half graded (RubricPhone, additive)", async (
   await page.screenshot({ path: out("7-phone-additive-box") });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.screenshot({ path: out("8-phone-additive-foot") });
-  await page.screenshot({ path: out("8b-phone-additive-whole"), fullPage: true });
+  await pageShot(page, out("8b-phone-additive-whole"));
 });
 
 test("phone: a banded question (RubricPhone, banded), dark", async ({ page }) => {
@@ -123,7 +123,7 @@ test("phone: a banded question (RubricPhone, banded), dark", async ({ page }) =>
   await page.screenshot({ path: out("9a-phone-banded-top") });
   await page.evaluate(() => window.scrollTo(0, document.querySelector(".fm-box")?.getBoundingClientRect().top ?? 0));
   await page.screenshot({ path: out("9-phone-banded-box") });
-  await page.screenshot({ path: out("9b-phone-banded-whole"), fullPage: true });
+  await pageShot(page, out("9b-phone-banded-whole"));
 });
 
 test("phone: a holistic question (RubricPhone, holistic)", async ({ page }) => {
@@ -138,7 +138,7 @@ test("phone: a holistic question (RubricPhone, holistic)", async ({ page }) => {
   await page.screenshot({ path: out("10-phone-holistic-top") });
   await page.evaluate(() => window.scrollTo(0, document.querySelector(".fm-box")?.getBoundingClientRect().top ?? 0));
   await page.screenshot({ path: out("10c-phone-holistic-box") });
-  await page.screenshot({ path: out("10b-phone-holistic-whole"), fullPage: true });
+  await pageShot(page, out("10b-phone-holistic-whole"));
 });
 
 test("phone: a code question", async ({ page }) => {

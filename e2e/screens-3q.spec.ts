@@ -7,6 +7,7 @@ import {
   buildWith,
   card,
   fixScreens,
+  pageShot,
   replayOf,
   root,
   run,
@@ -70,7 +71,7 @@ async function cards(page: Page, ids: string[], name: string): Promise<void> {
   const x = boxes[0]?.x ?? 0;
   const width = boxes[0]?.width ?? 0;
   // the five states are not next to each other in the quiz: one shot of the column holds them
-  await page.screenshot({ path: out(name), clip: { x, y: top, width, height: bottom - top }, fullPage: true });
+  await pageShot(page, out(name), { clip: { x, y: top, width, height: bottom - top } });
 }
 const STATES = ["s1", "n2", "m1", "h2", "e1", "c1"];
 

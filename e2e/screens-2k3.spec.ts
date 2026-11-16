@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { fixScreens, root, run, SCREENS_USE, savePdf } from "./helpers";
+import { fixScreens, pageShot, root, run, SCREENS_USE, savePdf } from "./helpers";
 
 /**
  * Screenshots of slice 2k3 for the owner: the first page of the answer key grouped by type, English and Vietnamese
@@ -35,11 +35,7 @@ async function shoot(page: Page, selector: string, name: string): Promise<void> 
   await page.setViewportSize({ width: 794, height: 1123 });
   await page.evaluate(() => document.fonts.ready);
   const top = await page.locator(selector).evaluate((el) => el.getBoundingClientRect().top + scrollY);
-  await page.screenshot({
-    path: join(folder, name),
-    fullPage: true,
-    clip: { x: 0, y: Math.max(0, top - 10), width: 794, height: 1123 },
-  });
+  await pageShot(page, join(folder, name), { clip: { x: 0, y: Math.max(0, top - 10), width: 794, height: 1123 } });
 }
 
 for (const lang of ["en", "vi"] as const) {

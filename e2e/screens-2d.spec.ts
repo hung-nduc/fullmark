@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, fixScreens, root, SCREENS_TIME, SCREENS_USE, submitAttempt } from "./helpers";
+import { buildIn, fixScreens, pageShot, root, SCREENS_TIME, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2d for the owner to compare with the Design canvas. Not part of `npm run check`: run with
@@ -17,10 +17,10 @@ const out = (name: string) => join(root, "docs", "screens", "2d", `${name}.png`)
 
 test("start screen with parts, without parts, Continue, the Start over dialog, storage blocked", async ({ page }) => {
   await page.goto(parts.url);
-  await page.screenshot({ path: out("1-start-with-parts"), fullPage: true });
+  await pageShot(page, out("1-start-with-parts"));
 
   await page.goto(timed.url);
-  await page.screenshot({ path: out("2-start-without-parts-timed"), fullPage: true });
+  await pageShot(page, out("2-start-without-parts-timed"));
 
   await page.goto(parts.url);
   await page.getByRole("button", { name: "Start" }).click();
@@ -28,7 +28,7 @@ test("start screen with parts, without parts, Continue, the Start over dialog, s
   await page.getByLabel(`right ${first}`).check();
   await page.reload();
   await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
-  await page.screenshot({ path: out("3-start-continue-or-start-over"), fullPage: true });
+  await pageShot(page, out("3-start-continue-or-start-over"));
   await page.getByRole("button", { name: "Start over" }).click();
   await page.screenshot({ path: out("4-start-over-dialog") });
   await page.getByRole("button", { name: "Cancel" }).click();
@@ -47,7 +47,7 @@ test("the timer line, and the results after reopening", async ({ page }) => {
   await page.clock.resume();
   await page.reload();
   await expect(page.locator(".fm-total")).toBeVisible();
-  await page.screenshot({ path: out("7-results-after-reopening"), fullPage: true });
+  await pageShot(page, out("7-results-after-reopening"));
 });
 
 test("storage blocked notice", async ({ page }) => {
@@ -60,7 +60,7 @@ test("storage blocked notice", async ({ page }) => {
     });
   });
   await page.goto(parts.url);
-  await page.screenshot({ path: out("8-start-storage-blocked"), fullPage: true });
+  await pageShot(page, out("8-start-storage-blocked"));
   await page.getByRole("button", { name: "Start" }).click();
   await page.screenshot({ path: out("9-answering-storage-blocked"), clip: { x: 0, y: 0, width: 1280, height: 520 } });
 });

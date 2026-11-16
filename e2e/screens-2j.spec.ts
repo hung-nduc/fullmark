@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, fixScreens, PHONE, root, run, SCREENS_USE, submitAttempt } from "./helpers";
+import { buildWith, fixScreens, PHONE, pageShot, root, run, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2j for the owner to compare with the ResultsReplay board. Not part of `npm run check`: run with
@@ -38,12 +38,12 @@ test("the replay on the board's theme and font, then light and dark", async ({ p
   const paper = await replayOf(page, ["theme: paper", "font: serif"], "paper");
   await page.goto(paper);
   await expect(page.locator("[data-replay-banner]")).toBeVisible();
-  await page.screenshot({ path: out("1-replay-paper-serif"), fullPage: true });
+  await pageShot(page, out("1-replay-paper-serif"));
   const light = await replayOf(page, [], "light");
   await page.goto(light);
-  await page.screenshot({ path: out("2-replay-light"), fullPage: true });
+  await pageShot(page, out("2-replay-light"));
   await page.emulateMedia({ colorScheme: "dark" });
-  await page.screenshot({ path: out("3-replay-dark"), fullPage: true });
+  await pageShot(page, out("3-replay-dark"));
 });
 
 test("the replay on a phone", async ({ page }) => {

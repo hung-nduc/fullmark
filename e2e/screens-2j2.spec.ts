@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { fixScreens, PHONE, root, run, SCREENS_USE } from "./helpers";
+import { fixScreens, PHONE, pageShot, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 2j2 for the owner to compare with the ResultsReplay board (its criterion tables under the essay
@@ -41,7 +41,9 @@ function replayOf(extra: string[], name: string, uiLang = "en"): string {
 
 const shot = async (page: Page, name: string, full = true) => {
   await expect(page.locator(".fm-box").first()).toBeVisible();
-  await page.screenshot({ path: out(name), fullPage: full });
+  // a viewport screen keeps the bars where a person sees them; a whole-page screen hides them
+  if (full) await pageShot(page, out(name));
+  else await page.screenshot({ path: out(name) });
 };
 
 test("the graded replay on the board's theme and font, then light and dark", async ({ page }) => {

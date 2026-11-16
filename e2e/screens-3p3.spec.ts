@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { fixScreens, PHONE, PHONES, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
+import { fixScreens, PHONE, PHONES, pageShot, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p3 (`grade --web --grades` on a phone), for the owner to set beside RubricPhone (the stacked box)
@@ -80,7 +80,7 @@ async function adjust(page: Page, q: Q): Promise<void> {
 
 /** the page whole, then the box's top and the foot, as the phone's screens of 3p did */
 async function shots(page: Page, name: string): Promise<void> {
-  await page.screenshot({ path: out(`${name}-whole`), fullPage: true });
+  await pageShot(page, out(`${name}-whole`));
   await page.evaluate(() =>
     window.scrollBy(0, (document.querySelector(".fm-box")?.getBoundingClientRect().top ?? 0) - 72),
   );

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, card, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
+import { buildIn, card, fixScreens, pageShot, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2e for the owner to compare with the Design canvas. Not part of `npm run check`: run with
@@ -27,9 +27,9 @@ test("the results card, the Missed filter and the retry confirm", async ({ page 
   await card(page, "r2").getByRole("button", { name: "Flag for review" }).click();
   await submitAttempt(page);
   await expect(page.locator(".fm-results")).toBeVisible();
-  await page.screenshot({ path: out("1-results-card"), fullPage: true });
+  await pageShot(page, out("1-results-card"));
   await page.locator('[data-filter="missed"]').click();
-  await page.screenshot({ path: out("2-missed-filter"), fullPage: true });
+  await pageShot(page, out("2-missed-filter"));
   await page.getByRole("button", { name: "Retry missed (4)" }).click();
   await page.screenshot({ path: out("3-retry-confirm") });
 });
@@ -38,7 +38,7 @@ test("a checked question under instant feedback", async ({ page }) => {
   await page.goto(instant.url);
   await page.getByRole("button", { name: "Start" }).click();
   await page.getByLabel("wrong i1").check();
-  await page.screenshot({ path: out("4-before-check"), fullPage: true });
+  await pageShot(page, out("4-before-check"));
   await card(page, "i1").getByRole("button", { name: "Check" }).click();
-  await page.screenshot({ path: out("5-checked-question"), fullPage: true });
+  await pageShot(page, out("5-checked-question"));
 });
