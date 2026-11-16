@@ -46,7 +46,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
-| 3z10 G142, G143: reproducible screens | brief written (2026-11-16); waits for the owner | |
+| 3z10 G142, G143: reproducible screens | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1811,7 +1811,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z10: reproducible screens
 
-**Brief written on 2026-11-16; waits for the owner's approval.** G142 and G143 are decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, says what is wanted. Tests and screens only: nothing in `src/` changes. After 3z10, the owner tries the samples and step 3 is closed.
+**Approved by the owner on 2026-11-16.** G142 and G143 are decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Screens are reproducible**, says what is wanted. Tests and screens only: nothing in `src/` changes. After 3z10, the owner tries the samples and step 3 is closed.
 
 ### Read first
 
