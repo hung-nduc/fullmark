@@ -44,12 +44,12 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
-| 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 open | `e6c1ef3`..`ef218d3`, review |
+| 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-G139 to G141, below (3z8's review).
+None open.
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -95,11 +95,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G139. A tap on the brief form's commitment "+" can miss on a phone (3z8's review).** After a choice in the card above, the first tap on the "+" moved the button about 24 px between pointerdown and click, so the click landed on the card; the test now focuses the button first. The cause is not found. **Recommendation:** treat it as a bug, not test timing: the next slice finds which focus or blur change moves the layout above the "+" and fixes it in CSS, with a phone test that taps (not focuses) the "+" right after a choice.
-
-**G140. The brief card's head on a phone (3z8's review, screen 06).** At 360 px "Question 1 of 14 · only you can answer" wraps into a narrow column beside "✎ Pre-filled for you". **Recommendation:** as G137 and G138: under 520 px the "Pre-filled for you" mark goes on its own line under the head line, aligned left, and the head line keeps the full width.
-
-**G141. Older phone screens after the gutter and the labels (3z8's review).** G136 to G138 change every phone layout, but only the 360 × 780 screens were taken again; the 390 × 844 screens in older slice folders show the 16 px gutter. **Recommendation:** the acceptance re-run takes every phone screen again at its size and commits them, as G122 did, counted.
+None open.
 
 ## Slices
 
