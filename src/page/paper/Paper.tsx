@@ -293,12 +293,12 @@ function Question({ q, t, study }: { q: PaperQuestion; t: T; study: boolean }) {
 
 const versionLine = (d: PaperData, t: T): string => `${d.title} · ${t.version} ${d.version}`;
 
-/** A study sheet's head: nobody sits it, so no name boxes and no marker's table. */
+/** A study sheet's head: nobody sits it, so no name boxes and no marker's table; the facts stand as in the header. */
 function StudyHead({ d, t }: { d: PaperData; t: T }) {
   return (
     <header class="study-head">
       <h1 class="title">{d.title}</h1>
-      <Facts d={d} t={t} stacked={false} />
+      <Facts d={d} t={t} />
     </header>
   );
 }
@@ -310,7 +310,7 @@ function Header({ d, t }: { d: PaperData; t: T }) {
         <tr>
           <td rowSpan={3} class="title-cell">
             <h1 class="title">{d.title}</h1>
-            <Facts d={d} t={t} stacked />
+            <Facts d={d} t={t} />
           </td>
           <td>{t.name}:</td>
         </tr>
@@ -332,8 +332,8 @@ function Header({ d, t }: { d: PaperData; t: T }) {
   );
 }
 
-/** The time, the total and the version: on the paper's header each on its own line; a study sheet's head joins them. */
-function Facts({ d, t, stacked }: { d: PaperData; t: T; stacked: boolean }) {
+/** The time, the total and the version, each on its own line: in the paper's header and in a study sheet's head alike (G123, G125). */
+function Facts({ d, t }: { d: PaperData; t: T }) {
   const facts = [
     d.time === null ? null : t.timeAllowed(d.time),
     d.total === null ? null : t.total(d.total),
@@ -341,15 +341,11 @@ function Facts({ d, t, stacked }: { d: PaperData; t: T; stacked: boolean }) {
   ].filter((x) => x !== null);
   return (
     <>
-      {stacked ? (
-        facts.map((f, i) => (
-          <div class="facts" key={i}>
-            {f}
-          </div>
-        ))
-      ) : (
-        <div class="facts">{facts.join(" · ")}</div>
-      )}
+      {facts.map((f, i) => (
+        <div class="facts" key={i}>
+          {f}
+        </div>
+      ))}
       {d.code === null ? null : (
         <div class="facts">
           {t.paperCode}: <b>{d.code}</b>
