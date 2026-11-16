@@ -47,12 +47,12 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z8 G135, the three phone sizes, and the owner's G136 to G138 | built and reviewed (2026-11-16), no fix in review; G139 to G141 decided as recommended; the next slice builds G139 and G140 | `e6c1ef3`..`ef218d3`, review |
 | 3z9 G139, G140: the brief form on a phone | built and reviewed (2026-11-16), one fix in review, no gaps | `f97e299`..`d6a7d80`, review |
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
-| 3z11 G144: the dock's whole-pixel height | brief approved (2026-11-16); to build | |
+| 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 open | `e705a67`..`2ba17e7`, review |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
-None open.
+G145, below (3z11's review).
 
 Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
@@ -98,7 +98,8 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+**G145. Full-page phone shots draw the bars across the page (3z11's review).** The 16 "whole" shots of the `grade --web` form on a phone (`3p/8b`, `9b`, `10b`, and `3p3/*-whole`) are full-page captures: Playwright makes the window as tall as the page, and the sticky dock and the foot bar land wherever they were when it captured, often across the middle of a card (`3p3/06-holistic-adjusted-whole` has the dock over "Explains how to avoid it"). Where they land varies, so these are also the screens that still differ between runs: the planner's second run on `2ba17e7` changed `3p/10b-phone-holistic-whole` (83 240 pixels, the dock moved from the middle to the top and the foot bar from the bottom to the middle); the agent's second run changed none. G143 hid the bars for element shots only. **Recommendation:** a full-page shot hides the sticky parts for the capture too (the same `shotOf` style, used for every full-page screen), since the `-top`, `-box` and `-foot` shots beside each one already show the bars in place; then every screen is taken again, twice, as in 3z11.
+
 
 ## Slices
 
@@ -1879,4 +1880,14 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; two screens runs on the same commit give the same bytes, or the screens that do not are listed. Then the owner tries the samples and step 3 is closed.
+
+### Review (2026-11-16)
+
+**Built** in `e705a67` (`src/page/dock.ts`, `watchDock(el, target)`: the dock's real height rounded up, set as its own `min-height` and as `--dock-h`, measured again by the resize observer; it replaces the three `offsetHeight` measures in `src/page/App.tsx`, `src/review/Form.tsx`, `src/grade-form/Form.tsx`; `expectWholeDock` with a test each in `sidebar.spec.ts`, `review.spec.ts`, `grade.spec.ts`, at four text sizes, each failing before the fix (95.796875 px) and passing after (96 px); 14 goldens) and `2ba17e7` (the screens, 262 files, all from the whole-pixel dock).
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: Vitest 3102 (the startup tests 2, alone first), Playwright 831 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean. **Goldens:** 14 change: 12 pages in the minified script and the CSP hash only, 2 `--json` stdouts in the byte count only (251860 to 251985). No markup or style changed. A second screens run on `2ba17e7` (257 passed) changes one screen, `3p/10b-phone-holistic-whole`, and none of the five of G144: the sidebar no longer moves. The one is a full-page phone shot whose bars land in another place each run, which is G145; it was put back.
+
+**Done differently, accepted:** the dock's inline `min-height` made `maths-code.spec.ts`'s count of `[style]` elements wrong; its selector leaves out the dock and the quiz root. `watchDock` keeps the last whole number when the dock measures 0 (the hidden replay frame in `grade --web`, which otherwise lost its scroll; `grade.spec.ts:759` found it).
+
+**Gaps:** G145, open in "Gaps".
 
