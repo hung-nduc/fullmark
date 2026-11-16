@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
+import { fixScreens, PHONE, PHONES, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p3 (`grade --web --grades` on a phone), for the owner to set beside RubricPhone (the stacked box)
@@ -15,6 +15,8 @@ import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
  * in docs/screens/3p3/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
 const out = (name: string) => join(root, "docs", "screens", "3p3", `${name}.png`);

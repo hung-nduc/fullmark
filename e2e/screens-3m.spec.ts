@@ -2,7 +2,7 @@ import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess } from "./helpers";
+import { fixScreens, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3m for the owner, to compare with the Review, ReviewSince and ReviewPhone boards
@@ -12,6 +12,8 @@ import { root, type Served, serveProcess } from "./helpers";
  * in docs/screens/3m/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "3m");
 mkdirSync(folder, { recursive: true });

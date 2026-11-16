@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { card, PHONE, replayOf, root, run } from "./helpers";
+import { card, fixScreens, PHONE, replayOf, root, run, SCREENS_USE, shotOf } from "./helpers";
 
 /**
  * Screenshots of slice 2j3 for the owner: the explanation, the grader's feedback panel and the hint (to show it
@@ -10,6 +10,8 @@ import { card, PHONE, replayOf, root, run } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2j3.spec.ts --project=chromium. They land in docs/screens/2j3/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const out = (name: string) => join(root, "docs", "screens", "2j3", `${name}.png`);
 
@@ -51,7 +53,7 @@ async function openHint(page: Page, shot: string): Promise<void> {
   await q.getByRole("button", { name: "Check" }).click();
   await expect(q.locator(".fm-explanation")).toBeVisible();
   await q.scrollIntoViewIfNeeded();
-  await q.screenshot({ path: out(shot) });
+  await shotOf(q, out(shot));
 }
 
 const SIZES = [
@@ -73,7 +75,7 @@ for (const size of SIZES) {
       await page.goto(replayOf([], `s-${size.name}-${scheme}`));
       const add = card(page, "add");
       await add.scrollIntoViewIfNeeded();
-      await add.screenshot({ path: out(`graded-${size.name}-${scheme}`) });
+      await shotOf(add, out(`graded-${size.name}-${scheme}`));
     });
   }
 }
@@ -81,7 +83,7 @@ for (const size of SIZES) {
 test("the explanation on a replay, and the banded and holistic tables on a phone", async ({ page }) => {
   await page.setViewportSize(PHONE);
   await page.goto(replayOf([], "phone-all"));
-  await card(page, "prime").screenshot({ path: out("explanation-replay-phone") });
-  await card(page, "ielts").screenshot({ path: out("banded-phone") });
-  await card(page, "holistic").screenshot({ path: out("holistic-phone") });
+  await shotOf(card(page, "prime"), out("explanation-replay-phone"));
+  await shotOf(card(page, "ielts"), out("banded-phone"));
+  await shotOf(card(page, "holistic"), out("holistic-phone"));
 });

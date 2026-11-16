@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { root, run } from "./helpers";
+import { fixScreens, root, run, SCREENS_USE, savePdf } from "./helpers";
 
 /**
  * Screenshots of slice 2k3 for the owner: the first page of the answer key grouped by type, English and Vietnamese
@@ -11,6 +11,8 @@ import { root, run } from "./helpers";
  * --project=chromium. They land in docs/screens/2k3/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "2k3");
 mkdirSync(folder, { recursive: true });
@@ -50,6 +52,6 @@ for (const lang of ["en", "vi"] as const) {
 test("the whole paper as a PDF: key.pdf", async ({ page }) => {
   await page.goto(paperIn(["--answers", "key", "--seed", "101"]));
   await page.evaluate(() => document.fonts.ready);
-  const pdf = await page.pdf({ format: "A4", path: join(folder, "key.pdf") });
+  const pdf = await savePdf(page, join(folder, "key.pdf"));
   expect(pdf.length).toBeGreaterThan(10_000);
 });

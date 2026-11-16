@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess } from "./helpers";
+import { fixScreens, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3z9 (the brief form on a phone: the card's mark under the head line, G140), `en`, light, at
@@ -11,6 +11,8 @@ import { root, type Served, serveProcess } from "./helpers";
  * They land in docs/screens/3z9/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const out = (name: string) => join(root, "docs", "screens", "3z9", `${name}.png`);
 const served: Served[] = [];

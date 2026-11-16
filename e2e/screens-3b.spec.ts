@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess, submitAttempt } from "./helpers";
+import { fixScreens, root, SCREENS_USE, type Served, serveProcess, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 3b for the owner: the Submit dialog's new line on a served page, and the results card with
@@ -11,6 +11,8 @@ import { root, type Served, serveProcess, submitAttempt } from "./helpers";
  * land in docs/screens/3b/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "3b");
 mkdirSync(folder, { recursive: true });

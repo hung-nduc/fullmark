@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, PHONE, root } from "./helpers";
+import { buildWith, card, fixScreens, PHONE, root, SCREENS_USE, shotOf } from "./helpers";
 
 /**
  * Screenshots of slice 2h3: the Vietnamese example in each of the four fonts (stacked diacritics, none clipped), one
@@ -10,6 +10,8 @@ import { buildWith, card, PHONE, root } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2h3.spec.ts --project=chromium. They land in docs/screens/2h3/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.describe.configure({ mode: "serial" });
 
 const dir = join(root, "docs", "screens", "2h3");
@@ -40,8 +42,8 @@ for (const font of FONTS) {
       card: (await card(page, "q1").boundingBox())?.height ?? 0,
     };
     await page.screenshot({ path: out(`1-vi-${font}`) });
-    await card(page, "q2").screenshot({ path: out(`2-stacked-${font}`) });
-    await card(page, "q1").screenshot({ path: out(`3-card-${font}`) });
+    await shotOf(card(page, "q2"), out(`2-stacked-${font}`));
+    await shotOf(card(page, "q1"), out(`3-card-${font}`));
   });
 }
 

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildFolder, card, root, submitAttempt } from "./helpers";
+import { buildFolder, card, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2f3 for the owner to compare with the MaterialsStacked, Materials, MaterialsFocus and Start
@@ -8,6 +8,8 @@ import { buildFolder, card, root, submitAttempt } from "./helpers";
  * --project=chromium. They land in docs/screens/2f3/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const quiz = buildFolder("test/fixtures/page", "materials.md");

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildFolder, card, PHONE, root, submitAttempt } from "./helpers";
+import { buildFolder, card, fixScreens, PHONE, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2f4 for the owner to compare with the MaterialsPhone board's source (the board has no image
@@ -8,6 +8,8 @@ import { buildFolder, card, PHONE, root, submitAttempt } from "./helpers";
  * --project=chromium. They land in docs/screens/2f4/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: PHONE, hasTouch: true, isMobile: true });
 
 const quiz = buildFolder("test/fixtures/page", "materials.md");

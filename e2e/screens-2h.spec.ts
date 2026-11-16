@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildWith, card, PHONE, root, submitAttempt } from "./helpers";
+import { buildWith, card, fixScreens, PHONE, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2h: the question card's new header and choice rows, A- / A+, the phone bar and its menu. Not part
@@ -8,6 +8,8 @@ import { buildWith, card, PHONE, root, submitAttempt } from "./helpers";
  * land in docs/screens/2h/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const SOURCE = "test/fixtures/page/mockup.md";
 const out = (name: string) => join(root, "docs", "screens", "2h", `${name}.png`);

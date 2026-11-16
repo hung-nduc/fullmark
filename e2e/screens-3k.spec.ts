@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess } from "./helpers";
+import { fixScreens, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3k for the owner, to compare with the Review boards (docs/mockup/images/Review*.png): the form
@@ -11,6 +11,8 @@ import { root, type Served, serveProcess } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-3k.spec.ts --project=chromium. They land in docs/screens/3k/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "3k");
 mkdirSync(folder, { recursive: true });

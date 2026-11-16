@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildIn, card, root, submitAttempt } from "./helpers";
+import { buildIn, card, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2f2 for the owner to compare with the Quiz, Results and Focus boards. Not part of
@@ -8,6 +8,8 @@ import { buildIn, card, root, submitAttempt } from "./helpers";
  * land in docs/screens/2f2/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const map = buildIn("test/fixtures/page/map.md", "map.md");

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
+import { fixScreens, PHONE, PHONES, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3h2 (`quiz brief --web` on a phone, 390 x 844), for the owner to set beside the BriefPhone,
@@ -11,6 +11,8 @@ import { PHONE, PHONES, root, type Served, serveProcess } from "./helpers";
  * with FULLMARK_SCREENS=1 npx playwright test e2e/screens-3h2.spec.ts --project=chromium. They land in docs/screens/3h2/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: PHONE, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
 
 const out = (name: string) => join(root, "docs", "screens", "3h2", `${name}.png`);

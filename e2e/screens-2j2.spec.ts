@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { PHONE, root, run } from "./helpers";
+import { fixScreens, PHONE, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 2j2 for the owner to compare with the ResultsReplay board (its criterion tables under the essay
@@ -12,6 +12,8 @@ import { PHONE, root, run } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2j2.spec.ts --project=chromium. They land in docs/screens/2j2/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const out = (name: string) => join(root, "docs", "screens", "2j2", `${name}.png`);

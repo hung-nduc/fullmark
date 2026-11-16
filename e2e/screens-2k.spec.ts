@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { root, run } from "./helpers";
+import { fixScreens, root, run, SCREENS_USE, savePdf } from "./helpers";
 
 /**
  * Screenshots of slice 2k for the owner: the first page of the board's paper (PrintPaper.dc.html, page="paper") at its
@@ -11,6 +11,8 @@ import { root, run } from "./helpers";
  * run with FULLMARK_SCREENS=1 npx playwright test e2e/screens-2k.spec.ts --project=chromium. They land in docs/screens/2k/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "2k");
 mkdirSync(folder, { recursive: true });
@@ -48,6 +50,6 @@ for (const lang of ["en", "vi"] as const) {
 test("the whole paper as a PDF, A4, with the footer and the page breaks", async ({ page }) => {
   await page.goto(paperIn("serif", ["--answer-sheet", "--seed", "101"]));
   await page.evaluate(() => document.fonts.ready);
-  const pdf = await page.pdf({ format: "A4", path: join(folder, "paper.pdf") });
+  const pdf = await savePdf(page, join(folder, "paper.pdf"));
   expect(pdf.length).toBeGreaterThan(10_000);
 });

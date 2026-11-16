@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
 import { resultsHash } from "../src/core/rubric/grades";
-import { root, run } from "./helpers";
+import { fixScreens, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 3o for the owner to set beside RubricC's replay side (its left column) and RubricPhoneReplay:
@@ -13,6 +13,8 @@ import { root, run } from "./helpers";
  * --project=chromium. They land in docs/screens/3o/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 // tall, so the page never scrolls and its sticky bars stay clear of the card
 test.use({ viewport: { width: 1280, height: 4200 } });
 

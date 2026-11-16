@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildFolder, buildWith, root, run } from "./helpers";
+import { buildFolder, buildWith, fixScreens, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 3z6: the Information & Licences dialog on each tab, in English and Vietnamese, dark (the
@@ -11,6 +11,8 @@ import { buildFolder, buildWith, root, run } from "./helpers";
  * --project=chromium. They land in docs/screens/3z6/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ timezoneId: "Asia/Ho_Chi_Minh", colorScheme: "dark" });
 
 const dir = join(root, "docs", "screens", "3z6");

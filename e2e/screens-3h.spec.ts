@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
-import { root, type Served, serveProcess } from "./helpers";
+import { fixScreens, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3h (`quiz brief --web` at 1280 x 940), for the owner to set beside the Brief boards: Brief (empty),
@@ -11,6 +11,8 @@ import { root, type Served, serveProcess } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-3h.spec.ts --project=chromium. They land in docs/screens/3h/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const out = (name: string) => join(root, "docs", "screens", "3h", `${name}.png`);

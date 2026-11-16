@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { root, run } from "./helpers";
+import { fixScreens, root, run, SCREENS_USE, savePdf } from "./helpers";
 
 /**
  * Screenshots of slice 2k2 for the owner: the first page of the answer key (with and without the answer sheet), of a
@@ -12,6 +12,8 @@ import { root, run } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2k2.spec.ts --project=chromium. They land in docs/screens/2k2/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const folder = join(root, "docs", "screens", "2k2");
 mkdirSync(folder, { recursive: true });
@@ -71,7 +73,7 @@ for (const [name, flags] of [
   test(`the whole paper as a PDF: ${name}.pdf`, async ({ page }) => {
     await page.goto(paperIn([...flags]));
     await page.evaluate(() => document.fonts.ready);
-    const pdf = await page.pdf({ format: "A4", path: join(folder, `${name}.pdf`) });
+    const pdf = await savePdf(page, join(folder, `${name}.pdf`));
     expect(pdf.length).toBeGreaterThan(10_000);
   });
 }

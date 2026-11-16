@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { PHONE, root, run } from "./helpers";
+import { fixScreens, PHONE, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 3z7: the start screen's Materials pop-up (G126) open at 1280 x 940, dark and light, and on a
@@ -10,6 +10,8 @@ import { PHONE, root, run } from "./helpers";
  * playwright test e2e/screens-3z7.spec.ts --project=chromium. They land in docs/screens/3z7/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const dir = join(root, "docs", "screens", "3z7");
 mkdirSync(dir, { recursive: true });

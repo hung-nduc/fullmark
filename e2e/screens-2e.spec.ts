@@ -1,12 +1,14 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, card, root, submitAttempt } from "./helpers";
+import { buildIn, card, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2e for the owner to compare with the Design canvas. Not part of `npm run check`: run with
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2e.spec.ts --project=chromium. They land in docs/screens/2e/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const results = buildIn("test/fixtures/page/results.md", "results.md");

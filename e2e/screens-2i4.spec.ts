@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildFolder, root, run } from "./helpers";
+import { buildFolder, fixScreens, root, run, SCREENS_USE } from "./helpers";
 
 /**
  * Screenshots of slice 2i4: the Information & Licences popup on each tab, light and dark, on a desktop and on a phone.
@@ -10,6 +10,8 @@ import { buildFolder, root, run } from "./helpers";
  * --project=chromium. They land in docs/screens/2i4/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.describe.configure({ mode: "serial" });
 
 const dir = join(root, "docs", "screens", "2i4");

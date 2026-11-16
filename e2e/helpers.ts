@@ -272,3 +272,67 @@ export function expectGolden(name: string, text: string): void {
   }
   expect(text).toBe(readFileSync(file, "utf8"));
 }
+
+// ---- Screens (TECHNICAL_DESIGN.md, foundation 8, "Screens are reproducible") ----
+
+/** The one time every screens spec starts at, in the screens' time zone: 2026-10-23 09:00. */
+export const SCREENS_TIME = "2026-10-23T09:00:00+07:00";
+/** The time zone and locale of every screen, so another machine's settings do not move a date. */
+export const SCREENS_USE = { timezoneId: "Asia/Ho_Chi_Minh", locale: "en-US" } as const;
+
+/**
+ * Fixes what would make a screen differ from one run to the next, before the page loads: the clock (every `Date` reads
+ * the same time; timers still run, and a spec that needs time to pass moves the clock itself) and the random bytes the page
+ * draws its seed from (`crypto.getRandomValues` gives a fixed sequence, so the shuffle and the draw are the same). Used by
+ * every screens spec in a `beforeEach`; the page is not changed.
+ */
+export async function fixScreens(page: Page): Promise<void> {
+  await page.clock.install({ time: new Date(SCREENS_TIME) });
+  await page.clock.setFixedTime(new Date(SCREENS_TIME));
+  await page.addInitScript(() => {
+    let s = 0x9e3779b9;
+    const next = (): number => {
+      // mulberry32
+      s = (s + 0x6d2b79f5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return (t ^ (t >>> 14)) >>> 0;
+    };
+    const fixed = <T extends ArrayBufferView | null>(array: T): T => {
+      if (array) {
+        const bytes = new Uint8Array(array.buffer, array.byteOffset, array.byteLength);
+        for (let i = 0; i < bytes.length; i++) bytes[i] = next() & 0xff;
+      }
+      return array;
+    };
+    Object.defineProperty(crypto, "getRandomValues", { value: fixed, configurable: true, writable: true });
+  });
+}
+
+/** A PDF of the page, its creation and modification dates replaced by the fixed time, so two runs write the same bytes. */
+export async function savePdf(page: Page, path: string): Promise<Buffer> {
+  const pdf = await page.pdf({ format: "A4" });
+  const text = pdf
+    .toString("latin1")
+    .replace(/\/(CreationDate|ModDate) \(D:\d{14}[^)]*\)/g, (_all, key: string) => `/${key} (D:20261023020000+00'00')`);
+  const fixed = Buffer.from(text, "latin1");
+  writeFileSync(path, fixed);
+  return fixed;
+}
+
+/**
+ * A screenshot of one element with the page's sticky parts (the top bar, the replay banner, the filter tabs, the foot bar,
+ * the forms' bars) hidden for the capture by a style the spec adds and removes: a tall card is then shown whole, not
+ * crossed by them (G143). The page is not changed.
+ */
+export async function shotOf(locator: Locator, path: string): Promise<void> {
+  const page = locator.page();
+  const style = await page.addStyleTag({
+    content: ".fm-dock,.fm-footbar{visibility:hidden!important}",
+  });
+  try {
+    await locator.screenshot({ path });
+  } finally {
+    await style.evaluate((el) => el.remove());
+  }
+}

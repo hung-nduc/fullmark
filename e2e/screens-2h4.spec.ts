@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildFolder, buildWith, card, PHONE, root } from "./helpers";
+import { buildFolder, buildWith, card, fixScreens, PHONE, root, SCREENS_USE, shotOf } from "./helpers";
 
 /**
  * Screenshots of slice 2h4: the Licences icon at the foot, a hint closed and open and an explanation, the current card
@@ -11,6 +11,8 @@ import { buildFolder, buildWith, card, PHONE, root } from "./helpers";
  * They land in docs/screens/2h4/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.describe.configure({ mode: "serial" });
 
 const dir = join(root, "docs", "screens", "2h4");
@@ -46,15 +48,15 @@ test("a hint closed and open, and an explanation", async ({ page }) => {
   await start(page);
   const b1 = card(page, "b1");
   await b1.scrollIntoViewIfNeeded();
-  await b1.screenshot({ path: out("3-hint-closed") });
+  await shotOf(b1, out("3-hint-closed"));
   await b1.getByRole("button", { name: "Hint" }).click();
-  await b1.screenshot({ path: out("4-hint-open") });
+  await shotOf(b1, out("4-hint-open"));
 
   await page.goto(buildWith("test/fixtures/page/instant.md", "explanation.md", ["theme: light"]).url);
   await start(page);
   await page.getByLabel(/right i1$/).check();
   await card(page, "i1").getByRole("button", { name: "Check" }).click();
-  await card(page, "i1").screenshot({ path: out("5-explanation") });
+  await shotOf(card(page, "i1"), out("5-explanation"));
 });
 
 test("the text size control at 100% and at 112%, in the bar", async ({ page }) => {

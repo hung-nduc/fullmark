@@ -3,7 +3,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { buildFolder, PHONES, root, type Served, serveProcess, submitAttempt } from "./helpers";
+import {
+  buildFolder,
+  fixScreens,
+  PHONES,
+  root,
+  SCREENS_USE,
+  type Served,
+  serveProcess,
+  submitAttempt,
+} from "./helpers";
 
 /**
  * Screenshots of slice 3z8, at 360 x 780 (the narrowest common phone), English, light: the start screen, the answering
@@ -12,6 +21,8 @@ import { buildFolder, PHONES, root, type Served, serveProcess, submitAttempt } f
  * in docs/screens/3z8/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: PHONES[0], hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
 
 const dir = join(root, "docs", "screens", "3z8");

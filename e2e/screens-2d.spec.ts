@@ -1,12 +1,14 @@
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { buildIn, root, submitAttempt } from "./helpers";
+import { buildIn, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2d for the owner to compare with the Design canvas. Not part of `npm run check`: run with
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-2d.spec.ts --project=chromium. They land in docs/screens/2d/, which is committed for the owner's review.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const parts = buildIn("test/fixtures/page/parts.md", "parts.md");
@@ -35,9 +37,8 @@ test("start screen with parts, without parts, Continue, the Start over dialog, s
 });
 
 test("the timer line, and the results after reopening", async ({ page }) => {
-  await page.clock.install({ time: new Date("2026-10-29T10:00:00") });
   await page.goto(timed.url);
-  await page.clock.pauseAt(new Date("2026-10-29T10:00:10"));
+  await page.clock.pauseAt(new Date(Date.parse(SCREENS_TIME) + 10_000));
   await page.getByRole("button", { name: "Start" }).click();
   await page.getByLabel("right t1").check();
   await page.clock.runFor(35_000);

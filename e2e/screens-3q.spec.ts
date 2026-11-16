@@ -3,7 +3,19 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { buildWith, card, replayOf, root, run, type Served, serveProcess, submitAttempt } from "./helpers";
+import {
+  buildWith,
+  card,
+  fixScreens,
+  replayOf,
+  root,
+  run,
+  SCREENS_USE,
+  type Served,
+  serveProcess,
+  shotOf,
+  submitAttempt,
+} from "./helpers";
 
 /**
  * Screenshots of slice 3q for the owner to set beside ResultsReplay and RubricPhoneReplay: the result pill in the five
@@ -12,6 +24,8 @@ import { buildWith, card, replayOf, root, run, type Served, serveProcess, submit
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-3q.spec.ts --project=chromium. They land in docs/screens/3q/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 // tall, so the page never scrolls and its sticky bars stay clear of the cards
 test.use({ viewport: { width: 1280, height: 3200 } });
 
@@ -68,7 +82,7 @@ test("paper, serif: the five states, and the waiting essay", async ({ page }) =>
 
 test("a graded essay, paper, serif", async ({ page }) => {
   await page.goto(replayOf(["theme: paper", "font: serif"], "graded"));
-  await card(page, "add").screenshot({ path: out("3-essay-graded-paper-serif") });
+  await shotOf(card(page, "add"), out("3-essay-graded-paper-serif"));
 });
 
 test("light and dark", async ({ page }) => {
@@ -94,7 +108,7 @@ test("vi", async ({ page }) => {
 test("at 390 px: a graded essay, and the longest pending badge in en and in vi", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 5200 });
   await page.goto(replayOf(["theme: paper", "font: serif"], "phone"));
-  await card(page, "add").screenshot({ path: out("10-phone-essay-graded") });
+  await shotOf(card(page, "add"), out("10-phone-essay-graded"));
   await page.goto(await typesReplay(page, ["theme: paper", "font: serif"]));
   await cards(page, ["s1", "m1", "e1"], "11-phone-states-en");
   await page.goto(await typesReplay(page, ["theme: paper", "font: serif"], { vi: true }));

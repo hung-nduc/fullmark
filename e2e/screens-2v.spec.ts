@@ -1,12 +1,14 @@
 import { join } from "node:path";
 import { expect, type Page, test } from "@playwright/test";
-import { buildIn, card, root, submitAttempt } from "./helpers";
+import { buildIn, card, fixScreens, root, SCREENS_USE, submitAttempt } from "./helpers";
 
 /**
  * Screenshots of slice 2v, one per board built, to lay beside docs/mockup/images/. Not part of `npm run check`: run
  * with FULLMARK_SCREENS=1 npx playwright test e2e/screens-2v.spec.ts --project=chromium. They land in docs/screens/2v/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 
 const mockup = buildIn("test/fixtures/page/mockup.md", "mockup.md");
 const parts = buildIn("test/fixtures/page/parts.md", "parts.md");

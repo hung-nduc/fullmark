@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type Page, test } from "@playwright/test";
 import { quizHash } from "../src/core/hash";
-import { PHONE, root, type Served, serveProcess } from "./helpers";
+import { fixScreens, PHONE, root, SCREENS_USE, type Served, serveProcess } from "./helpers";
 
 /**
  * Screenshots of slice 3p for the owner to set beside the boards: at 1280 x 940 G98's states (GradeFinish, GradeDone,
@@ -11,6 +11,8 @@ import { PHONE, root, type Served, serveProcess } from "./helpers";
  * FULLMARK_SCREENS=1 npx playwright test e2e/screens-3p.spec.ts --project=chromium. They land in docs/screens/3p/.
  */
 test.skip(!process.env.FULLMARK_SCREENS, "screenshots are made on request");
+test.use(SCREENS_USE);
+test.beforeEach(({ page }) => fixScreens(page));
 test.use({ viewport: { width: 1280, height: 940 } });
 
 const out = (name: string) => join(root, "docs", "screens", "3p", `${name}.png`);
