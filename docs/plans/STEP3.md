@@ -39,7 +39,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3h2 G116, `brief --web` on a phone | done, reviewed (2026-11-16), one fix in review, no gaps | `fd2d50a`..`0247344`, and the commit that holds this row |
 | 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
-| 3z3 G121, `quiz grade` takes each mode's own key | brief approved (2026-11-16); to build | |
+| 3z3 G121, `quiz grade` takes each mode's own key | built, awaiting review | `d8902b6` |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
