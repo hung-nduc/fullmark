@@ -1359,5 +1359,12 @@
     .bf-main {
       padding: 16px 8px;
     }
+
+    /* the mark ("Pre-filled for you", "Missing", ...) goes on its own line under the head line */
+    .bf-card-head {
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-start;
+    }
   }
 }

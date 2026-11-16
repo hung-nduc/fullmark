@@ -294,6 +294,29 @@ for (const phone of PHONES) {
       await all(page);
     });
 
+    test("brief --web: the card's mark is under the head line, aligned left (G140)", async ({ page }) => {
+      const dir = mkdtempSync(join(tmpdir(), "fm-sizes-brief-"));
+      mkdirSync(join(dir, ".git"));
+      await serve(dir, ["brief", "d", "--web", "--no-open", "--purpose", "exam-prep"], page, ".bf");
+      const heads = page.locator(".bf section[data-qkey] .bf-card-head");
+      const n = await heads.count();
+      expect(n).toBeGreaterThan(10);
+      for (let i = 0; i < n; i++) {
+        const [line, mark, head] = await heads.nth(i).evaluate((h) => {
+          const r = (e: Element | null) => (e as Element).getBoundingClientRect();
+          return [r(h.querySelector(".bf-card-name")), r(h.querySelector(".bf-mark")), r(h)].map((b) => ({
+            left: b.left,
+            top: b.top,
+            bottom: b.bottom,
+            width: b.width,
+          }));
+        });
+        expect(mark.top).toBeGreaterThanOrEqual(line.bottom - 0.5);
+        expect(mark.left).toBeCloseTo(line.left, 0);
+        expect(line.width).toBeLessThanOrEqual(head.width + 0.5);
+      }
+    });
+
     test("brief --web: a choice never moves the next card's first control (G139)", async ({ page }) => {
       const dir = mkdtempSync(join(tmpdir(), "fm-sizes-brief-"));
       mkdirSync(join(dir, ".git"));
