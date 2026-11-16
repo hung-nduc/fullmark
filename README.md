@@ -10,13 +10,13 @@ You write a quiz in Markdown. `quiz build` checks it and writes a single self-co
 
 | Area | Commands |
 |---|---|
-| Check and fix a quiz | `check`, `rules`, `ids`, `inspect` |
+| Check and fix a quiz | `check` (with `--review`), `rules`, `ids`, `inspect`, `review` (judge each question, with `--since`) |
 | Make the page or the paper | `build` (with `--print`, `--answers`, `--seed`, `--answer-sheet`, a build file, `--watch` and `--serve`) |
 | Take it with the answers sent back | `serve` (with `--section`, `--focus`, `--autosave`) |
-| Grade and look back | `grade`, `replay`, `stats` |
-| Start a quiz | `new`, `template`, `brief` (through flags or `--tui`) |
+| Grade and look back | `grade` (with `--web` and `--web --grades`), `replay`, `stats` |
+| Start a quiz | `new`, `template`, `brief` (through flags, `--tui` or `--web`) |
 
-Still to come in step 3: `review`, `grade --web` and `brief --web`, which wait for their form designs. Then step 4, the library. The plan is in [docs/plans/STEP3.md](docs/plans/STEP3.md).
+Step 3 is done (its plan: [docs/plans/archive/STEP3.md](docs/plans/archive/STEP3.md)). Next is step 4, the library.
 
 ## Try it from source
 

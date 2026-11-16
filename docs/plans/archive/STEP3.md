@@ -1,12 +1,22 @@
 # Step 3: the server, the forms and the authoring commands
 
+> **Archived (2026-11-16).** Step 3 (`serve`, `review`, `grade --web`, `brief` through flags, `--tui` and `--web`, `stats`, `inspect`, `new`, `template`, `build --watch` and `--serve`) is closed ("Acceptance", item 4): every "Done when" criterion passed in Chromium and Firefox, and the owner tried the samples. Its decided gaps, G1 to G148, are in [STEP3-GAPS.md](STEP3-GAPS.md); the decisions themselves live in `docs/design/`, which wins over anything here. Its "Rules for every slice" still hold, extended by the next plan. The rest is kept below as it was.
+>
+> **Step 4 starts here.** Step 4 is the library (TECHNICAL_DESIGN.md, section 12; COMMANDS.md, "Library commands"). Its plan, `docs/plans/STEP4.md`, is not written yet; the planner writes it, with a Handoff on top, for the owner to approve, and starts with:
+> 1. **The shared `config.toml`** ([TODO.md](../../design/TODO.md), "Before step 4"): 1.0 and 0.x read the same file; decide a folder of 1.0's own or a rewrite by step 6's script, as the first gap.
+> 2. **`content.names-control`** (G148, decided; TECHNICAL_DESIGN.md, section 5), in step 4's first slice.
+> 3. **How to run it faster than step 3** (the planner's suggestion to the owner, 2026-11-16, for the owner to confirm in the plan): fewer, larger slices where little is visual; the design's gaps raised together at the start of the step, not one per slice; visual polish gathered near the end, so screens are not taken again and again. The screens are reproducible (foundation 8), so a slice's screen diff shows only what it changed.
+> 4. **The proposals** in `docs/design/proposals/` stay out of step 4 unless the owner picks one.
+>
+> **Nothing is pushed:** this machine has no GitHub credentials; branch `1.0` is pushed by the owner.
+
 ## Handoff (2026-11-03, updated 2026-11-16): start here
 
 A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent**; the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews, pushes after the review, and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` and become the next brief's first tasks. Commit after every round. A slice is sized to fit one implementing agent's session (about 150k tokens), and its brief names exactly what to read. Which model plays each role is the owner's choice and may change; the reviews name who built and reviewed each slice.
+As in step 2 ([archive/STEP2.md](STEP2.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent**; the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews, pushes after the review, and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` and become the next brief's first tasks. Commit after every round. A slice is sized to fit one implementing agent's session (about 150k tokens), and its brief names exactly what to read. Which model plays each role is the owner's choice and may change; the reviews name who built and reviewed each slice.
 
 ### Where it stands
 
@@ -50,15 +60,15 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
 | 3z12 G145: full-page shots without the bars | built and reviewed (2026-11-16), one fix in review, no gaps | `cc5ccd8`..`5359380`, review |
 | 3z13 G146: the examples' intros | built and reviewed (2026-11-16), no fix in review; G147 decided and done by the planner | `ea4c3b6`, review |
-| acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
+| acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); the owner's samples run (item 4) found G146, fixed in 3z13 and with G147; **step 3 closed (2026-11-16)** | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
 None open.
 
-Step 2 is closed ([archive/STEP2.md](archive/STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
+Step 2 is closed ([archive/STEP2.md](STEP2.md), item 75): every "Done when" criterion passes in Chromium and Firefox. What step 2 left for step 3 is now built: the server listens on the page's attach point (`src/serve/module.ts` on `window.fullmark.events`), `serve --focus` sets `PageData.focus`, the served page has its own script hash and `connect-src 'self'`, `build --watch`/`--serve` and `check --review` work, and the six built-in templates ship from `scripts/build-templates.mjs`. `brief.yaml` is still read with no defaults; the defaults belong to `quiz brief`, which writes them.
 
-**Still stubs**, each refused as "not available yet": `brief --web` (3h; `src/cli/brief.ts`) and `grade --web --grades` (3p2, G75; `src/cli/grade.ts`).
+**No stubs are left:** `brief --web` (3h, 3h2) and `grade --web --grades` (3p2, 3p3) are built.
 
 ### Next steps, in order
 
@@ -70,13 +80,13 @@ How each slice got here is in its own **Review**; the table above is the summary
 4. **The `brief --web` boards** (3v) are **approved** (2026-11-16) and copied to `docs/mockup/boards/` (Brief and its ten wrappers). **3h** is **built and reviewed** ("Slice 3h", its Review); step 3's three-way byte-identity criterion passes. **G116** (`--timeout`, `--port` and `--no-open` without `--web`) is decided (2026-11-16), as recommended, and written into COMMANDS.md. **3h2** (G116, then the phone, G117) is **built and reviewed** ("Slice 3h2", its Review), with no new gap: every slice of step 3 but 3z is done. Then **3z**, acceptance.
 5. **3z**'s tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) are **built and reviewed** ("Slice 3z", its Review). **G119** (the grades schema holds only the envelope) and **G120** (a refused submit's detail is English in a `vi` form) are decided (2026-11-16), as recommended: G120 is written into COMMANDS.md and needs no code; G119 into TECHNICAL_DESIGN.md, and **3z2** builds it. **3z2** is **built and reviewed** ("Slice 3z2", its Review); **G121** (the schema asks for each mode's own key, `quiz grade` takes either) is decided (2026-11-16), not as recommended: `quiz grade` refuses the other key; **3z3** is **built and reviewed** ("Slice 3z3", its Review), with no new gap. Next: the acceptance run (the planner) and the samples (the owner).
 
-The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
+The other Grade boards (Grade, GradeBanded, GradeCode, GradePhone, GradeVi, GradeAI and the table boards) have no images: they were taken off the canvas on 2026-11-07 ([docs/mockup/README.md](../../mockup/README.md)), so they cannot be exported as they stand. Their sources in `docs/mockup/boards/` are the reference; this blocks no slice.
 
 ### Open proposals carried over from step 2
 
-- [build-log.md](../design/proposals/build-log.md): stays a proposal, not in step 3. `build --watch --json` already gives one line per rebuild, which is all v1 promises.
-- [print-pdf.md](../design/proposals/print-pdf.md) (raised in 2k's review, written in 3j's): stays a proposal, out of v1.
-- [TODO.md](../design/TODO.md)'s only item (1.0 and 0.x share `config.toml`) is due before step 4, not here.
+- [build-log.md](../../design/proposals/build-log.md): stays a proposal, not in step 3. `build --watch --json` already gives one line per rebuild, which is all v1 promises.
+- [print-pdf.md](../../design/proposals/print-pdf.md) (raised in 2k's review, written in 3j's): stays a proposal, out of v1.
+- [TODO.md](../../design/TODO.md)'s only item (1.0 and 0.x share `config.toml`) is due before step 4, not here.
 
 ## Goal
 
@@ -84,11 +94,11 @@ The one-shot server and everything on it, plus the authoring commands that need 
 
 **Done when** (section 12): contract tests pass for each command; the same answers through flags, `--web` and `--tui` write byte-identical `brief.yaml` files. **And** (from foundations 4 and 9, section 11): the server rejects a wrong token, `Host` or `Origin`; a `build` page is byte-identical with and without the server features and contains no server code; the two-quiz server seam test passes; every new form passes axe in both themes and has a `vi` scan; `npm run samples` gains a line for each served command, and the owner has tried them by hand.
 
-**Not in step 3:** `library take` and the rest of the library (step 4; the server supports it through `--timeout 0` and the quiz-keyed predicate, nothing more); `--background` ([proposals/background-serve.md](../design/proposals/background-serve.md); the `listening` line is its seam, built here); `quiz guide` and `agent-guide` (not in section 12's step 3; see G4); build logs.
+**Not in step 3:** `library take` and the rest of the library (step 4; the server supports it through `--timeout 0` and the quiz-keyed predicate, nothing more); `--background` ([proposals/background-serve.md](../../design/proposals/background-serve.md); the `listening` line is its seam, built here); `quiz guide` and `agent-guide` (not in section 12's step 3; see G4); build logs.
 
 ## Rules for every slice
 
-Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slice"), including item 73's rule on environmental failures: a failure is environmental only when its cause is shown, and a golden is never reverted to hide a difference. Commits end with the `Co-Authored-By` line of the model that made them; the implementing agent never pushes. Added for step 3:
+Step 2's rules hold ([archive/STEP2.md](STEP2.md), "Rules for every slice"), including item 73's rule on environmental failures: a failure is environmental only when its cause is shown, and a golden is never reverted to hide a difference. Commits end with the `Co-Authored-By` line of the model that made them; the implementing agent never pushes. Added for step 3:
 
 - **No real network in unit tests.** The server binds 127.0.0.1 on port `0` in tests and is driven with `fetch`; the page side is tested in Playwright against a served page. No test waits on a real timeout: the clock and the timeout are injected.
 - **Every served command is tested as a subprocess**: started with `--json`, its `listening` line read, the page or form driven by Playwright or by a POST, then the exit code, the second JSON line and the written file compared with a golden. A helper for this lives in `e2e/helpers.ts` (3a) and every later slice uses it.
@@ -409,7 +419,7 @@ The order (owner, 2026-11-03) puts the server first, since four commands stand o
 - **The reload server** (G30, G31): not the one-shot server's predicate or submit path. Either `startServer` gains a mode with no `quizIds`, no submit and an events path, or a small sibling in `src/serve/` shares its token, `Host` and refusal code; Sonnet picks the smaller change and says which. It holds the pages in memory and writes nothing. It runs until Ctrl+C, which exits 0 (G6).
 - **Outputs** (G32) and **the index** (G33), as decided.
 - **Determinism:** a `build --watch` page on disk is byte-identical to `build` of the same input (with `--built-at`); only the served copy carries the reload code.
-- **Not in this slice:** a disk cache; a build log ([proposals/build-log.md](../design/proposals/build-log.md)); the PDF through the browser (a proposal written in this slice's review, as "Open proposals" says).
+- **Not in this slice:** a disk cache; a build log ([proposals/build-log.md](../../design/proposals/build-log.md)); the PDF through the browser (a proposal written in this slice's review, as "Open proposals" says).
 
 ### Tasks
 
@@ -427,7 +437,7 @@ The order (owner, 2026-11-03) puts the server first, since four commands stand o
 
 ### Review
 
-**3j's review (2026-11-03).** Typecheck, Biome and Vitest clean: 101 files, **2525 of 2525**, the 2 startup tests. Playwright in Chromium: **197 passed** (4 new in `e2e/watch.spec.ts`), 128 skipped, none failed (run in review). No existing golden changed; 13 new (`brief/tui-bad-flag` for G26; 7 `build/*` usage errors and a missing file; `top/help-build`; the index in `en` and `vi`; 2 e2e `jsonl` goldens). `dist/reload.js` is 178 B (170 gzipped); `dist/serve.js` unchanged; the watch code is its own CLI chunk, which `build` and `check` never load. The reload server is a sibling, `src/serve/reload-server.ts`, with no POST path at all, sharing the one-shot server's token, `Host` and refusal code; the served copy is made by `withReload` on the finished page or paper, so a paper is served the same way. Tried by hand on a copy of `examples/rust`: `--watch --serve --json` gives `listening`, `built`, a `built` line and one `reload` event for a saved edit, a `failed` line with the errors and "kept the last good page" (no event) for a saved error; the page 200, a path outside the token 403; SIGINT printed `{"status":"stopped"}`, exit 0, no process left. Done differently, accepted in review unless the owner says otherwise: each watched file's folder gets a non-recursive watch (TECHNICAL_DESIGN.md section 3 says `recursive`); the 100 ms window starts at the first event and does not slide; a reload event names its page, so with several files an edit reloads only that page and the index; an unusable input at start exits 2 before anything is watched; the human line goes to stderr with and without `--json`. **Written in review:** [proposals/print-pdf.md](../design/proposals/print-pdf.md), as "Open proposals" planned.
+**3j's review (2026-11-03).** Typecheck, Biome and Vitest clean: 101 files, **2525 of 2525**, the 2 startup tests. Playwright in Chromium: **197 passed** (4 new in `e2e/watch.spec.ts`), 128 skipped, none failed (run in review). No existing golden changed; 13 new (`brief/tui-bad-flag` for G26; 7 `build/*` usage errors and a missing file; `top/help-build`; the index in `en` and `vi`; 2 e2e `jsonl` goldens). `dist/reload.js` is 178 B (170 gzipped); `dist/serve.js` unchanged; the watch code is its own CLI chunk, which `build` and `check` never load. The reload server is a sibling, `src/serve/reload-server.ts`, with no POST path at all, sharing the one-shot server's token, `Host` and refusal code; the served copy is made by `withReload` on the finished page or paper, so a paper is served the same way. Tried by hand on a copy of `examples/rust`: `--watch --serve --json` gives `listening`, `built`, a `built` line and one `reload` event for a saved edit, a `failed` line with the errors and "kept the last good page" (no event) for a saved error; the page 200, a path outside the token 403; SIGINT printed `{"status":"stopped"}`, exit 0, no process left. Done differently, accepted in review unless the owner says otherwise: each watched file's folder gets a non-recursive watch (TECHNICAL_DESIGN.md section 3 says `recursive`); the 100 ms window starts at the first event and does not slide; a reload event names its page, so with several files an edit reloads only that page and the index; an unusable input at start exits 2 before anything is watched; the human line goes to stderr with and without `--json`. **Written in review:** [proposals/print-pdf.md](../../design/proposals/print-pdf.md), as "Open proposals" planned.
 
 **3j's gaps decided by the owner on 2026-11-03**, all as recommended, and written into COMMANDS.md (`quiz build`: the index's note on the next load; `--open` with `--watch --serve` opens the index; the config needs a restart) and TECHNICAL_DESIGN.md section 3 (the Watching row). G35's line was made in review, with a test in `test/build/watch.test.ts`.
 
@@ -1556,6 +1566,8 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
    - **Looked at:** `2f/4-phone-answering`, `3p/10-phone-holistic-top` (the 8 px gutter), `3z8` and `3z9`'s screens. The phone element shots of a tall card (`2j3/graded-phone-*`) show the page's sticky top bar, the replay banner and the filter tabs drawn across the middle of the card, as they did before this run: the capture, not the page.
    - **Gaps:** G142 (the screens are not reproducible), G143 (the tall element shots), open in "Gaps".
    - **Left:** **the owner's run of the samples** by hand. Then step 3 is closed.
+
+4. **The owner's samples run (2026-11-16),** after 3z4 to 3z13 (the samples built at `df52499`, 33 of 33 pages), found one more thing: the examples' section intros named the Check button, printed on the paper too (G146). 3z13 fixed the two intros, and G147 three more lines; QUIZ_SYNTAX.md, section 8, now says a quiz's text holds on the page and the paper alike, and G148 decides a `check` warning for it, built in step 4. **Step 3 is closed (2026-11-16):** every "Done when" criterion passes in Chromium and Firefox (items 1 and 3), and the owner has tried the samples. This plan is archived as `docs/plans/archive/STEP3.md`, with its gaps file beside it.
 
 ## Slice 3z4: G123, the paper's header
 

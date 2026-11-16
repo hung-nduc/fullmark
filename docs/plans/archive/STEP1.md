@@ -1,6 +1,6 @@
 # Step 1: the core
 
-> **Archived (2026-11-03).** Step 1 (the core: the parser, rules and profiles, the grader and rubrics; `check`, `rules`, `grade`, `ids`) is done. Its slices' briefs, reviews and the owner's decisions are kept below as they were; the decisions themselves live in `docs/design/`, which wins over anything here. The current plan is [STEP3.md](../STEP3.md).
+> **Archived (2026-11-03).** Step 1 (the core: the parser, rules and profiles, the grader and rubrics; `check`, `rules`, `grade`, `ids`) is done. Its slices' briefs, reviews and the owner's decisions are kept below as they were; the decisions themselves live in `docs/design/`, which wins over anything here. The current plan is [STEP3.md](STEP3.md).
 
 ## Handoff (2026-10-28): start here
 

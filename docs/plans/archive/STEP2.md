@@ -1,6 +1,6 @@
 # Step 2: the page
 
-> **Archived (2026-11-03).** Step 2 (`build`, the page runtime, themes and fonts, `replay`, the printable paper) is closed (item 75): every "Done when" criterion passed in Chromium and Firefox. Its "Rules for every slice" still hold, extended by [STEP3.md](../STEP3.md); the rest is kept below as it was, and the decisions themselves live in `docs/design/`, which wins over anything here.
+> **Archived (2026-11-03).** Step 2 (`build`, the page runtime, themes and fonts, `replay`, the printable paper) is closed (item 75): every "Done when" criterion passed in Chromium and Firefox. Its "Rules for every slice" still hold, extended by [STEP3.md](STEP3.md); the rest is kept below as it was, and the decisions themselves live in `docs/design/`, which wins over anything here.
 
 ## Handoff (2026-10-28): start here
 
