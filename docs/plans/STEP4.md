@@ -44,7 +44,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-**G149. 1.0 and 0.x share `config.toml`** ([TODO.md](../design/TODO.md), "Before step 4"). Both read `%APPDATA%\fullmark\config.toml` (`~/.config/fullmark/config.toml`); `library init` writes its `library` key, so a 1.0 init would point 0.x at a 1.0 library, and the other way round. 0.x stays in use (as `fullmark-py`, for surveys) until step 6. **Recommendation:** keep one file and one key, and make each refuse the other's library clearly: 1.0's `library.toml` is `format = "fullmark-library"`, `version = 2`; 1.0 refuses a version 1 library (0.x's) with a pointer to the step 6 move-in script, and 0.x already refuses a version newer than its own. `library init` switches the key only with `--force`, as designed, and its message says that 0.x then no longer finds its library. No second config folder: the docs keep one path, and after step 6 there is one library.
+**G149. 1.0 and 0.x share `config.toml`.** **Decided by the owner on 2026-11-16:** 1.0 makes no provision for 0.x: it reads and writes its own `config.toml` and its own library (`library.toml` version 2), and a 0.x library is refused like any other foreign folder (TECHNICAL_DESIGN.md, section 1, "No compatibility with 0.x"). Nothing to build beyond that.
 
 **G150. The library's folder layout.** COMMANDS.md names `library.toml`, `check.json` and `quizzes/<id>/reports/`, but no layout. **Recommendation:** 0.x's layout, made simpler by one folder per version:
 
@@ -82,7 +82,7 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 | Slice | Content | Needs |
 |---|---|---|
 | **4a** | `content.names-control` (G148, decided): the rule, the word lists from the catalogs, the tests, every example passing | nothing open |
-| **4b** | The store: config read and write (the `library` key; G149), `library init`, `status`, `path`, `library.toml` (G151), the layout (G150), the lock, the git runner (G152), the lint boundary; contract tests | G149 to G152 |
+| **4b** | The store: config read and write (the `library` key), `library init`, `status`, `path`, `library.toml` (G151), the layout (G150), the lock, the git runner (G152), the lint boundary; contract tests | G150 to G152 |
 | **4c** | `library register` (one file, several, `--update`, `--build-file`, `check.json`, surveys refused), `list` (with `changed`, `ungraded`, the `public` column empty), `info`; the history helper started (G155) | 4b |
 | **4d** | `library take` (with `--section`, `--missed`, `--focus`, resume; G153, G154), `replay` | 4c |
 | **4e** | `library grade` (with `--grades`, `--json` and `--web`, every grades file kept), `stats` | 4d |
