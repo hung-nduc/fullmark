@@ -42,7 +42,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
-| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | brief written (2026-11-16), for the owner | |
+| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1611,7 +1611,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z6: the `vi` words, the example's names, the information dialog
 
-**Brief written on 2026-11-16, for the owner's approval.** Every gap in it is decided (STEP3-GAPS.md, G127, G128, G130 to G132). One slice so the page's script, the page goldens and the `vi` screens change once.
+**Approved by the owner on 2026-11-16.** Every gap in it is decided (STEP3-GAPS.md, G127, G128, G130 to G132). One slice so the page's script, the page goldens and the `vi` screens change once.
 
 ### Read first
 
