@@ -49,7 +49,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z10 G142, G143: reproducible screens | built and reviewed (2026-11-16), no fix in review; G144 decided, 3z11 builds it | `025f4bb`..`c018df3`, review |
 | 3z11 G144: the dock's whole-pixel height | built and reviewed (2026-11-16), no fix in review; G145 decided, 3z12 builds it | `e705a67`..`2ba17e7`, review |
 | 3z12 G145: full-page shots without the bars | built and reviewed (2026-11-16), one fix in review, no gaps | `cc5ccd8`..`5359380`, review |
-| 3z13 G146: the examples' intros | brief written (2026-11-16); waits for the owner | |
+| 3z13 G146: the examples' intros | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1), and again after 3z9 (item 3); the screens committed (G122, G141); G142, G143 decided; 3z10 builds them; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1934,7 +1934,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z13: the examples' intros
 
-**Brief written on 2026-11-16; waits for the owner's approval.** G146 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 9, item 7, says the examples and templates say only what holds on the page and the paper alike. Text only; nothing in `src/` changes. Then the owner's samples run goes on.
+**Approved by the owner on 2026-11-16.** G146 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 9, item 7, says the examples and templates say only what holds on the page and the paper alike. Text only; nothing in `src/` changes. Then the owner's samples run goes on.
 
 ### Read first
 
