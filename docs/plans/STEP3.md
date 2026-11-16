@@ -40,6 +40,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
+| 3z4 G123, the paper's header | brief written (2026-11-16), for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -88,7 +89,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-None open.
+None open. (G123 was decided as it was raised; it is in STEP3-GAPS.md.)
 
 ## Slices
 
@@ -120,6 +121,7 @@ None open.
 | **3z** | G118 (the JSON Schemas); a `vi` scan of the `review` and `grade` forms; then acceptance: every "Done when" item checked in Chromium and Firefox, the samples tried by the owner, step 3 closed | G118 |
 | **3z2** | G119: the grades schema describes each entry and the grader | G119, 3z |
 | **3z3** | G121: `quiz grade` refuses the other mode's key (`criteria` or `bullets`) | G121, 3z2 |
+| **3z4** | G123: the paper header's three lines and the Student ID row (MSSV) | G123 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1521,3 +1523,33 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
    - **`npm run samples`** builds (exit 0), and its index has a line for each served command: `serve` (plain, `--section`, `--focus`, `--autosave`), `review` (with `--out`, again, `--since`), `grade --web` (and `--grades`), `brief --tui`, `brief --web`, `build --watch --serve`.
    - **Every screens spec run once** (`FULLMARK_SCREENS=1`, Chromium): 238 passed. **273 committed screens differ** (268 PNGs, 5 PDFs); 3h's and 3h2's, taken on this machine today, are unchanged. Two causes, shown: (a) **later slices changed what an earlier slice's screen shows**, and those screens were not taken again (for example 3f's blocked dialog: the card head, the Questions button's icon, the dialog's place and "Graded by you", from 3f2, 3p and 3r); (b) **text rendering**: the same page with one line wrapped at a different width (2d's start screen: the Focus mode line, 23 px taller). 36 changed size, 188 differ in more than 0.5 % of their pixels, 44 in less. None shows a bug, in the ones looked at. G122 decided (2026-11-16): committed, as the acceptance's screens.
    - **Left:** **the owner's run of the samples** by hand. Then step 3 is closed (item 2).
+2. **The owner, trying the samples (2026-11-16),** found the `vi` paper's header line broken inside an item: G123, decided the same day; **3z4** builds it, then the samples run goes on.
+
+## Slice 3z4: G123, the paper's header
+
+**Brief written on 2026-11-16, for the owner's approval.** One short task, from the owner's own run of the samples. G123 (STEP3-GAPS.md) is decided; TECHNICAL_DESIGN.md, section 8, "Printable paper", **Header**, says what is wanted.
+
+### Read first
+
+- This plan: "Rules for every slice"; STEP3-GAPS.md, G123; archive/STEP2.md, the 2k, 2k2 and 2k3 sections (how the paper and its tests were built).
+- TECHNICAL_DESIGN.md, section 8, "Printable paper" (Header, and what else shares the head: the key, the materials page, the answer sheet).
+- Code: `src/page/paper/Paper.tsx` (the header table), the paper's CSS (`dist/paper.css`'s source), `src/core/i18n/paper.ts` (`studentId`, `timeAllowed`, `total`, `version`); `e2e/` specs for the paper (page breaks, the no-answer test); `e2e/screens-2k.spec.ts`, `screens-2k2.spec.ts`, `screens-2k3.spec.ts`; the goldens `test/golden/build/print-*`.
+
+### Decided for this slice
+
+- **Three lines, always.** Under the title, the time, the total and the version each on its own line, in that order, never joined with " · " (no `time_limit`: two lines, the total and the version). Then "Paper code" / "Mã đề" with `--seed`, as now. The same in `en` and `vi`, on every paper with a header.
+- **Student ID under Name.** The right side's boxes in rows: Name; Student ID on the row right under it; Class and Date; Signature. The left side's bottom cell that held Student ID goes; the title cell spans the header's height. Lines and spacing as the other boxes have them.
+- **"MSSV" in Vietnamese**: `studentId` in `src/core/i18n/paper.ts` becomes "MSSV" (in place of "Số báo danh"); English stays "Student ID".
+- **Goldens:** every `print-*` golden with a header changes; count them and say why in the report (the header's markup, and the `vi` label). Nothing else in a paper may change: the rest of each golden's diff is empty. The answer sheet's own Student ID box, if it has one, follows the same label; report it either way.
+- **Tests:** a Playwright check, in both browsers, that the three items are on three different lines and that the Student ID box is directly under Name, in `en` and `vi`; the page-break and no-answer tests still pass.
+- **Screens:** 2k's, 2k2's and 2k3's screens taken again, the headers checked by eye.
+
+### Tasks
+
+1. **G123** (one commit): the header, the label, the goldens, the test.
+2. **Screens** (one commit): `FULLMARK_SCREENS=1` for 2k, 2k2 and 2k3.
+3. **The slice table's 3z4 row** (one commit). The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; the changed goldens are only the headers'; the screens show three lines and MSSV under Họ và tên. Then the owner's samples run goes on.
