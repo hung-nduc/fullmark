@@ -40,7 +40,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z G118, the vi scans, acceptance | tasks 1 and 2 (the JSON Schemas, the forms' `vi` scans) built and reviewed (2026-11-16); G119 and G120 decided (2026-11-16); the acceptance after 3z2 | `c3a108d`..`d5293f2`, review |
 | 3z2 G119, the grades schema's entries | built and reviewed (2026-11-16); G121 decided (2026-11-16) | `349314d`, `6431471`, review |
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
-| acceptance | run (2026-11-16, "Acceptance", item 1); G122 and the owner's samples run left | review |
+| acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
 
@@ -88,7 +88,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G122. The screens taken again at acceptance (3z's acceptance, item 1).** Run once each, the screens specs rewrite 273 of the committed screens in `docs/screens/` (every slice's folder from 2c4 to 3r but 3h and 3h2), for the two causes item 1 shows: what later slices changed, and text rendering on this machine. Each slice's folder was meant as that slice's record, which git keeps either way. **Recommendation:** commit them, in one commit named as the acceptance's screens, so `docs/screens/` shows the product as step 3 leaves it, and the boards and the next steps compare against today's screens; the old ones stay in the history.
+None open.
 
 ## Slices
 
@@ -1519,5 +1519,5 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
    - **Every new form passes axe in both themes and has a `vi` scan:** `review` (`e2e/review.spec.ts`), `grade --web` (`e2e/grade.spec.ts`, `grade-phone`, `grade-prefilled`, `grade-prefilled-phone`) and `brief --web` (`e2e/brief.spec.ts`, `brief-phone`), axe in light and dark; the `vi` scans in `e2e/vi-scan.spec.ts` (3z) and `e2e/brief.spec.ts`.
    - **`npm run check`**, the whole of it, exits 0: typecheck, Biome, knip clean; Vitest, the 2 startup tests alone, then 118 files, 3088 of 3088; Playwright 715 passed, 481 skipped (the screens specs and the by-name skips), none failed, **in Chromium and Firefox**. `npm run schemas` leaves the tree unchanged.
    - **`npm run samples`** builds (exit 0), and its index has a line for each served command: `serve` (plain, `--section`, `--focus`, `--autosave`), `review` (with `--out`, again, `--since`), `grade --web` (and `--grades`), `brief --tui`, `brief --web`, `build --watch --serve`.
-   - **Every screens spec run once** (`FULLMARK_SCREENS=1`, Chromium): 238 passed. **273 committed screens differ** (268 PNGs, 5 PDFs); 3h's and 3h2's, taken on this machine today, are unchanged. Two causes, shown: (a) **later slices changed what an earlier slice's screen shows**, and those screens were not taken again (for example 3f's blocked dialog: the card head, the Questions button's icon, the dialog's place and "Graded by you", from 3f2, 3p and 3r); (b) **text rendering**: the same page with one line wrapped at a different width (2d's start screen: the Focus mode line, 23 px taller). 36 changed size, 188 differ in more than 0.5 % of their pixels, 44 in less. None shows a bug, in the ones looked at. Whether to commit them is G122.
-   - **Left:** G122, and **the owner's run of the samples** by hand. Then step 3 is closed (item 2).
+   - **Every screens spec run once** (`FULLMARK_SCREENS=1`, Chromium): 238 passed. **273 committed screens differ** (268 PNGs, 5 PDFs); 3h's and 3h2's, taken on this machine today, are unchanged. Two causes, shown: (a) **later slices changed what an earlier slice's screen shows**, and those screens were not taken again (for example 3f's blocked dialog: the card head, the Questions button's icon, the dialog's place and "Graded by you", from 3f2, 3p and 3r); (b) **text rendering**: the same page with one line wrapped at a different width (2d's start screen: the Focus mode line, 23 px taller). 36 changed size, 188 differ in more than 0.5 % of their pixels, 44 in less. None shows a bug, in the ones looked at. G122 decided (2026-11-16): committed, as the acceptance's screens.
+   - **Left:** **the owner's run of the samples** by hand. Then step 3 is closed (item 2).
