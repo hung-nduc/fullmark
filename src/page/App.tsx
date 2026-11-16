@@ -707,9 +707,9 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
               </section>
             ))}
           </div>
-          {/* the page's foot, after the last question; Focus mode shows nothing but the quiz: no button, no tab stop */}
-          {last && !store.screen.fullscreen.value ? <LicencesButton t={t} /> : null}
         </div>
+        {/* the page's foot, after the last question; Focus mode shows nothing but the quiz: no button, no tab stop */}
+        {last && !store.screen.fullscreen.value ? <LicencesButton t={t} /> : null}
         {started && sidebarOpen ? <Sidebar t={t} state={state} store={store} /> : null}
         {attempt.phase === "start" && materials && state.shelf.value ? <MaterialsPanel t={t} state={state} /> : null}
       </div>

@@ -19,6 +19,8 @@
   }
 
   .fm-side {
+    grid-column: 2;
+    grid-row: 1 / -1;
     position: sticky;
     top: var(--dock-h, 7rem);
     display: flex;

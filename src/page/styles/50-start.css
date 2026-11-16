@@ -418,11 +418,15 @@
 
 /* The Licences button at the page's foot, and its popup (TECHNICAL_DESIGN.md, section 3, "Licences") */
 @layer components {
+  /* the foot is the body's second row, under the main column: the main area's margins stay as they were, and the
+     foot spans the area, not the question column, so the button sits at the page's right edge, left of an open
+     sidebar, away from the test (owner, 2026-11-02) */
   .fm-foot {
     display: flex;
+    grid-column: 1;
+    grid-row: 2;
     justify-content: flex-end;
     padding: 16px 16px 12px;
-    margin-top: auto;
   }
 
   /* the page fills the window's height and the foot follows the content: on a short page (the start screen, a short
@@ -441,20 +445,22 @@
 
   .fm-page > .fm-quiz:last-child > .fm-body {
     flex: 1 0 auto;
+    grid-template-rows: minmax(0, 1fr) auto;
   }
 
-  .fm-main:has(> .fm-foot) {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 0;
+  .fm-body > .fm-main {
+    grid-column: 1;
+    grid-row: 1;
   }
 
-  /* the foot spans the main area, not the question column: the button sits at the page's right edge (left of an open
-     sidebar), away from the test (owner, 2026-11-02) */
-  .fm-body .fm-main > .fm-foot,
-  .fm-quiz[data-phase="start"] .fm-main > .fm-foot {
-    width: auto;
-    margin-inline: 0;
+  /* the foot brings its own space below the last question */
+  .fm-body:has(> .fm-foot) > .fm-main {
+    padding-bottom: 24px;
+  }
+
+  /* what the phone's stacked sidebar covers is covered, the foot with it */
+  .fm-body:has(> .fm-main[data-covered]) > .fm-foot {
+    visibility: hidden;
   }
 
   .fm-licences-button {
