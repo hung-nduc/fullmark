@@ -42,7 +42,8 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z3 G121, `quiz grade` takes each mode's own key | built and reviewed (2026-11-16), no gaps | `d8902b6`, `87079d2`, review |
 | 3z4 G123, the paper's header | built and reviewed (2026-11-16); G125 decided | `1e9c888`..`0844b96`, review |
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
-| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 for the owner | `5b05d1a`..`f596649`, review |
+| 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
+| 3z7 G126, G134: the start screen's Materials pop-up | brief written (2026-11-16), for the owner | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -93,9 +94,7 @@ Step 2's rules hold ([archive/STEP2.md](archive/STEP2.md), "Rules for every slic
 
 The design docs left these open, or a slice's review found them. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands. Once decided, it is written into `docs/design/`, which then wins over the text here. A gap stays here while it is open; once decided, it moves, as it stands, to [STEP3-GAPS.md](STEP3-GAPS.md), which holds every decided gap, in number order.
 
-**G133. The Information tab's values in `vi` (3z6's review).** The `vi` dialog shows "Màu nền: dark", "Giao diện của bài: locked", "Phông chữ: quiz (mặc định)", "Ngôn ngữ giao diện: vi", while on and off are translated ("tắt (mặc định)"). **Recommendation:** keep them so: the tab is for debugging, and these are the values as an author writes them in the front matter and the flags (`theme: dark`, `look: locked`, `--fonts quiz`, `ui_lang: vi`), which is what a bug report needs; only words that are not option values (on, off, default) are translated.
-
-**G134. Tone marks in the chemistry example (3z6's review).** Section 9, item 7 sets "hủy, xóa, khóa" for the catalogs; the example's own text still writes "hoá", "toả", and the tag `hoá học`. **Recommendation:** the examples and templates follow item 7 too ("hóa", "tỏa", the tag `hóa học`), so what fullmark ships reads one way; a quiz author's own text is the author's.
+None open.
 
 ## Slices
 
@@ -130,6 +129,7 @@ The design docs left these open, or a slice's review found them. Each needs the 
 | **3z4** | G123: the paper header's three lines and the Student ID row (MSSV) | G123 |
 | **3z5** | G124: chemistry with KaTeX's mhchem (`\ce`, `\pu`), and `examples/chemistry/` | G124 |
 | **3z6** | G127 (the `vi` words), G128 (the example's IUPAC names), G130 to G132 (the Information & Licences dialog, the ⓘ at the window's bottom) | G127, G128, G130 to G132 |
+| **3z7** | G126 (Materials as a pop-up on the start screen), G134 (the example's tone marks), G127's last word | G126, G134 |
 
 The order (owner, 2026-11-03) puts the server first, since four commands stand on it, then every slice that needs no form board (3c, 3d, 3g, 3i, 3j), so the owner's form design (3v) can come whenever the owner is ready; the three forms come last. Later briefs stay outlines until the slice before is reviewed.
 
@@ -1660,3 +1660,35 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 - **Goldens:** 14 page goldens (12 pages, 2 byte counts), each in the script, the style and their hashes (and the `vi` page's dialog markup); `print-example-chemistry`, the names. No other.
 - **Done differently, accepted:** a profile not given shows "default", not "default (default)"; the foot's padding 16/12 and the main column's bottom padding 24 px where a foot follows (was 64), so a short start screen fits a 390 × 844 window: pages are 60 to 90 px shorter at the end, 15 screens changed size; a new fixture `tiny.md`; the foot hidden while the phone's sidebar covers the page. Screens: all 34 specs taken again, 63 changed PNGs committed by a list, the rest (clock times, shuffles, pixel noise) left as they were.
 - **Gaps:** G133 (the dialog's values in `vi`), G134 (the example's tone marks).
+
+## Slice 3z7: the start screen's Materials pop-up
+
+**Brief written on 2026-11-16, for the owner's approval.** Every gap in it is decided (STEP3-GAPS.md, G126, G134).
+
+### Read first
+
+- This plan: "Rules for every slice"; the reviews of 3z4 to 3z6; STEP3-GAPS.md, G126, G127, G134.
+- TECHNICAL_DESIGN.md: section 8, the **Materials** row (the start screen's pop-up), the dialogs' rules elsewhere in section 8 (focus, Esc, a click outside, as the Information & Licences dialog and the Submit dialog do); section 9, item 7.
+- The boards on the Design canvas (<https://claude.ai/artifact/HPX2k7wM7ENHVQLc3zzjL5>, row "Materials: the wide view (G126)"): **MaterialsWide** (its `start` view only) and **MaterialsWidePhone**. MaterialsWideSidebar and MaterialsWideExpanded are **not adopted**: do not build them. Copy the two adopted boards' sources into `docs/mockup/boards/` and list them in `docs/mockup/README.md`, as the other boards are.
+- Code: the start screen and its Materials panel (find them from `clockStartsMaterials`, `closeMaterials` and `sheetsLabel` in the catalogs), the Information & Licences dialog (its focus trap, Esc and click-outside handling, to reuse), the sidebar's sheet chips (to reuse); the start screen's tests and screens specs (2f3, 2f4); `examples/chemistry/`; `src/core/i18n/vi.ts` `missedHint`.
+
+### Decided for this slice
+
+- **The pop-up, on the start screen only:** **Materials** opens a modal dialog in place of the side panel: 960 px wide or the window less 64 px, 40 px from the window's top and bottom; the heading "Materials" ("Tài liệu") and **Close** ("Đóng") at its top; the sheet chips under it, one per sheet, as in the sidebar; the open sheet below, scrolling inside the dialog; at its foot, muted, "Esc, Close or a click outside closes this. The clock has not started." (`vi`: "Esc, Đóng hoặc nhấp ra ngoài để đóng. Đồng hồ chưa chạy."). A scrim over the start screen; Esc, **Close** or a click on the scrim closes it, and the focus returns to **Materials**; the focus stays in the dialog while it is open. On a phone (under 520 px) it takes the whole screen, with **Close** at its top. Colours, borders and radii from the board and the theme's tokens, in all five themes.
+- **Everywhere else, nothing changes:** the sidebar while answering, review, replay and the phone's sidebar keep the materials as they are now. The start screen's side panel goes, since the pop-up replaces it.
+- **G134:** `examples/chemistry/` in the modern tone marks: "hóa", "tỏa", the tag `hóa học`, and any other "oá/oè/uỷ"-style marks in its text.
+- **G127's last word:** `vi.ts` `missedHint`: "Bài luận" becomes "Tự luận".
+- **Goldens:** the page goldens change through the script, the style and their hashes (count them; nothing else in a page); `check/example-chemistry` and `print-example-chemistry` with the tone marks. Nothing else.
+- **Tests:** Playwright, in both browsers: the pop-up opens from **Materials**, shows each sheet by its chip, closes by Esc, **Close** and a click on the scrim, returns the focus, keeps Tab inside, and a wide table is shown whole at 1280 × 940 (no column cut off); at 390 × 844 it takes the screen; axe in light and dark with it open; the `vi` scan of the start screen with the pop-up open. The sidebar's materials while answering are unchanged (the existing tests pass as they are).
+- **Screens:** the start screen's Materials screens taken again (2f3, 2f4 as they show it), and new ones in `docs/screens/3z7/`: the pop-up open in dark (as the owner's screenshot) and light at 1280 × 940, and on a phone, `en` and `vi`.
+
+### Tasks
+
+1. **The boards** (one commit): the two adopted boards copied into `docs/mockup/boards/`, the README.
+2. **G126** (one commit or two): the pop-up, its tests, the goldens.
+3. **G134 and `missedHint`** (one commit).
+4. **Screens** (one commit), then **the slice table's 3z7 row** (one commit). The agent's report as for every slice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; the changed goldens are only the ones named above; the screens show the pop-up and a wide sheet whole.
