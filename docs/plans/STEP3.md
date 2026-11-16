@@ -44,7 +44,7 @@ As in step 2 ([archive/STEP2.md](archive/STEP2.md), Handoff): the planner writes
 | 3z5 G124, mhchem and the chemistry example | built and reviewed (2026-11-16); G128 and G129 decided | `e93672f`..`0ea5d86`, review |
 | 3z6 G127, G128, G130 to G132: the words, the names, the information dialog | built and reviewed (2026-11-16); G133, G134 decided | `5b05d1a`..`f596649`, review |
 | 3z7 G126, G134: the start screen's Materials pop-up | built and reviewed (2026-11-16), one fix in review, no gaps | `3a04980`..`087a87b`, review |
-| 3z8 G135, the three phone sizes | brief written (2026-11-16), for the owner | |
+| 3z8 G135, the three phone sizes | brief approved (2026-11-16); to build | |
 | acceptance | run (2026-11-16, "Acceptance", item 1); G122 decided, the screens committed; the owner's samples run left | review |
 
 Each slice's review, and the owner's decisions on its gaps, are under its own section below (**Review**); the open gaps are in "Gaps" below, and the decided ones in [STEP3-GAPS.md](STEP3-GAPS.md), in number order.
@@ -1705,7 +1705,7 @@ Done differently, accepted in review unless the owner says otherwise: on a phone
 
 ## Slice 3z8: the three phone sizes
 
-**Brief written on 2026-11-16, for the owner's approval.** G135 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Phone sizes**, says what is wanted. After 3z8, step 3's acceptance is run again (the planner) and the owner tries the samples.
+**Approved by the owner on 2026-11-16.** G135 is decided (STEP3-GAPS.md); TECHNICAL_DESIGN.md, section 7, foundation 8, **Phone sizes**, says what is wanted. After 3z8, step 3's acceptance is run again (the planner) and the owner tries the samples.
 
 ### Read first
 
