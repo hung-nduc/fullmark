@@ -17,6 +17,8 @@ export default defineConfig({
   testDir: "e2e",
   testMatch: "**/*.spec.ts",
   fullyParallel: true,
+  // the screens are taken one at a time: under load a sticky sidebar was drawn a pixel off now and then
+  workers: process.env.FULLMARK_SCREENS ? 1 : undefined,
   reporter: [["list"]],
   projects: [
     // the page budget test measures the page, not the machine (G97): it runs first, alone (Firefox's after Chromium's),

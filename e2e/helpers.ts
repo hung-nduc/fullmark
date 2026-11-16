@@ -324,12 +324,6 @@ export async function settle(page: Page): Promise<void> {
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
-  const size = page.viewportSize();
-  if (!size) return;
-  // the window cannot be resized in full screen (Focus mode): there the page is left as it is
-  if (await page.evaluate(() => document.fullscreenElement !== null)) return;
-  await page.setViewportSize({ width: size.width + 1, height: size.height });
-  await page.setViewportSize(size);
 }
 
 /** A PDF of the page, its creation and modification dates replaced by the fixed time, so two runs write the same bytes. */
