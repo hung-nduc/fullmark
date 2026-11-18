@@ -17,12 +17,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
-| 4a | brief approved (2026-11-18); with the implementing agent | this file |
+| 4a | built and reviewed (2026-11-18); G19 and G20 wait for the owner | `24d99e0`, `ac90c6b` |
 
 ### Next
 
-1. One implementing agent (Sonnet) builds 4a; the planner reviews it and writes the review at the end of its section.
-2. Then **4b**'s brief (the store).
+1. The owner decides G19 and G20 (4a's review).
+2. The planner writes them into `docs/design/` and the plan's rules, then **4b**'s brief (the store).
 
 ## Goal
 
@@ -45,7 +45,11 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-Every gap of step 4 is decided (G1 to G18, in [STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G19.
+G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised since:
+
+**G19. `content.names-control`'s level in `draft` and `exam`.** 4a's brief said "`warning` in every built-in profile"; the rule was built as every quality warning is, so the built-in profiles map it as they map the others: info under `draft`, error under `exam` (a question naming "press" fails `check` under `exam`). **Recommendation:** keep it so, as built: one mechanism for every quality rule, and an exam is the quiz most likely printed, where naming a button matters most. The catalogue row says "warning", which is the default level, and stays true.
+
+**G20. Which tests a slice runs** (raised by the owner during 4a's review: should a library slice test only the library?). **Recommendation:** every slice runs the build, the typecheck, Biome, knip and all of Vitest, whatever it touches: the library uses core, and the command-graph, startup and golden tests are what catch a library slice breaking `check`. Playwright, in Chromium and Firefox, runs only for a slice that touches the page, the server, a form or a built page (`src/page/`, `src/serve/`, `src/build/`, the form folders): in step 4, **4d** (`take`, `replay`), **4e** (`grade --web`) and **4f** (the samples, acceptance), and not 4b or 4c. The last slice runs everything before step 4 is accepted. While building, an agent runs the tests it works on; the review runs the set above.
 
 ## Slices
 
@@ -92,3 +96,15 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 ### Done when
 
 `npm run build` and `npm run check` pass in Chromium and Firefox (or Chromium only, saying Firefox was not run, when it is not installed); `quiz check` on every example and template gives no `content.names-control` warning; `quiz rules --all` lists the rule.
+
+### Review (2026-11-18)
+
+**Built** in `24d99e0` (`src/core/i18n/controls.ts`: the lists, labels read from the catalogs through `buildControls`; `src/core/rules/names-control.ts`: the matching; the rule registered in `quality.ts`; materials sheets checked in `src/cli/load.ts`, since a rule sees only the quiz; 38 tests in `test/rules/names-control.test.ts`, the two fixtures, the examples and template test) and `ac90c6b` (the examples test skips a folder with no `quiz.md`).
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3159, Playwright 831 passed and 519 skipped in Chromium and Firefox, tsc, Biome and knip clean. Goldens: 19 changed, all expected: `check/quality-every-fixture-json` and `check/several-strict` gain the two fixtures; 17 `rules/*` goldens gain the rule's line. No page golden changed; no example or template needed rewording. **By hand**, on an `en` and a `vi` quiz: seven texts flagged once each (description, intro, choice, bold `**Hint:**`, explanation, a sheet under its own file); `check-ignore` silences its question; inline code and maths left; in `vi`, "nhấn mạnh", "cuộn dây", "cuộn cảm" and the English "Click" left, "Bấm **Nộp bài**" flagged; under `exam` all seven are errors, sheets included, under `draft` info.
+
+**The agent's flake, cause shown:** the test of `examples/build.toml` (`test/build/build-file-cli.test.ts`) builds into the real `examples/site/` while the examples test lists `examples/` in parallel; skipping a folder with no `quiz.md` is the right fix. The agent's startup failure (193 ms against 180) was inside the full Vitest run, under load; `npm run check` runs the startup tests alone first, where they pass.
+
+**Done differently, accepted:** a question's `check-ignore` no longer hides a finding in another file (a bug found here: `applyIgnores` matched by line alone; fixed in `src/core/rules/check.ts` with a test); passages, `fields` labels, `scale` labels and a choice's `input` prompt are read too (text a learner reads); when several words match in one text the earliest is named; a `description` finding is on the `description:` key's line. **Not accepted yet:** the levels in `draft` and `exam`, G19.
+
+**Gaps:** G19; G20, raised by the owner during the review.
