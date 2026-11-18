@@ -22,12 +22,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 | 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
-| 4f | brief written (2026-11-19); G34 to G37 raised; waits for the owner | this file |
+| 4f | brief approved (2026-11-19), G34 to G37 decided; being built | this file |
 
 ### Next
 
-1. The owner decides **G34 to G37** and approves **4f**'s brief (the last slice: `review`, `share`, `template add`, `rename`, `rm`, the `boxed` style, the samples, acceptance).
-2. The decisions go into COMMANDS.md; one implementing agent (Sonnet) builds 4f; the planner reviews it and the step.
+1. One implementing agent (Sonnet) builds **4f** (the last slice); the planner reviews it and the step.
+2. The owner tries the samples' library (`take`, `grade --web`, `replay`) and accepts step 4.
 
 ## Goal
 
@@ -51,15 +51,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G33 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised for 4f's brief, open:
-
-**G34. `library review` and the lock.** COMMANDS.md says **Finish** writes `review.json` "under the lock", but the form waits up to 1800 s, as `take`'s page and `grade --web`'s form do. **Recommendation:** as G29 and G32: no lock while the form is served; on **Finish**, the checked review is written to `progress/review.json` (git-ignored), then, under the lock, moved to `review.json` and committed. When the lock cannot be had in 10 s, it stays in `progress/`, the command exits 2 saying it is safe, the form's done card says it is saved but not filed yet (the words of G32, for a review), and the next `library review` of the quiz files it first, says so, and ends, with `next: quiz library review NAME`.
-
-**G35. The `fullmark.toml` of `share --source`.** COMMANDS.md: "a `fullmark.toml` with the custom profile the quiz uses, if any". A version stores its resolved rules in `check.json`, not the config they came from. **Recommendation:** when `check.json`'s profile is a built-in one with no change, no `fullmark.toml` is written. Otherwise one is written with `profile = NAME` and `[profiles.NAME]`, `extends` the built-in profile its chain starts from, and each rule whose level or options differ from that built-in's, sorted by id. A test checks the shared folder with `quiz check` and gets the same issues as under `check.json`.
-
-**G36. `share` into a place that holds something.** COMMANDS.md does not say. **Recommendation:** the page (`NAME.html`) is replaced, as `build` replaces its output. The `--source` folder (`DIR/NAME/`) is refused (exit 2) when it exists and is not empty, with the fix "choose another -o, or remove DIR/NAME", so an edited copy is never overwritten.
-
-**G37. `rm` while the quiz is open.** `rm` could delete a quiz while a `take`, `grade --web` or `review` of it is serving, or while it holds an attempt in progress or a leftover submit. **Recommendation:** refused (exit 1) while a `take` of the quiz is serving (its `serving.json` names a live process), "NAME is open in a take (pid N)", fix "finish or stop it, or add --force". Otherwise the folder goes with its `progress/`, and the question counts what is not in git: "delete chem-bonds (Chemical bonding): 2 versions, 6 attempts, 4 reports, 1 attempt in progress?" (the last only when there is one).
+G1 to G37 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G38.
 
 ## Slices
 
@@ -380,7 +372,7 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ## Slice 4f: `review`, `share`, `template add`, `rename`, `rm`; acceptance
 
-**Brief written on 2026-11-19; waits for the owner's approval, and for G34 to G37** (written below as recommended; changed here if decided otherwise). G10, G13, G16, G18, G30 to G33 and the approved boards (LibraryTidy, LibraryTake, LibraryStyleBordered) are written into COMMANDS.md: "Exit codes", "Terminal style", "How library commands print", "The library folder", `quiz library review`, `share`, `template add`, `rename`, `rm`, `grade`. This is the last slice of step 4: it finishes the commands, gives the terminal its `boxed` style, makes the samples' library, and checks the step's "Done when". It touches a form and the page, so per G20 it runs **everything**, Playwright in Chromium and Firefox.
+**Approved by the owner on 2026-11-19.** G10, G13, G16, G18, G30 to G37 and the approved boards (LibraryTidy, LibraryTake, LibraryStyleBordered) are written into COMMANDS.md: "Exit codes", "Terminal style", "How library commands print", "The library folder", `quiz library review`, `share`, `template add`, `rename`, `rm`, `grade`. This is the last slice of step 4: it finishes the commands, gives the terminal its `boxed` style, makes the samples' library, and checks the step's "Done when". It touches a form and the page, so per G20 it runs **everything**, Playwright in Chromium and Firefox.
 
 ### Read first
 

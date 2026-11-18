@@ -151,3 +151,19 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 **G33. Worktrees under `.claude/` and Biome.** A git worktree an agent leaves under `.claude/worktrees/` carries its own `biome.json`, and `npm run lint` (so `npm run check`) then fails on every file with "nested root configuration". **Recommendation:** `biome.json` leaves out `.claude/` (`files.includes` gains `!.claude`), so a check never reads another checkout's files.
 
 **Decided by the owner on 2026-11-19, as recommended.** A change to the repository's tooling, not the design: `biome.json` leaves out `.claude/`. Built first in 4f.
+
+**G34. `library review` and the lock.** COMMANDS.md says **Finish** writes `review.json` "under the lock", but the form waits up to 1800 s, as `take`'s page and `grade --web`'s form do. **Recommendation:** as G29 and G32: no lock while the form is served; on **Finish**, the checked review is written to `progress/review.json` (git-ignored), then, under the lock, moved to `review.json` and committed. When the lock cannot be had in 10 s, it stays in `progress/`, the command exits 2 saying it is safe, the form's done card says it is saved but not filed yet (the words of G32, for a review), and the next `library review` of the quiz files it first, says so, and ends, with `next: quiz library review NAME`.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library review` ("The lock") and "The library folder".
+
+**G35. The `fullmark.toml` of `share --source`.** COMMANDS.md: "a `fullmark.toml` with the custom profile the quiz uses, if any". A version stores its resolved rules in `check.json`, not the config they came from. **Recommendation:** when `check.json`'s profile is a built-in one with no change, no `fullmark.toml` is written. Otherwise one is written with `profile = NAME` and `[profiles.NAME]`, `extends` the built-in profile its chain starts from, and each rule whose level or options differ from that built-in's, sorted by id. A test checks the shared folder with `quiz check` and gets the same issues as under `check.json`.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library share`.
+
+**G36. `share` into a place that holds something.** COMMANDS.md does not say. **Recommendation:** the page (`NAME.html`) is replaced, as `build` replaces its output. The `--source` folder (`DIR/NAME/`) is refused (exit 2) when it exists and is not empty, with the fix "choose another -o, or remove DIR/NAME", so an edited copy is never overwritten.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library share`.
+
+**G37. `rm` while the quiz is open.** `rm` could delete a quiz while a `take`, `grade --web` or `review` of it is serving, or while it holds an attempt in progress or a leftover submit. **Recommendation:** refused (exit 1) while a `take` of the quiz is serving (its `serving.json` names a live process), "NAME is open in a take (pid N)", fix "finish or stop it, or add --force". Otherwise the folder goes with its `progress/`, and the question counts what is not in git: "delete chem-bonds (Chemical bonding): 2 versions, 6 attempts, 4 reports, 1 attempt in progress?" (the last only when there is one).
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library rm`.

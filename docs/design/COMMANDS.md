@@ -653,6 +653,7 @@ quizzes/<id>/
   progress/<version>.serving.json   the take serving it: process id, URL, start
   progress/<version>.submitted.json a submit waiting to be filed
   progress/<stamp>.grades.json      grades from the form waiting to be kept
+  progress/review.json              a review from the form waiting to be filed
 ```
 
 - **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
@@ -1029,6 +1030,8 @@ quiz library review NAME [--since] [--timeout SECONDS] [--port N] [--no-open] [-
 
 `quiz review` with the lookup done, as `library replay` is `quiz replay`: the review form on the quiz's current version. **Finish** writes `quizzes/<id>/review.json`, under the lock, and commits (`fullmark: review NAME`). There is one review per quiz, not per version: `review-v2` keys each verdict by question id with the question's hash, and merges, so one file follows the quiz across versions, and git keeps its history. `--since` asks only about the questions new or changed since the stored review, as `quiz review --since` does; with no stored review it exits 2, as there.
 
+**The lock**, as for `grade --web`: none while the form is served. On **Finish**, the review is written to `progress/review.json`, then, under the lock, moved to `review.json` and committed. When the lock cannot be had in 10 seconds, it stays in `progress/`, the command exits `2` saying it is safe, and the form's done card says it is saved but not filed yet; the next `library review` of the quiz files it first, says so, and ends, with `next: quiz library review NAME` after the commit.
+
 **An edit is the same quiz, a new version.** The quiz id and the question ids stay, so attempts, `--missed` and `stats` carry over: a fixed question has a new hash and `--missed` marks it changed; a dropped question is gone (`gone` in `take --json`). Edit the original source, or a copy from `share --source`, then `register FILE --update NAME`, which applies the stored review (`register`, `--review`). A new quiz, with a new id and no history, is only made on purpose, with `quiz new --from`.
 
 | Option | Meaning |
@@ -1060,6 +1063,10 @@ quiz library share NAME [-o DIR] [--version HASH] [--source] [--json]
 ```
 
 Writes the clean offline page to share, or with `--source` the editable folder (the original file name, assets, brief, and a `fullmark.toml` with the custom profile the quiz uses, if any). Default `DIR`: here.
+
+- **The page** is `DIR/NAME.html`, byte-identical to `quiz build` of the same source under the same profile; an existing one is replaced, as `build` replaces its output.
+- **The folder** is `DIR/NAME/`. It is refused (exit 2) when it exists and is not empty, with the fix "choose another -o, or remove DIR/NAME", so an edited copy is never overwritten.
+- **Its `fullmark.toml`.** None when the version's profile (`check.json`) is a built-in one with no change. Otherwise `profile = NAME` and `[profiles.NAME]`, with `extends` the built-in profile its chain starts from and each rule whose level or options differ from that built-in's, sorted by id, so `quiz check` on the folder finds what the library found.
 
 **Output.**
 
@@ -1195,7 +1202,7 @@ Exit: `0`, `1` name taken, `2` unknown quiz.
 quiz library rm NAME [--yes] [--force] [--json]
 ```
 
-**Deletes** a quiz with its versions and results, and commits, so `git -C LIBRARY revert HEAD` brings it back. Asks for confirmation unless `--yes`; with `--json` and without `--yes` it exits 2, with the fix "add `--yes`", since `--json` never prompts (as `template rm`). Refused when the library is not its own git repository or the quiz folder has uncommitted changes (`--force` skips both). A quiz on the `public` shelf is removed from it at the next `publish`. One quiz per command, on purpose: a glob or a list makes a mass deletion one typo away, and each deletion is its own commit to revert.
+**Deletes** a quiz with its versions and results, and commits, so `git -C LIBRARY revert HEAD` brings it back. Asks for confirmation unless `--yes`; with `--json` and without `--yes` it exits 2, with the fix "add `--yes`", since `--json` never prompts (as `template rm`). Refused when the library is not its own git repository, the quiz folder has uncommitted changes, or a `take` of the quiz is serving ("NAME is open in a take (pid N)", fix "finish or stop it, or add --force"); `--force` skips all three. An attempt in progress goes with the folder, and the question counts it ("…, 4 reports, 1 attempt in progress?"). A quiz on the `public` shelf is removed from it at the next `publish`. One quiz per command, on purpose: a glob or a list makes a mass deletion one typo away, and each deletion is its own commit to revert.
 
 **Output.**
 
