@@ -20,8 +20,8 @@ const index: LibraryIndex = {
       source: "/home/minh/quizzes/signals.md",
       current: H2,
       versions: [
-        { hash: H1, added: "2026-11-17T09:05:00+07:00" },
-        { hash: H2, added: "2026-11-18T08:00:00+07:00" },
+        { hash: H1, added: "2026-11-17T09:05:00+07:00", file: "signals.md" },
+        { hash: H2, added: "2026-11-18T08:00:00+07:00", file: "week2.md" },
       ],
       shelves: [],
     },
@@ -31,7 +31,7 @@ const index: LibraryIndex = {
       title: "Rust basics",
       source: "C:\\quizzes\\rust.md",
       current: H1,
-      versions: [{ hash: H1, added: "2026-11-17T09:00:00+07:00" }],
+      versions: [{ hash: H1, added: "2026-11-17T09:00:00+07:00", file: "rust.md" }],
       shelves: ["public"],
     },
   ],
@@ -43,7 +43,7 @@ describe("library.toml", () => {
     expect(text.endsWith("\n")).toBe(true);
     expect(text.indexOf("[quizzes.rust-basics]")).toBeLessThan(text.indexOf("[quizzes.signals]"));
     expect(renderIndex({ ...index, quizzes: [...index.quizzes].reverse() })).toBe(text);
-    expect(text).toContain(`versions = [{ hash = "${H1}", added = "2026-11-17T09:05:00+07:00" }, { hash = "${H2}"`);
+    expect(text).toContain(`versions = [{ hash = "${H1}", added = "2026-11-17T09:05:00+07:00", file = "signals.md" }, { hash = "${H2}"`);
   });
 
   it("round-trips: what is read renders to the same bytes", () => {
@@ -71,7 +71,7 @@ describe("library.toml", () => {
   };
   const head = 'format = "fullmark-library"\nversion = 2\ncreated = "t"\n';
   const quiz = (extra = "") =>
-    `\n[quizzes.a]\nid = "a"\ntitle = "A"\nsource = "/a.md"\ncurrent = "${H1}"\nversions = [{ hash = "${H1}", added = "t" }]\n${extra}`;
+    `\n[quizzes.a]\nid = "a"\ntitle = "A"\nsource = "/a.md"\ncurrent = "${H1}"\nversions = [{ hash = "${H1}", added = "t", file = "a.md" }]\n${extra}`;
 
   it("reads a quiz with `shelves` left out, as empty", () => {
     const r = readIndex(head + quiz());

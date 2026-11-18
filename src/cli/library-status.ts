@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { join } from "node:path";
 import { parseConfig } from "../core/config/parse";
 import { FALLBACK_IDENTITY } from "../library/git";
 import type { LibraryIndex } from "../library/index-file";
@@ -154,11 +154,11 @@ export async function runLibraryStatus(opts: LibraryStatusOptions, io: LibraryIo
         let actual: string | null = null;
         let why = "the files no longer match the version's hash";
         try {
-          const loaded = loadQuiz(join(dir, basename(quiz.source)));
+          const loaded = loadQuiz(join(dir, version.file));
           actual = loaded.hash;
           if (actual === null) why = "a file the quiz uses is missing, so the files no longer match the version's hash";
         } catch {
-          why = `the source file ${basename(quiz.source)} is missing, so the files no longer match the version's hash`;
+          why = `the source file ${version.file} is missing, so the files no longer match the version's hash`;
         }
         if (actual === version.hash) hashesOk++;
         else

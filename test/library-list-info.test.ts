@@ -227,7 +227,7 @@ describe("library info", () => {
     const t = await setup();
     const a = `abcd${"1".repeat(60)}`;
     const b = `abcd${"2".repeat(60)}`;
-    const hash = (h: string) => `{ hash = "${h}", added = "2026-10-01T09:00:00+00:00" }`;
+    const hash = (h: string) => `{ hash = "${h}", added = "2026-10-01T09:00:00+00:00", file = "twin.md" }`;
     writeFileSync(
       join(t.lib, "library.toml"),
       `format = "fullmark-library"\nversion = 2\ncreated = "${NOW}"\n\n[quizzes.twin]\nid = "twin"\ntitle = "Twin"\nsource = "/nowhere/twin.md"\ncurrent = "${b}"\nversions = [${hash(a)}, ${hash(b)}]\nshelves = []\n`,

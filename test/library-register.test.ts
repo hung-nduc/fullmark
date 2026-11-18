@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { loadStored } from "../src/cli/library-common";
+import { runLibraryStatus } from "../src/cli/library-status";
 import { loadQuiz } from "../src/cli/load";
 import { localIso } from "../src/cli/time";
 import { readCheck } from "../src/library/check-file";
@@ -56,7 +58,7 @@ describe("library register: one file", () => {
         title: "Rust basics",
         source: join(t.dir, "notes", "rust.md"),
         current: hash,
-        versions: [{ hash, added: localIso(new Date(NOW)) }],
+        versions: [{ hash, added: localIso(new Date(NOW)), file: "rust.md" }],
         shelves: [],
       },
     ]);
@@ -234,6 +236,22 @@ describe("library register: --update", () => {
     // the old version stays as it was
     expect(existsSync(join(t.lib, "quizzes", "alpha", "versions", first, "a.md"))).toBe(true);
     expect(await log(t.lib, t.env)).toEqual(["fullmark: register alpha", "fullmark: register alpha", "fullmark: init"]);
+  });
+
+  it("records each version's file name (G22): a quiz updated from another file name reads and stays healthy", async () => {
+    const t = await newLibrary();
+    t.write({ "quiz.md": v1 });
+    await t.register(["quiz.md"]);
+    t.write({ "week2.md": v2 });
+    const r = await t.register(["week2.md"], { update: "alpha" });
+    expect(r.exit).toBe(0);
+    const q = index(t.lib).quizzes[0];
+    expect(q?.versions.map((v) => v.file)).toEqual(["quiz.md", "week2.md"]);
+    expect(readFileSync(join(t.lib, "library.toml"), "utf8")).toContain('file = "quiz.md" }, { hash');
+    for (const v of q?.versions ?? []) expect(loadStored(t.lib, q as NonNullable<typeof q>, v.hash)?.hash).toBe(v.hash);
+    const c = t.at();
+    expect(await runLibraryStatus({ json: false, plain: true }, c.io)).toBe(0);
+    expect(c.out.join("\n")).toContain("2 of 2 match");
   });
 
   it("is unchanged for the current version, and makes an earlier version current again without a new folder", async () => {

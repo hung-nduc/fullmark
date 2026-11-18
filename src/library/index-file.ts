@@ -13,6 +13,8 @@ const VersionSchema = z
   .object({
     hash: z.string().regex(HASH, "must be a hash: 64 lowercase hexadecimal characters"),
     added: z.string().min(1),
+    /** the source's name in the version's folder (step 4, G22) */
+    file: z.string().min(1),
   })
   .strict();
 
@@ -160,7 +162,7 @@ export function renderIndex(index: LibraryIndex): string {
       `title = ${str(q.title)}`,
       `source = ${str(q.source)}`,
       `current = ${str(q.current)}`,
-      `versions = [${q.versions.map((v) => `{ hash = ${str(v.hash)}, added = ${str(v.added)} }`).join(", ")}]`,
+      `versions = [${q.versions.map((v) => `{ hash = ${str(v.hash)}, added = ${str(v.added)}, file = ${str(v.file)} }`).join(", ")}]`,
       `shelves = [${q.shelves.map(str).join(", ")}]`,
     );
   }

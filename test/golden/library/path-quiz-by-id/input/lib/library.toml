@@ -7,5 +7,5 @@ id = "chem"
 title = "Chemistry"
 source = "/x/chem.md"
 current = "203a64e7b57cd8f676e83d00fc0f555721422e54ccd7599d7428e955380e474e"
-versions = [{ hash = "203a64e7b57cd8f676e83d00fc0f555721422e54ccd7599d7428e955380e474e", added = "2026-11-18T14:22:10+00:00" }]
+versions = [{ hash = "203a64e7b57cd8f676e83d00fc0f555721422e54ccd7599d7428e955380e474e", added = "2026-11-18T14:22:10+00:00", file = "chem.md" }]
 shelves = []

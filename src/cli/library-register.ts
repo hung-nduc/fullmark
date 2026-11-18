@@ -520,7 +520,7 @@ export async function runLibraryRegister(
             title: fm.title,
             source: w.abs,
             current: w.hash,
-            versions: [{ hash: w.hash, added: now }],
+            versions: [{ hash: w.hash, added: now, file: basename(w.abs) }],
             shelves: [],
           });
         } else if ((w.what === "version" || w.what === "again") && fm) {
@@ -530,7 +530,7 @@ export async function runLibraryRegister(
             title: fm.title,
             source: w.abs,
             current: w.hash,
-            versions: w.what === "version" ? [...old.versions, { hash: w.hash, added: now }] : old.versions,
+            versions: w.what === "version" ? [...old.versions, { hash: w.hash, added: now, file: basename(w.abs) }] : old.versions,
           });
         }
       }

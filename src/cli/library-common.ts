@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
 import type { ConfigError } from "../core/config/types";
 import { suggest } from "../core/parse/report";
 import { Git, type GitExec } from "../library/git";
@@ -187,28 +187,15 @@ export function noSuchQuiz(io: LibraryIo, json: boolean, index: LibraryIndex, na
 }
 
 /**
- * A stored version, loaded from its folder: its source is found under the name it was registered with, else among the
- * folder's own `.md` files, taking the one whose hash is the version's. Null when the folder or the source is missing.
+ * A stored version, loaded from its folder by the file name the index records for it (step 4, G22), never by
+ * searching. Null when the version is not the quiz's, or its folder or source is missing or unreadable.
  */
 export function loadStored(root: string, quiz: IndexQuiz, hash: string): LoadedQuiz | null {
-  const dir = libraryPaths(root).quiz(quiz.id).version(hash);
-  let names: string[];
+  const version = quiz.versions.find((v) => v.hash === hash);
+  if (version === undefined) return null;
   try {
-    names = readdirSync(dir).filter((n) => n.endsWith(".md") && statSync(join(dir, n)).isFile());
+    return loadQuiz(join(libraryPaths(root).quiz(quiz.id).version(hash), version.file));
   } catch {
     return null;
   }
-  const first = basename(quiz.source);
-  const ordered = [...names.filter((n) => n === first), ...names.filter((n) => n !== first).sort()];
-  let fallback: LoadedQuiz | null = null;
-  for (const name of ordered) {
-    try {
-      const loaded = loadQuiz(join(dir, name));
-      if (loaded.hash === hash) return loaded;
-      fallback ??= loaded;
-    } catch {
-      // unreadable: try the next
-    }
-  }
-  return fallback;
 }

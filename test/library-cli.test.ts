@@ -224,7 +224,7 @@ describe("library init and status, with git", () => {
     await run("library", "init", "lib");
     writeFileSync(
       join(lib, "library.toml"),
-      `format = "fullmark-library"\nversion = 2\ncreated = "${NOW}"\n\n[quizzes.signals-intro]\nid = "signals"\ntitle = "S"\nsource = "/s.md"\ncurrent = "${"a".repeat(64)}"\nversions = [{ hash = "${"a".repeat(64)}", added = "${NOW}" }]\nshelves = []\n`,
+      `format = "fullmark-library"\nversion = 2\ncreated = "${NOW}"\n\n[quizzes.signals-intro]\nid = "signals"\ntitle = "S"\nsource = "/s.md"\ncurrent = "${"a".repeat(64)}"\nversions = [{ hash = "${"a".repeat(64)}", added = "${NOW}", file = "s.md" }]\nshelves = []\n`,
     );
     expect((await run("library", "path", "signals-intro")).stdout).toBe(`${join(lib, "quizzes", "signals")}\n`);
     expect((await run("library", "path", "signals")).stdout).toBe(`${join(lib, "quizzes", "signals")}\n`);
