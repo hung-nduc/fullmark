@@ -222,6 +222,15 @@ describe("what each command loads", () => {
       expect(closure(chunkWith(marker))).not.toContain(chunk);
   });
 
+  it("library replay is a chunk of its own with the page builder and the library but not the server, reached by a dynamic import() from main", () => {
+    const chunk = chunkWith("// src/cli/library-replay.ts");
+    const text = textOf(closure(chunk));
+    for (const m of [...BUILD_ONLY, "// src/library/"]) expect(text, m).toContain(m);
+    for (const m of [...SERVE_ONLY, ...CLACK]) expect(text, m).not.toContain(m);
+    expect(closure(entry("main"))).not.toContain(chunk);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
+  });
+
   for (const [command, marker] of [
     ["init", "// src/cli/library-init.ts"],
     ["status", "// src/cli/library-status.ts"],

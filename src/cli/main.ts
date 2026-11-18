@@ -622,6 +622,32 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         io,
       );
     });
+  library
+    .command("replay")
+    .description("open a past attempt as a page already submitted, with its grades; writes nothing in the library")
+    .argument("<name>", "a quiz's name or id")
+    .option("--attempt <stamp>", "the attempt (a stamp or a prefix of 4 or more characters; default: the newest)")
+    .option("-o, --output <dir>", "write the page into this folder instead of the temp folder")
+    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .option("--no-open", "do not open the page in the browser")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-replay")).runLibraryReplay(
+        name,
+        {
+          attempt: text("attempt"),
+          output: text("output"),
+          open: options.open !== false,
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          fonts: text("fonts"),
+          version: VERSION,
+        },
+        io,
+      );
+    });
   return program;
 }
 
