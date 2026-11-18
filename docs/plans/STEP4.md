@@ -17,6 +17,7 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
+| 4a | brief written (2026-11-18); waits for the owner's approval | this file |
 
 ### Next
 
@@ -58,3 +59,36 @@ Every gap of step 4 is decided (G1 to G18, in [STEP4-GAPS.md](STEP4-GAPS.md)). N
 | **4f** | `share`, `template add`, `rename`, `rm`, `review` (G16); the history goldens complete; the samples' library; acceptance | 4e |
 
 Each slice's brief is written here when the one before it is reviewed; 4a's can be written as soon as the plan is approved, since it needs nothing open.
+
+## Slice 4a: `content.names-control`
+
+**Brief written on 2026-11-18; waits for the owner's approval.** Step 3's G148, decided: TECHNICAL_DESIGN.md, section 5, the rule catalogue's row for `content.names-control`, and QUIZ_SYNTAX.md, section 8, "Write for the page and the paper alike", say what is wanted. This slice is core only: no library code, no page change.
+
+### Read first
+
+- This plan: "Rules for every slice"; [archive/STEP3-GAPS.md](archive/STEP3-GAPS.md), G146 to G148 (the texts found by reading that this rule would have caught).
+- TECHNICAL_DESIGN.md, section 5: "Rule catalogue (v1)", "Ignoring one finding", "Rules for agents"; QUIZ_SYNTAX.md, section 8, and the `check-ignore` attribute (section 6).
+- Code: `src/core/rules/quality.ts` (how a quality rule is declared: `id`, `level`, `summary`, `why`, `example`, `fix`, `options`, `run`; `explanation.short` is a close model), `src/core/ir.ts` (where each text a learner reads lives, and its line), `src/core/i18n/en.ts` and `vi.ts` (the control labels: keys `check`, `submit`, `flag`, `hint`), `test/rules/quality.test.ts` and `test/rules/registry.test.ts`, `test/templates.test.ts`.
+
+### Decided for this slice
+
+- **The word lists live next to the catalogs**, in `src/core/i18n/controls.ts`: for each `Lang`, (a) the control labels, **read from the catalogs' values** (`en.check`, `en.submit`, `en.flag`, `en.hint` and the `vi` ones: today "Check", "Submit", "Flag", "Hint"; "Kiểm tra", "Nộp bài", "Đánh dấu", "Gợi ý"), never copied as strings, so a renamed button renames the rule's word; (b) the screen words: `en` "button", "click", "tap", "press", "sidebar", "scroll"; `vi` "nút", "bấm", "nhấn", "thanh bên", "cuộn"; (c) the phrases left alone because they are ordinary words there: `vi` "nhấn mạnh" (emphasise), "cuộn dây" and "cuộn cảm" (a coil, an inductor, which the signals quizzes use). The object is typed `satisfies Record<Lang, …>`, so a language without lists is a compile error.
+- **Matching.** Text is NFC and matched case-insensitively. A screen word matches as a whole word, in `en` with its `-s`, `-es`, `-ed`, `-ing` forms and a doubled consonant (`tapped`, `tapping`, `pressed`); in `vi` as a whole sequence of syllables (bounded by a non-letter on each side). A control label matches only where it reads as a control: **in bold** (`**Submit**`, `__Gợi ý__`, the label being the whole bold run, ignoring a trailing `:`), or directly followed by "button" (`en`) or directly after "nút" (`vi`). The lists used are the quiz's `lang`'s only.
+- **What is read:** every text a learner reads: the quiz `description`, section intros, question prompts, choices (and the items of `matching` and `ordering`), hints, explanations, rubric criteria and their descriptions, and `materials` sheets. Not titles, ids, `sample_answer` or keys. Before matching, fenced code, inline code and maths (`$…$`, `$$…$$`) are removed, so `` `click()` `` or a variable named `press` never matches.
+- **One finding per text** (one prompt, one choice, one hint …), on the line of the first match, so a paragraph that says "click" three times warns once. The message is the catalogue's, exactly: "names a control of the page; the paper has none". The fix names the word found: `reword "click": say what it is, not which control shows it (QUIZ_SYNTAX.md, section 8)`.
+- **Level and options:** `warning` in every built-in profile, no options. `check-ignore="content.names-control" because="…"` on the question silences it, as for any quality rule.
+- **The rule's own `example`** (for `quiz rules`) is a single question whose hint says "Click **Check** to see the answer."
+- **Every example and template passes with no `content.names-control` finding.** If one does not, reword its text (say what the thing is, not which control shows it), and list each change in the report; the built pages' goldens change with it, counted.
+
+### Tasks
+
+1. **The rule, its lists and the tests** (one commit):
+   - `src/core/i18n/controls.ts` and the rule in `src/core/rules/quality.ts`, registered as every quality rule is.
+   - Tests in `test/rules/names-control.test.ts`: for **each** entry of each list, in each language, one sentence it flags and one it leaves (the leaving one for a label is the label as an ordinary word: "Check your units.", "Kiểm tra lại đơn vị."); each kind of text above flagged once; code, inline code and maths ignored; a bold label flagged and the same word unbolded left; "the Submit button" and "nút Nộp bài" flagged; a `vi` quiz not flagged by an `en`-only word ("click" in a `vi` quiz is left), and the reverse; the three `vi` phrases left; one finding for three matches in one text; `check-ignore` silences it; a catalog label changed in a test double changes what is matched.
+   - `test/templates.test.ts` (or the examples' test): every example and template has no finding of this rule.
+2. **Goldens** (same commit): `npm run golden:update`; the `quiz rules` goldens gain the rule, and any example reworded changes its page. Count and explain every golden that changes; no other change is expected.
+3. **Do not edit** `docs/plans/` or `docs/design/`. The agent's report as for every slice: what was built, the commits, the tests and goldens counted, every example text reworded, and anything done differently.
+
+### Done when
+
+`npm run build` and `npm run check` pass in Chromium and Firefox (or Chromium only, saying Firefox was not run, when it is not installed); `quiz check` on every example and template gives no `content.names-control` warning; `quiz rules --all` lists the rule.
