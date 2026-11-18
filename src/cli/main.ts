@@ -699,6 +699,55 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       );
     });
   library
+    .command("share")
+    .description("write a quiz's clean offline page, or with --source its editable folder")
+    .argument("<name>", "a quiz's name or id")
+    .option("-o, --output <dir>", "the folder to write into (default: here)")
+    .option("--version <hash>", "this version (a hash, or a prefix of at least 4 characters); default: the current one")
+    .option("--source", "write the editable folder NAME/ (the source, its assets and a fullmark.toml when needed)")
+    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-share")).runLibraryShare(
+        name,
+        {
+          output: text("output"),
+          version: text("version"),
+          source: Boolean(options.source),
+          fonts: text("fonts"),
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          program: VERSION,
+        },
+        io,
+      );
+    });
+  const libraryTemplate = library.command("template").description("templates from the library");
+  libraryTemplate
+    .command("add")
+    .description("store a quiz of the library, at one version, as a user template")
+    .argument("<name>", "a quiz's name or id")
+    .option("--as <template>", "the template's name: a slug (default: the quiz's name)")
+    .option("--version <hash>", "this version (a hash, or a prefix of at least 4 characters); default: the current one")
+    .option("--skeleton", "store the structure without the content")
+    .option("--replace", "overwrite one of your templates of that name")
+    .option("--json", "print the outcome as one JSON object")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      outcome.exit = await (await import("./library-template")).runLibraryTemplateAdd(
+        name,
+        {
+          as: (options.as as string | undefined) ?? null,
+          version: (options.version as string | undefined) ?? null,
+          skeleton: Boolean(options.skeleton),
+          replace: Boolean(options.replace),
+          json: Boolean(options.json),
+        },
+        io,
+      );
+    });
+  library
     .command("replay")
     .description("open a past attempt as a page already submitted, with its grades; writes nothing in the library")
     .argument("<name>", "a quiz's name or id")

@@ -9,12 +9,12 @@ import { EXIT, type ExitCode } from "./exit-codes";
 import {
   findQuiz,
   type LibraryIo,
-  libraryFail,
   machineOf,
   noSuchQuiz,
   nowOf,
   openLibrary,
   painterFor,
+  pickVersion,
 } from "./library-common";
 import { readHistory } from "./library-history";
 import { contentOf, flaggedOf, isoDate, listRow, percentText, shortDay, sourceOf } from "./library-row";
@@ -53,22 +53,9 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   if (quiz === undefined) return noSuchQuiz(io, opts.json, opened.index, name);
 
   const all = quiz.versions.map((v) => v.hash);
-  let at = quiz.current;
-  if (opts.version !== null) {
-    const wanted = opts.version.toLowerCase();
-    const found = wanted.length >= 4 ? all.filter((h) => h.startsWith(wanted)) : [];
-    if (found.length === 1) at = found[0] as string;
-    else {
-      const shown = (hashes: string[]) => hashes.map((h) => shortHash(h, all)).join(", ");
-      const message =
-        wanted.length < 4
-          ? `${opts.version} is too short: a version is named by at least 4 characters of its hash`
-          : found.length === 0
-            ? `${quiz.name} has no version ${opts.version}`
-            : `${opts.version} matches ${found.length} versions of ${quiz.name}: ${shown(found)}`;
-      return libraryFail(io, opts.json, message, { fix: `the versions are: ${shown(all)}` });
-    }
-  }
+  const picked = pickVersion(io, opts.json, quiz, opts.version);
+  if ("exit" in picked) return picked.exit;
+  const at = picked.hash;
 
   const now = nowOf(io);
   const history = readHistory(root, quiz);

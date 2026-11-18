@@ -52,6 +52,8 @@ export type BuildOptions = {
   open: boolean;
   /** `quiz replay`: the files are results files, and each is written as the page already submitted */
   replay?: ReplayOptions;
+  /** the profile to check under, already resolved: `library share` builds a stored version under its `check.json` */
+  fixed?: ResolvedProfile;
   /** `--print`: write the printable paper (TECHNICAL_DESIGN.md, section 8) instead of the page */
   print: boolean;
   /** `--seed S` with `--print`: the paper code; null: the quiz's short version draws the orders */

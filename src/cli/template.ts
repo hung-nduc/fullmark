@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
+import type { ResolvedProfile } from "../core/config/resolve";
 import { parse } from "../core/parse";
 import { SKELETON_RULES, skeleton } from "../core/skeleton";
 import { slug } from "../core/slug";
@@ -50,6 +51,18 @@ export function runTemplateList(json: boolean, io: CheckIo): ExitCode {
 
 export type TemplateAddOptions = { as: string | null; skeleton: boolean; replace: boolean; json: boolean };
 
+/** What `quiz library template add` changes about `template add` (COMMANDS.md): the profile, the default name and the words. */
+export type TemplateAddLibrary = {
+  /** the rules the version was registered with (`check.json`), which the quiz is checked under, not the config's */
+  profile: ResolvedProfile | null;
+  /** the name when `--as` is not given: the library quiz's own */
+  name: string;
+  /** where it came from, as the output says: `rust-basics version 9f3a` */
+  from: string;
+  /** `rust-basics`, for the `next:` line's neighbours */
+  quiz: string;
+};
+
 const same = (a: { path: string; bytes: Buffer }[], b: { path: string; bytes: Buffer }[]): boolean =>
   a.length === b.length &&
   a.every((f, i) => f.path === b[i]?.path && f.bytes.equals((b[i] as { bytes: Buffer }).bytes));
@@ -63,11 +76,21 @@ function freeName(name: string, taken: ReadonlySet<string>): string {
  * `template add FILE` (COMMANDS.md). A full quiz must pass `check`; a skeleton fails it by design and gets a
  * structural check instead: it parses, the profile exists, and every error it has is an emptied field's.
  */
-export function runTemplateAdd(file: string, opts: TemplateAddOptions, io: CheckIo): Promise<ExitCode> {
-  return add(file, opts, io);
+export function runTemplateAdd(
+  file: string,
+  opts: TemplateAddOptions,
+  io: CheckIo,
+  library?: TemplateAddLibrary,
+): Promise<ExitCode> {
+  return add(file, opts, io, library);
 }
 
-async function add(file: string, opts: TemplateAddOptions, io: CheckIo): Promise<ExitCode> {
+async function add(
+  file: string,
+  opts: TemplateAddOptions,
+  io: CheckIo,
+  library?: TemplateAddLibrary,
+): Promise<ExitCode> {
   const m = machineOf(io);
   const refuse = (
     code: ExitCode,
@@ -88,7 +111,7 @@ async function add(file: string, opts: TemplateAddOptions, io: CheckIo): Promise
     return refuse(EXIT.usage, `${file}: cannot read the file: ${readFailure(error)}`, { file });
   }
 
-  const name = opts.as ?? slug(stem(file));
+  const name = opts.as ?? library?.name ?? slug(stem(file));
   if (!NAME.test(name)) {
     return refuse(
       EXIT.usage,
@@ -105,7 +128,15 @@ async function add(file: string, opts: TemplateAddOptions, io: CheckIo): Promise
   }
 
   // the checks
-  const check: CheckOptions = { profile: null, config: null, strict: false, review: null, json: false, plain: true };
+  const check: CheckOptions = {
+    profile: null,
+    config: null,
+    strict: false,
+    review: null,
+    json: false,
+    plain: true,
+    ...(library?.profile ? { fixed: library.profile } : {}),
+  };
   const result = checkFile(file, check, io);
   if (result.status === "error") return refuse(EXIT.usage, `${file}: ${result.message}`, { file });
   if (opts.skeleton) {
@@ -148,6 +179,7 @@ async function add(file: string, opts: TemplateAddOptions, io: CheckIo): Promise
     if (same(now, out.files)) {
       if (opts.json) io.out(JSON.stringify({ status: "unchanged", name, path: shownPath(target, io.cwd) }));
       else io.out(`template ${name} is already stored with this content: unchanged`);
+      if (library) (opts.json ? io.err : io.out)(`next: quiz new ${name} PATH`);
       return EXIT.done;
     }
     if (!opts.replace) {
@@ -177,7 +209,13 @@ async function add(file: string, opts: TemplateAddOptions, io: CheckIo): Promise
   }
   if (opts.json)
     io.out(JSON.stringify({ status: replaced ? "replaced" : "added", name, path: shownPath(target, io.cwd) }));
-  else
+  if (library) {
+    const say = opts.json ? io.err : io.out;
+    say(
+      `template ${replaced ? "replaced" : "added"} ${name}${opts.skeleton ? " (a skeleton)" : ""}, from ${library.from}`,
+    );
+    say(`next: quiz new ${name} PATH`);
+  } else if (!opts.json)
     io.out(
       `${replaced ? "replaced" : "added"} template ${name} in ${shownPath(target, io.cwd)}${opts.skeleton ? " (a skeleton)" : ""}`,
     );

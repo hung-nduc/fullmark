@@ -6,7 +6,7 @@ import { suggest } from "../core/parse/report";
 import { CHECK_FILE, readCheck } from "../library/check-file";
 import { Git, type GitExec } from "../library/git";
 import { type IndexQuiz, type IndexRead, type LibraryIndex, readIndex } from "../library/index-file";
-import { INDEX_FILE, libraryPaths } from "../library/layout";
+import { INDEX_FILE, libraryPaths, shortHash } from "../library/layout";
 import type { LockEnv } from "../library/lock";
 import { realLockEnv } from "../library/lock";
 import { loadUserConfig, type Machine, realMachine } from "./config";
@@ -57,6 +57,17 @@ export function libraryFail(
   if (extra.fix) io.err(`    fix: ${extra.fix}`);
   for (const d of extra.details ?? []) io.err(d);
   return EXIT.usage;
+}
+
+/**
+ * A refusal: the library is fine and the command would not be safe or would clash (a name taken, a quiz with changes not
+ * in git). `error: MESSAGE`, then `    fix: FIX`, and with `--json` `{"status": "refused", "message", "fix"}`. Exit 1.
+ */
+export function libraryRefuse(io: LibraryIo, json: boolean, message: string, fix: string): ExitCode {
+  if (json) io.out(JSON.stringify({ status: "refused", message, fix }));
+  io.err(`error: ${message}`);
+  io.err(`    fix: ${fix}`);
+  return EXIT.problems;
 }
 
 /** `file:line: message` and `    fix:` lines for a malformed `config.toml`, as `check` prints them. */
@@ -213,4 +224,29 @@ export function storedProfile(root: string, quiz: IndexQuiz, hash: string): Reso
   } catch {
     return null;
   }
+}
+
+/**
+ * The version a command works on: the current one, or the one `--version` names (a hash, or a prefix of at least 4
+ * characters). A name that is too short, matches none or matches several is a usage error (exit 2), with the versions.
+ */
+export function pickVersion(
+  io: LibraryIo,
+  json: boolean,
+  quiz: IndexQuiz,
+  wanted: string | null,
+): { hash: string } | { exit: ExitCode } {
+  if (wanted === null) return { hash: quiz.current };
+  const all = quiz.versions.map((v) => v.hash);
+  const given = wanted.toLowerCase();
+  const found = given.length >= 4 ? all.filter((h) => h.startsWith(given)) : [];
+  if (found.length === 1) return { hash: found[0] as string };
+  const shown = (hashes: string[]) => hashes.map((h) => shortHash(h, all)).join(", ");
+  const message =
+    given.length < 4
+      ? `${wanted} is too short: a version is named by at least 4 characters of its hash`
+      : found.length === 0
+        ? `${quiz.name} has no version ${wanted}`
+        : `${wanted} matches ${found.length} versions of ${quiz.name}: ${shown(found)}`;
+  return { exit: libraryFail(io, json, message, { fix: `the versions are: ${shown(all)}` }) };
 }
