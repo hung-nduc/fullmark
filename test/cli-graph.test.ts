@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status`, `path`, `register`, `list` and `info` reach neither the page builder, the renderer nor the server.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list` and `info` reach neither the page builder, the renderer nor the server; `library take` loads the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -209,6 +209,18 @@ describe("what each command loads", () => {
       for (const marker of BUILD_ONLY) expect(text, marker).not.toContain(marker);
     });
   }
+
+  it("library take is a chunk of its own with the page builder, the server and the library, reached by a dynamic import() from main", () => {
+    const chunk = chunkWith("// src/cli/library-take.ts");
+    const text = textOf(closure(chunk));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, "// src/library/"]) expect(text, m).toContain(m);
+    for (const m of CLACK) expect(text, m).not.toContain(m);
+    expect(closure(entry("main"))).not.toContain(chunk);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
+    // the commands that only read the library never reach it
+    for (const marker of ["// src/cli/library-list.ts", "// src/cli/library-info.ts", "// src/cli/library-status.ts"])
+      expect(closure(chunkWith(marker))).not.toContain(chunk);
+  });
 
   for (const [command, marker] of [
     ["init", "// src/cli/library-init.ts"],

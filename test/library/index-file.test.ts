@@ -43,7 +43,9 @@ describe("library.toml", () => {
     expect(text.endsWith("\n")).toBe(true);
     expect(text.indexOf("[quizzes.rust-basics]")).toBeLessThan(text.indexOf("[quizzes.signals]"));
     expect(renderIndex({ ...index, quizzes: [...index.quizzes].reverse() })).toBe(text);
-    expect(text).toContain(`versions = [{ hash = "${H1}", added = "2026-11-17T09:05:00+07:00", file = "signals.md" }, { hash = "${H2}"`);
+    expect(text).toContain(
+      `versions = [{ hash = "${H1}", added = "2026-11-17T09:05:00+07:00", file = "signals.md" }, { hash = "${H2}"`,
+    );
   });
 
   it("round-trips: what is read renders to the same bytes", () => {

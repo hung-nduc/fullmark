@@ -590,6 +590,36 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         io,
       );
     });
+  library
+    .command("take")
+    .description("serve a quiz from the library, file the result next to its version and commit")
+    .argument("<name>", "a quiz's name or id")
+    .option("--section <s>", "only this section (its slug or title)")
+    .option("--focus", "tick Focus mode on the start screen")
+    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .option("--no-open", "do not open the page in the browser")
+    .option("--timeout <seconds>", "how long to wait for a submit; 0 waits forever (default 0)")
+    .option("--port <n>", "the port on 127.0.0.1 (default: a free one)")
+    .option("--json", "print a listening line, then the outcome, as JSON on stdout")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-take")).runLibraryTake(
+        name,
+        {
+          section: text("section"),
+          focus: Boolean(options.focus),
+          open: options.open !== false,
+          timeout: text("timeout"),
+          port: text("port"),
+          fonts: text("fonts"),
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          version: VERSION,
+        },
+        io,
+      );
+    });
   return program;
 }
 

@@ -114,6 +114,7 @@ function progressWarnings(root: string, quiz: IndexQuiz, current: string): { ver
   const out: { version: string; text: string }[] = [];
   const all = quiz.versions.map((v) => v.hash);
   for (const name of names.sort()) {
+    if (!/^[0-9a-f]{64}\.json$/.test(name)) continue; // not `<hash>.serving.json` or `<hash>.submitted.json`
     const hash = name.slice(0, -".json".length);
     if (hash === current) continue;
     let detail = "";
@@ -530,7 +531,10 @@ export async function runLibraryRegister(
             title: fm.title,
             source: w.abs,
             current: w.hash,
-            versions: w.what === "version" ? [...old.versions, { hash: w.hash, added: now, file: basename(w.abs) }] : old.versions,
+            versions:
+              w.what === "version"
+                ? [...old.versions, { hash: w.hash, added: now, file: basename(w.abs) }]
+                : old.versions,
           });
         }
       }

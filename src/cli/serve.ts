@@ -19,6 +19,7 @@ import { checkFile, describeOutcome, issueJson } from "./check";
 import { loadConfig, realMachine } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
+import type { LoadedQuiz } from "./load";
 import { readFailure, shownPath } from "./paths";
 
 export type ServeOptions = {
@@ -53,7 +54,7 @@ export type ServeIo = BuildIo & {
 const pad = (n: number): string => String(n).padStart(2, "0");
 
 /** `YYYYMMDD-HHMMSS` in local time: the page's export name, so the two kinds of file sort together. */
-const localStamp = (d: Date): string =>
+export const localStamp = (d: Date): string =>
   `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 
 const defaultInterrupt = (handler: () => void): (() => void) => {
@@ -126,30 +127,90 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
     }
     return EXIT.problems;
   }
-  const loaded = result.loaded;
-  const quiz = loaded.quiz as Quiz;
-  const hash = loaded.hash ?? "";
   for (const issue of result.issues) {
     if (issue.level === "warning") io.err(`${issue.file}:${issue.line}: warning ${issue.rule}: ${issue.message}`);
   }
+  const served = await serveLoaded(result.loaded, file, opts, io, {});
+  if ("exit" in served) return served.exit;
+  const { outcome, target, taken } = served;
+  switch (outcome.status) {
+    case "submitted": {
+      const shown = shownPath(target, io.cwd);
+      if (opts.json) io.out(JSON.stringify({ status: "submitted", results: shown, score: taken.score ?? null }));
+      else io.out(`wrote ${shown}`);
+      return EXIT.done;
+    }
+    case "timeout":
+      if (opts.json) io.out(JSON.stringify({ status: "timeout" }));
+      io.err(`timed out after ${served.timeout} seconds without a submit; nothing was written`);
+      return EXIT.usage;
+    case "interrupted":
+      if (opts.json) io.out(JSON.stringify({ status: "interrupted" }));
+      io.err("stopped; nothing was written");
+      return EXIT.usage;
+    case "error": {
+      const e = outcome.message;
+      fail(io, opts.json, `cannot write the results: ${e}`, { file: shownPath(target, io.cwd) });
+      return EXIT.usage;
+    }
+  }
+}
+
+/** A section by its slug or title, ignoring case; the plain-words problem (the valid sections) when there is none. */
+export function findSection(quiz: Quiz, name: string): Quiz["sections"][number] | string {
+  const wanted = name.toLowerCase();
+  const titled = quiz.sections.filter((s) => s.title !== null && s.id !== "");
+  const found =
+    titled.find((s) => s.id.toLowerCase() === wanted) ?? titled.find((s) => (s.title ?? "").toLowerCase() === wanted);
+  if (found !== undefined) return found;
+  const valid = titled.map((s) => `${s.id} (${s.title})`);
+  return `unknown section "${name}"; the sections are: ${valid.length > 0 ? valid.join(", ") : "(none: the quiz has no titled section)"}`;
+}
+
+/** What a caller other than `serve` (`library take`) changes about a served quiz. */
+export type ServeHooks = {
+  /** a plan of some questions the page starts as it starts a retry (`take --missed`) */
+  plan?: { source: "missed"; questions: string[] };
+  /** the ids of the questions the page marks "changed since you missed it" */
+  changed?: string[];
+  /** told once the server is up, in place of the `listening` line and the two lines on stderr */
+  announce?: (server: { url: string; port: number }) => void;
+};
+
+/** A quiz served: how the server ended, where the results went, and the score of the submit. */
+export type Served = {
+  outcome: ServerOutcome;
+  target: string;
+  timeout: number;
+  taken: { score?: ReturnType<typeof buildReport>["score"] };
+};
+
+/**
+ * What `runServe` does once the quiz is loaded and checked, and what `library take` does with a stored version: the
+ * options as `serve`'s, the server run until its outcome. The caller words that outcome. `file` names the source for
+ * the machine's config and for what is printed. Failures are reported and returned as `{exit}`.
+ */
+export async function serveLoaded(
+  loaded: LoadedQuiz,
+  file: string,
+  opts: ServeOptions,
+  io: ServeIo,
+  hooks: ServeHooks,
+): Promise<Served | { exit: ExitCode }> {
+  const quiz = loaded.quiz as Quiz;
+  const hash = loaded.hash ?? "";
+  const timeout = opts.timeout === null ? 1800 : (wholeNumber(opts.timeout, 0) ?? 1800);
+  const port = opts.port === null ? 0 : (wholeNumber(opts.port, 1) ?? 0);
 
   // `--section`: by slug or title, ignoring case; an unknown one stops here, before anything is served
   let section: string | null = null;
   if (opts.section !== null) {
-    const wanted = opts.section.toLowerCase();
-    const titled = quiz.sections.filter((s) => s.title !== null && s.id !== "");
-    const found =
-      titled.find((s) => s.id.toLowerCase() === wanted) ?? titled.find((s) => (s.title ?? "").toLowerCase() === wanted);
-    if (found === undefined) {
-      const valid = titled.map((s) => `${s.id} (${s.title})`);
-      fail(
-        io,
-        opts.json,
-        `unknown section "${opts.section}"; the sections are: ${valid.length > 0 ? valid.join(", ") : "(none: the quiz has no titled section)"}`,
-      );
-      return EXIT.usage;
+    const found = findSection(quiz, opts.section);
+    if (typeof found !== "string") section = found.id;
+    else {
+      fail(io, opts.json, found);
+      return { exit: EXIT.usage };
     }
-    section = found.id;
   }
 
   // `--autosave`: a file left by an earlier run is checked before anything is served, and never overwritten unseen
@@ -175,14 +236,14 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         fail(io, opts.json, `cannot read the progress file: ${readFailure(error)}`, { file: shown });
-        return EXIT.usage;
+        return { exit: EXIT.usage };
       }
     }
     if (text !== null) {
       const read = parseResults(text);
-      const refuse = (message: string): ExitCode => {
+      const refuse = (message: string): { exit: ExitCode } => {
         fail(io, opts.json, `${message}; nothing was served and the file was left alone`, { file: shown });
-        return EXIT.problems;
+        return { exit: EXIT.problems };
       };
       if (!read.ok) return refuse(`this is not a progress file (${read.message.split("\n")[0]})`);
       const attempt = attemptOf(read.results);
@@ -216,7 +277,7 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
   })();
   if (runtime === null || serveModule === null) {
     fail(io, opts.json, "the page runtime is missing next to the program: run `npm run build`");
-    return EXIT.usage;
+    return { exit: EXIT.usage };
   }
 
   const machine = io.machine ?? { ...realMachine(), cwd: io.cwd };
@@ -260,7 +321,7 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
       opts.json,
       "--autosave and --out name the same file; the progress file is deleted once the results are written",
     );
-    return EXIT.usage;
+    return { exit: EXIT.usage };
   }
   const pace = io.autosaveClock ?? {
     now: () => Date.now(),
@@ -331,13 +392,17 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
       opts.json,
       `cannot start the server${port ? ` on port ${port}` : ""}: ${e.code === "EADDRINUSE" ? "the port is in use" : readFailure(error)}`,
     );
-    return EXIT.usage;
+    return { exit: EXIT.usage };
   }
 
   const removeInterrupt = (io.onInterrupt ?? defaultInterrupt)(() => server.stop());
-  if (opts.json) io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
-  io.err(`serving ${shownPath(source, io.cwd)} at ${server.url}`);
-  io.err("waiting for Submit (Ctrl+C to stop)");
+  if (hooks.announce) hooks.announce({ url: server.url, port: server.port });
+  else {
+    if (opts.json)
+      io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
+    io.err(`serving ${shownPath(source, io.cwd)} at ${server.url}`);
+    io.err("waiting for Submit (Ctrl+C to stop)");
+  }
   if (opts.open) {
     try {
       await (io.open ?? systemOpen)(server.url);
@@ -353,25 +418,5 @@ export async function runServe(file: string, opts: ServeOptions, io: ServeIo): P
   removeInterrupt();
   // stopped without a submit: the last progress still waiting for its second is kept, so the attempt resumes
   if (outcome.status !== "submitted") await autosaver?.flush();
-  switch (outcome.status) {
-    case "submitted": {
-      const shown = shownPath(target, io.cwd);
-      if (opts.json) io.out(JSON.stringify({ status: "submitted", results: shown, score: taken.score ?? null }));
-      else io.out(`wrote ${shown}`);
-      return EXIT.done;
-    }
-    case "timeout":
-      if (opts.json) io.out(JSON.stringify({ status: "timeout" }));
-      io.err(`timed out after ${timeout} seconds without a submit; nothing was written`);
-      return EXIT.usage;
-    case "interrupted":
-      if (opts.json) io.out(JSON.stringify({ status: "interrupted" }));
-      io.err("stopped; nothing was written");
-      return EXIT.usage;
-    case "error": {
-      const e = outcome.message;
-      fail(io, opts.json, `cannot write the results: ${e}`, { file: shownPath(target, io.cwd) });
-      return EXIT.usage;
-    }
-  }
+  return { outcome, target, timeout, taken };
 }

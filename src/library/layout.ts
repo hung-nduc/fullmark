@@ -32,6 +32,10 @@ export type QuizPaths = {
   progress: string;
   /** `progress/<version>.json` */
   progressFile(hash: string): string;
+  /** `progress/<version>.serving.json`: who is serving that version now (G9) */
+  servingFile(hash: string): string;
+  /** `progress/<version>.submitted.json`: a submit written by the server, not yet filed (G9) */
+  submittedFile(hash: string): string;
 };
 
 /** Every path of a library, so that no command builds one by hand. */
@@ -72,6 +76,8 @@ export function libraryPaths(root: string): LibraryPaths {
         review: join(dir, "review.json"),
         progress,
         progressFile: (hash) => join(progress, `${hash}.json`),
+        servingFile: (hash) => join(progress, `${hash}.serving.json`),
+        submittedFile: (hash) => join(progress, `${hash}.submitted.json`),
       };
     },
   };
