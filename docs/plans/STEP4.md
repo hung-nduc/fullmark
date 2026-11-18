@@ -8,7 +8,7 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](archive/STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
 
-**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G7, below), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
+**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G15, below), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
 
 **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
 
@@ -16,12 +16,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-16); waits for the owner: the plan, the slice order and G1 to G7 | this file |
+| plan | written (2026-11-16); G8 to G15 added (2026-11-18) after a read of COMMANDS.md's library commands; waits for the owner: the plan, the slice order and G1 to G15 | this file |
 
 ### Next
 
-1. The owner approves this plan and decides G1 to G7.
-2. The planner writes the decisions into `docs/design/`, then **4a**'s brief.
+1. The owner approves this plan and decides G1 to G15.
+2. The planner writes the decisions into `docs/design/`, with G15's output samples and JSON shapes, then **4a**'s brief (4a needs none of the gaps and may start first).
 
 ## Goal
 
@@ -74,6 +74,22 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 **G6. "History-based tests".** **Recommendation:** as the Goal says: one helper, `test/helpers/library-history.ts`, that builds a library through the real commands (register, update, files results and grades as `take` and `grade` would, with a fixed clock), used by the unit tests and the samples; its goldens are the step's acceptance.
 
 **G7. The output of the reading commands.** `list`, `info` and `status` have `--plain` and `--json`; their terminal look is not drawn. **Recommendation:** the look of `stats` and `inspect` (step 3): a heading line, aligned columns, `--plain` with no colour; `list` one row per quiz, sorted by name, columns name, title, versions, attempts, last, best, taken, with `changed` and `ungraded` as marks after the name. No board: the goldens are the review.
+
+**G8. The exit code for "no library".** COMMANDS.md disagrees with itself: `register`, `info`, `template add` and `import` exit `3`, `status` and `list` exit `2`. Exit `3` means "a human-only value is missing", which a library is not (it is set up once, by `init`). **Recommendation:** `2` for every library command, with the message "no library: run `quiz library init PATH`"; `import`'s "no library and no `--into`" becomes `2` too.
+
+**G9. `take` and the lock.** `take` serves with no time limit, and the lock is held "until done". Holding it while the page is open would make every other changing command (`grade`, `register`, a second `take`) wait 10 seconds and fail for as long as a quiz is open. **Recommendation:** `take` takes the lock only to file the result and commit, never while serving. Two `take`s of the same quiz are kept apart by the progress file instead: it holds the serving process's id and URL, and a second `take` of that quiz while the first's process is alive exits 2, printing the URL to open; a progress file whose process is gone is resumed (G4).
+
+**G10. `library rm --json` without `--yes`.** `--json` never prompts, and `rm` asks. **Recommendation:** as `template rm`: with `--json` and without `--yes`, exit 2, with the fix "add `--yes`".
+
+**G11. What `library status` counts as a problem.** It lists diagnostics and exits `1` on "problems", without saying which. **Recommendation:** **problems** (exit `1`): the configured folder missing or not a library, `library.toml` that does not parse or names a version folder that is missing, a version whose files no longer match its hash, a library `fullmark.toml` that does not parse or names unknown rules. **Notes** (exit `0`, printed): uncommitted changes, no remote, no git repository (`--no-git`), orphan files, a stale lock, `FULLMARK_LIBRARY` set. `--json`: `{"status": "healthy" | "problems", "library", "config", "git": {"repository", "uncommitted", "remote"}, "counts": {"quizzes", "versions", "attempts", "reports"}, "problems": [{"code", "path", "message", "fix"}], "notes": [{"code", "path", "message"}]}`.
+
+**G12. Quiz ids in the library.** G1 names folders by the quiz's `id`, and `new` warns that two quizzes sharing an id would mix their histories, but `register` does not say what happens when they do. **Recommendation:** a new quiz (no `--update`) whose `id` is already in the library is refused (exit `1`, rule `library.id-taken`) with two fixes: "if it is the same quiz, `--update NAME`; if not, give it a new `id:`"; two files in one batch with the same id are refused the same way. `--update NAME` with a file whose `id` is not that quiz's is refused (`library.id-mismatch`), since a version keeps its quiz's id.
+
+**G13. What a name is.** A quiz is named "by its name or its id", and the default name is the slugged title, but no rule says what a valid name is or what happens when one quiz's name is another's id. **Recommendation:** a name is a slug (`a`–`z`, `0`–`9`, `-`, 1 to 64 characters, as `new` makes ids), checked by `register -n`, `--update` and `rename`; it may equal the quiz's own id but not another quiz's name or id (exit `1`, "name taken", with a free name suggested). Lookup tries names first, then ids, so it is never ambiguous.
+
+**G14. `library stats` with one attempt.** `quiz stats` needs two files; `library stats` exits 2 on "no attempts" and says nothing of one. **Recommendation:** one attempt is shown (the same blocks, `Weakest` left out until a tag is seen twice, as its rule already says); only no attempts exits 2.
+
+**G15. The output of every other library command.** G7 covers `list`, `info` and `status`; the human output of `init`, `register`, `take`, `replay`, `grade`, `share`, `template add`, `rename`, `rm` and `path` is not drawn, and `init`, `share`, `rename`, `rm` and `path` have no `--json` shape (`library stats`'s is presumably `quiz stats`'s; `take`'s `status` values are not listed). **Recommendation:** before 4b, the planner writes a text sample and a `--json` shape for every library command into COMMANDS.md, in the style of `inspect` (G7), as one commit for the owner to read; the slices then build to them and the goldens check them.
 
 ## Slices
 
