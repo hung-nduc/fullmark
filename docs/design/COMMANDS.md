@@ -669,7 +669,7 @@ quizzes/<id>/
 quiz library init [PATH] [--force] [--no-git] [--json]
 ```
 
-Makes `PATH` (default: here) this machine's library and records it in the config. A new, missing or empty folder is set up. An existing library is adopted. A folder with other files is refused.
+Makes `PATH` (default: here) this machine's library and records it in the config. A new, missing or empty folder is set up. An existing library is adopted. A folder with other files is refused. `init` takes the library's lock as soon as the folder exists (creating it first when missing) and decides what the folder is under the lock, so of two `init`s of one new folder started together, one sets it up and the other adopts it.
 
 | Option | Meaning |
 |---|---|

@@ -18,12 +18,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
-| 4b | built and reviewed (2026-11-18); G21 waits for the owner | `c070213`, `eb89812` |
+| 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 
 ### Next
 
-1. The owner decides G21 (4b's review).
-2. The planner writes **4c**'s brief (`register`, `list`, `info`), with G21 as its first task.
+1. The owner approves **4c**'s brief (`register`, `list`, `info`, with G21 first).
+2. One implementing agent (Sonnet) builds it; the planner reviews it.
 
 ## Goal
 
@@ -47,9 +47,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 and G20 are decided too. Open:
-
-**G21. Two `init`s of the same new folder.** Raised in 4b's review, from the agent's report: `init` decides what the folder is (new, empty, a library, refused) before it takes the lock, and takes the lock only to write. Two `init`s of one new folder started together can both decide "new"; the second waits for the lock, then writes over the first's `library.toml` and makes a second commit. **Recommendation:** `init` takes the lock as soon as the folder exists (creating it first when missing) and decides what the folder is under the lock, so the second `init` finds a library and adopts it. A test runs two `init`s together and finds one `created`, one `adopted`, one commit. The first task of 4c's brief.
+G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 to G21 are decided too. New ones found while building are added here from G22.
 
 ## Slices
 
@@ -181,4 +179,4 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 **Done differently, accepted:** two older tests that used a `[library]` table in `config.toml` now use `[shelves]` (`library` is a string now; step 5 gives `[shelves]` a meaning, and those tests change then); `writeIndex` takes the atomic writer as a parameter, since `src/library/` may not import `src/cli/`; `status`'s `Checks` row only when healthy (as both COMMANDS.md samples); the `library.hash` fix names the full hash so it can be pasted; `status`'s identity note has the `user.name` line only, as the board; codes the design did not name (`library.missing`, `library.index`, `library.version-missing`, `config.invalid`; notes `git.no-repository`, `git.unavailable`, `library.orphan`); a `--json` error may carry `"fix"`; a missing `config.toml` named by `FULLMARK_CONFIG` is not an error for library commands (`init` creates it); the waiting line on stderr; `TZ=UTC` in the goldens' environment, so `created` is the same on every machine.
 
-**Gaps:** G21.
+**Gaps:** G21, decided by the owner on 2026-11-18 as recommended.
