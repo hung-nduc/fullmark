@@ -70,6 +70,7 @@ choice.correct-longest    quality  error    the right choice is much longer than
                           options: min-length=40, ratio=1.8
 choice.in-stem            quality  error    the question text already contains the right choice
                           options: min-length=12
+content.names-control     quality  error    a text a learner reads names a control of the page, which the paper does not have
 explanation.short         quality  error    an explanation is too short to teach anything
                           options: min-words=8
 explanation.missing       quality  error    a graded question has no explanation

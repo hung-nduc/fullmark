@@ -5,6 +5,7 @@ import type { AssetRef, FrontMatter, Quiz } from "../core/ir";
 import type { Issue } from "../core/issue";
 import { type ParseOptions, parse } from "../core/parse";
 import { parseSheet } from "../core/parse/sheet";
+import { NAMES_CONTROL_RULE, textFinding } from "../core/rules/names-control";
 
 const IMAGE_TYPES = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"];
 const AUDIO_TYPES = [".mp3", ".ogg", ".wav", ".m4a"];
@@ -212,6 +213,10 @@ export function loadQuiz(file: string, options: ParseOptions = {}): LoadedQuiz {
     for (const issue of sheet.issues) {
       issues.push(issue);
       if (issue.level === "error") sheetErrors = true;
+    }
+    // a sheet is text a learner reads: `content.names-control` looks at it here, since a rule sees only the quiz
+    for (const found of textFinding(f.text.replace(/^\uFEFF/, ""), 1, parsed.frontMatter.lang)) {
+      issues.push({ rule: NAMES_CONTROL_RULE, level: "warning", file: f.shown, ...found });
     }
     const sheetDir = dirname(resolve(folder, f.rel));
     addAssets(sheet.assets, sheetDir, f.shown, "the sheet");

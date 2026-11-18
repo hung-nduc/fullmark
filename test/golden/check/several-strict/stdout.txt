@@ -38,6 +38,12 @@ quality/code.unknown-language.ok.md: profile default (built-in) from the default
 quality/code.unknown-language.ok.md:5: warning rubric.missing: the question has no rubric
     fix: add a `rubric:` to the answer block
 quality/code.unknown-language.ok.md: 0 errors, 1 warning
+quality/content.names-control.md: profile default (built-in) from the default; config: none
+quality/content.names-control.md:11: warning content.names-control: names a control of the page; the paper has none
+    fix: reword "Click": say what it is, not which control shows it (QUIZ_SYNTAX.md, section 8)
+quality/content.names-control.md: 0 errors, 1 warning
+quality/content.names-control.ok.md: profile default (built-in) from the default; config: none
+quality/content.names-control.ok.md: 0 errors, 0 warnings
 quality/explanation.missing.md: profile default (built-in) from the default; config: none
 quality/explanation.missing.md: 0 errors, 0 warnings
 quality/explanation.missing.ok.md: profile default (built-in) from the default; config: none
@@ -90,4 +96,4 @@ quality/rubric.thin.md:8: warning rubric.thin: the rubric has 1 criterion; at le
 quality/rubric.thin.md: 0 errors, 1 warning
 quality/rubric.thin.ok.md: profile default (built-in) from the default; config: none
 quality/rubric.thin.ok.md: 0 errors, 0 warnings
-16 done, 14 failed
+17 done, 15 failed

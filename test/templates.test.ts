@@ -38,3 +38,24 @@ describe("the built-in templates in dist/templates", () => {
     });
   }
 });
+
+describe("content.names-control over what ships", () => {
+  const quizzes = [
+    ...readdirSync(join(root, "examples"), { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      .map((e) => join(root, "examples", e.name, "quiz.md")),
+    join(root, "templates", "blank", "quiz.md"),
+  ];
+
+  it("covers every example and the blank template", () => {
+    expect(quizzes.length).toBe(8);
+  });
+
+  for (const file of quizzes) {
+    it(`${file.slice(root.length + 1)}: no finding of the rule`, () => {
+      const result = checkFile(file, opts, capture(root).io);
+      if (result.status === "error") throw new Error(result.message);
+      expect(result.issues.filter((i) => i.rule === "content.names-control")).toEqual([]);
+    });
+  }
+});

@@ -48,6 +48,7 @@ describe("quality rules under each built-in profile", () => {
     "quiz.no-time-limit": ["off", "off", "off", "off"],
     "answers.position-skew": ["warning", "info", "error", "off"],
     "code.unknown-language": ["warning", "info", "error", "warning"],
+    "content.names-control": ["warning", "info", "error", "warning"],
     "question.points-ignored": ["warning", "info", "error", "warning"],
     "rubric.missing": ["warning", "info", "error", "warning"],
     "rubric.thin": ["warning", "info", "error", "warning"],

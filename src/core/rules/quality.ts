@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Question, Quiz } from "../ir";
 import { correctPositions } from "../positions";
 import { file } from "./example";
+import { namesControl } from "./names-control";
 import type { Finding, QualityRule } from "./types";
 
 /** The question types a computer grades by itself, and so can have a key and an explanation worth checking. */
@@ -200,6 +201,17 @@ export const QUALITY_RULES: QualityRule[] = [
       }
       return out;
     },
+  }),
+  rule({
+    id: "content.names-control",
+    level: "warning",
+    summary: "a text a learner reads names a control of the page, which the paper does not have",
+    why: 'A quiz becomes a page and a paper from the same text; a text that names the Check button or says "click" means nothing on the paper. Say what a thing is, not which control shows it.',
+    example: file(
+      "## Pick one. {type=single id=q}\n\n- [x] a\n- [ ] b\n\n::: hint\nClick **Check** to see the answer.\n:::",
+    ),
+    fix: "say what it is, not which control shows it (QUIZ_SYNTAX.md, section 8)",
+    run: (quiz) => namesControl(quiz),
   }),
   rule({
     id: "explanation.short",

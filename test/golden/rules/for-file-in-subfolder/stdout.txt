@@ -70,6 +70,7 @@ choice.correct-longest    quality  info     the right choice is much longer than
                           options: min-length=40, ratio=1.8
 choice.in-stem            quality  info     the question text already contains the right choice  [profile draft]
                           options: min-length=12
+content.names-control     quality  info     a text a learner reads names a control of the page, which the paper does not have  [profile draft]
 explanation.short         quality  info     an explanation is too short to teach anything  [profile draft]
                           options: min-words=4
 explanation.missing       quality  off      a graded question has no explanation  [built-in]

@@ -70,6 +70,7 @@ choice.correct-longest    quality  warning  the right choice is much longer than
                           options: min-length=40, ratio=1.8
 choice.in-stem            quality  warning  the question text already contains the right choice
                           options: min-length=12
+content.names-control     quality  warning  a text a learner reads names a control of the page, which the paper does not have
 explanation.short         quality  warning  an explanation is too short to teach anything
                           options: min-words=4
 explanation.missing       quality  off      a graded question has no explanation

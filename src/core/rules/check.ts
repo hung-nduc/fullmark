@@ -169,7 +169,8 @@ function applyIgnores(
     }
   }
   const kept = issues.filter((i) => {
-    const q = questionAt(questions, i.line);
+    // a finding in another file (a materials sheet) is not under any question of this one
+    const q = i.file === file ? questionAt(questions, i.line) : undefined;
     return !(q && suppress.has(`${q.line}\u0000${i.rule}`));
   });
   return [...kept, ...extra];
