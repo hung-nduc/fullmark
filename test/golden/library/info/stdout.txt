@@ -1,0 +1,16 @@
+study-fixture · Study fixture · version 89a5
+Identity   id study · quiz · en · profile default
+Source     /home/minh/notes/study.md · the file is gone
+Content    7 questions · 17 points · 2 sections · untimed
+Sections   part-one 4 questions, 4 points · part-two 3, 13
+Types      single 4 (4 points) · truefalse 1 (1) · essay 2 (12)
+Tags       numbers 3 · logic 2 · writing 2
+Versions   89a5  10 Nov  current · 1 added, 1 removed, 1 changed
+           1432  15 Oct  1 added, 1 changed
+           2a73   1 Oct  first version
+Shelves    none
+Attempts   6 · 3 Oct to 16 Nov · last 15%* · best 100% · weakest numbers, writing, logic
+           ungraded: 20261010-100000 (2 essays)
+           ungraded: 20261017-100000 (2 essays)
+           ungraded: 20261116-201412 (1 essay)
+Path       lib/quizzes/study

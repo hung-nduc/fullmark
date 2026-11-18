@@ -1,0 +1,2 @@
+error: no quiz named study-fixtur
+    did you mean: study-fixture

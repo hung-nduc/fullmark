@@ -1,0 +1,2 @@
+error: no quiz named physics
+    the quizzes are: limits-and-continuity, study-fixture

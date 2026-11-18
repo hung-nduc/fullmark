@@ -44,6 +44,8 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     )
     .helpOption("-h, --help", "help for the command")
     .helpCommand("help [command]", "help for a command")
+    // `--version` is the program's own option before a command; after `library info NAME` it is that command's
+    .enablePositionalOptions()
     .exitOverride();
 
   const noColor = () => "NO_COLOR" in process.env;
@@ -560,6 +562,31 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
           json: Boolean(options.json),
           plain: Boolean(options.plain) || noColor(),
         },
+        io,
+      );
+    });
+  library
+    .command("list")
+    .description("every quiz in the library: versions, attempts, last score, and a note when its source changed")
+    .option("--json", "print the quizzes as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (options: { json?: boolean; plain?: boolean }) => {
+      outcome.exit = (await import("./library-list")).runLibraryList(
+        { json: Boolean(options.json), plain: Boolean(options.plain) || noColor() },
+        io,
+      );
+    });
+  library
+    .command("info")
+    .description("everything about one quiz: content, versions, attempts, review and where it lives")
+    .argument("<name>", "a quiz's name or id")
+    .option("--version <hash>", "show this version's content (a hash, or a prefix of at least 4 characters)")
+    .option("--json", "print the quiz's row and more as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: { version?: string; json?: boolean; plain?: boolean }) => {
+      outcome.exit = (await import("./library-info")).runLibraryInfo(
+        name,
+        { version: options.version ?? null, json: Boolean(options.json), plain: Boolean(options.plain) || noColor() },
         io,
       );
     });

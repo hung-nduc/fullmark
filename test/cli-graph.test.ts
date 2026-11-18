@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status` and `path` reach neither the page builder, the renderer nor the server.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list` and `info` reach neither the page builder, the renderer nor the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -214,6 +214,9 @@ describe("what each command loads", () => {
     ["init", "// src/cli/library-init.ts"],
     ["status", "// src/cli/library-status.ts"],
     ["path", "// src/cli/library-path.ts"],
+    ["register", "// src/cli/library-register.ts"],
+    ["list", "// src/cli/library-list.ts"],
+    ["info", "// src/cli/library-info.ts"],
   ] as const) {
     it(`library ${command} is a chunk of its own, reached by a dynamic import() from main, and never loads the page builder, the renderer or the server`, () => {
       const chunk = chunkWith(marker);

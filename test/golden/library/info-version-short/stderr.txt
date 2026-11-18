@@ -1,0 +1,2 @@
+error: 14 is too short: a version is named by at least 4 characters of its hash
+    fix: the versions are: 2a73, 1432, 89a5

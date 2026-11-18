@@ -1,0 +1,6 @@
+library
+info
+study-fixture
+--version
+14322b
+--json

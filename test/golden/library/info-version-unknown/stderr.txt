@@ -1,0 +1,2 @@
+error: study-fixture has no version abcd
+    fix: the versions are: 2a73, 1432, 89a5

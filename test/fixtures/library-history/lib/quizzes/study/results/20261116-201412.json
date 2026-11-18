@@ -1,0 +1,44 @@
+{
+  "format": "fullmark-results",
+  "version": 2,
+  "quizHash": "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27",
+  "plan": {
+    "source": "full",
+    "questions": [
+      "prime",
+      "even",
+      "syll",
+      "late",
+      "add",
+      "ielts"
+    ]
+  },
+  "state": {
+    "answers": {
+      "prime": {
+        "choice": 0
+      },
+      "even": {
+        "value": false
+      },
+      "syll": {
+        "choice": 0
+      },
+      "late": {
+        "choice": 1
+      },
+      "add": {
+        "text": "The transform maps a signal to the frequency domain; we apply it to input and output and divide."
+      },
+      "ielts": null
+    },
+    "startedAt": "2026-11-16T20:00:00",
+    "submittedAt": "2026-11-16T20:14:12",
+    "timeUsed": 600,
+    "sectionTime": {},
+    "flagged": [],
+    "checked": [],
+    "timedOut": false
+  },
+  "phase": "submitted"
+}
