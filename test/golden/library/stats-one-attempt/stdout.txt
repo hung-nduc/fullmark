@@ -1,0 +1,5 @@
+study-fixture · Study fixture · 1 attempt, 1 version
+Attempts   3 Oct 25% (12 points pending)
+Tags       logic 0% (0 of 1 points) · numbers 50% · no tag 0%
+Weakest    none yet (a tag needs two attempts)
+Missed     odd "Pick the odd one out." wrong in 1 of 1 · prime "Which number is prime?" wrong in 1 of 1 · syll "Which one is a syllogism?" wrong in 1 of 1

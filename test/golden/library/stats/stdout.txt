@@ -1,0 +1,6 @@
+study-fixture · Study fixture · 7 attempts, 3 versions
+Attempts   3 Oct 50% · 10 Oct (section part-two, 12 points pending) · 17 Oct 60% (12 points pending) · 24 Oct 72% · 31 Oct 100% (retry) · 5 Nov 0% (missed) · 16 Nov 15% (3 points pending)
+Tags       numbers 36% (4 of 11 points) · writing 49% · logic 78% · no tag 50%
+Weakest    numbers, writing, logic
+Missed     prime "Which of these numbers is pri…" wrong in 4 of 5 (changed) · add "Describe the process." wrong in 2 of 2 · even "Zero is an even number." wrong in 2 of 6 (changed) · ielts "To what extent do you agree?" wrong in 2 of 3 · odd "Pick the odd one out." wrong in 2 of 4 · late "Which statement is a fallacy?" wrong in 1 of 4 · syll "Which one is a syllogism?" wrong in 1 of 5
+Criteria   add/defs 100% over 2 attempts · add/derive 75% over 2 attempts · add/interp 50% over 2 attempts · ielts/TR band 5.8 average · ielts/CC band 5.8 average · ielts/LR band 5.5 average · ielts/GRA band 6.0 average
