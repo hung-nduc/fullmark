@@ -20,12 +20,11 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
-| 4d | brief written (2026-11-18); waits for the owner's approval | this file |
+| 4d | brief approved (2026-11-18); being built | this file |
 
 ### Next
 
-1. The owner approves **4d**'s brief (`take`, `replay`, with G22 first).
-2. One implementing agent (Sonnet) builds it; the planner reviews it.
+1. One implementing agent (Sonnet) builds **4d** (`take`, `replay`, with G22 first); the planner reviews it.
 
 ## Goal
 
@@ -250,7 +249,7 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ## Slice 4d: `take`, `replay`
 
-**Brief written on 2026-11-18; waits for the owner's approval.** G4, G5, G9, G17, G22 and the approved boards are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library take`, `quiz library replay`, `quiz serve` (`--autosave`); TECHNICAL_DESIGN.md, section 4 ("Plan and Attempt": the library chooses the plan), section 7 (foundation 9, the lock), section 10 (what *missed* means). This slice is the first that touches the page, so per G20 it runs **Playwright** too.
+**Approved by the owner on 2026-11-18.** G4, G5, G9, G17, G22 and the approved boards are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library take`, `quiz library replay`, `quiz serve` (`--autosave`); TECHNICAL_DESIGN.md, section 4 ("Plan and Attempt": the library chooses the plan), section 7 (foundation 9, the lock), section 10 (what *missed* means). This slice is the first that touches the page, so per G20 it runs **Playwright** too.
 
 ### Read first
 
