@@ -18,6 +18,7 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
+| 4b | brief written (2026-11-18); waits for the owner's approval | this file |
 
 ### Next
 
@@ -105,3 +106,67 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 **Done differently, accepted:** a question's `check-ignore` no longer hides a finding in another file (a bug found here: `applyIgnores` matched by line alone; fixed in `src/core/rules/check.ts` with a test); passages, `fields` labels, `scale` labels and a choice's `input` prompt are read too (text a learner reads); when several words match in one text the earliest is named; a `description` finding is on the `description:` key's line. **Not accepted yet:** the levels in `draft` and `exam`, G19.
 
 **Gaps:** G19 and G20, decided by the owner on 2026-11-18 as recommended.
+
+## Slice 4b: the store
+
+**Brief written on 2026-11-18; waits for the owner's approval.** G1 to G3, G8, G11, G13 and G18 are decided and written into COMMANDS.md ("Library commands": "How library commands print", "The library folder", "Git", `init`, `status`, `path`; "Terminal style"; "Environment") and TECHNICAL_DESIGN.md (section 7, "Library and shelf writes take a lock"; section 11). This slice builds the store every later library command stands on, and the three commands that need nothing else: `library init`, `library status`, `library path`. No quiz is registered yet; `register` is 4c. Tests per G20: no Playwright.
+
+### Read first
+
+- This plan: "Rules for every slice" (step 4's, with G20); STEP4-GAPS.md, G1, G2, G3, G8, G11, G13, G18.
+- COMMANDS.md: "Conventions" (exit codes, common options, "Terminal style", "Paths in output", "Names, ids and stamps", "Environment", the files table), and "Library commands" from its top to the end of `quiz library path`.
+- TECHNICAL_DESIGN.md, section 7: "Architecture" (the layers; `src/library/` uses core only), "Files, formats and safe writes" and the lock; section 11: "Contract tests", "Safe writes".
+- The CLI boards for `init`, `status` and `path` (docs/mockup/boards: LibrarySetup, LibraryStatus, LibraryTidy; LibraryStyleMiddle for the `simple` style), which COMMANDS.md's Output blocks transcribe.
+- Code: `src/cli/main.ts` (how a command is wired, its lazy `import()`), `src/cli/config.ts` (the `Machine`, `userConfigPath`), `src/core/config/parse.ts` (the user config's parse; only `[profiles.*]`, `fonts` and `[brief]` are read today), `src/cli/atomic.ts`, `src/cli/fail.ts`, `src/cli/exit-codes.ts`, `src/cli/paths.ts`, `src/cli/seed.ts` (the `FULLMARK_TEST_SEED` pattern), `src/core/hash.ts`, `src/cli/load.ts`; `test/cli-graph.test.ts`, `test/core-boundary.test.ts`, `test/golden/runner.ts` (`cmd.txt`, `copy.txt`, `env.txt`), `test/helpers/cli.ts`.
+
+### Decided for this slice
+
+**Layers.**
+- `src/library/` is the store: the layout's paths, `library.toml`'s schema, reader and writer, the lock, the git runner. It imports `node:*` and `src/core/` only, never `src/cli/`, `src/build/`, `src/serve/` or `src/page/`. Nothing in `src/core/`, `src/build/` or `src/serve/` imports it. A test, `test/library-boundary.test.ts`, checks both directions, as `core-boundary.test.ts` does for core ("the lint boundary").
+- The commands are `src/cli/library-init.ts`, `library-status.ts`, `library-path.ts`, wired in `main.ts` under a `library` command group, each by lazy `import()`. What needs the CLI's own helpers (the loader, config, output) stays in `src/cli/`; the version hash check of `status` uses `loadQuiz`, so it lives in `library-status.ts`.
+- `test/cli-graph.test.ts`: `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template`, `stats` and `--version` never load `src/library/`; `library path`, `library status` and `library init` never load the page builder, the page renderer or `src/serve/`.
+
+**The machine config.**
+- `config.toml` gains three keys, validated by `parseConfig` for the user config with the file and line of a bad value, as `fonts` is: `library = "PATH"` (a string; a relative path is relative to the config file's folder), `git = "PATH"` (a string), and `[terminal]` with `style = "simple" | "boxed"`. An unknown key in `[terminal]` is an error, as in `[brief]`.
+- **Where the library is:** `FULLMARK_LIBRARY` (relative to the working directory) when set, else `library` in `config.toml`, else none (G8: every library command exits 2, "no library", fix `quiz library init PATH`; `path` too).
+- **Writing the config** (only `init`): the file's text is kept as it is, comments and order included; a top-level `library = …` line is replaced, or `library = "ABSOLUTE PATH"` is inserted above the first table header (at the end when there is none). The file and its folder are created when missing. Atomic, through `writeFileAtomic`.
+
+**The folder and `library.toml`.**
+- `src/library/layout.ts` names every path of COMMANDS.md's tree (`quizzes/<id>/versions/<hash>/`, `results/`, `grades/`, `reports/`, `review.json`, `progress/`), so later slices never build a path by hand. A version folder is named by the quiz hash in full; output shows its first 4 characters (as `inspect` shows `short`), more when two versions of a quiz share them.
+- `library.toml`: `format = "fullmark-library"`, `version = 2`, `created` (ISO, local offset), then `[quizzes.<name>]` tables sorted by name with the fixed comparison, each `id`, `title`, `source`, `current`, `versions = [{ hash, added }]`, `shelves = []`. A zod schema in `src/library/index-file.ts`; the reader returns the index or every problem with its line; the writer writes the same bytes for the same index (keys in a fixed order, a final newline), atomically. 4b writes it empty; its tests cover a quiz table, for 4c.
+- `.gitignore`: `.fullmark.lock`, `quizzes/*/progress/`, `*.tmp`.
+- **A foreign folder:** a `library.toml` with another `format` or `version` (a 0.x library has `version = 1` or no `format`) is refused by every command, "not a fullmark 1.0 library", the decision of 2026-11-16 (STEP4-GAPS.md, first entry).
+
+**The lock** (`src/library/lock.ts`). `.fullmark.lock` in the root, created with exclusive create (`wx`), holding `{"pid", "command", "started"}` as JSON. A second writer polls every 100 ms for up to 10 s, printing the dim waiting line once, then exits 2 with COMMANDS.md's "the library is busy" error. A lock whose process is not running is stale: removed, with a note, and the command goes ahead. Released in a `finally`, commit included. The clock, the sleep and "is this pid alive" are injected; tests never wait 10 real seconds. `status` takes no lock (it only reads); it reports a stale lock as a note and removes it, as the approved board says.
+
+**The git runner** (`src/library/git.ts`), G3 exactly:
+- `execFile` of the `git` from `config.toml`, else the one on the path; `-C ROOT`; names after `--`. Injected for tests of failure (no git, a commit that fails); real `git` otherwise.
+- `commit(paths, message)`: `git add -A -- PATHS`, then `git commit -m MESSAGE -- PATHS`, so only those paths are committed (new, changed or deleted), and the user's own changes stay out. When `git config user.name` or `user.email` is unset in the repository, that one command gets `-c user.name=fullmark -c user.email=fullmark@localhost`. Returns the short hash (`git rev-parse --short HEAD`). A failed commit is a warning (the files stay written; the exit is the command's).
+- `identity()`, `uncommitted()` (from `git status --porcelain`, counting paths), `remote()` (the first of `git remote`), for `init` and `status`.
+- **Tests** run real `git` in a temporary folder with `GIT_CONFIG_GLOBAL` at a file the test writes (`init.defaultBranch = main`, and an identity or none, per case), `GIT_CONFIG_NOSYSTEM=1`, and fixed `GIT_AUTHOR_DATE` and `GIT_COMMITTER_DATE` (TECHNICAL_DESIGN.md, section 11), so hashes are the same on every run.
+
+**The clock.** `FULLMARK_TEST_NOW` (an ISO time with offset), read only in `main.ts`, as `FULLMARK_TEST_SEED` is, sets the clock of the library commands for subprocess tests; in-process tests pass `now` through the `io`.
+
+**`quiz library init [PATH] [--force] [--no-git] [--json]`.** Default `PATH`: the working directory.
+- A missing folder, an empty one, or one holding only `.git` (an existing repository whose root it is): set up: `library.toml`, `.gitignore`, `quizzes/`, then `git init -q` unless `--no-git` or no repository is wanted, then the first commit `fullmark: init`. A folder holding only `.git` keeps its repository (adopted).
+- A folder with a 1.0 `library.toml`: adopted, nothing written but the config, no commit (`"status": "adopted"`).
+- Anything else: refused (exit 2), "not empty and is not a library (N files)", fix "choose an empty or new folder". A folder inside another repository but not its root gets its own repository, with a note that the outer repository should ignore it.
+- Another library already in the config: exit 2, "a library is already set: PATH", fix "add --force to switch"; `--force` switches. The same library again: `adopted`, exit 0.
+- No `git` found: as `--no-git`, with a warning. No identity: COMMANDS.md's note with the two `git config` commands.
+- Records the library in `config.toml` (absolute path). Takes the lock once the folder exists. Output and `--json` exactly as COMMANDS.md's.
+
+**`quiz library status [--plain] [--json]`.** G11 and COMMANDS.md's Output: the facts block (library and where it was found, config, git, who commits, counts, checks), then problems and notes in `check`'s issue format, then the verdict line. Problems (exit 1) and notes (exit 0) exactly as COMMANDS.md lists them; the version hash check loads each version's quiz with `loadQuiz` and compares `quizHash` with the folder's name; "orphan files" are files under `quizzes/` outside a known quiz's layout, and files at the root other than `library.toml`, `.gitignore`, `.git/`, `fullmark.toml`, `.fullmark.lock` and `README.md`. The library's `fullmark.toml` is parsed with `parseConfig` (`project`). `--json` is G11's shape. Exit `2` with no library.
+
+**`quiz library path [NAME]`.** The library's folder, or a quiz's (`quizzes/<id>`, looked up by name, then id, G13), absolute, never coloured, nothing else on stdout. Unknown quiz: exit 2 with the near names. No library: exit 2.
+
+**Output and the terminal style** (G18). `src/cli/table.ts` draws what COMMANDS.md's "Terminal style" calls `simple`: aligned columns, a shaded header row, scores by band, coloured tags, `problem` and `note` badges, `dim`, `bold`; colour only on a terminal without `--plain` or `NO_COLOR`. `[terminal] style = "boxed"` is read and validated but drawn as `simple` until slice 4f. The helper is used by `status` here, and by `list` and the others later; `check`, `inspect` and `stats` move onto it in 4f, not now.
+
+### Tasks
+
+1. **The store** (one commit): `src/library/layout.ts`, `index-file.ts`, `lock.ts`, `git.ts`; the config keys; `FULLMARK_TEST_NOW`; unit tests: the index's round trip (same bytes), every reader problem with its line, the lock (wait, timeout, stale, release on throw, the waiting line once), the git runner against real git (commit only the given paths with an unrelated staged change left alone; fallback identity on that commit only, git's config untouched; a deleted path committed; no git; a failing commit as a warning), the config writer (comments and order kept, the line replaced or inserted, a new file), a writer killed mid-way leaves the old `library.toml` or the new one (simulated, as `atomic.ts`'s tests do), the boundary test.
+2. **The commands** (one commit): `init`, `status`, `path`, `table.ts`; the cli-graph cases; golden cases under `test/golden/library/` for every Output block in COMMANDS.md for these three commands, in plain text and `--json`, plus no library, a malformed `config.toml` key (file:line), a foreign `library.toml`, `init --force`, `init --no-git`, the same library again, `path NAME` unknown; git-state cases (uncommitted, remote, no identity, inside another repository) as subprocess tests in a temporary folder with the git environment above, comparing the output with expected text. A colour test for `table.ts` with a terminal `io`.
+3. **Do not edit** `docs/plans/` or `docs/design/`. The agent's report as for every slice, with every golden added or changed counted, and anything done differently.
+
+### Done when
+
+`npm run build`, the typecheck, Biome, knip and Vitest pass (G20: no Playwright for this slice); `quiz library init` in a new temporary folder, then `status` and `path`, print COMMANDS.md's text; the boundary and command-graph tests hold.
