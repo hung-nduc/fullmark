@@ -20,11 +20,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
-| 4d | brief approved (2026-11-18); being built | this file |
+| 4d | built and reviewed (2026-11-18); G23 to G26 raised, wait for the owner | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 
 ### Next
 
-1. One implementing agent (Sonnet) builds **4d** (`take`, `replay`, with G22 first); the planner reviews it.
+1. The owner decides **G23 to G26** (4d's review).
+2. The planner writes **4e**'s brief (`grade`, `stats`), with the decided gaps first.
 
 ## Goal
 
@@ -48,7 +49,15 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 to G22 are decided too. New ones found while building are added here from G23.
+G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 to G22 are decided too. Raised in 4d's review, open:
+
+**G23. Where the serving process is recorded.** COMMANDS.md (`library take`, "The lock") says the progress file holds the serving process's id and URL; the brief, and the build, keep them in `progress/<version>.serving.json` beside it, so the progress file stays a `results-v2` document as `serve --autosave` writes it, and a submit waits in `progress/<version>.submitted.json` until it is filed. The resume line also reads differently: built, the heading names the version (`version 41c0 · resuming your attempt of 18 Nov 14:02 (7 of 18 answered); the quiz has been updated since (now 9f3a)`), where COMMANDS.md's prose has "on version 41c0". **Recommendation:** COMMANDS.md follows the build: the three files of `progress/` named in "The library folder" and in `take`, and the resume line as built.
+
+**G24. A `--section` or `--missed` take while an attempt of that version is saved.** Both use `progress/<version>.json`; the build serves the new attempt **without autosave**, says so ("this attempt is not saved: another attempt of this version is in progress and is left alone"), and a Ctrl+C loses it. **Recommendation:** accept as built: the saved attempt is never touched, the learner is told, and a second saved attempt per version would need a choice of which to resume that the design does not have.
+
+**G25. A saved `--missed` attempt resumed by a plain `take`.** A `--missed` take interrupted is saved like any other; the next plain `take` resumes it with its plan (the missed questions), but without the "changed since you missed it" marks, since a plain page has no `changed`. **Recommendation:** when the attempt resumed has `plan.source` `missed`, `take` works the marks out again for those questions (`missedOf` against the version resumed) and serves them, so a resumed attempt looks as it did; a test resumes one.
+
+**G26. A take that files a leftover submit.** When `take` finds a `submitted.json` left by an earlier take (the lock was busy, or the process died), it files it and ends (exit 0) without serving. **Recommendation:** accept, with one more line after the commit, `next: quiz library take NAME` to start a new attempt, so the learner is not left wondering why no page opened.
 
 ## Slices
 
@@ -291,3 +300,15 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 ### Done when
 
 `npm run check` passes in Chromium and Firefox (G20: this slice runs Playwright); in a temporary library, `take` an example, answer some questions wrong, submit; `take --missed` serves only those, marked when changed; `replay` opens the attempt; each prints COMMANDS.md's text.
+
+### Review (2026-11-18)
+
+**Built** in `ac3301f` (G22: `versions = [{ hash, added, file }]`; `register` writes it, `status` and `loadStored` read by it; a test of `register week2.md --update` after `quiz.md`, then `status` healthy), `da851a0` (`library take`: `src/cli/library-take.ts`; `serve.ts` split so `serveLoaded` serves a stored version without checking it again; the serving and submitted files in `layout.ts`), `75be49c` (`--missed`: `src/cli/library-missed.ts`, `missedOf` and `missedFor`; `served.plan` and `served.changed` in `page.ts`; the page runs the plan as a retry, with the start line and the `changedMark` label in both catalogs; the history helper's seventh attempt; the screens) and `6df65f2` (`library replay`: `src/cli/library-replay.ts`, through `runBuild`). The agent worked in a worktree; `1.0` was fast-forwarded to these commits.
+
+**Checked by the planner** (G20: this slice runs Playwright): `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3454 in 136 files, Playwright 835 passed and 527 skipped (the screens specs) in Chromium and Firefox, tsc, Biome and knip clean. Goldens: G22 added `file = …` to 44 input `library.toml` files and the history fixture, and 14 expected `library.toml` outputs of `register` and `init` changed by that line only; 13 `list` and `info` goldens changed only in the attempt count (6 to 7, the helper's new `--missed` attempt); 12 built or replayed pages and 2 `--json` lines changed because the page code and CSS embedded in every page grew (their CSP hashes and the byte count, +803 B), with no `plan`, `changed` or server code in any shared page, and the byte-identity test of a `build` page passes; added: 5 `library/replay-*` goldens and 4 function goldens of `--missed` (`test/golden-fn/library-missed-study*.txt`). Screens: `docs/screens/4d/`, 6 images (the start screen, a changed card, the questions; desktop and phone), looked at: the start line "missed questions · 4", no section picker, the label after the question's number, muted. **By hand**, in a temporary library with `examples/calculus`, driving the page in Chromium: two takes filed and committed (`fullmark: take calculus-i-derivatives`); `take --missed` served the 5 missed of 12, "missed questions · 5 from 2 attempts", filed "0 of 5 right · 0%" with `plan.source` `missed`; `replay -o out` wrote the page with COMMANDS.md's heading, a 4-character prefix matching three attempts exits 2 listing them; `list` counts 3 attempts; `status` healthy; `progress/` empty after each filing.
+
+**Done differently, accepted:** the `take` unit tests run in-process (a real server on 127.0.0.1 driven with `fetch`, the clock, timers, Ctrl+C and the lock injected); the subprocess test is the Playwright spec, which starts `take --json` and reads its lines; a leftover submit is stamped by its own `submittedAt`, a fresh one by the clock; the progress file is removed after filing only when it is the filed attempt's (same `startedAt`); "unanswered is seen, not missed" neither marks nor clears an earlier miss; `--missed` with only gone questions or no attempt says why in its "nothing missed" line; with `--section` and `--missed`, `gone` counts that section's; the heading shows `time limit N s` with `--timeout`; `replay` drives `runBuild` and clears only `.html` files older than a day in its temp folder; function goldens are `.txt` (Biome reformats `.json`) and refresh with `FULLMARK_GOLDEN_UPDATE=1`; commit 1's two Biome issues were fixed in commit 2.
+
+**A leak, cause shown, not 4d's:** the agent's one failed run (44 Firefox failures, "Unknown system error -122" on a write) was `/tmp` full. The e2e specs and serve tests make `fm-*` folders with `mkdtempSync` and never remove them: one `npm run check` here left 1,179 new ones (most `fm-e2e-*`, then `fm-review-`, `fm-grade-`, `fm-brief-`, from steps 2 and 3). A fix for its own (remove them after each test) is offered to the owner.
+
+**Gaps:** G23 to G26, above, wait for the owner.
