@@ -135,3 +135,19 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 **G29. `library grade --web` and the lock.** The form waits up to 1800 s. Holding the lock all that time would block every other command, as G9 found for `take`. **Recommendation:** as `take` (G9): no lock while the form is served; once **Save grades** is pressed and checked, the grades file, the report and the commit are made under the lock. When the lock cannot be had in 10 s, the grades are written to `progress/<stamp>.grades.json` (git-ignored), and the command exits 2 saying they are safe; the next `library grade` of the quiz keeps them first, as `take` files a leftover submit (G26).
 
 **Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade` and "The library folder".
+
+**G30. Output cut short by a pipe.** `quiz library stats NAME | head -1`, and now and then `library list | head -1`, ends with an unhandled `EPIPE` stack trace on stderr and exit 1 once `head` has closed the pipe. This is not 4e's: the CLI's `io.out` writes to stdout with no handler for a closed pipe, and which command hits it depends on timing. **Recommendation:** when stdout is closed by its reader (`EPIPE`), the CLI stops writing and exits `0` with nothing on stderr, as most command-line tools do; one handler in `main.ts`, and a subprocess test piping `rules --all` and `library list` into a reader that closes after one line.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, "Exit codes". Built first in 4f.
+
+**G31. The `next:` line after a template is written.** `library grade NAME --json` writes the template and then still prints `next: quiz library grade NAME --web, or --json for a grades template`, offering what was just done. **Recommendation:** when the template is written, the line is `next: fill in FILE, then quiz library grade NAME --grades FILE (or --web)`; unchanged otherwise. COMMANDS.md's `library grade` gains it.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade` ("The template"). Built first in 4f.
+
+**G32. The form when the lock is busy at Save.** With `--web`, the grades are kept in `progress/` and the command exits 2 as G29 says, but the form still shows `quiz grade --web`'s "Grades saved" card, naming a file in `grades/` and a report that were not written. **Recommendation:** the server answers Save only after the keep is tried; when the lock was busy, the card says "Your grades are saved, but not filed yet: the library was busy. Run `quiz library grade NAME` to file them." (vi: "Điểm đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy `quiz library grade NAME` để ghi."), two keys in `src/core/i18n/grade.ts`; the plain card otherwise.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade` ("The lock"). Built first in 4f.
+
+**G33. Worktrees under `.claude/` and Biome.** A git worktree an agent leaves under `.claude/worktrees/` carries its own `biome.json`, and `npm run lint` (so `npm run check`) then fails on every file with "nested root configuration". **Recommendation:** `biome.json` leaves out `.claude/` (`files.includes` gains `!.claude`), so a check never reads another checkout's files.
+
+**Decided by the owner on 2026-11-19, as recommended.** A change to the repository's tooling, not the design: `biome.json` leaves out `.claude/`. Built first in 4f.

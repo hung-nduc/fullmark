@@ -21,6 +21,8 @@ The program is `quiz`. `fullmark` runs the same program, for systems where anoth
 
 `quiz` with no command prints the help on stderr and exits 2.
 
+When the reader of stdout closes it early (`quiz library list | head -1`), the command stops writing and exits `0`, with nothing on stderr.
+
 ### Common options
 
 | Option | Meaning |
@@ -1106,8 +1108,8 @@ quiz library grade NAME --web [--attempt STAMP] [--name NAME] [--timeout SECONDS
 Grades an attempt against the version it was taken on and writes the report into `quizzes/<id>/reports/` (never `results/`). With `--json`, also the grades template. `--web` opens the grading form as for `quiz grade`, pre-filled with the newest grades for that attempt. Every grades file is kept, and the newest counts. Commits.
 
 - **Which attempt.** `--attempt` takes a stamp or a prefix of 4 or more characters. Without it: the newest attempt with an essay or code answer still waiting for a grade, else the newest attempt.
-- **The template.** With `--json`, for an attempt with an essay or code question answered, the empty grades template is written to the working directory as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never into `grades/`, where every file counts. An existing one is never overwritten: it is skipped with `quiz grade --json`'s warning. Once filled, `--grades` takes it and keeps a copy in `grades/`.
-- **The lock.** As for `take`: `--web` holds no lock while the form is served. On **Save grades**, the checked grades are written to `progress/<stamp>.grades.json`, then, under the lock, kept in `grades/`, the report written and the commit made. When the lock cannot be had in 10 seconds, the grades stay in `progress/` and the command exits `2`, saying they are safe; the next `library grade` of the quiz keeps them first, says so, and ends, with `next: quiz library grade NAME` after the commit.
+- **The template.** With `--json`, for an attempt with an essay or code question answered, the empty grades template is written to the working directory as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never into `grades/`, where every file counts. An existing one is never overwritten: it is skipped with `quiz grade --json`'s warning. Once filled, `--grades` takes it and keeps a copy in `grades/`. When a template is written, the `next:` line is `next: fill in FILE, then quiz library grade NAME --grades FILE (or --web)`.
+- **The lock.** As for `take`: `--web` holds no lock while the form is served. On **Save grades**, the checked grades are written to `progress/<stamp>.grades.json`, then, under the lock, kept in `grades/`, the report written and the commit made. When the lock cannot be had in 10 seconds, the grades stay in `progress/` and the command exits `2`, saying they are safe; the next `library grade` of the quiz keeps them first, says so, and ends, with `next: quiz library grade NAME` after the commit. The form answers **Save grades** once the keeping was tried: when the lock was busy, its card says "Your grades are saved, but not filed yet: the library was busy. Run `quiz library grade NAME` to file them." (vi: "Điểm đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy `quiz library grade NAME` để ghi.") in place of the files written.
 
 **Output.**
 

@@ -21,12 +21,11 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
-| 4e | built and reviewed (2026-11-19); G30 to G33 raised, wait for the owner | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
+| 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
 
 ### Next
 
-1. The owner decides **G30 to G33** (4e's review).
-2. The planner writes **4f**'s brief (`share`, `template add`, `rename`, `rm`, `review`; the samples; acceptance), with the decided gaps first.
+1. The planner writes **4f**'s brief (`share`, `template add`, `rename`, `rm`, `review`; the samples; acceptance), with the decided gaps first.
 
 ## Goal
 
@@ -50,15 +49,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G29 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised in 4e's review, open:
-
-**G30. Output cut short by a pipe.** `quiz library stats NAME | head -1`, and now and then `library list | head -1`, ends with an unhandled `EPIPE` stack trace on stderr and exit 1 once `head` has closed the pipe. This is not 4e's: the CLI's `io.out` writes to stdout with no handler for a closed pipe, and which command hits it depends on timing. **Recommendation:** when stdout is closed by its reader (`EPIPE`), the CLI stops writing and exits `0` with nothing on stderr, as most command-line tools do; one handler in `main.ts`, and a subprocess test piping `rules --all` and `library list` into a reader that closes after one line.
-
-**G31. The `next:` line after a template is written.** `library grade NAME --json` writes the template and then still prints `next: quiz library grade NAME --web, or --json for a grades template`, offering what was just done. **Recommendation:** when the template is written, the line is `next: fill in FILE, then quiz library grade NAME --grades FILE (or --web)`; unchanged otherwise. COMMANDS.md's `library grade` gains it.
-
-**G32. The form when the lock is busy at Save.** With `--web`, the grades are kept in `progress/` and the command exits 2 as G29 says, but the form still shows `quiz grade --web`'s "Grades saved" card, naming a file in `grades/` and a report that were not written. **Recommendation:** the server answers Save only after the keep is tried; when the lock was busy, the card says "Your grades are saved, but not filed yet: the library was busy. Run `quiz library grade NAME` to file them." (vi: "Điểm đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy `quiz library grade NAME` để ghi."), two keys in `src/core/i18n/grade.ts`; the plain card otherwise.
-
-**G33. Worktrees under `.claude/` and Biome.** A git worktree an agent leaves under `.claude/worktrees/` carries its own `biome.json`, and `npm run lint` (so `npm run check`) then fails on every file with "nested root configuration". **Recommendation:** `biome.json` leaves out `.claude/` (`files.includes` gains `!.claude`), so a check never reads another checkout's files.
+G1 to G33 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G34.
 
 ## Slices
 
@@ -375,4 +366,4 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 **Done differently, accepted:** the code of tasks 2 to 4 is in one commit, since each needs the others to build, with the tests and goldens in the next two; `--no-open` on `--web`, as `take`; the refusals of `quiz grade` (`--name` without `--web`, `--grades` with `--web`, `--timeout` and `--port` checked before serving); the saved card names `grades/<stamp>-…-grades.json`, since the second is not known when the page is built; `library-grade-web.ts` takes the helpers it needs as a parameter, so esbuild keeps `grade`'s chunks as the command-graph test expects; an invalid `--grades` with `--json` is `{"status": "problems", …}` as `quiz grade`'s; `graded` counts the graded essay and code answers; an unreadable grades file exits 2; `report.md` names the quiz by its name; with no grades file kept the report is rebuilt without grades (only the old hand-made fixture had one); the newest kept grades file that cannot be applied exits 2 naming it, never falling back to an older one; `stats` leaves out an attempt that cannot be graded; a leftover `progress/<stamp>.grades.json` whose attempt is gone is ignored. **The agent's stuck wait:** its last command waited on `pgrep -f "playwright test"`, which matched itself; stopped by the planner.
 
-**Gaps:** G30 to G33, above, wait for the owner.
+**Gaps:** G30 to G33, decided by the owner on 2026-11-19 as recommended.
