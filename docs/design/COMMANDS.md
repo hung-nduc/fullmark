@@ -784,12 +784,12 @@ unchanged 2  chem-bonds, rust-basics
 committed 9a0b1c2 fullmark: register calculus-limits, ielts-writing, signals
 
 $ quiz library register notes/*.md
-notes/chem.md:2: error: library.id-taken: the id chem-bonds is already in the library, as chem-bonds
+notes/chem.md:2: error library.id-taken: the id chem-bonds is already in the library, as chem-bonds
     fix: if it is the same quiz, quiz library register notes/chem.md --update chem-bonds;
-         if not, give it a new id:
-notes/rust2.md: error: library.name-taken: the name rust-basics is taken
+         if not, give it a new `id:` in its front matter
+notes/rust2.md: error library.name-taken: the name rust-basics is taken
     fix: -n rust-basics-2 (one file at a time)
-notes/limits.md:12: error: question.id-missing: a question without an id
+notes/limits.md:12: error question.id-missing: a question without an id
     fix: quiz ids notes/limits.md
 nothing registered 2 of 5 files ready, 3 refused
 
