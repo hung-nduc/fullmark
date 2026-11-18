@@ -56,7 +56,7 @@ A path is printed relative to the working directory when it lies under it, else 
 
 ### Names, ids and stamps
 
-- A quiz in the library is named by its **name** or its **id**.
+- A quiz in the library is named by its **name** or its **id**. A name is a slug (`a` to `z`, `0` to `9` and `-`, 1 to 64 characters, as `new` makes ids), checked by `register -n`, `register --update` and `rename`. It may equal the quiz's own id but not another quiz's name or id (exit `1`, "name taken", with a free name suggested). A lookup tries names first, then ids, so it is never ambiguous.
 - An attempt is named by its **stamp** (the results file name) or a prefix of at least 4 characters. Default: the newest.
 - A version is named by its **hash** or a prefix of at least 4 characters. Default: the current one.
 - A section is named by its **slug** or its title, ignoring case. An unknown section exits 2 and lists the valid ones.
@@ -610,7 +610,7 @@ In a terminal, the Markdown is rendered: headings, lists, tables, wrapping to th
 
 ## Library commands
 
-All under `quiz library`. A library is one folder under git that holds each quiz's versions (sources, `materials` sheets and assets, never HTML), results and reports. fullmark commits after every command that changes it and **never pushes**.
+All under `quiz library`. A library is one folder under git that holds each quiz's versions (sources, `materials` sheets and assets, never HTML), results and reports. fullmark commits after every command that changes it and **never pushes**. Every library command exits `2` when no library is set (neither `FULLMARK_LIBRARY` nor `library` in `config.toml`), with "no library: run `quiz library init PATH`".
 
 ### quiz library init
 
@@ -639,7 +639,11 @@ quiz library status [--plain] [--json]
 
 Diagnostics: config, library path, git (repository, uncommitted changes, remote), counts, snapshots whose content no longer matches their hash, orphan files, and a library `fullmark.toml` that does not parse or names unknown rules.
 
-Exit: `0` healthy, `1` problems, `2` no library.
+**Problems** (exit `1`): the configured folder is missing or is not a library; `library.toml` does not parse or names a version folder that is missing; a version whose files no longer match its hash; a library `fullmark.toml` that does not parse or names unknown rules. **Notes** (printed, exit `0`): uncommitted changes, no remote, no git repository (`--no-git`), orphan files, a stale lock, `FULLMARK_LIBRARY` set.
+
+`--json`: `{"status": "healthy" | "problems", "library", "config", "git": {"repository", "uncommitted", "remote"}, "counts": {"quizzes", "versions", "attempts", "reports"}, "problems": [{"code", "path", "message", "fix"}], "notes": [{"code", "path", "message"}]}`.
+
+Exit: `0` healthy (notes may be printed), `1` problems, `2` no library.
 
 ### quiz library register
 
@@ -661,9 +665,11 @@ Checks the quiz, then copies its source, assets and brief into the library as a 
 | `--profile`, `--config`, `--strict`, `--review` | As for `check`. The config is looked up from `FILE`, then from the library root |
 | `--json` | `{"status": "registered" \| "unchanged" \| "problems", "registered": [{"file", "name", "version"}], "unchanged": [{"file", "name", "version"}], "refused": [{"file", "reason", "suggest"}], "committed"}`. One file gives the same object as several, with one entry |
 
-Exit: `0` registered or unchanged, `1` check errors, name taken (the output suggests a free name) or a survey refused, `3` no library.
+Exit: `0` registered or unchanged, `1` check errors, name taken (the output suggests a free name), id taken or mismatched, or a survey refused, `2` no library.
 
 **Surveys are refused.** A quiz whose kind is `survey` (following `extends`) is refused with the rule `library.survey`, and exits `1` like any other refusal. The library is one learner's history of their own attempts, and surveys are mostly sent to other people; `serve` and `stats` handle them without a library. `library import` applies the same refusal. Allowing surveys in a shared library later is additive: `take` works, `grade` exits 2 with no score, `--missed` refuses. There is no separate survey-library kind.
+
+**Quiz ids.** A quiz's folder is named by its `id`, so two quizzes never share one. A new quiz (no `--update`) whose `id` is already in the library is refused with the rule `library.id-taken` and two fixes: "if it is the same quiz, `--update NAME`; if not, give it a new `id:`". Two files in one batch with the same id are refused the same way. `--update NAME` with a file whose `id` is not that quiz's is refused with `library.id-mismatch`, since a version keeps its quiz's id. Both exit `1`, like any refusal.
 
 **One file** behaves as a batch of one: content that is already the current version is skipped as `unchanged` (exit `0`), and `--json` has the same shape as for several files.
 
@@ -729,7 +735,7 @@ Everything about one quiz in one place, so you need not run `inspect`, `list` an
 | `--version HASH` | Show the content of this version. Default: the current one |
 | `--json` | The quiz's `library list` row, with the same field names and meanings, plus `{"generated_by", "source": {"path", "exists"}, "sections": [{"slug", "title", "questions", "points"}], "banks", "history": [{"hash", "added", "added_questions", "removed_questions", "changed_questions"}], "first_taken", "path"}`. With `--version HASH`, the fields that describe content (`kind`, `lang`, `profile`, `tags`, `types`, `questions`, `points`, `sections`, `banks`) are that version's |
 
-Exit: `0`, `2` unknown quiz or version, `3` no library.
+Exit: `0`, `2` unknown quiz or version, or no library.
 
 ### quiz library take
 
@@ -742,13 +748,17 @@ quiz library take NAME [--section S] [--missed] [--focus] [--no-open]
 
 Builds the current version with the installed fullmark, serves it, files the result next to that version and commits. Progress is autosaved, so closing the tab or the server resumes the attempt.
 
+- **Autosave and resume.** `take` serves with autosave (as `serve --autosave`) to `quizzes/<id>/progress/<version>.json`, which git ignores. The next `take` of the same version without `--section` or `--missed` resumes it, as the page's **Continue** does; the file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone.
+- **The lock.** `take` takes the library's lock only to file the result and commit, never while serving, so other commands work while a quiz is open. The progress file holds the serving process's id and URL: a second `take` of that quiz while that process is alive exits `2` and prints the URL to open; a progress file whose process is gone is resumed.
+- **`--missed` across versions.** Questions are matched by `id` across versions. A question missed on an old version and still in the current one is served as it is now; when its hash differs from the one missed, the page marks it "changed since you missed it" (one label in both catalogs, next to the question's number). A missed question no longer in the current version is left out and counted (`"gone"` in `--json`). The plan's `source` is `"missed"`.
+
 | Option | Meaning |
 |---|---|
 | `--section S` | Only this section |
 | `--missed` | Only questions that are wrong or partly right in an earlier attempt and not answered fully right since, across all attempts and versions. Questions changed since they were missed are included and marked. Ungraded essays and code are skipped. With `--section`, the missed questions in that section |
 | `--focus` | Tick **Focus mode** on the start screen, as for `serve` |
 | `--timeout SECONDS` | Default `0` (no limit) |
-| `--json` | `{"status", "results", "score", "plan": {"source", "questions"}}`, or `{"status": "nothing_missed"}` |
+| `--json` | `{"status", "results", "score", "plan": {"source", "questions"}, "gone"}` (`gone`: with `--missed`, the missed questions no longer in the current version, else `0`), or `{"status": "nothing_missed"}` |
 
 Exit: `0` filed, or nothing missed (with a message); `2` unknown quiz or section, or timeout.
 
@@ -792,7 +802,7 @@ quiz library template add NAME [--as TEMPLATE] [--version HASH] [--skeleton] [--
 
 Stores a quiz from the library as a user template (`quiz template add`, for a library quiz): its source and assets at the current version, or at `--version HASH` as for `share`. The version is checked under the rules it was registered with (`check.json`), so a version that registered can be stored; the other options and the name rules are those of `quiz template add`. It reads the library and does not change it, so nothing is committed. This is the only `library template` command: templates live in your config folder, not in the library, so you list and remove them with `quiz template list` and `quiz template rm`.
 
-Exit: `0` added or unchanged, `1` check errors or name taken, `2` unknown quiz, `3` no library.
+Exit: `0` added or unchanged, `1` check errors or name taken, `2` unknown quiz or no library.
 
 ### quiz library grade
 
@@ -815,7 +825,7 @@ Exit: `0` written, `1` invalid grades, `2` unknown quiz or attempt, timeout, or 
 quiz library stats NAME [--json]
 ```
 
-Progress over every attempt at a quiz, across versions, using the grades each attempt was made with. Writes nothing.
+Progress over every attempt at a quiz, across versions, using the grades each attempt was made with. Writes nothing. One attempt is shown like several (Weakest stays empty until a tag is seen in two attempts, as its rule says).
 
 Exit: `0`, `2` unknown quiz or no attempts.
 
@@ -839,7 +849,7 @@ Exit: `0`, `1` name taken, `2` unknown quiz.
 quiz library rm NAME [--yes] [--force] [--json]
 ```
 
-**Deletes** a quiz with its versions and results, and commits, so `git -C LIBRARY revert HEAD` brings it back. Asks for confirmation unless `--yes`. Refused when the library is not its own git repository or the quiz folder has uncommitted changes (`--force` skips both). A quiz on the `public` shelf is removed from it at the next `publish`. One quiz per command, on purpose: a glob or a list makes a mass deletion one typo away, and each deletion is its own commit to revert.
+**Deletes** a quiz with its versions and results, and commits, so `git -C LIBRARY revert HEAD` brings it back. Asks for confirmation unless `--yes`; with `--json` and without `--yes` it exits 2, with the fix "add `--yes`", since `--json` never prompts (as `template rm`). Refused when the library is not its own git repository or the quiz folder has uncommitted changes (`--force` skips both). A quiz on the `public` shelf is removed from it at the next `publish`. One quiz per command, on purpose: a glob or a list makes a mass deletion one typo away, and each deletion is its own commit to revert.
 
 Exit: `0` deleted, `1` refused, `2` unknown quiz.
 
@@ -903,7 +913,7 @@ Registers the quizzes of a published folder into a library, keeping ids and name
 | `--into PATH` | Create a library at `PATH` first, with the rules of `library init`. The location is the user's choice, so agents pass it only when the user named it |
 | `--json` | `{"status": "imported" \| "unchanged" \| "problems", "library", "imported", "unchanged", "refused": [{"name", "reason", "suggest"}], "warnings", "committed"}` |
 
-Exit: `0` imported or unchanged, `1` a quiz refused or check errors (nothing imported), `2` `--into` folder refused, `3` no library and no `--into`.
+Exit: `0` imported or unchanged, `1` a quiz refused or check errors (nothing imported), `2` `--into` folder refused, or no library and no `--into`.
 
 ## Removed or merged
 
