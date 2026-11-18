@@ -107,8 +107,11 @@ export function formatDuration(seconds: number): string {
 
 const plural = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-/** The summary as the lines `quiz inspect` prints (COMMANDS.md): the first item of a row spells out its unit. */
-export function summaryLines(s: Summary): string[] {
+/** A labelled row of a facts block: `Types`, then what it holds. */
+export type SummaryRow = [label: string, text: string];
+
+/** The two heading lines of `quiz inspect`: the quiz, then its size. */
+export function summaryHead(s: Summary): [string, string] {
   const titled = s.sections.filter((x) => x.title !== null);
   const head = [
     plural(s.questions, "question"),
@@ -116,9 +119,15 @@ export function summaryLines(s: Summary): string[] {
     titled.length > 0 ? plural(titled.length, "section") : "no sections",
     s.timeLimit === null ? "untimed" : `time limit ${formatDuration(s.timeLimit)}`,
   ];
-  const lines = [`${s.quiz.id} · ${s.quiz.title} · version ${s.quiz.short}`, head.join(" · ")];
+  return [`${s.quiz.id} · ${s.quiz.title} · version ${s.quiz.short}`, head.join(" · ")];
+}
+
+/** The rows of `quiz inspect` under its heading: the first item of a row spells out its unit. Empty rows are left out. */
+export function summaryRows(s: Summary): SummaryRow[] {
+  const titled = s.sections.filter((x) => x.title !== null);
+  const rows: SummaryRow[] = [];
   const row = (name: string, items: string[]): void => {
-    if (items.length > 0) lines.push(`${name.padEnd(10)}${items.join(" · ")}`);
+    if (items.length > 0) rows.push([name, items.join(" · ")]);
   };
   row(
     "Types",
@@ -139,5 +148,10 @@ export function summaryLines(s: Summary): string[] {
   // a quiz with no right answers to place (a survey) has no spread to show
   const placed = Object.values(s.positions).some((n) => n > 0);
   row("Positions", placed ? Object.entries(s.positions).map(([letter, n]) => `${letter} ${n}`) : []);
-  return lines;
+  return rows;
+}
+
+/** The summary as the lines `quiz inspect` prints (COMMANDS.md) in plain text: a label column of ten characters. */
+export function summaryLines(s: Summary): string[] {
+  return [...summaryHead(s), ...summaryRows(s).map(([label, text]) => `${label.padEnd(10)}${text}`)];
 }

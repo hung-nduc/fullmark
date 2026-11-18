@@ -1,9 +1,17 @@
 import type { Quiz } from "../core/ir";
-import { renderStats, type StatsInput, type StatsNames, summarise, titleOf } from "../core/stats";
+import { type StatsInput, type StatsNames, statsParts, summarise, titleOf } from "../core/stats";
 import { EXIT, type ExitCode } from "./exit-codes";
-import { findQuiz, type LibraryIo, libraryFail, loadStored, noSuchQuiz, openLibrary } from "./library-common";
+import {
+  findQuiz,
+  type LibraryIo,
+  libraryFail,
+  loadStored,
+  noSuchQuiz,
+  openLibrary,
+  painterFor,
+} from "./library-common";
 import { readHistory } from "./library-history";
-import { plural } from "./table";
+import { plural, renderFacts } from "./table";
 
 export type LibraryStatsOptions = { json: boolean };
 
@@ -38,10 +46,19 @@ export function runLibraryStats(name: string, opts: LibraryStatsOptions, io: Lib
     io.out(JSON.stringify(summary));
     return EXIT.done;
   }
+  const p = painterFor(io, { plain: false, json: false });
   const versions = new Set(summary.attempts.map((a) => a.version)).size;
   io.out(
-    `${quiz.name} · ${quiz.title} · ${plural(summary.attempts.length, "attempt")}, ${plural(versions, "version")}`,
+    p.bold(
+      `${quiz.name} · ${quiz.title} · ${plural(summary.attempts.length, "attempt")}, ${plural(versions, "version")}`,
+    ),
   );
-  for (const line of renderStats(summary).slice(1)) io.out(line);
+  const parts = statsParts(summary);
+  for (const line of renderFacts(p, parts.rows)) io.out(line);
+  if (parts.answers !== null) {
+    io.out("");
+    io.out("Answers over time");
+    for (const line of parts.answers) io.out(line);
+  }
   return EXIT.done;
 }

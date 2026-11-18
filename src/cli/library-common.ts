@@ -13,8 +13,8 @@ import { loadUserConfig, type Machine, realMachine } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
 import type { Io } from "./ids";
 import { type LoadedQuiz, loadQuiz } from "./load";
+import { terminalPainter } from "./look";
 import { shownPath } from "./paths";
-import { painter } from "./table";
 
 /** An `Io` plus what the library commands read from the machine and the world; every part defaults to the real one. */
 export type LibraryIo = Io & {
@@ -30,8 +30,7 @@ export const lockEnvOf = (io: LibraryIo): LockEnv => io.lock ?? realLockEnv();
 export const nowOf = (io: LibraryIo): Date => (io.now ?? (() => new Date()))();
 
 /** Colour only on a terminal, without `--plain`, `--json` or `NO_COLOR` (COMMANDS.md, "Terminal style"). */
-export const painterFor = (io: LibraryIo, opts: { plain: boolean; json: boolean }) =>
-  painter(!opts.plain && !opts.json && io.tty && !("NO_COLOR" in machineOf(io).env));
+export const painterFor = (io: LibraryIo, opts: { plain: boolean; json: boolean }) => terminalPainter(io, opts);
 
 /**
  * A run error: `error: MESSAGE` on stderr, then `    fix: FIX`, and with `--json` `{"status": "error", "message"}` on

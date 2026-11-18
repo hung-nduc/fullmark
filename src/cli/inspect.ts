@@ -1,10 +1,11 @@
-import pc from "picocolors";
-import { summarise, summaryLines } from "../core/inspect";
-import { reviewCounts, reviewRow } from "../core/review/counts";
+import { summarise, summaryHead, summaryRows } from "../core/inspect";
+import { reviewCounts, reviewFact } from "../core/review/counts";
 import { type CheckIo, type CheckOptions, checkFile, describeOutcome, humanIssue, issueJson } from "./check";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
 import { expandInputs } from "./files";
+import { terminalPainter } from "./look";
+import { renderFacts } from "./table";
 
 export type InspectOptions = {
   profile: string | null;
@@ -70,11 +71,17 @@ export function runInspect(pattern: string, opts: InspectOptions, io: CheckIo): 
     );
     return failed ? EXIT.problems : EXIT.done;
   }
-  const color = !opts.plain && io.tty && !("NO_COLOR" in (io.machine?.env ?? process.env));
-  if (summary) for (const line of summaryLines(summary)) io.out(line);
-  if (summary && counts) io.out(reviewRow(counts));
-  for (const i of result.issues) for (const line of humanIssue(i, color)) io.out(line);
+  const p = terminalPainter(io, opts);
+  if (summary) {
+    const [first, second] = summaryHead(summary);
+    io.out(p.bold(first));
+    io.out(second);
+    // the rows of the facts block, and the review's after Positions: a panel in the `boxed` style
+    const rows = [...summaryRows(summary), ...(counts ? [reviewFact(counts)] : [])];
+    for (const line of renderFacts(p, rows, 10)) io.out(line);
+  }
+  for (const i of result.issues) for (const line of humanIssue(i, p.color)) io.out(line);
   const count = `${file}: ${errors.length} error${errors.length === 1 ? "" : "s"}, ${warnings.length} warning${warnings.length === 1 ? "" : "s"}`;
-  io.out(failed ? (color ? pc.red(count) : count) : color ? pc.green(count) : count);
+  io.out(failed ? p.red(count) : p.green(count));
   return failed ? EXIT.problems : EXIT.done;
 }

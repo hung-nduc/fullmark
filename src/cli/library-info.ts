@@ -19,13 +19,13 @@ import {
 import { readHistory } from "./library-history";
 import { contentOf, flaggedOf, isoDate, listRow, percentText, shortDay, sourceOf } from "./library-row";
 import { shownPath } from "./paths";
-import { plural } from "./table";
+import { plural, renderFacts } from "./table";
 
 export type LibraryInfoOptions = { version: string | null; json: boolean; plain: boolean };
 
 /** The labels of `inspect`'s rows are 10 wide; the boards of `info` give them 11. */
 const LABEL = 11;
-const row = (label: string, value: string): string => `${label.padEnd(LABEL)}${value}`;
+const row = (label: string, value: string): [string, string] => [label, value];
 
 /** What a version changed against the one before it, in words: `2 added, 1 removed, 3 changed`. */
 function diffWords(d: { added: string[]; removed: string[]; changed: string[] }): string {
@@ -114,11 +114,12 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   const p = painterFor(io, opts);
   const short = (hash: string) => shortHash(hash, all);
   const lines: string[] = [];
+  const facts: [string, string][] = [];
   lines.push(
     `${p.bold(quiz.name)} · ${quiz.title} · version ${short(at)}${at === quiz.current ? "" : ` (not current: ${short(quiz.current)} is)`}`,
   );
   const fm = content.loaded?.frontMatter;
-  lines.push(
+  facts.push(
     row(
       "Identity",
       [
@@ -132,7 +133,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
         .join(" · "),
     ),
   );
-  lines.push(
+  facts.push(
     row(
       "Source",
       `${shownPath(quiz.source, cwd)} · ${
@@ -142,7 +143,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   );
   if (summary !== null) {
     const titled = summary.sections.filter((s) => s.title !== null);
-    lines.push(
+    facts.push(
       row(
         "Content",
         [
@@ -157,11 +158,11 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
     for (const l of summaryLines(summary).slice(2)) rows.set(l.slice(0, 10).trim(), l.slice(10));
     for (const label of ["Sections", "Types", "Tags"]) {
       const text = rows.get(label);
-      if (text !== undefined) lines.push(row(label, text));
+      if (text !== undefined) facts.push(row(label, text));
     }
     if (banks.length > 0)
-      lines.push(row("Banks", banks.map((b) => `${b.section}: pick ${b.pick} of ${b.of}`).join(" · ")));
-  } else lines.push(row("Content", "the version's files are missing"));
+      facts.push(row("Banks", banks.map((b) => `${b.section}: pick ${b.pick} of ${b.of}`).join(" · ")));
+  } else facts.push(row("Content", "the version's files are missing"));
 
   const versionLines = history2.map((h) => {
     const marks = [
@@ -171,10 +172,10 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
     const joined = h.first && h.hash === quiz.current ? "current · first version" : marks.join(" · ");
     return `${short(h.hash)}  ${shortDay(h.added, now).padStart(6)}  ${joined}`;
   });
-  versionLines.forEach((l, i) => lines.push(i === 0 ? row("Versions", l) : row("", l)));
-  lines.push(row("Shelves", quiz.shelves.length > 0 ? quiz.shelves.join(", ") : "none"));
+  versionLines.forEach((l, i) => facts.push(i === 0 ? row("Versions", l) : row("", l)));
+  facts.push(row("Shelves", quiz.shelves.length > 0 ? quiz.shelves.join(", ") : "none"));
 
-  if (history.attempts.length === 0) lines.push(row("Attempts", "none"));
+  if (history.attempts.length === 0) facts.push(row("Attempts", "none"));
   else {
     const first = history.firstTaken === null ? null : shortDay(history.firstTaken, now);
     const lastDay = history.taken === null ? null : shortDay(history.taken, now);
@@ -186,9 +187,9 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
       `best ${percentText(history.best)}`,
       history.weak.length > 0 ? `weakest ${history.weak.join(", ")}` : null,
     ].filter((x): x is string => x !== null);
-    lines.push(row("Attempts", parts.join(" · ")));
+    facts.push(row("Attempts", parts.join(" · ")));
     for (const a of history.ungraded)
-      lines.push(row("", `ungraded: ${a.stamp} (${waiting(a.pending.essay, a.pending.code)})`));
+      facts.push(row("", `ungraded: ${a.stamp} (${waiting(a.pending.essay, a.pending.code)})`));
   }
 
   const reviewFile = paths.review;
@@ -197,7 +198,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
     const current = at === quiz.current ? content.quiz : null;
     if (read.ok && current !== null) {
       const flagged = flaggedOf(root, quiz, current);
-      lines.push(
+      facts.push(
         row(
           "Review",
           `${reviewRow(reviewCounts(current, read.review)).slice(10)}${flagged > 0 ? ` · ${flagged} flagged` : ""}`,
@@ -205,7 +206,8 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
       );
     }
   }
-  lines.push(row("Path", shownPath(paths.dir, cwd)));
+  facts.push(row("Path", shownPath(paths.dir, cwd)));
   for (const line of lines) io.out(line);
+  for (const line of renderFacts(p, facts, LABEL)) io.out(line);
   return EXIT.done;
 }

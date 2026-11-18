@@ -4,13 +4,15 @@ import { answerProblem, attemptOf, parseResults } from "../core/attempt";
 import { en, vi } from "../core/i18n";
 import type { Quiz } from "../core/ir";
 import { buildReport, REPORT_FORMAT, REPORT_VERSION, type Report } from "../core/report";
-import { renderStats, type StatsInput, type StatsNames, summarise, titleOf } from "../core/stats";
+import { type StatsInput, type StatsNames, statsParts, summarise, titleOf } from "../core/stats";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
 import { expandInputs } from "./files";
 import type { Io } from "./ids";
 import { loadQuiz } from "./load";
+import { terminalPainter } from "./look";
 import { readFailure, shownPath } from "./paths";
+import { renderFacts } from "./table";
 
 export type StatsOptions = { quiz: string | null; json: boolean };
 
@@ -171,6 +173,17 @@ export function runStats(patterns: readonly string[], opts: StatsOptions, io: Io
 
   const summary = summarise(reports, names);
   if (opts.json) io.out(JSON.stringify(summary));
-  else for (const line of renderStats(summary)) io.out(line);
+  else {
+    // the facts block is drawn by the terminal's style: a panel in the `boxed` one
+    const p = terminalPainter(io, { plain: false, json: false });
+    const parts = statsParts(summary);
+    io.out(p.bold(parts.heading));
+    for (const line of renderFacts(p, parts.rows)) io.out(line);
+    if (parts.answers !== null) {
+      io.out("");
+      io.out("Answers over time");
+      for (const line of parts.answers) io.out(line);
+    }
+  }
   return EXIT.done;
 }

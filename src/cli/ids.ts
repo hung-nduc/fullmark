@@ -22,6 +22,8 @@ export type Io = {
   cwd: string;
   /** whether stderr is a terminal, which decides the progress line */
   tty: boolean;
+  /** the terminal's width in columns, when it is known: the `boxed` style falls back to `simple` below a table's width */
+  columns?: number;
   /** an id not in `used`; the default draws from `node:crypto` */
   newId?: (used: ReadonlySet<string>) => string;
   /** the clock of the library commands; the default is the real one */

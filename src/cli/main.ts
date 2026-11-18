@@ -25,6 +25,7 @@ function terminalIo(): Io {
     errRaw: (text) => process.stderr.write(text),
     cwd: process.cwd(),
     tty: Boolean(process.stderr.isTTY),
+    ...(process.stdout.columns ? { columns: process.stdout.columns } : {}),
     // TEST-ONLY: a fixed seed makes `quiz ids` repeatable, for the golden files. Nothing else reads this variable.
     ...(process.env.FULLMARK_TEST_SEED ? { newId: seededIds(process.env.FULLMARK_TEST_SEED) } : {}),
     // TEST-ONLY: a fixed time (ISO, with its offset) is the clock of every library command, for the golden files.

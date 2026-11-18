@@ -1,6 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
-import pc from "picocolors";
 import { lazyParseTex } from "../build/tex";
 import {
   chooseProfile,
@@ -25,6 +24,7 @@ import type { Io } from "./ids";
 import { type LoadedQuiz, loadQuiz } from "./load";
 import { readFailure, shownPath } from "./paths";
 import { loadReview } from "./review-file";
+import { painter } from "./table";
 
 export type CheckOptions = {
   profile: string | null;
@@ -241,7 +241,8 @@ export const issueJson = ({ rule, level, file, line, message, fix }: Issue) => (
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export function humanIssue(i: Issue, color: boolean): string[] {
-  const paint = !color ? (s: string) => s : i.level === "error" ? pc.red : i.level === "warning" ? pc.yellow : pc.cyan;
+  const p = painter(color);
+  const paint = i.level === "error" ? p.red : i.level === "warning" ? p.yellow : p.cyan;
   const lines = [`${i.file}:${i.line}: ${paint(i.level)} ${i.rule}: ${i.message}`];
   if (i.fix) lines.push(`    fix: ${i.fix}`);
   return lines;
@@ -263,7 +264,8 @@ export function describeOutcome(r: FileOutcome, several: boolean, color: boolean
   const parts = [plural(r.errors, "error"), plural(r.warnings, "warning")];
   const ignored = r.ignored.length > 0 ? `, ${r.ignored.length} ignored` : "";
   const summary = `${r.file}: ${parts.join(", ")}${ignored}`;
-  out.push(r.status === "ok" ? (color ? pc.green(summary) : summary) : color ? pc.red(summary) : summary);
+  const p = painter(color);
+  out.push(r.status === "ok" ? p.green(summary) : p.red(summary));
   return out;
 }
 

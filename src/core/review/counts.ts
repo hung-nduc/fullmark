@@ -53,8 +53,8 @@ export function reviewCounts(quiz: Quiz, review: Review): ReviewCounts {
   return out;
 }
 
-/** The summary row `inspect --review` prints after Positions: `keep 26 (14 not looked at) · fix 3 (2 changed since) · …`. */
-export function reviewRow(c: ReviewCounts): string {
+/** The row `inspect --review` adds after Positions, as a label and what it holds: `keep 26 (14 not looked at) · fix 3 (2 changed since) · …`. */
+export function reviewFact(c: ReviewCounts): [label: string, text: string] {
   const parts = [
     `keep ${c.keep}${c.assumed > 0 ? ` (${c.assumed} not looked at)` : ""}`,
     `fix ${c.fix}${c.fixChanged > 0 ? ` (${c.fixChanged} changed since)` : ""}`,
@@ -62,5 +62,11 @@ export function reviewRow(c: ReviewCounts): string {
     `not judged ${c.unjudged}`,
     shortDate(c.reviewedAt),
   ];
-  return `${"Review".padEnd(10)}${parts.join(" · ")}`;
+  return ["Review", parts.join(" · ")];
+}
+
+/** The same row in plain text: a label column of ten characters. */
+export function reviewRow(c: ReviewCounts): string {
+  const [label, text] = reviewFact(c);
+  return `${label.padEnd(10)}${text}`;
 }
