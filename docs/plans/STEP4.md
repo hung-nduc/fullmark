@@ -18,12 +18,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
-| 4b | brief approved (2026-11-18); with the implementing agent | this file |
+| 4b | built and reviewed (2026-11-18); G21 waits for the owner | `c070213`, `eb89812` |
 
 ### Next
 
-1. One implementing agent (Sonnet) builds **4b**; the planner reviews it and writes the review at the end of its section.
-2. Then **4c**'s brief (`register`, `list`, `info`).
+1. The owner decides G21 (4b's review).
+2. The planner writes **4c**'s brief (`register`, `list`, `info`), with G21 as its first task.
 
 ## Goal
 
@@ -47,7 +47,9 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 and G20 are decided too. New ones found while building are added here from G21.
+G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 and G20 are decided too. Open:
+
+**G21. Two `init`s of the same new folder.** Raised in 4b's review, from the agent's report: `init` decides what the folder is (new, empty, a library, refused) before it takes the lock, and takes the lock only to write. Two `init`s of one new folder started together can both decide "new"; the second waits for the lock, then writes over the first's `library.toml` and makes a second commit. **Recommendation:** `init` takes the lock as soon as the folder exists (creating it first when missing) and decides what the folder is under the lock, so the second `init` finds a library and adopts it. A test runs two `init`s together and finds one `created`, one `adopted`, one commit. The first task of 4c's brief.
 
 ## Slices
 
@@ -170,3 +172,13 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 ### Done when
 
 `npm run build`, the typecheck, Biome, knip and Vitest pass (G20: no Playwright for this slice); `quiz library init` in a new temporary folder, then `status` and `path`, print COMMANDS.md's text; the boundary and command-graph tests hold.
+
+### Review (2026-11-18)
+
+**Built** in `c070213` (the store: `src/library/layout.ts`, `index-file.ts`, `lock.ts`, `git.ts`; the config keys `library`, `git` and `[terminal]` in `parseConfig`; `src/cli/config-write.ts`; `FULLMARK_TEST_NOW`; the boundary test) and `eb89812` (`library init`, `status`, `path`; `src/cli/table.ts`; `src/cli/library-common.ts`; 55 goldens; the command-graph cases; 13 subprocess tests of git states).
+
+**Checked by the planner** (G20: no Playwright): `npm run build`, the typecheck, Biome and knip pass; Vitest: the startup tests 2 (alone, first), then 3293 in 127 files. Goldens: 55 added under `test/golden/library/` (23 `init-*`, 23 `status-*`, 9 `path-*`), each an Output block of COMMANDS.md or a case the brief named; 2 changed, `top/help` and `top/no-command`, which gain the `library` line. **By hand**, in a temporary folder with a temporary `config.toml` and git config: `status` with no library exits 2 with COMMANDS.md's error; `init lib` writes `library.toml`, `.gitignore`, the commit `fullmark: init` as `fullmark <fullmark@localhost>` (git's config untouched), the identity note, and `library = "…"` above the first table with the comment and order of `config.toml` kept; `status` prints the board's facts and notes, a stray file as `library.orphan`, exit 0; `path` and `path nope` as COMMANDS.md; a second `init` elsewhere exits 2, "a library is already set". The `git` runner commits only the paths it is given.
+
+**Done differently, accepted:** two older tests that used a `[library]` table in `config.toml` now use `[shelves]` (`library` is a string now; step 5 gives `[shelves]` a meaning, and those tests change then); `writeIndex` takes the atomic writer as a parameter, since `src/library/` may not import `src/cli/`; `status`'s `Checks` row only when healthy (as both COMMANDS.md samples); the `library.hash` fix names the full hash so it can be pasted; `status`'s identity note has the `user.name` line only, as the board; codes the design did not name (`library.missing`, `library.index`, `library.version-missing`, `config.invalid`; notes `git.no-repository`, `git.unavailable`, `library.orphan`); a `--json` error may carry `"fix"`; a missing `config.toml` named by `FULLMARK_CONFIG` is not an error for library commands (`init` creates it); the waiting line on stderr; `TZ=UTC` in the goldens' environment, so `created` is the same on every machine.
+
+**Gaps:** G21.
