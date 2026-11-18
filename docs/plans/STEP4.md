@@ -22,10 +22,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 | 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
+| 4f | brief written (2026-11-19); G34 to G37 raised; waits for the owner | this file |
 
 ### Next
 
-1. The planner writes **4f**'s brief (`share`, `template add`, `rename`, `rm`, `review`; the samples; acceptance), with the decided gaps first.
+1. The owner decides **G34 to G37** and approves **4f**'s brief (the last slice: `review`, `share`, `template add`, `rename`, `rm`, the `boxed` style, the samples, acceptance).
+2. The decisions go into COMMANDS.md; one implementing agent (Sonnet) builds 4f; the planner reviews it and the step.
 
 ## Goal
 
@@ -49,7 +51,15 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G33 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G34.
+G1 to G33 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised for 4f's brief, open:
+
+**G34. `library review` and the lock.** COMMANDS.md says **Finish** writes `review.json` "under the lock", but the form waits up to 1800 s, as `take`'s page and `grade --web`'s form do. **Recommendation:** as G29 and G32: no lock while the form is served; on **Finish**, the checked review is written to `progress/review.json` (git-ignored), then, under the lock, moved to `review.json` and committed. When the lock cannot be had in 10 s, it stays in `progress/`, the command exits 2 saying it is safe, the form's done card says it is saved but not filed yet (the words of G32, for a review), and the next `library review` of the quiz files it first, says so, and ends, with `next: quiz library review NAME`.
+
+**G35. The `fullmark.toml` of `share --source`.** COMMANDS.md: "a `fullmark.toml` with the custom profile the quiz uses, if any". A version stores its resolved rules in `check.json`, not the config they came from. **Recommendation:** when `check.json`'s profile is a built-in one with no change, no `fullmark.toml` is written. Otherwise one is written with `profile = NAME` and `[profiles.NAME]`, `extends` the built-in profile its chain starts from, and each rule whose level or options differ from that built-in's, sorted by id. A test checks the shared folder with `quiz check` and gets the same issues as under `check.json`.
+
+**G36. `share` into a place that holds something.** COMMANDS.md does not say. **Recommendation:** the page (`NAME.html`) is replaced, as `build` replaces its output. The `--source` folder (`DIR/NAME/`) is refused (exit 2) when it exists and is not empty, with the fix "choose another -o, or remove DIR/NAME", so an edited copy is never overwritten.
+
+**G37. `rm` while the quiz is open.** `rm` could delete a quiz while a `take`, `grade --web` or `review` of it is serving, or while it holds an attempt in progress or a leftover submit. **Recommendation:** refused (exit 1) while a `take` of the quiz is serving (its `serving.json` names a live process), "NAME is open in a take (pid N)", fix "finish or stop it, or add --force". Otherwise the folder goes with its `progress/`, and the question counts what is not in git: "delete chem-bonds (Chemical bonding): 2 versions, 6 attempts, 4 reports, 1 attempt in progress?" (the last only when there is one).
 
 ## Slices
 
@@ -367,3 +377,68 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 **Done differently, accepted:** the code of tasks 2 to 4 is in one commit, since each needs the others to build, with the tests and goldens in the next two; `--no-open` on `--web`, as `take`; the refusals of `quiz grade` (`--name` without `--web`, `--grades` with `--web`, `--timeout` and `--port` checked before serving); the saved card names `grades/<stamp>-…-grades.json`, since the second is not known when the page is built; `library-grade-web.ts` takes the helpers it needs as a parameter, so esbuild keeps `grade`'s chunks as the command-graph test expects; an invalid `--grades` with `--json` is `{"status": "problems", …}` as `quiz grade`'s; `graded` counts the graded essay and code answers; an unreadable grades file exits 2; `report.md` names the quiz by its name; with no grades file kept the report is rebuilt without grades (only the old hand-made fixture had one); the newest kept grades file that cannot be applied exits 2 naming it, never falling back to an older one; `stats` leaves out an attempt that cannot be graded; a leftover `progress/<stamp>.grades.json` whose attempt is gone is ignored. **The agent's stuck wait:** its last command waited on `pgrep -f "playwright test"`, which matched itself; stopped by the planner.
 
 **Gaps:** G30 to G33, decided by the owner on 2026-11-19 as recommended.
+
+## Slice 4f: `review`, `share`, `template add`, `rename`, `rm`; acceptance
+
+**Brief written on 2026-11-19; waits for the owner's approval, and for G34 to G37** (written below as recommended; changed here if decided otherwise). G10, G13, G16, G18, G30 to G33 and the approved boards (LibraryTidy, LibraryTake, LibraryStyleBordered) are written into COMMANDS.md: "Exit codes", "Terminal style", "How library commands print", "The library folder", `quiz library review`, `share`, `template add`, `rename`, `rm`, `grade`. This is the last slice of step 4: it finishes the commands, gives the terminal its `boxed` style, makes the samples' library, and checks the step's "Done when". It touches a form and the page, so per G20 it runs **everything**, Playwright in Chromium and Firefox.
+
+### Read first
+
+- This plan: "Goal" (the step's "Done when"), "Rules for every slice"; 4b's to 4e's sections and reviews; STEP4-GAPS.md, G10, G13, G16, G18, G30 to G37.
+- COMMANDS.md: the sections named above, `quiz review` (all of it), `quiz template add` and `quiz template rm`, `quiz build`'s output, "Terminal style", "Paths in output".
+- The boards LibraryTidy (`rename`, `rm`), LibrarySetup (`share`, `template add`), LibraryStyleBordered (the `boxed` style), which COMMANDS.md's Output blocks transcribe.
+- Code: `src/cli/review.ts` (`runReview`, `submitReader`), `src/cli/template.ts` (`runTemplateAdd`), `src/cli/table.ts` (`renderTable`, `renderFacts`, `painter`), `src/cli/check.ts`, `inspect.ts` and `stats.ts` (their human output), `src/cli/library-common.ts`, 4d's `library-take.ts` (the serving file and leftover pattern), 4e's `library-grade-web.ts` (the hooks into a form's server, the busy card of G32), `src/library/check-file.ts` (`check.json`'s reader), `scripts/samples.mjs` (its `SERVED` list), `test/cli-graph.test.ts`, `test/helpers/library-history.ts`.
+
+### Decided for this slice
+
+**First, G30 to G33.**
+- **G30:** one handler in `main.ts`: an `EPIPE` on stdout stops the writing and exits `0` with nothing on stderr. A subprocess test pipes `rules --all` and `library list` into a reader that closes after one line: exit 0, stderr empty.
+- **G31:** `library grade --json` that writes a template prints `next: fill in FILE, then quiz library grade NAME --grades FILE (or --web)`; the `grade-template-json` golden changes by that line.
+- **G32:** `--web`'s server answers **Save grades** once the keep was tried; on a busy lock the done card says COMMANDS.md's words, two keys in `src/core/i18n/grade.ts` (en, vi). A test of the busy case reads the card's text.
+- **G33:** `biome.json` leaves out `.claude/`.
+
+**`library review NAME [--since] [--timeout SECONDS] [--port N] [--no-open] [--json]`** (G16, G34).
+- `quiz review`'s form on the current version (`loadStored` by `file`), with the stored `review.json` as its earlier review (as `quiz review --review` merges); `--since` as `quiz review --since` (no stored review: exit 2). A survey: exit 2. `runReview` gains hooks as `runGradeWeb` did in 4e; `quiz review`'s goldens and tests do not move.
+- G34: no lock while serving; **Finish** writes `progress/review.json`, then under the lock moves it to `review.json`, one commit `fullmark: review NAME`; busy: kept in `progress/`, exit 2, the done card's words, the next `library review` files it first and ends with `next:`.
+- Output and `--json` as COMMANDS.md; the heading counts the questions and those judged before.
+- `register --update` already applies the stored review (4c): a test reviews a question `fix` here, then registers an update that leaves it unchanged and is refused.
+
+**`library share NAME [-o DIR] [--version HASH] [--source] [--json]`** (G35, G36).
+- The page: the version (current, or `--version` as `info`'s: a hash or a prefix of 4 or more, ambiguous exits 2) built from its stored source as `quiz build` builds it, with `check.json`'s profile, into `DIR/NAME.html` (default `DIR`: the working directory). It must be **byte-identical** to `quiz build` of the same source and profile (foundation 9): a test builds both and compares.
+- `--source`: `DIR/NAME/` with the version folder's files (the source under its file name, assets, sheets, `brief.yaml`), not `check.json`, plus the `fullmark.toml` of G35 when the profile is not a plain built-in. G36 for what is there already.
+- Reads the library, writes nothing in it, no lock, no commit. Output and `--json` as COMMANDS.md (`412 KB`: the size as `build` prints it).
+
+**`library template add NAME [--as TEMPLATE] [--version HASH] [--skeleton] [--replace] [--json]`.** The version's source and assets handed to `quiz template add`'s machinery, checked under `check.json`'s profile (not the config's); its options, name rules, exits and `unchanged` as `quiz template add`'s. Writes the user's template folder (under the injected config folder in tests), nothing in the library, no commit. Output as COMMANDS.md.
+
+**`library rename OLD NEW [--json]`.** NEW by G13's rules (`ID_FORMAT`; not another quiz's name or id; "name taken" with the next free `NAME-2`, exit 1). Only `name` in `library.toml` changes (the table moves to keep the file sorted); the id and the folder stay. Under the lock, one commit `fullmark: rename OLD NEW`. Unknown quiz: exit 2 with the near names. Output and `--json` as COMMANDS.md.
+
+**`library rm NAME [--yes] [--force] [--json]`** (G10, G37).
+- Asks `[y/N]` on a terminal (the prompt injected in tests), counting versions, attempts and reports, and an attempt in progress (G37). Not on a terminal and without `--yes`: exit 2, as `--json` without `--yes` (G10).
+- Refused (exit 1), unless `--force`: no git repository at the root, uncommitted changes under `quizzes/<id>/` (git-ignored `progress/` aside), a `take` of the quiz serving (G37). With `--force` and no git: deleted, no commit, a warning that it cannot be undone.
+- Under the lock: the folder is removed (a rename aside first, then removed, so a killed run leaves the quiz or nothing: a test), the table removed from `library.toml`, one commit `fullmark: rm NAME`, then `undo: git -C ROOT revert HASH`. Output and `--json` as COMMANDS.md.
+
+**The `boxed` style and the shared tables** (G18; COMMANDS.md, "Terminal style").
+- `src/cli/table.ts` draws `boxed` as the LibraryStyleBordered board: tables in box characters, `library status`'s facts block in a panel; the same colours as `simple`. Used when `[terminal] style = "boxed"` and stdout is a terminal without `--plain` or `NO_COLOR`; it falls back to `simple` when the terminal (its injected width) is narrower than the table.
+- `check`, `inspect` and `stats` move their tables and blocks onto `table.ts` (4b's brief deferred this). Their plain output (every golden) must not change: the goldens are the proof, and none of `check/`, `inspect/`, `stats/` changes. Colour tests with a terminal `io` for both styles, including the narrow fallback.
+
+**Acceptance of step 4** ("Goal", Done when).
+- **Every library command has a contract test** run as a subprocess with `--json`: a test lists the commands in `main.ts`'s `library` group and fails for one with no such test.
+- **Every command that changes the library takes the lock and commits once:** a test runs each (`init`, `register`, `take`, `grade`, `review`, `rename`, `rm`) against a library with the lock held by a live process and finds it waits and then fails with the "busy" error, and, once free, makes exactly one commit.
+- **The history goldens complete** (G6): `list`, `info`, `stats`, `take --missed` (its function golden) and `replay` over the history library, each present, reviewed and committed; the helper gains a renamed quiz and a review, so `rename` and `review` are in the history too.
+- **The command graph:** `check` and the core commands load nothing of `src/library/`; `share` and `template add` load no server; the library's read-only commands no page builder.
+- **The samples** (`scripts/samples.mjs`): `samples/library/`, a copy of the history fixture made a git repository, and `samples/config.toml` naming it, so the owner's own config and library are never touched; lines in `SERVED` for `FULLMARK_CONFIG=samples/config.toml node dist/cli.js library take study-fixture`, `library take study-fixture --missed`, `library grade study-fixture --web` and `library replay study-fixture`, each with what to try, as the other lines; `SERVED`'s page lists them.
+
+### Tasks
+
+1. **G30 to G33** (one commit), each with its test.
+2. **`review`** (one commit): the command, the hooks in `review.ts`, G34; in-process tests (Finish written and committed, `--since`, none to ask, busy, timeout, Ctrl+C), a subprocess `--json` test, a Playwright spec in both browsers (the form on the history library, one verdict changed, Finish, `review.json` committed).
+3. **`share` and `template add`** (one commit): the commands, G35, G36; the byte-identity test; goldens for COMMANDS.md's Output blocks and `--json`, `--version`, an unknown version, the refused `--source` folder.
+4. **`rename` and `rm`** (one commit): the commands, G37; unit tests for each refusal, the prompt, the killed `rm`, the undo line (a real `git revert` brings the quiz back and `status` is healthy); goldens of the Output blocks.
+5. **The `boxed` style** (one commit): `table.ts`, `check`, `inspect`, `stats` onto it; the colour tests; no plain golden changes.
+6. **Acceptance and the samples** (one commit): the contract-test and lock-and-commit tests, the history goldens completed, the command-graph cases, the samples' library and lines; `npm run samples` run.
+7. **Do not edit** `docs/plans/` or `docs/design/`. The agent's report as for every slice, with every golden and screen added or changed counted and explained, and anything done differently.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox; the step's "Done when" (Goal) holds, each part shown by a test named in the report; `npm run samples` builds the samples' library, and the owner tries `library take`, `library grade --web` and `library replay` from it.
+
