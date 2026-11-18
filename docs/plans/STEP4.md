@@ -18,12 +18,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
-| 4b | brief written (2026-11-18); waits for the owner's approval | this file |
+| 4b | brief approved (2026-11-18); with the implementing agent | this file |
 
 ### Next
 
-1. The owner approves **4b**'s brief (the store).
-2. One implementing agent (Sonnet) builds it; the planner reviews it.
+1. One implementing agent (Sonnet) builds **4b**; the planner reviews it and writes the review at the end of its section.
+2. Then **4c**'s brief (`register`, `list`, `info`).
 
 ## Goal
 
@@ -109,7 +109,7 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ## Slice 4b: the store
 
-**Brief written on 2026-11-18; waits for the owner's approval.** G1 to G3, G8, G11, G13 and G18 are decided and written into COMMANDS.md ("Library commands": "How library commands print", "The library folder", "Git", `init`, `status`, `path`; "Terminal style"; "Environment") and TECHNICAL_DESIGN.md (section 7, "Library and shelf writes take a lock"; section 11). This slice builds the store every later library command stands on, and the three commands that need nothing else: `library init`, `library status`, `library path`. No quiz is registered yet; `register` is 4c. Tests per G20: no Playwright.
+**Approved by the owner on 2026-11-18.** G1 to G3, G8, G11, G13 and G18 are decided and written into COMMANDS.md ("Library commands": "How library commands print", "The library folder", "Git", `init`, `status`, `path`; "Terminal style"; "Environment") and TECHNICAL_DESIGN.md (section 7, "Library and shelf writes take a lock"; section 11). This slice builds the store every later library command stands on, and the three commands that need nothing else: `library init`, `library status`, `library path`. No quiz is registered yet; `register` is 4c. Tests per G20: no Playwright.
 
 ### Read first
 
