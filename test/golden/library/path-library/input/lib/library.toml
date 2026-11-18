@@ -1,0 +1,19 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.rust-basics]
+id = "rust-basics"
+title = "Rust basics"
+source = "/home/minh/quizzes/rust.md"
+current = "203a64e7b57cd8f676e83d00fc0f555721422e54ccd7599d7428e955380e474e"
+versions = [{ hash = "203a64e7b57cd8f676e83d00fc0f555721422e54ccd7599d7428e955380e474e", added = "2026-11-17T09:00:00+00:00" }]
+shelves = []
+
+[quizzes.signals]
+id = "signals"
+title = "Signals"
+source = "/home/minh/quizzes/signals.md"
+current = "b7a8e5b995f1445dff04652990ddbd5747abcf56fc0a30cb2de4de5c23347279"
+versions = [{ hash = "26a58d8a424550a493fdc96f174cb6d1c651d771e914bd7b6c344f05d4cbcc05", added = "2026-11-17T09:05:00+00:00" }, { hash = "b7a8e5b995f1445dff04652990ddbd5747abcf56fc0a30cb2de4de5c23347279", added = "2026-11-18T08:00:00+00:00" }]
+shelves = []

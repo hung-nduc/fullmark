@@ -1,0 +1,9 @@
+Library    lib
+Config     user-config.toml
+Git        no repository
+Counts     0 quizzes · 0 versions · 0 attempts · 0 reports
+Checks     fullmark.toml: none · hashes: 0 of 0 match
+
+note git.no-repository: the library is not a git repository: its changes are not kept in history
+
+healthy (1 note)

@@ -1,0 +1,5 @@
+[init]
+	defaultBranch = main
+[user]
+	name = Minh Tran
+	email = minh@example.com

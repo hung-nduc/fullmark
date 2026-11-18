@@ -1,0 +1,10 @@
+Library    lib
+Config     user-config.toml
+Git        no repository
+Counts     2 quizzes · 3 versions · 3 attempts · 1 report
+
+quizzes/rust-basics/versions/203a: problem library.hash: the source file rust.md is missing, so the files no longer match the version's hash
+    fix: restore the folder from a copy
+note git.no-repository: the library is not a git repository: its changes are not kept in history
+
+1 problem (1 note)

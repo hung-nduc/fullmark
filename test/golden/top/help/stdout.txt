@@ -42,4 +42,6 @@ Commands:
   review [options] <file>        a form to judge every question (keep, fix or
                                  drop) and write review.json when you press
                                  Finish
+  library                        the library: one folder under git that keeps
+                                 each quiz's versions, attempts and reports
   help [command]                 help for a command

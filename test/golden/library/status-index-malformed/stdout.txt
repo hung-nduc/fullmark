@@ -1,0 +1,10 @@
+Library    lib
+Config     user-config.toml
+Git        no repository
+
+library.toml:5: problem library.index: quiz `signals`: `source` is missing
+library.toml:5: problem library.index: quiz `signals`: `current` is missing
+library.toml:5: problem library.index: quiz `signals`: `versions` is missing
+note git.no-repository: the library is not a git repository: its changes are not kept in history
+
+3 problems (1 note)

@@ -1,0 +1,3 @@
+error: the config has errors
+user-config.toml:2: `library` must be a path, in quotes, not number 5
+    fix: write library = "/path/to/the/library", or run `quiz library init PATH`

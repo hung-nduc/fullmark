@@ -27,7 +27,6 @@ const QuizSchema = z
   })
   .strict();
 
-export type IndexVersion = z.infer<typeof VersionSchema>;
 /** A quiz of the index, with its name; `shelves` is reserved for step 5. */
 export type IndexQuiz = z.infer<typeof QuizSchema> & { name: string };
 export type LibraryIndex = {

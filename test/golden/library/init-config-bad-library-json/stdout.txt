@@ -1,0 +1,1 @@
+{"status":"error","message":"the config has errors","errors":[{"file":"user-config.toml","line":2,"message":"`library` must be a path, in quotes, not number 5","fix":"write library = \"/path/to/the/library\", or run `quiz library init PATH`"}]}

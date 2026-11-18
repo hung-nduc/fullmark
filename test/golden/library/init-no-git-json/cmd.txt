@@ -1,0 +1,5 @@
+library
+init
+lib
+--no-git
+--json

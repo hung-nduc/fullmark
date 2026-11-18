@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
  * A command loads only what it uses (TECHNICAL_DESIGN.md, section 7, "CLI startup"). tsup splits `dist/` into chunks
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
- * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`.
+ * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
+ * (`src/library/`); `library init`, `status` and `path` reach neither the page builder, the renderer nor the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -24,6 +25,9 @@ const BUILD_ONLY = [
 
 /** The one-shot server (`src/serve/`): only the commands that serve load it. */
 const SERVE_ONLY = ["// src/serve/"];
+
+/** The library's store: only the `library` commands load it. */
+const LIBRARY_ONLY = ["// src/library/", "// src/cli/library-"];
 
 /** The terminal form's prompts (`@clack/prompts`): only `brief --tui` loads them. */
 const CLACK = ["// node_modules/@clack/", "// node_modules/sisteransi/", "// node_modules/fast-wrap-ansi/"];
@@ -193,11 +197,33 @@ describe("what each command loads", () => {
       for (const marker of SERVE_ONLY) expect(text, marker).not.toContain(marker);
     });
 
+    it(`${name} never loads the library`, () => {
+      const text = textOf(closure(entry(name)));
+      for (const marker of LIBRARY_ONLY) expect(text, marker).not.toContain(marker);
+    });
+
     it(`${name} never reaches the page builder, the renderer or the build's Markdown-to-HTML path`, () => {
       const list = closure(entry(name));
       expect(list.some((f) => f.startsWith("build-"))).toBe(false);
       const text = textOf(list);
       for (const marker of BUILD_ONLY) expect(text, marker).not.toContain(marker);
+    });
+  }
+
+  for (const [command, marker] of [
+    ["init", "// src/cli/library-init.ts"],
+    ["status", "// src/cli/library-status.ts"],
+    ["path", "// src/cli/library-path.ts"],
+  ] as const) {
+    it(`library ${command} is a chunk of its own, reached by a dynamic import() from main, and never loads the page builder, the renderer or the server`, () => {
+      const chunk = chunkWith(marker);
+      const list = closure(chunk);
+      const text = textOf(list);
+      for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...CLACK]) expect(text, m).not.toContain(m);
+      expect(list.some((f) => f.startsWith("build-"))).toBe(false);
+      expect(text).toContain("// src/library/");
+      expect(closure(entry("main"))).not.toContain(chunk);
+      expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
     });
   }
 });

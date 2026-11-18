@@ -1,0 +1,4 @@
+library
+init
+docs
+--json

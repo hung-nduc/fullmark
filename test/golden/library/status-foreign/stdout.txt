@@ -1,0 +1,9 @@
+Library    lib
+Config     user-config.toml
+Git        no repository
+
+library.toml:1: problem library.index: not a fullmark 1.0 library: library.toml has no `format`
+    fix: fullmark 1.0 keeps its own library: make one with `quiz library init PATH`
+note git.no-repository: the library is not a git repository: its changes are not kept in history
+
+1 problem (1 note)

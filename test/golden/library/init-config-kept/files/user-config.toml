@@ -1,0 +1,10 @@
+# my machine
+fonts = "all"
+
+library = "<dir>/lib"
+
+[terminal]
+style = "simple"
+
+[profiles.mine]
+extends = "default"

@@ -1,0 +1,2 @@
+error: docs is not empty and is not a library (3 files)
+    fix: choose an empty or new folder

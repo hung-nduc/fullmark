@@ -1,0 +1,1 @@
+{"status":"problems","library":"<dir>/gone","config":"<dir>/user-config.toml","git":{"repository":false,"uncommitted":0,"remote":null},"counts":{"quizzes":0,"versions":0,"attempts":0,"reports":0},"problems":[{"code":"library.missing","path":"gone","message":"the library's folder does not exist","fix":"quiz library init gone"}],"notes":[]}

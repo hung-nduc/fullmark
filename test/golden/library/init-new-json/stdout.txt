@@ -1,0 +1,1 @@
+{"status":"created","library":"<dir>/lib","config":"<dir>/no-home/.config/fullmark/config.toml","git":true,"identity":null,"committed":"ef0195c"}

@@ -1,0 +1,4 @@
+error: the config has errors
+user-config.toml:3: unknown key `colour` in [terminal]
+    fix: the keys are: style
+user-config.toml:2: `style` must be "simple" or "boxed", not string "round"

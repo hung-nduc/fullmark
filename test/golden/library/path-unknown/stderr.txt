@@ -1,0 +1,2 @@
+error: no quiz named "signal" in the library
+    fix: did you mean `signals`?

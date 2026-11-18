@@ -1,0 +1,7 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.signals]
+id = "signals"
+title = "Signals"

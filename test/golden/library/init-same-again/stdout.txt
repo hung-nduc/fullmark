@@ -1,0 +1,3 @@
+library ready lib (existing library, no git repository)
+recorded in user-config.toml
+next: quiz library register FILE

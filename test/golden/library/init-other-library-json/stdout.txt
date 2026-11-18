@@ -1,0 +1,1 @@
+{"status":"error","message":"a library is already set: elsewhere","fix":"add --force to switch"}

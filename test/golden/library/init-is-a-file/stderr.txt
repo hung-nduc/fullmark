@@ -1,0 +1,2 @@
+error: notes.txt is a file, not a folder
+    fix: choose an empty or new folder

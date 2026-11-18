@@ -1,0 +1,2 @@
+error: no quiz named "x" in the library
+    fix: the library has no quizzes yet: quiz library register FILE

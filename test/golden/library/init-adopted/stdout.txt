@@ -1,0 +1,3 @@
+library ready lib (existing library, no git repository)
+recorded in no-home/.config/fullmark/config.toml
+next: quiz library register FILE

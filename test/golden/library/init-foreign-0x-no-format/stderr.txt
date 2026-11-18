@@ -1,0 +1,2 @@
+error: old/library.toml:1: not a fullmark 1.0 library: library.toml has no `format`
+    fix: fullmark 1.0 keeps its own library: make one with `quiz library init PATH`

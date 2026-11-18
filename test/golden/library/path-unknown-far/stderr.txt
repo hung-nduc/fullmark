@@ -1,0 +1,2 @@
+error: no quiz named "physics" in the library
+    fix: the quizzes are: rust-basics, signals

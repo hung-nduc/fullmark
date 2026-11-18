@@ -1,0 +1,4 @@
+library ready lib (new folder, no git repository)
+recorded in user-config.toml
+warning git was not found: the library has no repository (rm will need --force)
+next: quiz library register FILE

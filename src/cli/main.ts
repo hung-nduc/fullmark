@@ -490,6 +490,48 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       };
       outcome.exit = await (await import("./review")).runReview(file, opts, io);
     });
+
+  const library = program
+    .command("library")
+    .description("the library: one folder under git that keeps each quiz's versions, attempts and reports");
+  library
+    .command("init")
+    .description("make PATH (default: here) this machine's library and record it in the config")
+    .argument("[path]", "the folder: new, empty or already a library")
+    .option("--force", "switch from another library already in the config")
+    .option("--no-git", "do not make a git repository (rm then needs --force)")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (path: string | undefined, options: Record<string, unknown>) => {
+      outcome.exit = await (await import("./library-init")).runLibraryInit(
+        path ?? null,
+        {
+          force: Boolean(options.force),
+          noGit: options.git === false,
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+        },
+        io,
+      );
+    });
+  library
+    .command("status")
+    .description("the library's config, git state, counts and problems")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (options: { json?: boolean; plain?: boolean }) => {
+      outcome.exit = await (await import("./library-status")).runLibraryStatus(
+        { json: Boolean(options.json), plain: Boolean(options.plain) || noColor() },
+        io,
+      );
+    });
+  library
+    .command("path")
+    .description("print the library's folder, or a quiz's")
+    .argument("[name]", "a quiz's name or id")
+    .action(async (name: string | undefined) => {
+      outcome.exit = (await import("./library-path")).runLibraryPath(name ?? null, io);
+    });
   return program;
 }
 

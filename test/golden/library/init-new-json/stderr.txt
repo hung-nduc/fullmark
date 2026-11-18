@@ -1,0 +1,7 @@
+library ready lib (new folder, git repository)
+recorded in no-home/.config/fullmark/config.toml
+note git has no identity here: commits are made as fullmark <fullmark@localhost>
+    set one: git -C lib config user.name "Your Name"
+             git -C lib config user.email you@example.com
+committed ef0195c fullmark: init
+next: quiz library register FILE

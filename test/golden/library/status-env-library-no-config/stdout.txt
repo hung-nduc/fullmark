@@ -1,0 +1,10 @@
+Library    lib (from FULLMARK_LIBRARY)
+Config     no-home/.config/fullmark/config.toml
+Git        no repository
+Counts     2 quizzes · 3 versions · 3 attempts · 1 report
+Checks     fullmark.toml: none · hashes: 3 of 3 match
+
+note env.library: FULLMARK_LIBRARY is set; the config sets no library
+note git.no-repository: the library is not a git repository: its changes are not kept in history
+
+healthy (2 notes)

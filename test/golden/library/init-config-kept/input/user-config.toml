@@ -1,0 +1,8 @@
+# my machine
+fonts = "all"
+
+[terminal]
+style = "simple"
+
+[profiles.mine]
+extends = "default"
