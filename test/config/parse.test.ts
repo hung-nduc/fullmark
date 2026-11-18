@@ -52,7 +52,7 @@ where = { type = "code", graded = true, section = "intro" }
   });
 
   it("reads only [profiles] from the user's config, and leaves the rest alone", () => {
-    const user = `[library]\npath = "D:/quizzes"\n\n[check]\nprofile = "x"\n\n[profiles.mine]\nrules."question.untagged" = "warning"\n`;
+    const user = `[shelves]\npublic = "D:/quizzes"\n\n[check]\nprofile = "x"\n\n[profiles.mine]\nrules."question.untagged" = "warning"\n`;
     const { data, errors } = parseConfig(user, "config.toml", "user");
     expect(errors).toEqual([]);
     expect(data?.profiles.get("mine")?.layer).toBe("user");

@@ -24,6 +24,8 @@ export type Io = {
   tty: boolean;
   /** an id not in `used`; the default draws from `node:crypto` */
   newId?: (used: ReadonlySet<string>) => string;
+  /** the clock of the library commands; the default is the real one */
+  now?: () => Date;
 };
 
 type FileResult =

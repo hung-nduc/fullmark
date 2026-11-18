@@ -48,6 +48,12 @@ export type ConfigFileData = {
   check: { profile: string | null; profileLine: number; failOn: "error" | "warning" | null; failOnLine: number };
   /** `fonts` at the top of the machine `config.toml`: the default of `--fonts` */
   fonts: "quiz" | "all" | "none" | null;
+  /** `library = "PATH"` at the top of the machine `config.toml`, as written (a relative path is relative to the file) */
+  library: string | null;
+  /** `git = "PATH"`: the `git` to run when it is not on the path, as written */
+  git: string | null;
+  /** `[terminal] style`: how tables and blocks are drawn (COMMANDS.md, "Terminal style") */
+  terminalStyle: "simple" | "boxed" | null;
   profiles: Map<string, ProfileDef>;
   /** `[brief.purpose.<purpose>]` in the machine `config.toml`: the defaults of a purpose, by purpose then key */
   briefDefaults: Partial<Record<(typeof PURPOSES)[number], Record<string, BriefDefault>>>;

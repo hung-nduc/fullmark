@@ -263,7 +263,7 @@ describe("the config", () => {
 
   it("the user config offers personal profiles, from FULLMARK_CONFIG", () => {
     const dir = tree({
-      "mine.toml": '[library]\npath = "x"\n\n[profiles.mine]\nrules."question.untagged" = "warning"\n',
+      "mine.toml": '[shelves]\npublic = "x"\n\n[profiles.mine]\nrules."question.untagged" = "warning"\n',
       "quiz.md": quiz(),
     });
     const c = capture(dir, { FULLMARK_CONFIG: "mine.toml" });

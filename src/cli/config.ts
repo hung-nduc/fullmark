@@ -120,3 +120,15 @@ export function loadConfig(m: Machine, quizDir: string, override: string | null)
   if (errors.length === 0) errors.push(...validateLayers(layers));
   return { layers, files, errors, failOn: project?.check.failOn ?? "error" };
 }
+
+/** The machine `config.toml` alone, for the commands that read nothing else (the library's). */
+export function loadUserConfig(m: Machine): {
+  path: string;
+  data: ConfigFileData | null;
+  errors: ConfigError[];
+} {
+  const user = userConfigPath(m);
+  // a config that does not exist yet is no error here: `library init` makes it
+  const read = readConfig(user.path, shownPath(user.path, m.cwd), "user", false);
+  return { path: user.path, data: read.data, errors: read.errors };
+}

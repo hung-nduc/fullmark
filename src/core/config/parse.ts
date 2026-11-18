@@ -68,6 +68,9 @@ export function parseConfig(text: string, file: string, kind: "project" | "user"
     file,
     check: { profile: null, profileLine: 1, failOn: null, failOnLine: 1 },
     fonts: null,
+    library: null,
+    git: null,
+    terminalStyle: null,
     profiles: new Map(),
     briefDefaults: {},
   };
@@ -117,6 +120,8 @@ export function parseConfig(text: string, file: string, kind: "project" | "user"
     else
       fail(["fonts"], `\`fonts\` must be ${FONT_CHOICES.map((c) => `"${c}"`).join(", ")}, not ${describe(doc.fonts)}`);
   }
+
+  if (kind === "user") readMachineKeys(doc, data, fail, unknownKeys);
 
   if (kind === "user" && doc.brief !== undefined) readBriefDefaults(doc.brief, data, fail);
 
@@ -365,6 +370,44 @@ export function parseConfig(text: string, file: string, kind: "project" | "user"
     }
     return where;
   }
+}
+
+const TERMINAL_STYLES = ["simple", "boxed"] as const;
+
+/**
+ * `library`, `git` and `[terminal]` in the machine `config.toml` (COMMANDS.md, "Environment" and "Terminal style"): the
+ * library's folder, the `git` to run, and the look of tables and blocks.
+ */
+function readMachineKeys(
+  doc: Table,
+  data: ConfigFileData,
+  fail: (path: readonly string[], message: string, fix?: string) => void,
+  unknownKeys: (t: Table, allowed: readonly string[], path: string[], where: string) => void,
+): void {
+  for (const [key, fix] of [
+    ["library", 'write library = "/path/to/the/library", or run `quiz library init PATH`'],
+    ["git", 'write git = "/path/to/git"'],
+  ] as const) {
+    const value = doc[key];
+    if (value === undefined) continue;
+    if (typeof value === "string" && value !== "") data[key] = value;
+    else fail([key], `\`${key}\` must be a path, in quotes, not ${describe(value)}`, fix);
+  }
+  const terminal = doc.terminal;
+  if (terminal === undefined) return;
+  if (!isTable(terminal)) {
+    fail(["terminal"], `\`terminal\` must be a table, not ${describe(terminal)}`, "write [terminal]");
+    return;
+  }
+  unknownKeys(terminal, ["style"], ["terminal"], "[terminal]");
+  const style = terminal.style;
+  if (style === undefined) return;
+  if ((TERMINAL_STYLES as readonly unknown[]).includes(style)) data.terminalStyle = style as "simple" | "boxed";
+  else
+    fail(
+      ["terminal", "style"],
+      `\`style\` must be ${TERMINAL_STYLES.map((c) => `"${c}"`).join(" or ")}, not ${describe(style)}`,
+    );
 }
 
 const BRIEF_KEYS = ["count", "minutes", "mix", "difficulty", "mode"] as const;
