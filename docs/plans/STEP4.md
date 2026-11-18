@@ -17,12 +17,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
-| 4a | brief written (2026-11-18); waits for the owner's approval | this file |
+| 4a | brief approved (2026-11-18); with the implementing agent | this file |
 
 ### Next
 
-1. The owner approves **4a**'s brief (below, in its slice section).
-2. One implementing agent (Sonnet) builds 4a; the planner reviews it.
+1. One implementing agent (Sonnet) builds 4a; the planner reviews it and writes the review at the end of its section.
+2. Then **4b**'s brief (the store).
 
 ## Goal
 
@@ -62,7 +62,7 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ## Slice 4a: `content.names-control`
 
-**Brief written on 2026-11-18; waits for the owner's approval.** Step 3's G148, decided: TECHNICAL_DESIGN.md, section 5, the rule catalogue's row for `content.names-control`, and QUIZ_SYNTAX.md, section 8, "Write for the page and the paper alike", say what is wanted. This slice is core only: no library code, no page change.
+**Approved by the owner on 2026-11-18.** Step 3's G148, decided: TECHNICAL_DESIGN.md, section 5, the rule catalogue's row for `content.names-control`, and QUIZ_SYNTAX.md, section 8, "Write for the page and the paper alike", say what is wanted. This slice is core only: no library code, no page change.
 
 ### Read first
 
