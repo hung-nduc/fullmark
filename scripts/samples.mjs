@@ -1,7 +1,7 @@
 // Builds every example and every page fixture into samples/, with an index, for trying the page by hand.
 // Run with `npm run samples` (it builds dist first). samples/ is git-ignored: regenerate it, never commit it.
 import { execFileSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const OUT = "samples";
@@ -108,6 +108,26 @@ const SERVED = [
     command: "node dist/cli.js build samples/watch/quiz.md --watch --serve --open",
     try: "quiz build --watch --serve: samples/watch/quiz.md (a copy of the Rust example, made when the samples are built) is built, served on 127.0.0.1 and opened in your browser. Edit and save it: the page reloads within a second and shows the change. Save an error (an unclosed ::: or a question with no id): the terminal prints the errors and 'kept the last good page', and the page does not reload; fix it and the page reloads. samples/watch/quiz.html on disk is what quiz build writes (no reload code). Ctrl+C in the terminal exits 0. Add --json to see one line per build, and give two files (samples/watch/quiz.md samples/watch/second.md) to see the index of pages, which notes a failed rebuild at its next load.",
   },
+  {
+    command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library take study-fixture",
+    try: "quiz library take, on the samples' library (samples/library, a git repository made when the samples are built; samples/config.toml names it, so your own config and library are never touched; set FULLMARK_CONFIG to it in each shell, or put it before the command). The current version of study-fixture is served and opens in your browser: answer, press Submit; the command prints 'filed results/<stamp>.json' with the score, then the commit. Look at what it did with git -C samples/library log --stat -1. Press Ctrl+C or close the tab part-way instead: the command exits 2 and the progress is saved in samples/library/quizzes/study/progress/ (git-ignored); run it again and the page offers Continue. Run quiz library list and quiz library info study-fixture to see the attempt counted.",
+  },
+  {
+    command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library take study-fixture --missed",
+    try: "quiz library take --missed: only the questions you got wrong or partly right and have not answered right since, from the seven attempts in the history. The heading says how many came from how many attempts, how many changed since you missed them (the question reworded in the third version carries its mark on the page) and how many are no longer in the quiz. Answer and Submit: the attempt is filed with plan source missed, and the next run counts what you answered right. Add --section part-one to keep the missed questions of one part.",
+  },
+  {
+    command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library grade study-fixture --web",
+    try: 'quiz library grade --web: the newest attempt with an essay waiting for a grade (20261116-201412, taken on the third version) opens in the grading form, as quiz grade --web has it. Grade the essay, Finish, give your name and Save grades: the grades are kept in samples/library/quizzes/study/grades/, the report is written in reports/, and one commit holds them (the command prints grades kept, report, committed). Take the lock away by hand to see the busy case: create samples/library/.fullmark.lock containing {"pid": PID-OF-A-RUNNING-PROCESS, "command": "x", "started": "2026-11-19T00:00:00Z"} before Save: the card says your grades are saved but not filed yet, the command exits 2, and the next quiz library grade study-fixture files them. Try --attempt 20261003 for an attempt already graded: the form opens pre-filled from the newest grades kept.',
+  },
+  {
+    command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library replay study-fixture",
+    try: "quiz library replay: the newest attempt as a page already submitted, built from the version it was taken on, and opened in your browser; nothing is written in the library. Add --attempt 20261003-100000 for the first attempt, which an AI graded and a person regraded: the page shows the newest grades kept, with the grader's line. Add -o samples/replays to keep the page.",
+  },
+  {
+    command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library review tidy",
+    try: "quiz library review: the review form on the current version of tidy (renamed from tidy-notes by quiz library rename; the history already holds one review of it, with a fix on the second question), opened with that verdict in place and the heading counting what was judged before. Change a verdict, press Finish: review.json is filed in the library and one commit holds it. For --since: quiz library share tidy --source -o samples/edit writes an editable copy; change a question in samples/edit/tidy/tidy.md and register it with quiz library register samples/edit/tidy/tidy.md --update tidy (the review marks the second question fix, so the update is refused until that question has changed); then quiz library review tidy --since asks only about the question that changed.",
+  },
 ];
 
 // extra `build` flags for a page
@@ -145,6 +165,27 @@ mkdirSync(join(OUT, "grade-ai"), { recursive: true });
 copyFileSync(join("test", "fixtures", "replay", "essay.md"), join(OUT, "grade-ai", "quiz.md"));
 copyFileSync(join("test", "fixtures", "replay", "essay-results.json"), join(OUT, "grade-ai", "results.json"));
 copyFileSync(join("test", "fixtures", "replay", "essay-results-grades.json"), join(OUT, "grade-ai", "grades.json"));
+
+// the library the `library` samples run on: a copy of the history fixture (STEP4.md, G6) made a git repository, and a
+// config that names it, so the owner's own config and library are never touched
+const LIBRARY = join(OUT, "library");
+cpSync(join("test", "fixtures", "library-history", "lib"), LIBRARY, { recursive: true });
+writeFileSync(
+  join(OUT, "config.toml"),
+  '# the samples\' library: FULLMARK_CONFIG=samples/config.toml node dist/cli.js library list\n# add a [terminal] section with style = "boxed" to try the boxed style on a terminal\nlibrary = "library"\n',
+);
+try {
+  for (const args of [
+    ["init", "-q"],
+    ["add", "-A"],
+    ["-c", "user.name=fullmark", "-c", "user.email=fullmark@localhost", "commit", "-q", "-m", "fullmark: init"],
+  ])
+    execFileSync("git", ["-C", LIBRARY, ...args], { stdio: "pipe" });
+} catch (e) {
+  console.error(
+    `samples/library: git could not make it a repository (library rm needs one, or --force)\n${e.stderr?.toString() ?? e}`,
+  );
+}
 
 const built = [];
 for (const s of sources) {
