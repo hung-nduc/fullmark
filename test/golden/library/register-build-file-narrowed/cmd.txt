@@ -1,0 +1,5 @@
+library
+register
+--build-file
+quizzes/build.toml
+quizzes/signals.md

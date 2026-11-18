@@ -1,0 +1,6 @@
+library
+register
+rust-v2.md
+--update
+rust
+--json

@@ -1,0 +1,11 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.rust-basics]
+id = "rust-basics"
+title = "Rust basics"
+source = "/home/minh/notes/rust-v2.md"
+current = "53af3e2248e6d0168485f2e7c68eed6c0f6181af5b9d5b56b009d200df3f4545"
+versions = [{ hash = "f9d8a0d4e000b25d7b80857d526312c5ee77165b70b4b7279abbcc903b5be744", added = "2026-11-18T14:22:10+00:00" }, { hash = "53af3e2248e6d0168485f2e7c68eed6c0f6181af5b9d5b56b009d200df3f4545", added = "2026-11-18T14:22:10+00:00" }]
+shelves = []

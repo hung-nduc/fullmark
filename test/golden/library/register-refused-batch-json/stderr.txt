@@ -1,0 +1,10 @@
+notes/chem.md:3: error library.id-taken: the id chem-bonds is already in the library, as chemical-bonding
+    fix: if it is the same quiz, quiz library register notes/chem.md --update chemical-bonding;
+         if not, give it a new `id:` in its front matter
+notes/limits.md:6: error question.id-missing: the question has no `id`
+    fix: run: quiz ids FILE
+notes/rust2.md: error library.name-taken: the name rust-basics is taken
+    fix: -n rust-basics-2 (one file at a time)
+notes/survey.md:3: error library.survey: a survey is not kept in the library: the library is one learner's history of their own attempts
+    fix: `quiz serve` and `quiz stats` handle a survey with no library
+nothing registered 1 of 5 files ready, 4 refused

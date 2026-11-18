@@ -1,0 +1,4 @@
+chem2.md:3: error library.id-taken: the id chem-bonds is already in the library, as chemical-bonding
+    fix: if it is the same quiz, quiz library register chem2.md --update chemical-bonding;
+         if not, give it a new `id:` in its front matter
+nothing registered 0 of 1 file ready, 1 refused

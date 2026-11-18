@@ -1,0 +1,3 @@
+rust-v2.md:16: warning review.unconfirmed: borrow was marked fix on 17 Nov (unclear): the question has changed since, and has not been judged again
+    fix: run `quiz review rust-v2.md --since lib/quizzes/rust-basics/review.json` and judge the change
+registered rust-basics · version 53af (was f9d8) · 1 added, 1 removed, 1 changed

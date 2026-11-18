@@ -1,0 +1,2 @@
+error: quizzes/chem.md is in several entries of quizzes/build.toml with a different profile, config or strict
+    fix: give the entries the same values, or list the file once

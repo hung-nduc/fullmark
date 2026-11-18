@@ -1,0 +1,1 @@
+{"status":"registered","registered":[{"file":"rust-v2.md","name":"rust-basics","version":"53af3e2248e6d0168485f2e7c68eed6c0f6181af5b9d5b56b009d200df3f4545"}],"unchanged":[],"refused":[],"committed":null}

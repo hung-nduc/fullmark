@@ -1,0 +1,18 @@
+{
+  "format": "fullmark-review",
+  "version": 2,
+  "quizId": "rust-basics",
+  "quizHash": "f9d8a0d4e000b25d7b80857d526312c5ee77165b70b4b7279abbcc903b5be744",
+  "reviewedAt": "2026-11-17T10:00:00+00:00",
+  "questions": {
+    "own": {
+      "verdict": "fix",
+      "reasons": [
+        "unclear"
+      ],
+      "note": "",
+      "hash": "b620f14d6062e93f4bfa58f48206dd4cfe6b5079c8174d3f65d98e20e025183f",
+      "source": "x"
+    }
+  }
+}

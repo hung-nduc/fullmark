@@ -1,0 +1,3 @@
+rust2.md: error library.name-taken: the name rust-basics is taken
+    fix: -n rust-basics-2
+nothing registered 0 of 1 file ready, 1 refused

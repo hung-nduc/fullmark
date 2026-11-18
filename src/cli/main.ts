@@ -532,6 +532,37 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .action(async (name: string | undefined) => {
       outcome.exit = (await import("./library-path")).runLibraryPath(name ?? null, io);
     });
+  library
+    .command("register")
+    .description("check quizzes and keep each as a version in the library, with the rules it was checked under")
+    .argument("[files...]", "quiz .md files (globs are expanded); with --build-file, only those of its entries")
+    .option("-n, --name <name>", "the name of a new quiz (default: the slugged title)")
+    .option("--update <name>", "add a version to this existing quiz")
+    .option("--build-file <build>", "register the files a build file lists (only files, profile, config and strict)")
+    .option("--profile <name>", "the check profile; overrides the quiz's profile")
+    .option("--config <toml>", "use this config file instead of the nearest fullmark.toml, or the library's")
+    .option("--strict", "warnings count as errors")
+    .option("--review <review.json>", "also fail until every question marked fix has changed and every drop is gone")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours and no progress line, even in a terminal")
+    .action(async (files: string[], options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-register")).runLibraryRegister(
+        files,
+        {
+          name: text("name"),
+          update: text("update"),
+          buildFile: text("buildFile"),
+          profile: text("profile"),
+          config: text("config"),
+          strict: Boolean(options.strict),
+          review: text("review"),
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+        },
+        io,
+      );
+    });
   return program;
 }
 

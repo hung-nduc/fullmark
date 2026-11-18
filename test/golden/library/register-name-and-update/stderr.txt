@@ -1,0 +1,1 @@
+error: -n names a new quiz and --update adds to an existing one: use one

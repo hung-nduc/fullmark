@@ -1,0 +1,1 @@
+{"status":"problems","registered":[],"unchanged":[],"refused":[{"file":"signals.md","reason":"library.id-mismatch: the id signals is not rust-basics's id, rust-basics","suggest":"give the quiz the id rust-basics, or register it as a new quiz without --update"}],"committed":null}

@@ -1,0 +1,3 @@
+rust-v2.md:6: error review.fix: own was marked fix on 17 Nov (unclear): the question has not changed since
+    fix: change the question as the reasons say, or judge it again with `quiz review`
+nothing registered 0 of 1 file ready, 1 refused

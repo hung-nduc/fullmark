@@ -1,0 +1,19 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.chemical-bonding]
+id = "chem-bonds"
+title = "Chemical bonding"
+source = "<dir>/quizzes/chem.md"
+current = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20"
+versions = [{ hash = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20", added = "2026-11-18T14:22:10+00:00" }]
+shelves = []
+
+[quizzes.signals-and-systems]
+id = "signals"
+title = "Signals and systems"
+source = "<dir>/quizzes/signals.md"
+current = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678"
+versions = [{ hash = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678", added = "2026-11-18T14:22:10+00:00" }]
+shelves = []

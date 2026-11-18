@@ -1,0 +1,2 @@
+error: no quiz named rust
+    the quizzes are: rust-basics

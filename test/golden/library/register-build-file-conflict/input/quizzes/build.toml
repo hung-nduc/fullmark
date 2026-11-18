@@ -1,0 +1,8 @@
+[[build]]
+files = ["chem.md"]
+profile = "exam"
+
+[[build]]
+files = ["chem.md"]
+print = true
+out = "paper"

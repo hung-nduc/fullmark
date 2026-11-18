@@ -1,0 +1,4 @@
+library
+register
+notes/*.md
+--json

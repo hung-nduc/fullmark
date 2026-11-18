@@ -1,0 +1,11 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.chemical-bonding]
+id = "chem-bonds"
+title = "Chemical bonding"
+source = "<dir>/chem.md"
+current = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20"
+versions = [{ hash = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20", added = "2026-11-18T14:22:10+00:00" }]
+shelves = []

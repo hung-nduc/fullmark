@@ -1,0 +1,5 @@
+[check]
+profile = "house"
+
+[profiles.house.rules]
+"explanation.short" = "error"

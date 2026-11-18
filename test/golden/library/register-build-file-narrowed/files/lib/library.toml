@@ -1,0 +1,11 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.signals-and-systems]
+id = "signals"
+title = "Signals and systems"
+source = "<dir>/quizzes/signals.md"
+current = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678"
+versions = [{ hash = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678", added = "2026-11-18T14:22:10+00:00" }]
+shelves = []

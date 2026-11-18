@@ -1,0 +1,1 @@
+{"status":"problems","registered":[],"unchanged":[],"refused":[{"file":"rust2.md","reason":"library.name-taken: the name rust-basics is taken","suggest":"-n rust-basics-2"}],"committed":null}

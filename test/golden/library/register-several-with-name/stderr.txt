@@ -1,0 +1,1 @@
+error: -n names one quiz: give one file

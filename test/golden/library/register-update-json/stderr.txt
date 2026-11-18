@@ -1,0 +1,3 @@
+registered rust-basics · version 53af (was f9d8) · 1 added, 1 removed, 1 changed
+warning an attempt in progress on f9d8 (2 of 3 answered, 18 Nov 14:02) stays on that version
+    the next quiz library take rust-basics resumes it there (G17)

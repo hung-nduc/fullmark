@@ -1,0 +1,4 @@
+library
+register
+--build-file
+quizzes/build.toml

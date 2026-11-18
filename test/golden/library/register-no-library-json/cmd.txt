@@ -1,0 +1,4 @@
+library
+register
+rust-v1.md
+--json

@@ -1,0 +1,3 @@
+survey.md:3: error library.survey: a survey is not kept in the library: the library is one learner's history of their own attempts
+    fix: `quiz serve` and `quiz stats` handle a survey with no library
+nothing registered 0 of 1 file ready, 1 refused

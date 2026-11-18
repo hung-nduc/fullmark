@@ -1,0 +1,502 @@
+{
+  "allowIgnore": true,
+  "chain": [
+    {
+      "name": "house",
+      "origin": "lib/fullmark.toml:4"
+    }
+  ],
+  "checks": [],
+  "format": "fullmark-check",
+  "profile": "house",
+  "rules": [
+    {
+      "id": "answers.position-skew",
+      "level": "warning",
+      "options": {
+        "max-share": 0.5,
+        "min-questions": 8
+      }
+    },
+    {
+      "id": "asset.alt",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "asset.missing",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "asset.outside",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "asset.remote",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "asset.type",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "blanks.in-math",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "blanks.none",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "blanks.outside",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "blanks.syntax",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "brief.content-kinds",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.count",
+      "level": "warning",
+      "options": {
+        "tolerance": 0.2
+      }
+    },
+    {
+      "id": "brief.generated-by",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.invalid",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.mix",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.mode",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.no-history",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.past-exams",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "brief.vague",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "build.answer-sheet-empty",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "build.font-not-embedded",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "build.size",
+      "level": "warning",
+      "options": {
+        "max-mb": 100,
+        "warn-mb": 20
+      }
+    },
+    {
+      "id": "choice.all-none-above",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "choice.correct-count",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "choice.correct-longest",
+      "level": "warning",
+      "options": {
+        "min-length": 40,
+        "ratio": 1.8
+      }
+    },
+    {
+      "id": "choice.count",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "choice.duplicate",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "choice.in-stem",
+      "level": "warning",
+      "options": {
+        "min-length": 12
+      }
+    },
+    {
+      "id": "choice.input",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "choice.marker",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "code.language",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "code.unknown-language",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "config.ignored",
+      "level": "info",
+      "options": {}
+    },
+    {
+      "id": "content.names-control",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "essay.words",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "explanation.missing",
+      "level": "off",
+      "options": {}
+    },
+    {
+      "id": "explanation.short",
+      "level": "error",
+      "options": {
+        "min-words": 4
+      }
+    },
+    {
+      "id": "fields.empty",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "fields.key",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "fields.points",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "ignore.invalid",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "markdown.raw-html",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "matching.pairs",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "materials.empty",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "materials.heading",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "materials.missing",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "materials.question",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "math.syntax",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "numeric.value",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "ordering.items",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "profile.unknown",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.answer-block",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.container-twice",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.id-duplicate",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.id-format",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.id-missing",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.points-ignored",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "question.prompt-empty",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.trailing-text",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.type-missing",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.ungraded",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.ungraded-key",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "question.untagged",
+      "level": "off",
+      "options": {}
+    },
+    {
+      "id": "questions.type-order",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "quiz.empty",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "quiz.no-time-limit",
+      "level": "off",
+      "options": {}
+    },
+    {
+      "id": "review.drop",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "review.fix",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "review.unconfirmed",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "rubric.duplicate-id",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "rubric.missing",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "rubric.mode-missing",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "rubric.points-in-text",
+      "level": "warning",
+      "options": {}
+    },
+    {
+      "id": "rubric.scale",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "rubric.step",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "rubric.sum",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "rubric.thin",
+      "level": "warning",
+      "options": {
+        "min": 3
+      }
+    },
+    {
+      "id": "rubric.weights",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "scale.range",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "section.id-duplicate",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "section.pick",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "short.key",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "short.regex",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "survey.forbidden",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.attributes",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.container",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.front-matter",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.heading-level",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.preamble",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.unknown-key",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.value",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "syntax.yaml",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "theme.unknown",
+      "level": "error",
+      "options": {}
+    },
+    {
+      "id": "theme.unknown-font",
+      "level": "error",
+      "options": {}
+    }
+  ],
+  "version": 1
+}

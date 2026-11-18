@@ -1,0 +1,7 @@
+[[build]]
+files = ["chem.md", "signals.md"]
+
+[[build]]
+files = ["chem.md"]
+print = true
+out = "paper"

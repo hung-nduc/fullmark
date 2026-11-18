@@ -1,19 +1,27 @@
-import { existsSync, readFileSync, statSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 import type { ConfigError } from "../core/config/types";
+import { suggest } from "../core/parse/report";
 import { Git, type GitExec } from "../library/git";
-import { type IndexRead, readIndex } from "../library/index-file";
-import { INDEX_FILE } from "../library/layout";
+import { type IndexQuiz, type IndexRead, type LibraryIndex, readIndex } from "../library/index-file";
+import { INDEX_FILE, libraryPaths } from "../library/layout";
 import type { LockEnv } from "../library/lock";
 import { realLockEnv } from "../library/lock";
 import { loadUserConfig, type Machine, realMachine } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
 import type { Io } from "./ids";
+import { type LoadedQuiz, loadQuiz } from "./load";
 import { shownPath } from "./paths";
 import { painter } from "./table";
 
 /** An `Io` plus what the library commands read from the machine and the world; every part defaults to the real one. */
-export type LibraryIo = Io & { machine?: Machine; lock?: LockEnv; gitExec?: GitExec };
+export type LibraryIo = Io & {
+  machine?: Machine;
+  lock?: LockEnv;
+  gitExec?: GitExec;
+  /** the atomic writer of `library.toml` and the files beside it; tests pass one that dies mid-way */
+  atomic?: (file: string, data: Uint8Array) => Promise<void>;
+};
 
 export const machineOf = (io: LibraryIo): Machine => io.machine ?? { ...realMachine(), cwd: io.cwd };
 export const lockEnvOf = (io: LibraryIo): LockEnv => io.lock ?? realLockEnv();
@@ -141,4 +149,66 @@ export function refusal(root: string, opened: Opened, cwd: string): { message: s
     message: `${shown}/${INDEX_FILE}:${first?.line ?? 1}: ${first?.message ?? "library.toml has problems"}`,
     fix: first?.fix ?? "fix library.toml at that line",
   };
+}
+
+/** The library a command works on, found and read: or the failure already reported (exit 2). */
+export function openLibrary(
+  io: LibraryIo,
+  json: boolean,
+): { located: Located; index: LibraryIndex } | { exit: ExitCode } {
+  const found = locate(io, json);
+  if ("exit" in found) return found;
+  const { root } = found.located;
+  const opened = openIndex(root);
+  const refused = refusal(root, opened, machineOf(io).cwd);
+  if (refused) return { exit: libraryFail(io, json, refused.message, { fix: refused.fix }) };
+  if (opened.kind !== "read" || !opened.read.ok) return { exit: EXIT.usage };
+  return { located: found.located, index: opened.read.index };
+}
+
+/** A quiz by its name, then by its id (COMMANDS.md, "Names, ids and stamps"). */
+export const findQuiz = (index: LibraryIndex, name: string): IndexQuiz | undefined =>
+  index.quizzes.find((q) => q.name === name) ?? index.quizzes.find((q) => q.id === name);
+
+/** `error: no quiz named NAME`, with the nearest names (exit 2). */
+export function noSuchQuiz(io: LibraryIo, json: boolean, index: LibraryIndex, name: string): ExitCode {
+  const names = index.quizzes.flatMap((q) => (q.name === q.id ? [q.name] : [q.name, q.id]));
+  const near = suggest(name, names);
+  const hint =
+    near !== null && near !== undefined
+      ? `    did you mean: ${near}`
+      : names.length > 0
+        ? `    the quizzes are: ${index.quizzes.map((q) => q.name).join(", ")}`
+        : "    the library has no quizzes yet: quiz library register FILE";
+  if (json) io.out(JSON.stringify({ status: "error", message: `no quiz named ${name}`, fix: hint.trim() }));
+  io.err(`error: no quiz named ${name}`);
+  io.err(hint);
+  return EXIT.usage;
+}
+
+/**
+ * A stored version, loaded from its folder: its source is found under the name it was registered with, else among the
+ * folder's own `.md` files, taking the one whose hash is the version's. Null when the folder or the source is missing.
+ */
+export function loadStored(root: string, quiz: IndexQuiz, hash: string): LoadedQuiz | null {
+  const dir = libraryPaths(root).quiz(quiz.id).version(hash);
+  let names: string[];
+  try {
+    names = readdirSync(dir).filter((n) => n.endsWith(".md") && statSync(join(dir, n)).isFile());
+  } catch {
+    return null;
+  }
+  const first = basename(quiz.source);
+  const ordered = [...names.filter((n) => n === first), ...names.filter((n) => n !== first).sort()];
+  let fallback: LoadedQuiz | null = null;
+  for (const name of ordered) {
+    try {
+      const loaded = loadQuiz(join(dir, name));
+      if (loaded.hash === hash) return loaded;
+      fallback ??= loaded;
+    } catch {
+      // unreadable: try the next
+    }
+  }
+  return fallback;
 }
