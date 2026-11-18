@@ -1389,12 +1389,16 @@ function Dialog({ state }: { state: GradeState }) {
       });
       if (reply.ok) {
         const who = (fromFlag ? data.name : state.name.value.trim()) as string;
+        // `library grade --web` says when the lock was busy, so the card does not name files that were not written
+        const said = (await reply.json().catch(() => null)) as { filed?: unknown; command?: unknown } | null;
+        const unfiled = said?.filed === false && typeof said.command === "string" ? said.command : null;
         state.saved.value = {
           graded: totals.graded,
           pending: left,
           earned: totals.score.earned,
           points: totals.score.points,
           name: who,
+          unfiled,
         };
         state.dialog.value = "none";
         dialog.current?.close();
@@ -1510,14 +1514,18 @@ function SavedCard({ state }: { state: GradeState }) {
       <p class="fm-grade-saved-score">{r.doneScore(n(s.earned), n(s.points), pct)}</p>
       <p>{r.doneGraded(s.graded, s.name, s.pending.map((i) => r.qn(i.number)).join(", "))}</p>
       {graderNames(data).length === 0 ? null : <p>{r.reviewing(joinNames(r, graderNames(data)))}</p>}
-      <ul class="fm-grade-files">
-        <li>
-          <code>{data.files.grades}</code> {r.gradesFile}
-        </li>
-        <li>
-          <code>{data.files.report}</code> {r.reportFile}
-        </li>
-      </ul>
+      {s.unfiled !== null ? (
+        <p data-grade-unfiled>{r.unfiled(s.unfiled)}</p>
+      ) : (
+        <ul class="fm-grade-files">
+          <li>
+            <code>{data.files.grades}</code> {r.gradesFile}
+          </li>
+          <li>
+            <code>{data.files.report}</code> {r.reportFile}
+          </li>
+        </ul>
+      )}
       <p class="fm-grade-dialog-note">{r.closed}</p>
     </section>
   );

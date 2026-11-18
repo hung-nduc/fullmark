@@ -13,6 +13,7 @@
       "!test/fixtures",
       "!test/data",
       "!test/golden",
+      "!.claude",
       "!src/build/notices-data.ts",
       "!package-lock.json"
     ]

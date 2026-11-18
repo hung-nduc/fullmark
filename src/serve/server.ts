@@ -42,6 +42,12 @@ export type ServerOptions<T = Results> = {
    */
   onSubmit(quizId: string, value: T): Promise<string | null> | string | null;
   /**
+   * Fields added to the `{"status":"accepted"}` answer of an accepted submit, read once `onSubmit` has run. `library
+   * grade --web` and `library review` say through it that what was saved is not filed yet because the lock was busy
+   * (STEP4-GAPS.md, G32, G34); the form reads them, and a server without the hook answers as before.
+   */
+  answer?(quizId: string): Record<string, unknown>;
+  /**
    * `--autosave`: called with each valid progress post (an attempt in `answering`), answered 204. Returns a plain-words
    * problem when it cannot be kept (400). Absent: the progress path does not exist (404).
    */
@@ -235,7 +241,7 @@ export async function startServer<T = Results>(options: ServerOptions<T>): Promi
       return refuse(res, 400, problem);
     }
     res.writeHead(200, { "Cache-Control": "no-store", "Content-Type": "application/json; charset=utf-8" });
-    res.end('{"status":"accepted"}');
+    res.end(JSON.stringify({ status: "accepted", ...(options.answer?.(quizId) ?? {}) }));
     if (options.predicate(accepted)) close({ status: "submitted" });
   };
 

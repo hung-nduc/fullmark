@@ -63,6 +63,8 @@ export type LibraryGradeHooks = {
   announce(server: { url: string; port: number }): void;
   /** keeps a submit that passed the checks: in place of writing `RESULTS-grades.json` and the report beside the results */
   save(submit: GradesSubmit): Promise<void>;
+  /** what the server's answer to Save grades adds once the keeping was tried: `{ filed: false, command }` when the lock was busy (G32) */
+  answer(): Record<string, unknown>;
   /** the words and the exit code once Save grades was accepted */
   done(): ExitCode | Promise<ExitCode>;
 };
@@ -346,6 +348,7 @@ export async function runGradeWeb(
         reviewed: new Map((p.grades?.applied.details ?? []).map((d) => [d.id, d.graded_by])),
       }),
       ...(io.setTimer ? { setTimer: io.setTimer } : {}),
+      ...(library ? { answer: () => library.answer() } : {}),
       async onSubmit(_id, { file, applied }) {
         if (library !== undefined) {
           await library.save({ file, applied });

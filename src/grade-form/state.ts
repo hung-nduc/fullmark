@@ -15,7 +15,15 @@ import {
   specOf,
 } from "./logic";
 
-export type Saved = { graded: number; pending: GradeItem[]; earned: number; points: number; name: string };
+export type Saved = {
+  graded: number;
+  pending: GradeItem[];
+  earned: number;
+  points: number;
+  name: string;
+  /** the command that files the grades, when the server says the library was busy and they are not filed yet (G32) */
+  unfiled: string | null;
+};
 
 /** The form's state: what has been typed for each question, where the grader is, the dialog and the result. */
 export function createGradeState(data: GradeData) {

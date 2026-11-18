@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { LibraryGradeIo, LibraryGradeOptions } from "../src/cli/library-grade";
 import { runLibraryGrade } from "../src/cli/library-grade";
+import { gradeEn, gradeVi } from "../src/core/i18n/grade";
 import type { GradeData } from "../src/grade-form/data";
 import { realLockEnv } from "../src/library/lock";
 import { cleanTemps, git } from "./helpers/library";
@@ -142,7 +143,10 @@ describe("library grade --web", () => {
       report: `reports/${STAMP}-report.md`,
     });
     const before = (await git(t.lib, t.env, "log", "--format=%s")).trim().split("\n").length;
-    expect((await save(url, doc)).status).toBe(200);
+    const reply = await save(url, doc);
+    expect(reply.status).toBe(200);
+    // filed: the answer is the plain one
+    expect(await reply.json()).toEqual({ status: "accepted" });
     expect(await run.done).toBe(0);
 
     const kept = `grades/${STAMP}-20261118-150212-grades.json`;
@@ -234,7 +238,17 @@ describe("library grade --web", () => {
       lock,
       `${JSON.stringify({ pid: process.pid, command: "quiz library register notes/*.md", started: "2026-11-18T14:22:10.000Z" })}\n`,
     );
-    expect((await save(url, doc)).status).toBe(200);
+    // the server answers once the keeping was tried, and says the grades are not filed (G32); the card's words are in
+    // e2e/library-grade.spec.ts and, in both languages, below
+    const reply = await save(url, doc);
+    expect(reply.status).toBe(200);
+    expect(await reply.json()).toEqual({ status: "accepted", filed: false, command: "quiz library grade writing" });
+    expect(gradeEn.unfiled("quiz library grade writing")).toBe(
+      "Your grades are saved, but not filed yet: the library was busy. Run `quiz library grade writing` to file them.",
+    );
+    expect(gradeVi.unfiled("quiz library grade writing")).toBe(
+      "Điểm đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy `quiz library grade writing` để ghi.",
+    );
     expect(await run.done).toBe(2);
     const errors = run.err.join("\n");
     expect(errors).toContain(`your grades are safe in progress/${STAMP}.grades.json`);

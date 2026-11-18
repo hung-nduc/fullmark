@@ -68,6 +68,8 @@ export async function runLibraryGradeWeb(
         state.busy = error;
       }
     },
+    // the form answers once the keeping was tried: when the lock was busy its card says so (G32)
+    answer: () => (state.busy === undefined ? {} : { filed: false, command: `quiz library grade ${t.quiz.name}` }),
     done(): ExitCode {
       if (state.busy !== undefined || state.kept === undefined)
         return libraryFail(

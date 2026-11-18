@@ -1,6 +1,6 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: a test reads the grades file loosely
 import { execFileSync } from "node:child_process";
-import { copyFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
+import { copyFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
 import { historyLibrary, root, type Served, serveProcess } from "./helpers";
@@ -98,4 +98,53 @@ test("library grade --web is pre-filled from the AI's grades, and Save keeps a h
   expect(existsSync(join(quizDir, "progress", `${STAMP}.grades.json`))).toBe(false);
   expect(existsSync(join(t.lib, ".fullmark.lock"))).toBe(false);
   expect(end.stderr).toContain(`grades kept ${kept} · human, Minh Tran`);
+});
+
+test("when the library is busy at Save, the card says the grades are saved but not filed, and names the command (G32)", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  const t = historyLibrary();
+  const env = { ...process.env, ...t.env };
+  copyFileSync(join(root, "test", "golden", "library", "grade-grades", "input", "grades.json"), join(t.dir, "ai.json"));
+  execFileSync(
+    process.execPath,
+    [join(root, "dist", "cli.js"), "library", "grade", "study-fixture", "--grades", "ai.json", "--plain"],
+    {
+      cwd: t.dir,
+      env,
+      encoding: "utf8",
+    },
+  );
+  const before = execFileSync("git", ["-C", t.lib, "rev-parse", "HEAD"], { env, encoding: "utf8" });
+
+  const server = await serveProcess(
+    t.dir,
+    ["library", "grade", "study-fixture", "--web", "--no-open", "--attempt", STAMP, "--name", "Minh Tran"],
+    t.env,
+  );
+  served.push(server);
+  await page.setViewportSize({ width: 1280, height: 940 });
+  await page.goto(server.url);
+  await page.locator("[data-quiz]").waitFor();
+  await page.locator('[data-crit="derive"] [data-act=more]').click();
+  await page.locator("[data-action=finish]").click();
+  // another command holds the library (this process, which is alive) for the whole 10 s the server waits
+  writeFileSync(
+    join(t.lib, ".fullmark.lock"),
+    `${JSON.stringify({ pid: process.pid, command: "quiz library register notes/*.md", started: new Date().toISOString() })}\n`,
+  );
+  await page.locator("dialog[open] [data-action=save]").click();
+  const card = page.locator("[data-grade-saved]");
+  await expect(card).toContainText("Grades saved", { timeout: 30_000 });
+  await expect(card.locator("[data-grade-unfiled]")).toHaveText(
+    "Your grades are saved, but not filed yet: the library was busy. Run `quiz library grade study-fixture` to file them.",
+  );
+  // no file is named: none was written
+  await expect(card.locator(".fm-grade-files")).toHaveCount(0);
+
+  const end = await server.end();
+  expect(end.code).toBe(2);
+  expect(existsSync(join(t.lib, "quizzes", "study", "progress", `${STAMP}.grades.json`))).toBe(true);
+  expect(execFileSync("git", ["-C", t.lib, "rev-parse", "HEAD"], { env, encoding: "utf8" })).toBe(before);
 });

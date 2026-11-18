@@ -112,6 +112,9 @@ export const gradeEn = {
   gradesFile: "your grades (kind: human)",
   reportFile: "the report, with the grades folded in",
   closed: "The server has stopped. You can close this tab.",
+  // `library grade --web` when the lock was busy at Save (G32): the grades wait in the library's progress folder
+  unfiled: (command: string) =>
+    `Your grades are saved, but not filed yet: the library was busy. Run \`${command}\` to file them.`,
   keyNext: "next not graded",
   keyQuestions: "questions",
   keyClose: "close",
@@ -245,6 +248,8 @@ export const gradeVi: GradeMessages = {
   gradesFile: "điểm bạn chấm (kind: human)",
   reportFile: "báo cáo, đã gộp điểm chấm",
   closed: "Máy chủ đã dừng. Bạn có thể đóng thẻ này.",
+  unfiled: (command) =>
+    `Điểm đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy \`${command}\` để ghi.`,
   keyNext: "câu chưa chấm tiếp theo",
   keyQuestions: "câu hỏi",
   keyClose: "đóng",

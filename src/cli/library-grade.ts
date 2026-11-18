@@ -336,7 +336,15 @@ export function printKept(
     }`,
   );
   if (extra.template !== null) out(`${p.green("written")} ${extra.template} (a grades template)`);
-  if (waitingCount > 0) out(p.dim(`next: quiz library grade ${t.quiz.name} --web, or --json for a grades template`));
+  // a template was just written: the next step is to fill it in (G31), not to ask for one again
+  if (extra.template !== null)
+    out(
+      p.dim(
+        `next: fill in ${extra.template}, then quiz library grade ${t.quiz.name} --grades ${extra.template} (or --web)`,
+      ),
+    );
+  else if (waitingCount > 0)
+    out(p.dim(`next: quiz library grade ${t.quiz.name} --web, or --json for a grades template`));
   if (kept.warning !== null) out(`${p.yellow("warning")} ${kept.warning}`);
   if (kept.committed !== null) out(p.dim(`committed ${kept.committed.hash} ${kept.committed.message}`));
   if (extra.next !== null) out(p.dim(extra.next));

@@ -733,4 +733,11 @@ async function main(argv: string[]): Promise<number> {
   }
 }
 
+// The reader of stdout closed it early (`quiz library list | head -1`): stop writing and end quietly, as most command-line
+// tools do (COMMANDS.md, "Exit codes"; STEP4-GAPS.md, G30). Any other error on stdout is left to fail as before.
+process.stdout.on("error", (error: NodeJS.ErrnoException) => {
+  if (error.code === "EPIPE") process.exit(EXIT.done);
+  throw error;
+});
+
 process.exitCode = await main(process.argv);
