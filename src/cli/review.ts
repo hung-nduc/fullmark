@@ -56,6 +56,8 @@ export type LibraryReviewHooks = {
   save(bytes: Uint8Array): Promise<void>;
   /** what the server's answer to Finish adds once the filing was tried (`{ filed: false, command }` when busy) */
   answer(): Record<string, unknown>;
+  /** the words and the exit code when the stored review cannot be used (`--since` with none, or one that does not read) */
+  refuse(message: string, problems: string[]): ExitCode;
   /** the words and the exit code of `--since` with nothing to ask */
   unchanged(line: string): ExitCode;
   /** the words and the exit code once the review was taken */
@@ -256,6 +258,7 @@ export async function runReview(
   };
   const old = readOld();
   if ("message" in old) {
+    if (library) return library.refuse(old.message, old.problems);
     if (opts.json) {
       io.out(
         JSON.stringify({

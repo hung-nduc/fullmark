@@ -196,6 +196,8 @@ export async function runLibraryReview(
     },
     // the form answers once the filing was tried: when the lock was busy its card says so (G34)
     answer: () => (state.busy === undefined ? {} : { filed: false, command: `quiz library review ${quiz.name}` }),
+    refuse: (message, problems) =>
+      libraryFail(io, opts.json, message, { details: problems.map((problem) => `  ${problem}`) }),
     unchanged(line) {
       if (opts.json) io.out(JSON.stringify({ status: "unchanged", review: "review.json" }));
       out(line);

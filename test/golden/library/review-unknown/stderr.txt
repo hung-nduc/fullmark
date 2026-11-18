@@ -1,0 +1,2 @@
+error: no quiz named tidyy
+    did you mean: tidy
