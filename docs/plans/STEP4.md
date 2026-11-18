@@ -21,11 +21,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
+| 4e | brief written (2026-11-19); G27 to G29 raised; waits for the owner | this file |
 
 ### Next
 
-1. The planner writes **4e**'s brief (`grade`, `stats`), with G25 and G26 first (G23 and G24 need no code: the docs follow the build).
-2. The owner approves it; one implementing agent (Sonnet) builds it.
+1. The owner decides **G27 to G29** and approves **4e**'s brief (`grade`, `stats`, with G25 and G26 first).
+2. The decisions go into COMMANDS.md; one implementing agent (Sonnet) builds 4e; the planner reviews it.
 
 ## Goal
 
@@ -49,7 +50,13 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G26 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G27.
+G1 to G26 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised for 4e's brief, open:
+
+**G27. Where `library grade --json` writes the grades template.** COMMANDS.md says "with `--json`, also the grades template" and gives it a `template` field, but not where. It cannot go in `grades/`: every file there is kept and the newest counts, so an empty template would count as the newest grades. **Recommendation:** in the working directory, as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never overwritten: an existing one is skipped with `quiz grade --json`'s warning. `--grades` then takes that file once it is filled, and keeps a copy in `grades/`.
+
+**G28. Which attempt `library grade` grades without `--attempt`.** COMMANDS.md gives no default; `replay`'s is the newest. **Recommendation:** the newest attempt with an essay or code answer still waiting for a grade; when none is waiting, the newest attempt. So `take`'s `next: quiz library grade NAME --web` grades the attempt just filed, and with several ungraded, the plain command works back from the newest. The heading names the attempt, as COMMANDS.md's sample does.
+
+**G29. `library grade --web` and the lock.** The form waits up to 1800 s. Holding the lock all that time would block every other command, as G9 found for `take`. **Recommendation:** as `take` (G9): no lock while the form is served; once **Save grades** is pressed and checked, the grades file, the report and the commit are made under the lock. When the lock cannot be had in 10 s, the grades are written to `progress/<stamp>.grades.json` (git-ignored), and the command exits 2 saying they are safe; the next `library grade` of the quiz keeps them first, as `take` files a leftover submit (G26).
 
 ## Slices
 
@@ -304,3 +311,57 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 **A leak, cause shown, not 4d's:** the agent's one failed run (44 Firefox failures, "Unknown system error -122" on a write) was `/tmp` full. The e2e specs and serve tests make `fm-*` folders with `mkdtempSync` and never remove them: one `npm run check` here left 1,179 new ones (most `fm-e2e-*`, then `fm-review-`, `fm-grade-`, `fm-brief-`, from steps 2 and 3). A fix for its own (remove them after each test) is offered to the owner.
 
 **Gaps:** G23 to G26, decided by the owner on 2026-11-19 as recommended.
+
+## Slice 4e: `grade`, `stats`
+
+**Brief written on 2026-11-19; waits for the owner's approval, and for G27 to G29** (written below as recommended; changed here if decided otherwise). G6, G14, G25, G26 and the approved boards (LibraryGrade) are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library take`, `quiz library grade`, `quiz library stats`, and `quiz grade` (`--grades`, `--json`, `--web`, the form) and `quiz stats`, which the library commands look up for you. This slice adds the grading of a filed attempt and the numbers over all of them. `--web` serves the grading form, so per G20 it runs **Playwright** too.
+
+### Read first
+
+- This plan: "Rules for every slice"; 4c's and 4d's sections and reviews; STEP4-GAPS.md, G6, G9, G14, G25, G26; G27 to G29 above.
+- COMMANDS.md: `quiz grade` (all of it: the form, "Before it serves", "The submit", the exits), `quiz stats`, `quiz library grade`, `quiz library stats`, `quiz library take` ("The lock"), "How library commands print", "The library folder".
+- TECHNICAL_DESIGN.md, section 6 (the grades format, the validator, pending grades in a score), section 7 (the lock, safe writes).
+- Code: `src/cli/grade.ts` (`readAttempt`, `gradeOne`, the template), `src/cli/grade-web.ts` (`Prepared`, `gradesSubmitReader`, `runGradeWeb`: where it writes today), `src/cli/stats.ts` and `src/core/stats/` (`summarise`, `renderStats`, `StatsNames`); 4c's `src/cli/library-history.ts` (`readHistory`: the newest report, else graded on the spot), `library-common.ts` (`loadStored`, `findQuiz`, `openLibrary`); 4d's `src/cli/library-take.ts` (the leftover-submit pattern, `fileSubmitted`, the lock), `library-missed.ts`, `library-replay.ts` (the newest grades file of an attempt); `src/library/layout.ts` (`grade`, `reportJson`, `reportMd`); the history helper and its fixture.
+
+### Decided for this slice
+
+**First, G25 and G26** (COMMANDS.md, `quiz library take`):
+- **G25.** When `take` resumes a saved attempt whose `plan.source` is `missed`, it works out the marks again: `missedOf` against the version resumed, the `changed` ids kept that are in the plan, served as `served.changed`. A test interrupts a `--missed` take with a changed question, resumes it with a plain `take`, and finds the mark on that card.
+- **G26.** After filing a leftover submit, `take` prints `next: quiz library take NAME` after the commit line (COMMANDS.md's Output), and ends, exit 0, as today. The golden or test of that case gains the line.
+
+**`library grade NAME [--attempt STAMP] [--grades FILE] [--json]`.**
+- **The attempt:** `--attempt` takes a stamp or a prefix of 4 or more (ambiguous: exit 2 listing the matches, as `replay`). Without it, G28: the newest attempt with an essay or code answer waiting for a grade (`readHistory`'s `pending`), else the newest. No attempts, or an unknown stamp: exit 2. The quiz is the version the attempt names, read by `loadStored` (by `file`).
+- **The grades used:** `--grades FILE` when given, checked by `quiz grade --grades`'s validator against that version (exit 1 with every problem, nothing written); else the newest file of that attempt in `grades/` (by the graded stamp in its name); else none, and the essays and code stay pending.
+- **Kept:** a `--grades` file is copied as given, its bytes, to `grades/<attempt stamp>-<YYYYMMDD-HHMMSS>-grades.json`, the second stamp the injected clock's local time (the next free second when one exists). Every grades file is kept; none is ever overwritten or removed.
+- **The report:** `reports/<stamp>-report.json` and `reports/<stamp>-report.md`, from the grades used, as `quiz grade` builds them (`buildReport`, `renderMarkdown`), replaced each time. `list`, `info`, `replay` and `stats` then read that report.
+- **The template (G27):** with `--json`, for an attempt with an essay or code question answered, the empty grades template as `quiz grade --json` writes it, into the working directory as `<name>-<stamp>-grades.json`; an existing one is skipped with `quiz grade`'s warning. `template` is its path, or null.
+- **Under the lock, one commit:** the kept grades file and the two report files, `fullmark: grade NAME`.
+- **Output and `--json`** exactly as COMMANDS.md's first two samples and its `--json` row: the heading `NAME · attempt STAMP · version HASH`; `grades kept … · KIND, NAME` from the file's grader; `report reports/<stamp>-report.md · 61%* · 1 essay waiting for a grade` (or `nothing pending`); the `next:` line when something waits; the commit.
+
+**`library grade NAME --web [--attempt STAMP] [--name NAME] [--timeout SECONDS] [--port N] [--json]`.**
+- The form of `quiz grade --web`, unchanged, for the attempt and its version, **pre-filled from the newest grades file of that attempt** (as `--grades` pre-fills it), with "· pre-filled from GRADER's grades" in the heading when there is one. `quiz grade --web`'s refusals in its order, with its exits (nothing to grade: exit 0, nothing served or written).
+- **G29:** no lock while the form is served. On **Save grades**, the server checks the submit as `quiz grade --web` does (400 and still waiting on a problem); the document (`kind: human`) is then written to `progress/<stamp>.grades.json` (git-ignored), and under the lock moved to `grades/<stamp>-<YYYYMMDD-HHMMSS>-grades.json`, the reports written, one commit. `runGradeWeb` gains a way to be told where to write (a hook or an option, as `serveLoaded` was split in 4d), with `quiz grade --web` unchanged: its goldens and tests do not move.
+- Lock busy for 10 s: the grades stay in `progress/`, exit 2, "your grades are safe in progress/<stamp>.grades.json", fix "run `quiz library grade NAME` again to keep them". The next `library grade` of the quiz (with or without `--web`) keeps a leftover first, says so, and ends, with `next: quiz library grade NAME` after the commit, as `take` does (G26).
+- Timeout or Ctrl+C: exit 2, nothing written, nothing committed. Default timeout `1800`, as `quiz grade --web`.
+- Output: COMMANDS.md's third sample; `--json` the `listening` line, then the `written` object.
+
+**`library stats NAME [--json]`.**
+- Over every attempt of the quiz, every version, each as `readHistory` grades it (the newest report, else graded on the spot), oldest first: `summarise` with the current version's names (as `quiz stats --quiz`), `renderStats`. No new numbers: `list`, `info`, `--missed` and `stats` read one module.
+- The heading `NAME · TITLE · N attempts, M versions`, M the versions among the attempts. One attempt is shown like several (G14); no attempts: exit 2, "no attempts at NAME yet", fix `quiz library take NAME`. Unknown quiz: exit 2 with the near names. Writes nothing and takes no lock.
+- `--json`: `quiz stats --json`'s object, over every attempt.
+- The plan of each attempt shows as `quiz stats` shows it: `(section S)`, `(missed)`, `(retry)`.
+
+**The history helper** (G6) files its reports through the real `library grade`, no longer by hand, and gains what the step's goal names: an essay graded by an AI with `--grades`, then regraded by a person (two grades files kept, the newest counting), an attempt on an old version graded against it. Its library is regenerated; every `list`, `info`, `replay` and `--missed` golden that changes is explained by those grades.
+
+### Tasks
+
+1. **G25 and G26** (one commit), each with its test.
+2. **`library grade`** (one commit): the command without `--web`; unit tests for the default attempt (G28), the grades used (given, newest kept, none), the bytes kept, the report replaced, an invalid `--grades` (exit 1, nothing written, nothing committed), the template (G27, and skipped when it exists), an attempt on an old version; subprocess `--json` contract tests with real git; goldens for COMMANDS.md's first two samples, `--json`, an unknown attempt, an ambiguous prefix, no attempts.
+3. **`--web`** (one commit): the write hook in `grade-web.ts` with `quiz grade --web`'s tests and goldens unchanged; pre-filled from the newest grades; the leftover kept first; in-process tests for Save (kept, reported, committed), a submit with a problem (400, still waiting), the lock busy (G29), timeout and Ctrl+C; a Playwright spec, Chromium and Firefox: `library grade --web` on the history library, the form pre-filled from the AI's grades, one score adjusted, the name given, **Save grades**, then the kept file (`kind: human`, `reviewed`), the report and the commit. No new screen: the form is `quiz grade --web`'s.
+4. **`library stats` and the helper** (one commit): the command; the helper's grades; goldens over the history library (plain, `--json`), one attempt, no attempts, unknown quiz; the command-graph cases (`stats` loads no page builder, renderer or server; `grade` without `--web` no server; `check` and the core commands still nothing of `src/library/`).
+5. **Do not edit** `docs/plans/` or `docs/design/`. The agent's report as for every slice, with every golden added or changed counted and explained, and anything done differently.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox (G20); in a temporary library, an example with an essay taken and filed, then `library grade NAME --json` writes the template, `--grades` with it filled keeps it and reports, `--web` pre-fills from it and keeps a second file, and `library stats` shows the attempts; each prints COMMANDS.md's text.
+
