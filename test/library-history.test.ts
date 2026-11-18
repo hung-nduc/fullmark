@@ -43,6 +43,9 @@ describe("the history helper", () => {
     expect(h.hashes).toHaveLength(3);
     expect(new Set(h.hashes).size).toBe(3);
     expect(readdirSync(join(h.lib, "quizzes", "study", "results"))).toHaveLength(7);
-    expect(readdirSync(join(h.lib, "quizzes", "study", "reports"))).toHaveLength(2);
+    // the reports `library grade` wrote, as JSON and Markdown, for the two attempts graded (a1, a4)
+    expect(readdirSync(join(h.lib, "quizzes", "study", "reports"))).toHaveLength(4);
+    // an AI's grades and a person's over them for the first attempt, a person's for the fourth
+    expect(readdirSync(join(h.lib, "quizzes", "study", "grades"))).toHaveLength(3);
   });
 });

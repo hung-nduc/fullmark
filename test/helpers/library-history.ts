@@ -1,5 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { type LibraryGradeIo, type LibraryGradeOptions, runLibraryGrade } from "../../src/cli/library-grade";
 import { loadQuiz } from "../../src/cli/load";
 import { newLibrary, quizText } from "./library-register";
 
@@ -10,7 +11,9 @@ import { newLibrary, quizText } from "./library-register";
  * file them: on the first version, on the second, and one on the third that leaves an essay ungraded; reports for two
  * of them. 4d adds a practice of two questions on the second version (one wrong and later removed, one wrong and later
  * reworded) and leaves `even` unanswered in the last attempt, so that `--missed` has something gone and something
- * changed; 4e extends it with grades and regrades.
+ * changed. 4e files the reports through the real `library grade` (no longer by hand): the first attempt is graded by an
+ * AI with `--grades` and regraded by a person (two grades files kept, the newest counting), and the fourth is graded by
+ * a person; both were taken on versions that are no longer current, and are graded against the version they name.
  */
 const stats = resolve(import.meta.dirname, "..", "fixtures", "stats");
 const read = (path: string): string => readFileSync(join(stats, path), "utf8");
@@ -102,9 +105,6 @@ async function build() {
     a4: file1("a4-v2", 1),
     a5: file1("a5-v2", 1),
   };
-  // the reports the grader filed for two of them
-  file(`reports/${stamps.a1}-report.json`, read("reports/a1-v1-report.json"));
-  file(`reports/${stamps.a4}-report.json`, read("reports/a4-v2-report.json"));
 
   // a practice of the two questions the retry did not cover, on the second version, both answered wrong: `odd` goes
   // from the third version, `even` is reworded in it (4d: what `--missed` counts as gone and as changed)
@@ -136,7 +136,76 @@ async function build() {
   six.state.submittedAt = "2026-11-16T20:14:12";
   file(`results/${stampOf("2026-11-16T20:14:12")}.json`, json(six));
 
+  // the grades, through the real command: an AI's, then a person's over it; and a person's on the fourth attempt
+  const grade = async (stamp: string, from: string, grader: GraderOf, at: string): Promise<void> => {
+    const c = t.at();
+    const io: LibraryGradeIo = { ...c.io, now: () => new Date(at) };
+    const scratch = join(t.dir, ".scratch", "grades");
+    mkdirSync(scratch, { recursive: true });
+    const cwd = { ...io, cwd: scratch };
+    // the empty template, as `--json` writes it
+    const first = await runLibraryGrade("study-fixture", gradeOptions({ attempt: stamp, json: true }), cwd);
+    if (first !== 0) throw new Error(`library grade --json failed: ${c.err.join(" | ")}`);
+    const templatePath = join(scratch, `study-fixture-${stamp}-grades.json`);
+    const filled = fill(
+      JSON.parse(readFileSync(templatePath, "utf8")),
+      JSON.parse(read(`reports/${from}-report.json`)),
+      grader,
+    );
+    const path = join(scratch, `${stamp}-${grader.kind}.json`);
+    writeFileSync(path, `${JSON.stringify(filled, null, 2)}\n`);
+    rmSync(templatePath);
+    const exit = await runLibraryGrade("study-fixture", gradeOptions({ attempt: stamp, grades: path }), cwd);
+    if (exit !== 0) throw new Error(`library grade --grades failed: ${c.err.join(" | ")}`);
+  };
+  const ai: GraderOf = { kind: "ai", name: "Claude Opus 5.5", model: "claude-opus-5-5" };
+  const human: GraderOf = { kind: "human", name: "Fixture grader" };
+  await grade(stamps.a1 as string, "a1-v1", { ...ai, at: "2026-10-03T17:00:00+00:00" }, "2026-10-03T17:00:00+00:00");
+  await grade(stamps.a1 as string, "a1-v1", { ...human, at: "2026-10-03T18:00:00+00:00" }, "2026-10-03T18:00:00+00:00");
+  await grade(stamps.a4 as string, "a4-v2", { ...human, at: "2026-10-24T18:00:00+00:00" }, "2026-10-24T18:00:00+00:00");
+
   return { ...t, quizPath, hashes, stamps, texts: [v1, v2, v3] as const };
+}
+
+type GraderOf = { kind: "ai" | "human"; name: string; model?: string; at?: string };
+
+const gradeOptions = (o: Partial<LibraryGradeOptions>): LibraryGradeOptions => ({
+  attempt: null,
+  grades: null,
+  web: false,
+  name: null,
+  timeout: null,
+  port: null,
+  open: false,
+  json: false,
+  plain: true,
+  version: "1.0.0-test",
+  ...o,
+});
+
+// biome-ignore lint/suspicious/noExplicitAny: a fixture walked loosely
+type Json = Record<string, any>;
+
+/**
+ * An empty grades template filled with what a report of the stats fixtures records for the same attempt: every score,
+ * band, note and justification, so that the report the real command writes reads as that fixture's.
+ */
+function fill(template: Json, report: Json, grader: GraderOf): Json {
+  template.grader = grader;
+  for (const [id, entry] of Object.entries<Json>(template.grades)) {
+    const done = (report.open as Json[]).find((o) => o.id === id)?.grade as Json | undefined;
+    if (done === undefined) continue;
+    entry.justification = done.justification;
+    entry.improvement = done.improvement;
+    for (const [cid, cell] of Object.entries<Json>(entry.criteria ?? {})) {
+      const got = (done.criteria as Json[]).find((c) => c.id === cid);
+      if (got === undefined) continue;
+      if (entry.mode === "banded") cell.band = got.band;
+      else cell.score = got.earned;
+      cell.note = got.note;
+    }
+  }
+  return template;
 }
 
 /** The recorded hashes in the stats fixtures are the hashes of the quiz files they are taken on. */

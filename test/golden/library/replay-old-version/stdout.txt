@@ -1,2 +1,2 @@
-study-fixture · attempt 20261003-100000 · version 2a73 (not current: 89a5 is) · not graded
+study-fixture · attempt 20261003-100000 · version 2a73 (not current: 89a5 is) · graded 3 Oct
 page: out/study-fixture-20261003-100000.html

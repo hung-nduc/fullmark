@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status`, `path`, `register`, `list` and `info` reach neither the page builder, the renderer nor the server; `library take` loads the server.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats` and `grade` (without `--web`) reach neither the page builder, the renderer nor the server; `library take` loads the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -231,6 +231,24 @@ describe("what each command loads", () => {
     expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
   });
 
+  it("library grade --web is a chunk of its own, reached by a dynamic import() from library grade, and loads the form's server and page builder through quiz grade --web's chunk", () => {
+    const grade = chunkWith("// src/cli/library-grade.ts");
+    const web = chunkWith("// src/cli/library-grade-web.ts");
+    const form = chunkWith("// src/cli/grade-web.ts");
+    expect(web).not.toBe(grade);
+    // `library grade` without --web reaches neither by a static import, and `main` reaches none of the three
+    expect(closure(grade)).not.toContain(web);
+    expect(closure(grade)).not.toContain(form);
+    expect(readFileSync(join(dist, grade), "utf8")).toContain(`import("./${web}")`);
+    expect(closure(entry("main"))).not.toContain(web);
+    // the server and the page builder are `quiz grade --web`'s own chunk, a dynamic import from the web chunk
+    expect(closure(web)).not.toContain(form);
+    expect(readFileSync(join(dist, web), "utf8")).toContain(`import("./${form}")`);
+    const text = textOf(closure(form));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY]) expect(text, m).toContain(m);
+    for (const m of CLACK) expect(text, m).not.toContain(m);
+  });
+
   for (const [command, marker] of [
     ["init", "// src/cli/library-init.ts"],
     ["status", "// src/cli/library-status.ts"],
@@ -238,6 +256,8 @@ describe("what each command loads", () => {
     ["register", "// src/cli/library-register.ts"],
     ["list", "// src/cli/library-list.ts"],
     ["info", "// src/cli/library-info.ts"],
+    ["stats", "// src/cli/library-stats.ts"],
+    ["grade", "// src/cli/library-grade.ts"],
   ] as const) {
     it(`library ${command} is a chunk of its own, reached by a dynamic import() from main, and never loads the page builder, the renderer or the server`, () => {
       const chunk = chunkWith(marker);

@@ -623,6 +623,54 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       );
     });
   library
+    .command("grade")
+    .description("grade an attempt against its version and write the report; keeps every grades file")
+    .argument("<name>", "a quiz's name or id")
+    .option(
+      "--attempt <stamp>",
+      "the attempt (a stamp or a prefix of 4 or more characters; default: the newest waiting for a grade)",
+    )
+    .option("--grades <file>", "keep this filled-in grades file and grade with it")
+    .option("--json", "write a grades template for an attempt with essays or code, and print JSON")
+    .option("--web", "grade by hand in a form on 127.0.0.1, pre-filled from the newest grades kept")
+    .option("--name <name>", "with --web: the human grader's name (default: the form asks)")
+    .option("--no-open", "with --web: do not open the form in the browser")
+    .option(
+      "--timeout <seconds>",
+      "with --web: give up after this long without Save grades (default 1800; 0 waits forever)",
+    )
+    .option("--port <n>", "with --web: the port on 127.0.0.1 (default: a free one)")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-grade")).runLibraryGrade(
+        name,
+        {
+          attempt: text("attempt"),
+          grades: text("grades"),
+          web: Boolean(options.web),
+          name: text("name"),
+          timeout: text("timeout"),
+          port: text("port"),
+          open: options.open !== false,
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          version: VERSION,
+        },
+        io,
+      );
+    });
+  library
+    .command("stats")
+    .description(
+      "progress over every attempt at a quiz, across versions: score by date, tags, weakest, missed, criteria",
+    )
+    .argument("<name>", "a quiz's name or id")
+    .option("--json", "print the summary as one JSON object")
+    .action(async (name: string, options: { json?: boolean }) => {
+      outcome.exit = (await import("./library-stats")).runLibraryStats(name, { json: Boolean(options.json) }, io);
+    });
+  library
     .command("replay")
     .description("open a past attempt as a page already submitted, with its grades; writes nothing in the library")
     .argument("<name>", "a quiz's name or id")

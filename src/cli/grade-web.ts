@@ -50,6 +50,23 @@ export type Prepared = {
   grades: { path: string; applied: AppliedGrades } | null;
 };
 
+/**
+ * What `quiz library grade --web` changes about the form's run (COMMANDS.md): where the grades go, and what is said. The
+ * form, the checks of the submit and the way it ends are `quiz grade --web`'s own; with no hooks nothing here applies.
+ */
+export type LibraryGradeHooks = {
+  /** the two files as the saved card names them, in place of the ones next to the results file */
+  files: { grades: string; report: string };
+  /** said in place of `quiz grade`'s line when no essay or code question was answered */
+  nothing: string;
+  /** told once the server is up, in place of the `listening` line and the two lines on stderr */
+  announce(server: { url: string; port: number }): void;
+  /** keeps a submit that passed the checks: in place of writing `RESULTS-grades.json` and the report beside the results */
+  save(submit: GradesSubmit): Promise<void>;
+  /** the words and the exit code once Save grades was accepted */
+  done(): ExitCode | Promise<ExitCode>;
+};
+
 const defaultInterrupt = (handler: () => void): (() => void) => {
   process.once("SIGINT", handler);
   return () => {
@@ -181,7 +198,12 @@ export function gradesSubmitReader(ctx: {
  * 127.0.0.1 and waits for one **Save grades**, which writes `RESULTS-grades.json` (`kind: human`) and the report, both
  * atomically. With `--json` the first line is `listening` and the second the outcome.
  */
-export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo): Promise<ExitCode> {
+export async function runGradeWeb(
+  p: Prepared,
+  opts: GradeOptions,
+  io: GradeIo,
+  library?: LibraryGradeHooks,
+): Promise<ExitCode> {
   const { quiz, attempt, hash } = p;
   const timeout = opts.timeout === null ? 1800 : wholeNumber(opts.timeout, 0);
   if (timeout === null) {
@@ -196,7 +218,9 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   const graded = grade(quiz, attempt);
   // G91: an attempt with no answered essay or code question has an empty template, so there is nothing to fill
   if (gradable(quiz, graded).length === 0) {
-    const line = `nothing to grade: no essay or code question was answered; quiz grade ${p.results} --quiz ${p.quizFile} writes the report`;
+    const line =
+      library?.nothing ??
+      `nothing to grade: no essay or code question was answered; quiz grade ${p.results} --quiz ${p.quizFile} writes the report`;
     if (opts.json) {
       io.out(JSON.stringify({ status: "nothing-to-grade" }));
       io.err(line);
@@ -208,10 +232,10 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   const stem = basename(resultsPath).replace(/\.json$/i, "");
   const gradesPath = join(dirname(resultsPath), `${stem}-grades.json`);
   const reportPath = join(dirname(resultsPath), `${stem}-report.md`);
-  const gradesShown = shownPath(gradesPath, io.cwd);
-  const reportShown = shownPath(reportPath, io.cwd);
+  const gradesShown = library?.files.grades ?? shownPath(gradesPath, io.cwd);
+  const reportShown = library?.files.report ?? shownPath(reportPath, io.cwd);
   // G87: an existing grades file that is an empty template is replaced; one holding grades is never touched
-  if (existsSync(gradesPath)) {
+  if (library === undefined && existsSync(gradesPath)) {
     let empty = false;
     try {
       empty = isEmptyTemplate(JSON.parse(readFileSync(gradesPath, "utf8").replace(/^﻿/, "")));
@@ -323,6 +347,11 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
       }),
       ...(io.setTimer ? { setTimer: io.setTimer } : {}),
       async onSubmit(_id, { file, applied }) {
+        if (library !== undefined) {
+          await library.save({ file, applied });
+          taken.graded = applied.details.length;
+          return null;
+        }
         // the report as `quiz grade RESULTS --quiz FILE --grades GRADES` writes it
         const report = buildReport({ quiz, quizHash: hash, attempt, applied }, m);
         await writeFileAtomic(gradesPath, Buffer.from(`${JSON.stringify(file, null, 2)}\n`, "utf8"));
@@ -342,9 +371,13 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   }
 
   const removeInterrupt = (io.onInterrupt ?? defaultInterrupt)(() => server.stop());
-  if (opts.json) io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
-  io.err(`grading ${shownPath(resultsPath, io.cwd)} at ${server.url}`);
-  io.err("waiting for Save grades (Ctrl+C to stop)");
+  if (library !== undefined) library.announce({ url: server.url, port: server.port });
+  else {
+    if (opts.json)
+      io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
+    io.err(`grading ${shownPath(resultsPath, io.cwd)} at ${server.url}`);
+    io.err("waiting for Save grades (Ctrl+C to stop)");
+  }
   if (opts.open) {
     try {
       await (io.open ?? systemOpen)(server.url);
@@ -360,6 +393,7 @@ export async function runGradeWeb(p: Prepared, opts: GradeOptions, io: GradeIo):
   removeInterrupt();
   switch (outcome.status) {
     case "submitted": {
+      if (library !== undefined) return await library.done();
       const done = taken.graded ?? 0;
       const pending = asked - done;
       if (opts.json) {

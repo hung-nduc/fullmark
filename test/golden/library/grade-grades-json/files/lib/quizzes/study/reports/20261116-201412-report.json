@@ -1,0 +1,280 @@
+{
+  "format": "fullmark-report",
+  "version": 2,
+  "quiz": {
+    "title": "Study fixture",
+    "id": "study",
+    "hash": "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27",
+    "kind": "quiz",
+    "lang": "en"
+  },
+  "attempt": {
+    "phase": "submitted",
+    "source": "full",
+    "questions": 6,
+    "started": "2026-11-16T20:00:00",
+    "submitted": "2026-11-16T20:14:12",
+    "time_used": 600,
+    "timed_out": false
+  },
+  "score": {
+    "earned": 4,
+    "points": 16,
+    "percent": 25,
+    "pending": 0,
+    "pass": {
+      "mark": 50,
+      "passed": false
+    }
+  },
+  "sections": [
+    {
+      "id": "part-one",
+      "title": "Part one",
+      "earned": 2,
+      "points": 4,
+      "percent": 50,
+      "pending": 0,
+      "questions": 4
+    },
+    {
+      "id": "part-two",
+      "title": "Part two",
+      "earned": 2,
+      "points": 12,
+      "percent": 16.67,
+      "pending": 0,
+      "questions": 2
+    }
+  ],
+  "tags": [
+    {
+      "id": "logic",
+      "title": null,
+      "earned": 2,
+      "points": 2,
+      "percent": 100,
+      "pending": 0,
+      "questions": 2
+    },
+    {
+      "id": "numbers",
+      "title": null,
+      "earned": 0,
+      "points": 2,
+      "percent": 0,
+      "pending": 0,
+      "questions": 2
+    },
+    {
+      "id": "writing",
+      "title": null,
+      "earned": 2,
+      "points": 12,
+      "percent": 16.67,
+      "pending": 0,
+      "questions": 2
+    }
+  ],
+  "questions": [
+    {
+      "id": "prime",
+      "hash": "7f5f6c34060ddff4e9f99f6e91fe4a81a3c1905e82e92805f236e3b305012eb8",
+      "section": "part-one",
+      "type": "single",
+      "tags": [
+        "numbers"
+      ],
+      "points": 1,
+      "earned": 0,
+      "status": "incorrect",
+      "prompt": "Which of these numbers is prime?",
+      "answer": "Four",
+      "key": "Seven",
+      "explanation": null,
+      "words": null
+    },
+    {
+      "id": "even",
+      "hash": "67d313af75f91fe399dc40439b67629926325b3874633dce168a613ed74dfc00",
+      "section": "part-one",
+      "type": "truefalse",
+      "tags": [
+        "numbers"
+      ],
+      "points": 1,
+      "earned": 0,
+      "status": "unanswered",
+      "prompt": "Zero is an even number.",
+      "answer": null,
+      "key": "true",
+      "explanation": null,
+      "words": null
+    },
+    {
+      "id": "syll",
+      "hash": "bedb6f1a9f53304f5bbb0062c025e6ef43c85a819b428df52d5156e6915dde74",
+      "section": "part-one",
+      "type": "single",
+      "tags": [
+        "logic"
+      ],
+      "points": 1,
+      "earned": 1,
+      "status": "correct",
+      "prompt": "Which one is a syllogism?",
+      "answer": "All men are mortal; Socrates is a man; so Socrates is mortal",
+      "key": "All men are mortal; Socrates is a man; so Socrates is mortal",
+      "explanation": null,
+      "words": null
+    },
+    {
+      "id": "late",
+      "hash": "f2310350d6503036159a813972a24b3d096578e5797c2dbfdd774ce91bbaf69d",
+      "section": "part-one",
+      "type": "single",
+      "tags": [
+        "logic"
+      ],
+      "points": 1,
+      "earned": 1,
+      "status": "correct",
+      "prompt": "Which statement is a fallacy?",
+      "answer": "Affirming the consequent",
+      "key": "Affirming the consequent",
+      "explanation": null,
+      "words": null
+    },
+    {
+      "id": "add",
+      "hash": "df29744a7164dc6f5fe30bc30c90a90287330f32e46c4d63d2159924b34414e2",
+      "section": "part-two",
+      "type": "essay",
+      "tags": [
+        "writing"
+      ],
+      "points": 3,
+      "earned": 2,
+      "status": "partial",
+      "prompt": "Describe the process.",
+      "answer": "The transform maps a signal to the frequency domain; we apply it to input and output and divide.",
+      "key": null,
+      "explanation": null,
+      "words": 18
+    },
+    {
+      "id": "ielts",
+      "hash": "8e4778bbbaa53828bb76a8891514eea27fed8685bb8db5285079fa875b98b2a3",
+      "section": "part-two",
+      "type": "essay",
+      "tags": [
+        "writing"
+      ],
+      "points": 9,
+      "earned": null,
+      "status": "unanswered",
+      "prompt": "To what extent do you agree?",
+      "answer": null,
+      "key": null,
+      "explanation": null,
+      "words": 0
+    }
+  ],
+  "wrong": [
+    "prime",
+    "add"
+  ],
+  "open": [
+    {
+      "id": "add",
+      "type": "essay",
+      "points": 3,
+      "prompt": "Describe the process.",
+      "answer": "The transform maps a signal to the frequency domain; we apply it to input and output and divide.",
+      "words": 18,
+      "language": null,
+      "rubric": {
+        "mode": "additive",
+        "step": 0.25,
+        "criteria": [
+          {
+            "id": "defs",
+            "text": "Define the terms",
+            "max": 0.5
+          },
+          {
+            "id": "derive",
+            "text": "Derive the result",
+            "max": 1.5
+          },
+          {
+            "id": "interp",
+            "text": "Interpret it",
+            "max": 1
+          }
+        ]
+      },
+      "sample_answer": null,
+      "pending": false,
+      "grade": {
+        "id": "add",
+        "mode": "additive",
+        "points": 3,
+        "earned": 2,
+        "band": null,
+        "rubric_current": true,
+        "justification": "A sound start with a gap in the middle.",
+        "improvement": "Show the step from the transform to the ratio.",
+        "criteria": [
+          {
+            "id": "defs",
+            "text": "Define the terms",
+            "earned": 0.5,
+            "max": 0.5,
+            "weight": null,
+            "band": null,
+            "note": "Both terms are defined.",
+            "verdict": null
+          },
+          {
+            "id": "derive",
+            "text": "Derive the result",
+            "earned": 1,
+            "max": 1.5,
+            "weight": null,
+            "band": null,
+            "note": "The derivation skips a step.",
+            "verdict": null
+          },
+          {
+            "id": "interp",
+            "text": "Interpret it",
+            "earned": 0.5,
+            "max": 1,
+            "weight": null,
+            "band": null,
+            "note": "A start.",
+            "verdict": null
+          }
+        ],
+        "graded_by": {
+          "kind": "ai",
+          "name": "Claude Opus 5.5",
+          "model": "claude-opus-5-5",
+          "at": "2026-11-18T14:00:00+00:00"
+        },
+        "status": "partial"
+      }
+    }
+  ],
+  "grades": {
+    "grader": {
+      "kind": "ai",
+      "name": "Claude Opus 5.5",
+      "model": "claude-opus-5-5",
+      "at": "2026-11-18T14:00:00+00:00"
+    },
+    "warnings": []
+  },
+  "unknown": []
+}

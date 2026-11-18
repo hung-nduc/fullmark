@@ -8,3 +8,7 @@ export function localIso(d: Date): string {
   const minutes = pad(Math.abs(offset) % 60);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}${sign}${hours}:${minutes}`;
 }
+
+/** `YYYYMMDD-HHMMSS` in local time: the page's export name, so the two kinds of file sort together. */
+export const localStamp = (d: Date): string =>
+  `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;

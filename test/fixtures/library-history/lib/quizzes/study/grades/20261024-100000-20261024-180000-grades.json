@@ -1,0 +1,79 @@
+{
+  "format": "fullmark-grades",
+  "version": 2,
+  "results_hash": "219cdad62e052bc468238e56c955447ae31c4c676ef3285b97b474d42cd8e66f",
+  "grader": {
+    "kind": "human",
+    "name": "Fixture grader",
+    "at": "2026-10-24T18:00:00+00:00"
+  },
+  "grades": {
+    "add": {
+      "mode": "additive",
+      "rubric_hash": "393a310a0b7565af0d662fb1875d394c18077ab022c1ff5053e0eb3d75da8d8c",
+      "points": 3,
+      "step": 0.25,
+      "criteria": {
+        "defs": {
+          "text": "Define the terms",
+          "max": 0.5,
+          "score": 0.5,
+          "note": "Fixture note."
+        },
+        "derive": {
+          "text": "Derive the result",
+          "max": 1.5,
+          "score": 1.5,
+          "note": "Fixture note."
+        },
+        "interp": {
+          "text": "Interpret it",
+          "max": 1,
+          "score": 0.75,
+          "note": "Fixture note."
+        }
+      },
+      "justification": "Fixture justification.",
+      "improvement": "Fixture improvement."
+    },
+    "ielts": {
+      "mode": "banded",
+      "rubric_hash": "d4a406656d42df725dde3e1522d03496b8819e8a01894f643d9da1fa78bdaa1d",
+      "points": 9,
+      "scale": {
+        "min": 0,
+        "max": 9,
+        "step": 0.5
+      },
+      "round": "ielts",
+      "criteria": {
+        "TR": {
+          "text": "Task Response",
+          "weight": 1,
+          "band": 6.5,
+          "note": "Fixture note."
+        },
+        "CC": {
+          "text": "Coherence and Cohesion",
+          "weight": 1,
+          "band": 6,
+          "note": "Fixture note."
+        },
+        "LR": {
+          "text": "Lexical Resource",
+          "weight": 1,
+          "band": 6,
+          "note": "Fixture note."
+        },
+        "GRA": {
+          "text": "Grammatical Range and Accuracy",
+          "weight": 1,
+          "band": 6.5,
+          "note": "Fixture note."
+        }
+      },
+      "justification": "Fixture justification.",
+      "improvement": "Fixture improvement."
+    }
+  }
+}

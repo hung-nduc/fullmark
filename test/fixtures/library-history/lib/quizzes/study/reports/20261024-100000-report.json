@@ -277,7 +277,7 @@
         "graded_by": {
           "kind": "human",
           "name": "Fixture grader",
-          "at": "2026-10-24T18:00:00"
+          "at": "2026-10-24T18:00:00+00:00"
         },
         "status": "partial"
       }
@@ -378,7 +378,7 @@
         "graded_by": {
           "kind": "human",
           "name": "Fixture grader",
-          "at": "2026-10-24T18:00:00"
+          "at": "2026-10-24T18:00:00+00:00"
         },
         "status": "partial"
       }
@@ -388,7 +388,7 @@
     "grader": {
       "kind": "human",
       "name": "Fixture grader",
-      "at": "2026-10-24T18:00:00"
+      "at": "2026-10-24T18:00:00+00:00"
     },
     "warnings": []
   },

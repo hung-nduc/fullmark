@@ -21,6 +21,7 @@ import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
 import type { LoadedQuiz } from "./load";
 import { readFailure, shownPath } from "./paths";
+import { localStamp } from "./time";
 
 export type ServeOptions = {
   out: string | null;
@@ -51,11 +52,7 @@ export type ServeIo = BuildIo & {
   autosaveClock?: { now(): number; setTimer(fire: () => void, ms: number): () => void };
 };
 
-const pad = (n: number): string => String(n).padStart(2, "0");
-
-/** `YYYYMMDD-HHMMSS` in local time: the page's export name, so the two kinds of file sort together. */
-export const localStamp = (d: Date): string =>
-  `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+export { localStamp };
 
 const defaultInterrupt = (handler: () => void): (() => void) => {
   process.once("SIGINT", handler);

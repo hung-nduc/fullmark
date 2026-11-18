@@ -42,6 +42,7 @@ const REFUSED = [
   "test/golden/grade/rubrics-grades-invalid-wrong-mode/input/grades.json",
   "test/golden/grade/several-with-grades/input/grades.json",
   "test/golden/grade/web-grades-v1/input/grades.json",
+  "test/golden/library/grade-invalid-grades/input/grades.json",
   "test/golden/review/out-invalid-json/input/review.json",
   "test/golden/review/out-invalid/input/review.json",
   "test/golden/review/since-invalid/input/review.json",

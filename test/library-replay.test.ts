@@ -68,7 +68,7 @@ describe("library replay", () => {
     const r = await t.run({ output: join(t.dir, "out"), json: true });
     expect(r.exit).toBe(0);
     const line = JSON.parse(r.out[0] ?? "");
-    expect(line).toMatchObject({ status: "built", attempt: "20261003-100000", graded: false });
+    expect(line).toMatchObject({ status: "built", attempt: "20261003-100000", graded: true });
     expect(line.version).toBe(t.hashes[0]);
     const html = readFileSync(join(t.dir, "out", "study-fixture-20261003-100000.html"), "utf8");
     expect(html).toContain(`"hash":"${t.hashes[0]}"`);
