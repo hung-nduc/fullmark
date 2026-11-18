@@ -8,7 +8,7 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](archive/STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
 
-**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G18, below), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
+**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G18, below; G18 is decided), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
 
 **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
 
@@ -16,11 +16,11 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas | this file |
+| plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md | this file |
 
 ### Next
 
-1. The owner decides G1 to G3 and G16 to G18, and reviews the CLI boards (G7, G15, and G18's two variants) on the canvas.
+1. The owner decides G1 to G3, G16 and G17, and reviews the CLI boards (G7, G15) on the canvas.
 2. The planner writes those decisions into `docs/design/`, with the boards' text and JSON shapes into COMMANDS.md, then **4a**'s brief (4a needs none of the gaps and may start first).
 
 ## Goal
@@ -88,12 +88,6 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 - **In slice 4f**, with `share`.
 
 **G17. Resuming an attempt after `register --update`.** COMMANDS.md says an attempt saved on the old version "stays tied to the version it started on", and G4 resumes only "the same version": so after an update, `take` builds the new current version and the saved attempt can never be resumed. **Recommendation:** a plain `take` (no `--section`, `--missed`) resumes a saved attempt on any version, oldest saved first, saying so ("resuming your attempt of 18 Nov 14:02 on version 41c0; the quiz has been updated since"); it is filed against that version; the next `take` uses the current one. `register --update`'s warning says this (drawn on LibrarySetup).
-
-**G18. Terminal styles, and where they are set.** Raised by the owner (2026-11-18) after the CLI boards: may the look of the terminal output be chosen, as the page's themes are, and set in the library? Two variants are drawn beside the boards for comparison: **LibraryStyleBordered** (A: box-drawn tables, scores by band, coloured tags and badges, a status panel) and **LibraryStyleMiddle** (B: no borders, a shaded header row, the same colours). **Recommendation:**
-- **A setting with two styles, not a theme system:** `[terminal] style = "simple" | "boxed"` in `config.toml`. `simple` is B, the default; `boxed` is A. Colours are the terminal's 16 ANSI colours, never fixed RGB, so the user's own terminal theme (dark, light, any palette) decides the shades. That is the "themes" part, and it costs nothing.
-- **In `config.toml`, not `library.toml`.** It is a person's and a machine's taste, and it applies to every command with a table or a block (`check`, `inspect`, `stats` as well as the library's), most of which run with no library at all. `library.toml` travels with the repository.
-- **Layout is stable where it is read by programs:** `--plain`, `NO_COLOR`, and stdout that is not a terminal always give the `simple` layout without colour, whatever the setting, so scripts and pipes see one format; `--json` is untouched. `boxed` falls back to `simple` when the terminal is narrower than the table.
-- **One table helper draws both** (`src/cli/table.ts`), no new dependency; each style has goldens for `list`, `status` and `stats`. Step 4 builds `simple`, and `boxed` in 4f with the other polish, or later if the owner prefers.
 
 ## Slices
 

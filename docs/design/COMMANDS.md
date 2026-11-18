@@ -39,6 +39,15 @@ The program is `quiz`. `fullmark` runs the same program, for systems where anoth
 
 How the profile and the config are chosen is in [TECHNICAL_DESIGN.md](TECHNICAL_DESIGN.md), section 5. A malformed config file exits 2 with the config's `file:line`; an unknown profile given with `--profile` exits 2 with a plain message naming the known profiles.
 
+### Terminal style
+
+Human output with a table or a block (`check`, `inspect`, `stats` and the library's commands) has two styles, set by `style` under `[terminal]` in `config.toml`:
+
+- **`simple`** (the default): no borders, columns separated by spaces, a shaded header row, scores by band (80% and up green, under 65% yellow), marks as coloured tags, `problem` and `note` as badges.
+- **`boxed`**: the same, with tables drawn in box characters and blocks such as `library status`'s facts in a panel.
+
+Colours are the terminal's 16 ANSI colours, never fixed RGB, so the terminal's own theme decides the shades; fullmark has no colour themes of its own. Output read by programs never changes with the setting: `--plain`, `NO_COLOR` and stdout that is not a terminal always give the `simple` layout with no colour, and `--json` is untouched. `boxed` falls back to `simple` when the terminal is narrower than the table. The setting is per machine, in `config.toml`, never in a library: it applies to commands that need no library, and `library.toml` travels with the repository.
+
 ### Several files
 
 Commands that handle each input on its own take `FILE...`: `check`, `build`, `ids`, `grade`, `replay` and `library register`. The rules are the same for all of them:
@@ -82,7 +91,7 @@ A path is printed relative to the working directory when it lies under it, else 
 | `brief.yaml` plus `content/` | brief | `brief` |
 | build file (`build.toml`) | what `build --build-file` builds: files, and per entry the `build` options | the user |
 | `fullmark.toml` | check config: default profile, custom profiles, rule levels and options, custom checks | the user (agents never edit it to make `check` pass) |
-| `config.toml` | machine config: library path, shelf folders (by shelf name; `public` in v1), personal profiles, default `fonts`, each brief purpose's defaults (`[brief.purpose.<purpose>]`) | `library init`, `library publish`, the user |
+| `config.toml` | machine config: library path, shelf folders (by shelf name; `public` in v1), personal profiles, default `fonts`, the terminal style (`[terminal] style`), each brief purpose's defaults (`[brief.purpose.<purpose>]`) | `library init`, `library publish`, the user |
 | `check.json` | the resolved rules a library version was registered with | `library register` |
 | `library.toml` | the library's index of quizzes | `library` commands |
 | `fullmark-shelf.json` | shelf manifest | `library publish` |

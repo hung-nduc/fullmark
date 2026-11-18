@@ -49,7 +49,7 @@ These ideas are the product, and the rewrite keeps them unchanged.
 | Local server | `node:http` | One-shot, with a token and no framework |
 | Git | `execFile('git', ...)` | As today, with no wrapper library |
 | Config | `smol-toml` | `config.toml`, `library.toml`, `fullmark.toml` |
-| Terminal output | `picocolors` and a small table helper, respecting `NO_COLOR` | Replaces Rich |
+| Terminal output | `picocolors` and a small table helper of fullmark's own (`src/cli/table.ts`), respecting `NO_COLOR` | Replaces Rich. Two styles, `simple` and `boxed` (COMMANDS.md, "Terminal style"), in the terminal's 16 colours |
 | Languages | Typed message catalogs (`en.ts`, `vi.ts`), no library | A missing translation is a compile error; no page weight from an i18n framework (section 9) |
 | Terminal form | `@clack/prompts` | `brief --tui` only: select with hints, multi-select, text with validation. Textual or Ink would be overkill for a flat form |
 | Watching | `node:fs.watch` on each watched file's folder, not recursive | Only the files the quiz hash covers matter, and an editor's save by rename is seen in its folder; works on Windows with Node 22 |
