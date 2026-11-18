@@ -52,6 +52,8 @@ export type FormState = {
   held: Signal<string[]>;
   /** the counts of what was written; null until the server has taken the review */
   saved: Signal<Counts | null>;
+  /** the command that files the review, when the server says the library was busy and it is not filed yet (G34) */
+  unfiled: Signal<string | null>;
   /** why the server did not take it, in its own words */
   problem: Signal<string | null>;
   sending: Signal<boolean>;
@@ -72,7 +74,7 @@ export type FormState = {
 
 export type Deps = {
   /** posts the body to `./submit`; the default is `fetch` */
-  post?: (body: string) => Promise<{ ok: boolean; text(): Promise<string> }>;
+  post?: (body: string) => Promise<{ ok: boolean; text(): Promise<string>; json?(): Promise<unknown> }>;
 };
 
 const defaultPost = (body: string) =>
@@ -119,6 +121,7 @@ export function createFormState(data: ReviewData, deps: Deps = {}): FormState {
     dialog: signal("none"),
     held: signal([]),
     saved: signal(null),
+    unfiled: signal(null),
     problem: signal(null),
     sending: signal(false),
     // the counts the bar shows cover what is asked; the saved card's cover the whole review (below)
@@ -165,8 +168,12 @@ export function createFormState(data: ReviewData, deps: Deps = {}): FormState {
       state.problem.value = null;
       try {
         const response = await post(JSON.stringify({ quizId: page.id, quizHash: page.hash, judged }));
-        if (response.ok) state.saved.value = countsOf(items, entries.value);
-        else state.problem.value = (await response.text()).trim() || "the server did not take the review";
+        if (response.ok) {
+          // `library review` says when the lock was busy, so the card does not say the review is filed (G34)
+          const said = (await response.json?.().catch(() => null)) as { filed?: unknown; command?: unknown } | null;
+          state.unfiled.value = said?.filed === false && typeof said.command === "string" ? said.command : null;
+          state.saved.value = countsOf(items, entries.value);
+        } else state.problem.value = (await response.text()).trim() || "the server did not take the review";
       } catch {
         state.problem.value = "the server cannot be reached";
       } finally {

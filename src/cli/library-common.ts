@@ -1,7 +1,9 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import type { ResolvedProfile } from "../core/config/resolve";
 import type { ConfigError } from "../core/config/types";
 import { suggest } from "../core/parse/report";
+import { CHECK_FILE, readCheck } from "../library/check-file";
 import { Git, type GitExec } from "../library/git";
 import { type IndexQuiz, type IndexRead, type LibraryIndex, readIndex } from "../library/index-file";
 import { INDEX_FILE, libraryPaths } from "../library/layout";
@@ -195,6 +197,19 @@ export function loadStored(root: string, quiz: IndexQuiz, hash: string): LoadedQ
   if (version === undefined) return null;
   try {
     return loadQuiz(join(libraryPaths(root).quiz(quiz.id).version(hash), version.file));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The rules a version was registered with: its `check.json`, read back. Null when the file is missing or unreadable, and
+ * the caller then checks under the config as `check` would.
+ */
+export function storedProfile(root: string, quiz: IndexQuiz, hash: string): ResolvedProfile | null {
+  try {
+    const read = readCheck(readFileSync(join(libraryPaths(root).quiz(quiz.id).version(hash), CHECK_FILE), "utf8"));
+    return read.ok ? read.profile : null;
   } catch {
     return null;
   }

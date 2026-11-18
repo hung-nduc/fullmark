@@ -411,9 +411,13 @@ function Saved({ state, data, r }: { state: FormState; data: ReviewData; r: Revi
         {r.saved}
       </h2>
       <p>{r.doneLine(data.out, c.keep, c.assumed, c.fix, c.drop)}</p>
-      <p class="fm-review-saved-note">
-        {r.closed} <code>{data.check}</code>
-      </p>
+      {state.unfiled.value !== null ? (
+        <p data-review-unfiled>{r.unfiled(state.unfiled.value)}</p>
+      ) : (
+        <p class="fm-review-saved-note">
+          {r.closed} <code>{data.check}</code>
+        </p>
+      )}
     </section>
   );
 }

@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { languagesUsed, loadHighlighter } from "../build/highlight";
 import { buildReviewForm } from "../build/review-form";
 import { katexTools, lazyParseTex } from "../build/tex";
+import type { ResolvedProfile } from "../core/config/resolve";
 import { FONT_CHOICES, type FontsChoice } from "../core/fonts";
 import type { Quiz } from "../core/ir";
 import { reviewCounts, shortDate } from "../core/review/counts";
@@ -35,6 +36,30 @@ export type ReviewOptions = {
   profile: string | null;
   config: string | null;
   version: string;
+};
+
+/** What `quiz library review` changes about the form's run (COMMANDS.md; STEP4.md, slice 4f, G34): where the review is read from and kept, and what is said. */
+export type LibraryReviewHooks = {
+  /** the quiz's stored review, absolute: read as the earlier review and merged into, whatever `--out` and `--since` say */
+  stored: string;
+  /** how the form and the words name it (`review.json`) */
+  shown: string;
+  /** the form's last line in place of `quiz check FILE --review REVIEW`: the command that applies the review */
+  check: string;
+  /** the rules the version was registered with (`check.json`); null: the config's, as `check` would */
+  profile: ResolvedProfile | null;
+  /** the refusal of `--since` when there is no stored review */
+  sinceMissing: string;
+  /** told once the server is up, in place of the `listening` line and the two lines on stderr */
+  announce(server: { url: string; port: number }, ask: { quiz: Quiz; review: Review | null }): void;
+  /** keeps the merged review a Finish sent: waits for the lock, files it and commits; a busy lock is noted, not thrown */
+  save(bytes: Uint8Array): Promise<void>;
+  /** what the server's answer to Finish adds once the filing was tried (`{ filed: false, command }` when busy) */
+  answer(): Record<string, unknown>;
+  /** the words and the exit code of `--since` with nothing to ask */
+  unchanged(line: string): ExitCode;
+  /** the words and the exit code once the review was taken */
+  done(counts: ReturnType<typeof reviewCounts>): ExitCode | Promise<ExitCode>;
 };
 
 const defaultInterrupt = (handler: () => void): (() => void) => {
@@ -118,7 +143,12 @@ export function askedIds(quiz: Quiz, review: Review): string[] {
  * one Finish, which is merged into `--out` and written atomically. With `--json` the first line is `listening` and the
  * second the outcome.
  */
-export async function runReview(file: string, opts: ReviewOptions, io: ServeIo): Promise<ExitCode> {
+export async function runReview(
+  file: string,
+  opts: ReviewOptions,
+  io: ServeIo,
+  library?: LibraryReviewHooks,
+): Promise<ExitCode> {
   if (/\.html?$/i.test(file)) {
     fail(io, opts.json, "review takes the quiz source, not a built page");
     return EXIT.usage;
@@ -141,7 +171,15 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
 
   const result = checkFile(
     file,
-    { profile: opts.profile, config: opts.config, strict: false, review: null, json: false, plain: true },
+    {
+      profile: opts.profile,
+      config: opts.config,
+      strict: false,
+      review: null,
+      json: false,
+      plain: true,
+      ...(library?.profile ? { fixed: library.profile } : {}),
+    },
     io,
   );
   if (result.status === "error") {
@@ -193,19 +231,23 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
   const loaded = result.loaded;
   const quiz = loaded.quiz as Quiz;
   const hash = loaded.hash ?? "";
-  for (const issue of result.issues) {
+  // a stored version's findings were told when it was registered
+  for (const issue of library ? [] : result.issues) {
     if (issue.level === "warning") io.err(`${issue.file}:${issue.line}: warning ${issue.rule}: ${issue.message}`);
   }
 
   const source = resolve(io.cwd, file);
-  const given = opts.since ?? opts.out;
+  const given = library ? library.stored : (opts.since ?? opts.out);
   const target = given === null ? join(dirname(source), "review.json") : resolve(io.cwd, given);
-  const shown = shownPath(target, io.cwd);
+  const shown = library ? library.shown : shownPath(target, io.cwd);
   // the review as it stands, read as `check --review` reads it: a file it would refuse is refused here, unchanged
   const readOld = (): { review: Review | null } | { message: string; problems: string[] } => {
     if (!existsSync(target)) {
       if (opts.since !== null) {
-        return { message: "--since needs an existing review; run quiz review FILE first", problems: [] };
+        return {
+          message: library?.sinceMissing ?? "--since needs an existing review; run quiz review FILE first",
+          problems: [],
+        };
       }
       return { review: null };
     }
@@ -233,6 +275,7 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
     const asked = askedIds(quiz, old.review);
     if (asked.length === 0) {
       const line = `nothing new or changed since your review of ${shortDate(old.review.reviewedAt)}`;
+      if (library) return library.unchanged(line);
       if (opts.json) {
         io.out(JSON.stringify({ status: "unchanged", review: shown }));
         io.err(line);
@@ -273,7 +316,7 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
     review: old.review,
     ...(opts.since !== null && old.review !== null ? { since: { asked: askedIds(quiz, old.review), blocks } } : {}),
     out: shown,
-    check: `quiz check ${file} --review ${shown}`,
+    check: library?.check ?? `quiz check ${file} --review ${shown}`,
     script,
     css: pageCss,
     reviewCss,
@@ -299,12 +342,15 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
       port,
       readSubmit: submitReader(quizId, hash, types),
       ...(io.setTimer ? { setTimer: io.setTimer } : {}),
+      ...(library ? { answer: () => library.answer() } : {}),
       async onSubmit(_id, judged) {
         // merged into the file as it is now, which may have changed since the form opened
         const now = readOld();
         if ("message" in now) return now.message;
         const review = merge(now.review, judged, reviewTarget(quiz, hash, blocks, localIso(clock())));
-        await writeFileAtomic(target, Buffer.from(serialiseReview(review), "utf8"));
+        const bytes = Buffer.from(serialiseReview(review), "utf8");
+        if (library) await library.save(bytes);
+        else await writeFileAtomic(target, bytes);
         taken.counts = reviewCounts(quiz, review);
         return null;
       },
@@ -320,9 +366,13 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
   }
 
   const removeInterrupt = (io.onInterrupt ?? defaultInterrupt)(() => server.stop());
-  if (opts.json) io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
-  io.err(`reviewing ${shownPath(source, io.cwd)} at ${server.url}`);
-  io.err("waiting for Finish (Ctrl+C to stop)");
+  if (library) library.announce({ url: server.url, port: server.port }, { quiz, review: old.review });
+  else {
+    if (opts.json)
+      io.out(JSON.stringify({ status: "listening", url: server.url, port: server.port, pid: process.pid }));
+    io.err(`reviewing ${shownPath(source, io.cwd)} at ${server.url}`);
+    io.err("waiting for Finish (Ctrl+C to stop)");
+  }
   if (opts.open) {
     try {
       await (io.open ?? systemOpen)(server.url);
@@ -338,6 +388,7 @@ export async function runReview(file: string, opts: ReviewOptions, io: ServeIo):
   removeInterrupt();
   switch (outcome.status) {
     case "submitted": {
+      if (library && taken.counts) return await library.done(taken.counts);
       const c = taken.counts;
       const keep = c?.keep ?? 0;
       const fix = c?.fix ?? 0;

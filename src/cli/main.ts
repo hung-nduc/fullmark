@@ -671,6 +671,34 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       outcome.exit = (await import("./library-stats")).runLibraryStats(name, { json: Boolean(options.json) }, io);
     });
   library
+    .command("review")
+    .description(
+      "judge every question of a quiz in the library (keep, fix or drop) in a form; Finish files review.json",
+    )
+    .argument("<name>", "a quiz's name or id")
+    .option("--since", "ask only about the questions new or changed since the stored review")
+    .option("--timeout <seconds>", "how long to wait for Finish; 0 waits forever (default 1800)")
+    .option("--port <n>", "the port on 127.0.0.1 (default: a free one)")
+    .option("--no-open", "do not open the form in the browser")
+    .option("--json", "print a listening line, then the outcome, as JSON on stdout")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-review")).runLibraryReview(
+        name,
+        {
+          since: Boolean(options.since),
+          timeout: text("timeout"),
+          port: text("port"),
+          open: options.open !== false,
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          version: VERSION,
+        },
+        io,
+      );
+    });
+  library
     .command("replay")
     .description("open a past attempt as a page already submitted, with its grades; writes nothing in the library")
     .argument("<name>", "a quiz's name or id")

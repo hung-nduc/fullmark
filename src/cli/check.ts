@@ -33,6 +33,12 @@ export type CheckOptions = {
   review: string | null;
   json: boolean;
   plain: boolean;
+  /**
+   * The profile to check under, already resolved: a library version's `check.json` (`library share`, `library
+   * template add`, `library review`). The quiz's own `profile:` and the config's profiles are not consulted; the
+   * config still gives `fail_on`.
+   */
+  fixed?: ResolvedProfile;
 };
 
 /** An `Io` plus what the config commands read from the machine; both default to the real ones. */
@@ -131,8 +137,10 @@ export function checkFile(file: string, opts: CheckOptions, io: CheckIo): FileOu
 
   // the profile
   const issues = [...loaded.issues];
-  let choice = chooseProfile({ cli: opts.profile, frontMatter: loaded.frontMatter, brief, layers: config.layers });
-  if (choice.from === "brief.yaml" && !resolveProfile(choice.name, config.layers).profile) {
+  let choice: ProfileChoice = opts.fixed
+    ? { name: opts.fixed.name, from: "check.json", line: null }
+    : chooseProfile({ cli: opts.profile, frontMatter: loaded.frontMatter, brief, layers: config.layers });
+  if (!opts.fixed && choice.from === "brief.yaml" && !resolveProfile(choice.name, config.layers).profile) {
     const line = briefText.split(/\r?\n/).findIndex((l) => /^profile\s*:/.test(l)) + 1;
     briefIssues = [
       ...briefIssues,
@@ -147,7 +155,9 @@ export function checkFile(file: string, opts: CheckOptions, io: CheckIo): FileOu
     ];
     choice = chooseProfile({ cli: null, frontMatter: loaded.frontMatter, brief: null, layers: config.layers });
   }
-  let resolved = resolveProfile(choice.name, config.layers);
+  let resolved: ReturnType<typeof resolveProfile> = opts.fixed
+    ? { profile: opts.fixed, errors: [] }
+    : resolveProfile(choice.name, config.layers);
   if (!resolved.profile && resolved.errors.length === 0) {
     const fix = unknownProfileFix(choice.name, config.layers);
     if (choice.from === "the quiz") {

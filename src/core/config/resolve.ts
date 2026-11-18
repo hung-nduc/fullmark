@@ -244,7 +244,15 @@ export function validateLayers(layers: Layers): ConfigError[] {
 export type ProfileChoice = {
   name: string;
   /** where the name came from, in words */
-  from: "--profile" | "the quiz" | "the survey default" | "brief.yaml" | "[check] profile" | "the default";
+  from:
+    | "--profile"
+    | "the quiz"
+    | "the survey default"
+    | "brief.yaml"
+    | "[check] profile"
+    | "the default"
+    /** a library version's own `check.json`, handed over by `library share` and `library template add` */
+    | "check.json";
   /** the line it came from, when it came from a config file or the quiz */
   line: number | null;
 };

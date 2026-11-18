@@ -99,6 +99,9 @@ export const reviewEn = {
   doneLine: (out: string, keep: number, assumed: number, fix: number, drop: number) =>
     `${out}: ${keep} keep${assumed > 0 ? ` (${assumed} not looked at)` : ""}, ${fix} fix, ${drop} drop.`,
   closed: "fullmark has closed the form, so you can close this tab. Fix the questions you marked, then run",
+  // `library review` when the lock was busy at Finish (G34): the review waits in the library's progress folder
+  unfiled: (command: string) =>
+    `Your review is saved, but not filed yet: the library was busy. Run \`${command}\` to file it.`,
 };
 
 export type ReviewMessages = typeof reviewEn;
@@ -181,4 +184,6 @@ export const reviewVi = {
   doneLine: (out: string, keep: number, assumed: number, fix: number, drop: number) =>
     `${out}: ${keep} giữ${assumed > 0 ? ` (${assumed} chưa xem)` : ""}, ${fix} sửa, ${drop} bỏ.`,
   closed: "fullmark đã đóng biểu mẫu, bạn có thể đóng thẻ này. Sửa các câu đã đánh dấu, rồi chạy",
+  unfiled: (command: string) =>
+    `Bản rà soát đã lưu nhưng chưa được ghi vào thư viện vì thư viện đang bận. Chạy \`${command}\` để ghi.`,
 } satisfies ReviewMessages;
