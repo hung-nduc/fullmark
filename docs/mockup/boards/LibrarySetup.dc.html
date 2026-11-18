@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quiz library init, register</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;650&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ln{white-space:pre-wrap;overflow-wrap:anywhere;min-height:20px}
+.t-dark .term{background:#16181d;color:#d6d9de}
+.t-dark .term .d{color:#8b929c} .t-dark .term .r{color:#ff7b72} .t-dark .term .g{color:#7ee787} .t-dark .term .y{color:#e3b341} .t-dark .term .c{color:#56d4dd} .t-dark .term .b{color:#ffffff;font-weight:700}
+.t-light .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-light .term .d{color:#59636e} .t-light .term .r{color:#cf222e} .t-light .term .g{color:#1a7f37} .t-light .term .y{color:#9a6700} .t-light .term .c{color:#0b7a83} .t-light .term .b{color:#000000;font-weight:700}
+.t-plain .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-plain .term span{color:inherit;font-weight:400}
+.term.plainbox span{color:inherit !important;font-weight:400 !important}
+.t-dark .term.plainbox{color:#d6d9de}
+</style>
+</helmet>
+<div class="t-{{term}}" style="width: 1280px; min-height: 1978px; box-sizing: border-box; padding: 40px 48px; background: #f5f6f8; font-family: Inter, system-ui, sans-serif; color: #1f2328; display: flex; flex-direction: column; gap: 24px">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 650">quiz library init, register</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #59636e; max-width: 1080px">G15. Every changing command ends with the commit it made, dim. Check findings print as check prints them. Batch register is all or nothing: a refusal names every problem and registers nothing. Tweaks: a dark or light terminal, or --plain.</p>
+  </header>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">init, a new folder</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">G3: git init, the first commit, and a note when git has no identity (not a prompt).</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library init /home/minh/quiz-library</span></div>
+      <div class="ln"><span class="g">library ready</span> /home/minh/quiz-library (new folder, git repository)</div>
+      <div class="ln">recorded in /home/minh/.config/fullmark/config.toml</div>
+      <div class="ln"><span class="c">note</span> git has no identity here: commits are made as fullmark &lt;fullmark@localhost&gt;</div>
+      <div class="ln">    set one: git -C /home/minh/quiz-library config user.name "Your Name"</div>
+      <div class="ln">             git -C /home/minh/quiz-library config user.email you@example.com</div>
+      <div class="ln"><span class="d">committed 3c1e0a2 fullmark: init</span></div>
+      <div class="ln"><span class="d">next: quiz library register FILE</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">init refused</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 2, nothing written.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library init /home/minh/Documents</span></div>
+      <div class="ln"><span class="r">error</span> /home/minh/Documents is not empty and is not a library (12 files)</div>
+      <div class="ln">    fix: choose an empty or new folder</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">init --json</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">New shape (G15).</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library init /home/minh/quiz-library --json</span></div>
+      <div class="ln">{"status":"created","library":"/home/minh/quiz-library","config":"/home/minh/.config/fullmark/config.toml","git":true,"identity":null,"committed":"3c1e0a2"}</div>
+      <div class="ln"><span class="d">status: created | adopted; git: false with --no-git or no git; identity: "Name &lt;email&gt;" or null (the fallback is used)</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">register, one file</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Warnings print as check prints them and do not stop it.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library register rust/quiz.md</span></div>
+      <div class="ln">rust/quiz.md:41: <span class="y">warning</span> answers.position-skew: 5 of 8 single-choice keys are B</div>
+      <div class="ln">    fix: move some correct choices to other positions</div>
+      <div class="ln"><span class="g">registered</span> rust-basics, a new quiz · version e7d2 · 18 questions</div>
+      <div class="ln"><span class="d">committed 5f20b4c fullmark: register rust-basics</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">register several</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">One line per outcome, one commit. On a terminal, [3/5] notes/signals.md updates in place while it checks.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library register notes/*.md</span></div>
+      <div class="ln"><span class="g">registered 3</span> calculus-limits (new, 5a1f) · ielts-writing (new, 77b2) · signals (new, 0c9d)</div>
+      <div class="ln">unchanged 2  chem-bonds, rust-basics</div>
+      <div class="ln"><span class="d">committed 9a0b1c2 fullmark: register calculus-limits, ielts-writing, signals</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">register several, refused</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 1. G12 and G13’s refusals, each with its fix; nothing registered.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library register notes/*.md</span></div>
+      <div class="ln">notes/chem.md:2: <span class="r">error</span> library.id-taken: the id chem-bonds is already in the library, as chem-bonds</div>
+      <div class="ln">    fix: if it is the same quiz, quiz library register notes/chem.md --update chem-bonds;</div>
+      <div class="ln">         if not, give it a new id:</div>
+      <div class="ln">notes/rust2.md: <span class="r">error</span> library.name-taken: the name rust-basics is taken</div>
+      <div class="ln">    fix: -n rust-basics-2 (one file at a time)</div>
+      <div class="ln">notes/limits.md:12: <span class="r">error</span> question.id-missing: a question without an id</div>
+      <div class="ln">    fix: quiz ids notes/limits.md</div>
+      <div class="ln"><span class="r">nothing registered</span> 2 of 5 files ready, 3 refused</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">register --update</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">The version’s changes, and G4’s warning about an attempt saved on the old version.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library register rust/quiz.md --update rust-basics</span></div>
+      <div class="ln"><span class="g">registered</span> rust-basics · version 9f3a (was 41c0) · 2 added, 1 removed, 3 changed</div>
+      <div class="ln"><span class="y">warning</span> an attempt in progress on 41c0 (7 of 17 answered, 18 Nov 14:02) stays on that version</div>
+      <div class="ln">    the next quiz library take rust-basics resumes it there (G17)</div>
+      <div class="ln"><span class="d">committed 4b77e01 fullmark: register rust-basics</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">No library (G8)</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Every library command, exit 2.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library register rust/quiz.md</span></div>
+      <div class="ln"><span class="r">error</span> no library</div>
+      <div class="ln">    fix: quiz library init PATH</div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"term": {"editor": "enum", "options": ["dark", "light", "plain"], "default": "dark"}, "$preview": {"width": 1280, "height": 1978}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { term: this.props.term ?? 'dark' };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quiz library share, template add, rename, rm, path</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;650&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ln{white-space:pre-wrap;overflow-wrap:anywhere;min-height:20px}
+.t-dark .term{background:#16181d;color:#d6d9de}
+.t-dark .term .d{color:#8b929c} .t-dark .term .r{color:#ff7b72} .t-dark .term .g{color:#7ee787} .t-dark .term .y{color:#e3b341} .t-dark .term .c{color:#56d4dd} .t-dark .term .b{color:#ffffff;font-weight:700}
+.t-light .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-light .term .d{color:#59636e} .t-light .term .r{color:#cf222e} .t-light .term .g{color:#1a7f37} .t-light .term .y{color:#9a6700} .t-light .term .c{color:#0b7a83} .t-light .term .b{color:#000000;font-weight:700}
+.t-plain .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-plain .term span{color:inherit;font-weight:400}
+.term.plainbox span{color:inherit !important;font-weight:400 !important}
+.t-dark .term.plainbox{color:#d6d9de}
+</style>
+</helmet>
+<div class="t-{{term}}" style="width: 1280px; min-height: 1714px; box-sizing: border-box; padding: 40px 48px; background: #f5f6f8; font-family: Inter, system-ui, sans-serif; color: #1f2328; display: flex; flex-direction: column; gap: 24px">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 650">quiz library share, template add, rename, rm, path</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #59636e; max-width: 1080px">G10, G15: one line saying what was written or changed, with paths; rm asks with the counts it is about to delete and says how to undo. Tweaks: a dark or light terminal, or --plain.</p>
+  </header>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">share</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e"></p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library share rust-basics</span></div>
+      <div class="ln"><span class="g">written</span> rust-basics.html · version 9f3a · 412 KB</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">share --source</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">The editable folder, ready for register --update.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library share rust-basics --source -o edit</span></div>
+      <div class="ln"><span class="g">written</span> edit/rust-basics/ · quiz.md, 4 assets, brief.yaml · version 9f3a</div>
+      <div class="ln"><span class="d">next: edit it, then quiz library register edit/rust-basics/quiz.md --update rust-basics</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">share --json</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">New shape (G15).</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library share rust-basics --json</span></div>
+      <div class="ln">{"status":"written","path":"rust-basics.html","version":"9f3a","source":false}</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">template add</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Nothing committed: templates live in the config folder.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library template add rust-basics --as rust-week</span></div>
+      <div class="ln"><span class="g">template added</span> rust-week, from rust-basics version 9f3a</div>
+      <div class="ln"><span class="d">next: quiz new rust-week PATH</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">rename</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e"></p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library rename rust-basics rust</span></div>
+      <div class="ln"><span class="g">renamed</span> rust-basics to rust · id and folder unchanged (quizzes/rust-basics)</div>
+      <div class="ln"><span class="d">committed 1c9a7d3 fullmark: rename rust-basics rust</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">rm</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Asks, defaulting to No; then the commit to revert.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library rm chem-bonds</span></div>
+      <div class="ln">delete chem-bonds (Chemical bonding): 2 versions, 6 attempts, 4 reports? [y/N] y</div>
+      <div class="ln"><span class="g">deleted</span> chem-bonds</div>
+      <div class="ln"><span class="d">undo: git -C /home/minh/quiz-library revert 7e1f3a0</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">rm refused</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 1; --force skips it.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library rm chem-bonds</span></div>
+      <div class="ln"><span class="r">error</span> quizzes/chem-bonds has uncommitted changes, so deleting it could not be undone</div>
+      <div class="ln">    fix: commit or discard them, or add --force</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">rm --json without --yes (G10)</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 2.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library rm chem-bonds --json</span></div>
+      <div class="ln">{"status":"error","message":"rm asks before deleting, and --json never asks","fix":"add --yes"}</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">path</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">The path alone, for $(…); no colour ever.</p>
+    </div>
+    <div class="term plainbox" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library path rust-basics</span></div>
+      <div class="ln">/home/minh/quiz-library/quizzes/rust-basics</div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"term": {"editor": "enum", "options": ["dark", "light", "plain"], "default": "dark"}, "$preview": {"width": 1280, "height": 1714}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { term: this.props.term ?? 'dark' };
+  }
+}
+</script>
+</body>
+</html>

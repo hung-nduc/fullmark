@@ -350,6 +350,94 @@
       "y": 22200,
       "is_interactive": true,
       "title": "On a phone: Finish, the summary"
+    },
+    "MaterialsWide.dc.html": {
+      "x": 0,
+      "y": 23560,
+      "w": 1280,
+      "h": 940,
+      "is_interactive": true,
+      "title": "G126, adopted: Materials on the start screen open a wide pop-up (Close, Esc or a click outside); the start-screen view only"
+    },
+    "MaterialsWideSidebar.dc.html": {
+      "x": 1360,
+      "y": 23560,
+      "w": 1280,
+      "h": 940,
+      "is_interactive": true,
+      "title": "Not adopted (G126): the sidebar while answering stays as it is; no Expand. Kept for the record"
+    },
+    "MaterialsWideExpanded.dc.html": {
+      "x": 2720,
+      "y": 23560,
+      "w": 1280,
+      "h": 940,
+      "is_interactive": true,
+      "title": "Not adopted (G126): no pop-up while answering. Kept for the record"
+    },
+    "MaterialsWidePhone.dc.html": {
+      "x": 4080,
+      "y": 23560,
+      "w": 390,
+      "h": 844,
+      "is_interactive": true,
+      "title": "G126, adopted: on a phone the start screen's pop-up takes the screen"
+    },
+    "LibraryList.dc.html": {
+      "x": 0,
+      "y": 25020,
+      "w": 1280,
+      "h": 1158,
+      "is_interactive": true,
+      "title": "G7, list: one row per quiz, marks in NOTES; --plain, empty, --json (Tweaks: dark, light, plain)"
+    },
+    "LibraryInfo.dc.html": {
+      "x": 1360,
+      "y": 25020,
+      "w": 1280,
+      "h": 1018,
+      "is_interactive": true,
+      "title": "G7, info: inspect's look; versions newest first; --version (Tweaks: dark, light, plain)"
+    },
+    "LibraryStatus.dc.html": {
+      "x": 2720,
+      "y": 25020,
+      "w": 1280,
+      "h": 1258,
+      "is_interactive": true,
+      "title": "G7 and G11, status: facts, then problems and notes in check's format (Tweaks: dark, light, plain)"
+    },
+    "LibrarySetup.dc.html": {
+      "x": 4080,
+      "y": 25020,
+      "w": 1280,
+      "h": 1978,
+      "is_interactive": true,
+      "title": "G15, init and register: one file, several, refused, --update, no library (Tweaks: dark, light, plain)"
+    },
+    "LibraryTake.dc.html": {
+      "x": 5440,
+      "y": 25020,
+      "w": 1280,
+      "h": 1638,
+      "is_interactive": true,
+      "title": "G15, take: filed, resuming, --missed, already open, the lock, --json (Tweaks: dark, light, plain)"
+    },
+    "LibraryGrade.dc.html": {
+      "x": 6800,
+      "y": 25020,
+      "w": 1280,
+      "h": 1338,
+      "is_interactive": true,
+      "title": "G15, grade (plain, --grades, --web), replay, stats (Tweaks: dark, light, plain)"
+    },
+    "LibraryTidy.dc.html": {
+      "x": 8160,
+      "y": 25020,
+      "w": 1280,
+      "h": 1714,
+      "is_interactive": true,
+      "title": "G15, share, template add, rename, rm, path (Tweaks: dark, light, plain)"
     }
   },
   "createdOnFiles": {
@@ -363,9 +451,19 @@
   "noteOrder": [
     "formsReview",
     "formsGrade",
-    "formsBrief"
+    "formsBrief",
+    "materialsWide",
+    "cliLibrary"
   ],
   "notes": {
+    "formsBrief": {
+      "kind": "title1",
+      "maxW": 5360,
+      "text": "Forms: quiz brief --web",
+      "w": 240,
+      "x": 0,
+      "y": 19800
+    },
     "formsGrade": {
       "kind": "title1",
       "maxW": 5830,
@@ -382,13 +480,21 @@
       "x": 0,
       "y": 11700
     },
-    "formsBrief": {
+    "materialsWide": {
       "kind": "title1",
-      "maxW": 5360,
-      "text": "Forms: quiz brief --web",
+      "maxW": 4470,
+      "text": "Materials: the wide view (G126)",
       "w": 240,
       "x": 0,
-      "y": 19800
+      "y": 23300
+    },
+    "cliLibrary": {
+      "kind": "title1",
+      "maxW": 9440,
+      "text": "CLI: quiz library (G7, G15)",
+      "w": 240,
+      "x": 0,
+      "y": 24760
     }
   },
   "order": [
@@ -438,7 +544,18 @@
     "BriefDark.dc.html",
     "BriefPhone.dc.html",
     "BriefPhoneSide.dc.html",
-    "BriefPhoneFinish.dc.html"
+    "BriefPhoneFinish.dc.html",
+    "MaterialsWide.dc.html",
+    "MaterialsWideSidebar.dc.html",
+    "MaterialsWideExpanded.dc.html",
+    "MaterialsWidePhone.dc.html",
+    "LibraryList.dc.html",
+    "LibraryInfo.dc.html",
+    "LibraryStatus.dc.html",
+    "LibrarySetup.dc.html",
+    "LibraryTake.dc.html",
+    "LibraryGrade.dc.html",
+    "LibraryTidy.dc.html"
   ],
   "pages": [],
   "title": "fullmark themes"

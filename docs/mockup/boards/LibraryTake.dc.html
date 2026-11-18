@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quiz library take</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;650&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ln{white-space:pre-wrap;overflow-wrap:anywhere;min-height:20px}
+.t-dark .term{background:#16181d;color:#d6d9de}
+.t-dark .term .d{color:#8b929c} .t-dark .term .r{color:#ff7b72} .t-dark .term .g{color:#7ee787} .t-dark .term .y{color:#e3b341} .t-dark .term .c{color:#56d4dd} .t-dark .term .b{color:#ffffff;font-weight:700}
+.t-light .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-light .term .d{color:#59636e} .t-light .term .r{color:#cf222e} .t-light .term .g{color:#1a7f37} .t-light .term .y{color:#9a6700} .t-light .term .c{color:#0b7a83} .t-light .term .b{color:#000000;font-weight:700}
+.t-plain .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-plain .term span{color:inherit;font-weight:400}
+.term.plainbox span{color:inherit !important;font-weight:400 !important}
+.t-dark .term.plainbox{color:#d6d9de}
+</style>
+</helmet>
+<div class="t-{{term}}" style="width: 1280px; min-height: 1638px; box-sizing: border-box; padding: 40px 48px; background: #f5f6f8; font-family: Inter, system-ui, sans-serif; color: #1f2328; display: flex; flex-direction: column; gap: 24px">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 650">quiz library take</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #59636e; max-width: 1080px">G4, G5, G9, G15: what is served, where, and what to do; then what was filed, the score, and what is next. The URL is printed even when the browser opens, for a closed tab. Tweaks: a dark or light terminal, or --plain.</p>
+  </header>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">take, filed</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">While serving it holds no lock (G9). After Submit: filed, scored, committed.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take rust-basics</span></div>
+      <div class="ln"><span class="b">rust-basics · Rust basics · version 9f3a</span> · 18 questions · no time limit</div>
+      <div class="ln">serving http://127.0.0.1:52811/?t=8f3a…  <span class="d">(opened in your browser)</span></div>
+      <div class="ln"><span class="d">progress is saved: close the tab or press Ctrl+C, and take resumes it</span></div>
+      <div class="ln"> </div>
+      <div class="ln"><span class="g">filed</span> results/20261118-1422.json · 80%* (20 of 21 points, 4 waiting for a grade)</div>
+      <div class="ln"><span class="d">next: quiz library grade rust-basics --web</span></div>
+      <div class="ln"><span class="d">committed 4d2e9f1 fullmark: take rust-basics</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">take, resuming</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">G4: the saved attempt of this version, without --section or --missed.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take rust-basics</span></div>
+      <div class="ln"><span class="b">rust-basics · Rust basics · version 9f3a</span> · <span class="c">resuming</span> your attempt of 18 Nov 14:02 (7 of 18 answered)</div>
+      <div class="ln">serving http://127.0.0.1:52811/?t=8f3a…  <span class="d">(opened in your browser)</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">take --missed</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">G5: what the plan holds, from how many attempts, changed and gone counted.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take rust-basics --missed</span></div>
+      <div class="ln"><span class="b">rust-basics · missed questions</span> · 6 from 17 attempts · <span class="y">2 changed since you missed them</span> · 1 no longer in the quiz</div>
+      <div class="ln">serving http://127.0.0.1:52811/?t=8f3a…  <span class="d">(opened in your browser)</span></div>
+      <div class="ln"> </div>
+      <div class="ln"><span class="g">filed</span> results/20261118-1510.json · 4 of 6 right · 67%</div>
+      <div class="ln"><span class="d">committed 0e6c3b8 fullmark: take rust-basics</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">take --missed, nothing missed</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 0, nothing served.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take signals --missed</span></div>
+      <div class="ln">nothing missed: every question you got wrong has been answered right since</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">Already open (G9)</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Exit 2: a second take of the quiz while the first is serving.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take rust-basics</span></div>
+      <div class="ln"><span class="r">error</span> rust-basics is already open in another take (pid 48211)</div>
+      <div class="ln">    open: http://127.0.0.1:52811/?t=8f3a…</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">Waiting for the lock</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Another writer (foundation’s 10 seconds), then exit 2 naming it.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library grade signals --grades g.json</span></div>
+      <div class="ln"><span class="d">waiting for the library: quiz library take rust-basics is filing (pid 48211)…</span></div>
+      <div class="ln"><span class="r">error</span> the library is busy: quiz library register notes/*.md (pid 48300) has held it for 10 s</div>
+      <div class="ln">    fix: run the command again when it finishes</div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">take --json</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">The listening line, then the outcome; gone is new (G5).</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library take rust-basics --missed --json</span></div>
+      <div class="ln">{"status":"listening","url":"http://127.0.0.1:52811/?t=8f3a…","port":52811,"pid":48211}</div>
+      <div class="ln">{"status":"filed","results":"/home/minh/quiz-library/quizzes/rust-basics/results/20261118-1510.json","score":67,"plan":{"source":"missed","questions":6},"gone":1}</div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"term": {"editor": "enum", "options": ["dark", "light", "plain"], "default": "dark"}, "$preview": {"width": 1280, "height": 1638}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { term: this.props.term ?? 'dark' };
+  }
+}
+</script>
+</body>
+</html>
