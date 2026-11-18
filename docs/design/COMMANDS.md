@@ -650,6 +650,7 @@ quizzes/<id>/
   progress/<version>.json           an attempt in progress (autosave), git-ignored
   progress/<version>.serving.json   the take serving it: process id, URL, start
   progress/<version>.submitted.json a submit waiting to be filed
+  progress/<stamp>.grades.json      grades from the form waiting to be kept
 ```
 
 - **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
@@ -1103,6 +1104,10 @@ quiz library grade NAME --web [--attempt STAMP] [--name NAME] [--timeout SECONDS
 ```
 
 Grades an attempt against the version it was taken on and writes the report into `quizzes/<id>/reports/` (never `results/`). With `--json`, also the grades template. `--web` opens the grading form as for `quiz grade`, pre-filled with the newest grades for that attempt. Every grades file is kept, and the newest counts. Commits.
+
+- **Which attempt.** `--attempt` takes a stamp or a prefix of 4 or more characters. Without it: the newest attempt with an essay or code answer still waiting for a grade, else the newest attempt.
+- **The template.** With `--json`, for an attempt with an essay or code question answered, the empty grades template is written to the working directory as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never into `grades/`, where every file counts. An existing one is never overwritten: it is skipped with `quiz grade --json`'s warning. Once filled, `--grades` takes it and keeps a copy in `grades/`.
+- **The lock.** As for `take`: `--web` holds no lock while the form is served. On **Save grades**, the checked grades are written to `progress/<stamp>.grades.json`, then, under the lock, kept in `grades/`, the report written and the commit made. When the lock cannot be had in 10 seconds, the grades stay in `progress/` and the command exits `2`, saying they are safe; the next `library grade` of the quiz keeps them first, says so, and ends, with `next: quiz library grade NAME` after the commit.
 
 **Output.**
 

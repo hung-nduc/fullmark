@@ -21,12 +21,11 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
-| 4e | brief written (2026-11-19); G27 to G29 raised; waits for the owner | this file |
+| 4e | brief approved (2026-11-19), G27 to G29 decided; being built | this file |
 
 ### Next
 
-1. The owner decides **G27 to G29** and approves **4e**'s brief (`grade`, `stats`, with G25 and G26 first).
-2. The decisions go into COMMANDS.md; one implementing agent (Sonnet) builds 4e; the planner reviews it.
+1. One implementing agent (Sonnet) builds **4e** (`grade`, `stats`, with G25 and G26 first); the planner reviews it.
 
 ## Goal
 
@@ -50,13 +49,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G26 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised for 4e's brief, open:
-
-**G27. Where `library grade --json` writes the grades template.** COMMANDS.md says "with `--json`, also the grades template" and gives it a `template` field, but not where. It cannot go in `grades/`: every file there is kept and the newest counts, so an empty template would count as the newest grades. **Recommendation:** in the working directory, as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never overwritten: an existing one is skipped with `quiz grade --json`'s warning. `--grades` then takes that file once it is filled, and keeps a copy in `grades/`.
-
-**G28. Which attempt `library grade` grades without `--attempt`.** COMMANDS.md gives no default; `replay`'s is the newest. **Recommendation:** the newest attempt with an essay or code answer still waiting for a grade; when none is waiting, the newest attempt. So `take`'s `next: quiz library grade NAME --web` grades the attempt just filed, and with several ungraded, the plain command works back from the newest. The heading names the attempt, as COMMANDS.md's sample does.
-
-**G29. `library grade --web` and the lock.** The form waits up to 1800 s. Holding the lock all that time would block every other command, as G9 found for `take`. **Recommendation:** as `take` (G9): no lock while the form is served; once **Save grades** is pressed and checked, the grades file, the report and the commit are made under the lock. When the lock cannot be had in 10 s, the grades are written to `progress/<stamp>.grades.json` (git-ignored), and the command exits 2 saying they are safe; the next `library grade` of the quiz keeps them first, as `take` files a leftover submit (G26).
+G1 to G29 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G30.
 
 ## Slices
 
@@ -314,11 +307,11 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ## Slice 4e: `grade`, `stats`
 
-**Brief written on 2026-11-19; waits for the owner's approval, and for G27 to G29** (written below as recommended; changed here if decided otherwise). G6, G14, G25, G26 and the approved boards (LibraryGrade) are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library take`, `quiz library grade`, `quiz library stats`, and `quiz grade` (`--grades`, `--json`, `--web`, the form) and `quiz stats`, which the library commands look up for you. This slice adds the grading of a filed attempt and the numbers over all of them. `--web` serves the grading form, so per G20 it runs **Playwright** too.
+**Approved by the owner on 2026-11-19.** G6, G14, G25 to G29 and the approved boards (LibraryGrade) are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library take`, `quiz library grade`, `quiz library stats`, and `quiz grade` (`--grades`, `--json`, `--web`, the form) and `quiz stats`, which the library commands look up for you. This slice adds the grading of a filed attempt and the numbers over all of them. `--web` serves the grading form, so per G20 it runs **Playwright** too.
 
 ### Read first
 
-- This plan: "Rules for every slice"; 4c's and 4d's sections and reviews; STEP4-GAPS.md, G6, G9, G14, G25, G26; G27 to G29 above.
+- This plan: "Rules for every slice"; 4c's and 4d's sections and reviews; STEP4-GAPS.md, G6, G9, G14, G25 to G29.
 - COMMANDS.md: `quiz grade` (all of it: the form, "Before it serves", "The submit", the exits), `quiz stats`, `quiz library grade`, `quiz library stats`, `quiz library take` ("The lock"), "How library commands print", "The library folder".
 - TECHNICAL_DESIGN.md, section 6 (the grades format, the validator, pending grades in a score), section 7 (the lock, safe writes).
 - Code: `src/cli/grade.ts` (`readAttempt`, `gradeOne`, the template), `src/cli/grade-web.ts` (`Prepared`, `gradesSubmitReader`, `runGradeWeb`: where it writes today), `src/cli/stats.ts` and `src/core/stats/` (`summarise`, `renderStats`, `StatsNames`); 4c's `src/cli/library-history.ts` (`readHistory`: the newest report, else graded on the spot), `library-common.ts` (`loadStored`, `findQuiz`, `openLibrary`); 4d's `src/cli/library-take.ts` (the leftover-submit pattern, `fileSubmitted`, the lock), `library-missed.ts`, `library-replay.ts` (the newest grades file of an attempt); `src/library/layout.ts` (`grade`, `reportJson`, `reportMd`); the history helper and its fixture.

@@ -123,3 +123,15 @@ Folders are named by the quiz's `id`, never its name (so `rename` moves nothing)
 **G26. A take that files a leftover submit.** When `take` finds a `submitted.json` left by an earlier take (the lock was busy, or the process died), it files it and ends (exit 0) without serving. **Recommendation:** accept, with one more line after the commit, `next: quiz library take NAME` to start a new attempt, so the learner is not left wondering why no page opened.
 
 **Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library take` ("The lock" and the Output). Built first in 4e.
+
+**G27. Where `library grade --json` writes the grades template.** COMMANDS.md says "with `--json`, also the grades template" and gives it a `template` field, but not where. It cannot go in `grades/`: every file there is kept and the newest counts, so an empty template would count as the newest grades. **Recommendation:** in the working directory, as `<name>-<stamp>-grades.json` (`ielts-writing-20261115-093012-grades.json`), never overwritten: an existing one is skipped with `quiz grade --json`'s warning. `--grades` then takes that file once it is filled, and keeps a copy in `grades/`.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade`.
+
+**G28. Which attempt `library grade` grades without `--attempt`.** COMMANDS.md gives no default; `replay`'s is the newest. **Recommendation:** the newest attempt with an essay or code answer still waiting for a grade; when none is waiting, the newest attempt. So `take`'s `next: quiz library grade NAME --web` grades the attempt just filed, and with several ungraded, the plain command works back from the newest. The heading names the attempt, as COMMANDS.md's sample does.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade`.
+
+**G29. `library grade --web` and the lock.** The form waits up to 1800 s. Holding the lock all that time would block every other command, as G9 found for `take`. **Recommendation:** as `take` (G9): no lock while the form is served; once **Save grades** is pressed and checked, the grades file, the report and the commit are made under the lock. When the lock cannot be had in 10 s, the grades are written to `progress/<stamp>.grades.json` (git-ignored), and the command exits 2 saying they are safe; the next `library grade` of the quiz keeps them first, as `take` files a leftover submit (G26).
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library grade` and "The library folder".
