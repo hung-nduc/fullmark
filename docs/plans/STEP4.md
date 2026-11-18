@@ -19,6 +19,7 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
+| 4c | brief written (2026-11-18); waits for the owner's approval | this file |
 
 ### Next
 
@@ -180,3 +181,56 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 **Done differently, accepted:** two older tests that used a `[library]` table in `config.toml` now use `[shelves]` (`library` is a string now; step 5 gives `[shelves]` a meaning, and those tests change then); `writeIndex` takes the atomic writer as a parameter, since `src/library/` may not import `src/cli/`; `status`'s `Checks` row only when healthy (as both COMMANDS.md samples); the `library.hash` fix names the full hash so it can be pasted; `status`'s identity note has the `user.name` line only, as the board; codes the design did not name (`library.missing`, `library.index`, `library.version-missing`, `config.invalid`; notes `git.no-repository`, `git.unavailable`, `library.orphan`); a `--json` error may carry `"fix"`; a missing `config.toml` named by `FULLMARK_CONFIG` is not an error for library commands (`init` creates it); the waiting line on stderr; `TZ=UTC` in the goldens' environment, so `created` is the same on every machine.
 
 **Gaps:** G21, decided by the owner on 2026-11-18 as recommended.
+
+## Slice 4c: `register`, `list`, `info`
+
+**Brief written on 2026-11-18; waits for the owner's approval.** G1, G2, G4, G5 (the `changed` mark only), G12, G13, G16 (`flagged`, the stored review on `--update`), G17 (the warning), G21 and the approved boards are written into COMMANDS.md: "How library commands print", "The library folder", `quiz library register`, `list`, `info`. This slice fills the library: versions in, and the two commands that read them. Tests per G20: no Playwright.
+
+### Read first
+
+- This plan: "Rules for every slice"; 4b's section and review; STEP4-GAPS.md, G1, G2, G4, G12, G13, G16, G17, G21.
+- COMMANDS.md: "Several files", "Names, ids and stamps", "Terminal style", "Library commands" from its top through `quiz library info`, and `quiz check`'s options (`--profile`, `--config`, `--strict`, `--review`) and `quiz build`'s build file.
+- TECHNICAL_DESIGN.md, section 4 ("`results-v2`", "`review-v2`"), section 5 ("Where the config comes from", "In the library"), section 7 (safe writes, the lock).
+- The boards LibrarySetup (`register`) and LibraryList, LibraryInfo, which COMMANDS.md's Output blocks transcribe.
+- Code: 4b's `src/library/` and `src/cli/library-*.ts`, `src/cli/table.ts`; `src/cli/check.ts` (`checkFile`, `FileOutcome`: the issues, the resolved profile and the loaded quiz in one call), `src/cli/load.ts` (`LoadedQuiz`: the text, assets, sheets and hash), `src/cli/build-file.ts` (`planBuildFile`), `src/core/config/resolve.ts` (`ResolvedProfile`), `src/core/inspect.ts` (`summarise`), `src/core/stats/` (what `stats` computes from reports), `src/core/slug.ts`, `src/core/hash.ts`; `test/golden/stats/` and `test/fixtures/stats/` (results and reports to build histories from).
+
+### Decided for this slice
+
+**First, G21:** `init` takes the lock as soon as the folder exists (creating it when missing) and decides what the folder is under the lock. A test starts two `init`s of one new folder together: one `created`, one `adopted`, one commit.
+
+**A version in the library.**
+- `register` checks each file with `checkFile` (its profile, config, `--strict`, `--review`; the config looked up from the file, then from the library root, as COMMANDS.md says) and stores the version from the `LoadedQuiz` it returns: the source under its original file name, every asset and sheet at its relative path, `brief.yaml` when one sits next to the source, and `check.json`. Nothing is read twice, so what is stored is what was checked and hashed.
+- **`check.json`** is the resolved profile, so a later re-check (`template add` in 4f) needs no config: `{"format": "fullmark-check", "version": 1, "profile", "chain", "rules": [{"id", "level", "options"}], "checks", "allowIgnore"}`, the rules sorted by id, written with sorted keys, two-space indent and a final newline. A reader in `src/library/` turns it back into a `ResolvedProfile`; a test checks a quiz under the stored file and under the original config and gets the same issues.
+- **Written safely:** each version is written into `quizzes/<id>/versions/.<hash>.<8 hex>.tmp/` and renamed to `<hash>/` when complete; `library.toml` is written last; all under the lock, then one commit. A folder left by a killed run (`*.tmp`) is removed by the next `register`. A test kills a register mid-way (simulated) and finds the library as it was before.
+- **The quiz table:** `name`, `id`, `title`, `source` (the absolute path of the file registered), `current`, `versions = [{ hash, added }]`, `shelves = []`.
+
+**What a file is, against the library** (in this order, for each file):
+1. Check errors, or a survey (`library.survey`): refused.
+2. Its `source` path is a quiz's `source`: the same hash as that quiz's current version is `unchanged`; another hash is refused, "registered before as NAME and edited since", fix `quiz library register FILE --update NAME`.
+3. With `--update NAME`: its `id` must be NAME's (`library.id-mismatch`); the current hash is `unchanged`; a hash among NAME's earlier versions makes that version current again (no new folder, no new entry in `versions`; the output says "an earlier version, now current again"); else a new version.
+4. Without `--update`: its `id` already in the library is `library.id-taken` (G12's two fixes); else a new quiz, named `-n NAME` or its slugged title, or its `id` when the title slugs to nothing. A name must match `ID_FORMAT` (`src/core/slug.ts`) and must not be another quiz's name or id (G13): "name taken", the suggestion `NAME-2` (or the next free number).
+- **Several files:** all or nothing (COMMANDS.md): every file is checked and every name resolved before anything is written, including two files of the batch with one name or one id; then one commit, `fullmark: register a, b, c` (the names sorted). Globs, sorting, the `[3/12]` line as "Several files" says. `-n` and `--update` with several files exit 2.
+- **`--build-file BUILD [FILE...]`:** the files of `planBuildFile`'s entries, reading only `files`, `profile`, `config` and `strict`; a file in several entries with different values of those exits 2; `FILE`s narrow it to those entries.
+- **On `--update`:** the quiz's stored `review.json`, when there is one, is passed as `--review` (an explicit `--review` replaces it), so `review.fix` and `review.drop` refuse the version (G16); a saved attempt in `quizzes/<id>/progress/` on the old version gives the G17 warning (exit still 0; 4b's layout names the folder; a test writes a progress file by hand).
+- **Output and `--json`** exactly as COMMANDS.md (the Output block and the `--json` row), with `committed`.
+
+**`list`** (G7, COMMANDS.md's Output and field table).
+- One row per quiz, every field of the table always present. Content fields (`kind`, `lang`, `profile`, `tags`, `types`, `questions`, `points`) from the current version: `summarise` of the stored source, the profile from `check.json`. `added` and `updated` from `versions`. `shelves` from the table, `[]` in step 4.
+- **Attempts** come from `quizzes/<id>/results/` and `reports/`: an attempt's score is its newest report's when there is one, else the attempt graded on the spot against the version it names, as `quiz stats` grades a results file (so a pending essay leaves it with `*`). `score` is the last attempt's percent, `best` the highest, `taken` the last date, `weak` the three weakest tags over all attempts (the rule of `stats`'s Weakest), `ungraded` true when an attempt has essays or code with no grade. One module, `src/cli/library-history.ts`, computes this, so `stats` (4e) and `info` read the same numbers.
+- `changed`: the `source` file exists and its hash (`loadQuiz`) is not the current version's. `flagged`: the open `review.fix` and `review.drop` findings of `review.json` against the current version (`0` without one).
+- NOTES column: `source changed`, `N ungraded`, `N flagged`, in that order, joined by ` · `.
+
+**`info NAME [--version HASH]`** (COMMANDS.md's Output and `--json`). Every block of its table, in order. Versions newest first, the current one marked; each against the version before by question id and question hash: added, removed, changed. `--version` takes a hash or a prefix of at least 4 characters (an ambiguous prefix exits 2, listing the matches). Unknown quiz: exit 2 with the nearest names, as `path` does.
+
+**The history helper** (G6), started here: `test/helpers/library-history.ts` builds a library through the real commands, in-process with a fixed clock and the git test environment: `init`, `register` of a quiz, `register --update` with a question changed, one removed and one added, then results files filed into `results/` as `take` will file them (built from the fixtures' results or core's attempt API, on the old and the new version), a report for one, an essay left ungraded. 4c's `list` and `info` goldens run over it; 4d and 4e extend it.
+
+### Tasks
+
+1. **G21** (one commit), with its test.
+2. **`register`** (one commit): the version store, `check.json` and its reader, the order of decisions above, several files, `--build-file`, `--update` with the review and the progress warning; unit tests for each decision, the batch refusal (nothing written), the killed run, `check.json`'s round trip; subprocess `--json` contract tests; goldens for every Output block of `register` in COMMANDS.md and each refusal.
+3. **`list`, `info` and the history helper** (one commit): `src/cli/library-history.ts`; goldens for `list` (plain, empty, `--json`) and `info` (plain, `--version`, unknown, `--json`) over the helper's library; the command-graph cases (`list`, `info` and `register` load no page builder, renderer or server; `check` and the core commands still load nothing of `src/library/`).
+4. **Do not edit** `docs/plans/` or `docs/design/`. The agent's report as for every slice, with every golden added or changed counted, and anything done differently.
+
+### Done when
+
+`npm run build`, the typecheck, Biome, knip and Vitest pass (G20: no Playwright); in a temporary library, registering two examples, editing one and registering it with `--update`, then `list` and `info`, print COMMANDS.md's text with their own numbers.
