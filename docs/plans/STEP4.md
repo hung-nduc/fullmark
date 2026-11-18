@@ -17,12 +17,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
-| 4a | built and reviewed (2026-11-18); G19 and G20 wait for the owner | `24d99e0`, `ac90c6b` |
+| 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
 
 ### Next
 
-1. The owner decides G19 and G20 (4a's review).
-2. The planner writes them into `docs/design/` and the plan's rules, then **4b**'s brief (the store).
+1. The owner approves **4b**'s brief (the store).
+2. One implementing agent (Sonnet) builds it; the planner reviews it.
 
 ## Goal
 
@@ -39,17 +39,14 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 - **`src/library/` uses core's public API only**, and nothing in `core`, `build` or `serve` imports it (section 7; the lint boundary is added in 4b).
 - **Git is real in tests, in a temp folder**: a library test runs real `git` in a fresh temporary folder with a fixed author, committer and date (`GIT_AUTHOR_DATE`, `GIT_COMMITTER_DATE`), so commits are reproducible. Failure cases (no `git` on the path, a commit that fails) use an injected runner, never a broken machine.
 - **The clock and the config folder are injected**: no test reads the owner's real `config.toml` or library (`FULLMARK_CONFIG`, which `check` already reads, points at a temp file in every test).
+- **Which tests a slice runs** (G20): every slice runs `npm run build`, the typecheck, Biome, knip and all of Vitest (the startup tests alone first), whatever it touches. Playwright, in Chromium and Firefox, runs only for a slice that touches the page, the server, a form or a built page (`src/page/`, `src/serve/`, `src/build/`, the form folders): **4d**, **4e** and **4f**, not 4b or 4c. The last slice runs everything before the step is accepted. While building, an agent runs the tests it works on; the review runs the set above.
 - **Every write is atomic, under the lock**, and a test kills a writer mid-way (or simulates it) and checks the library is the old state or the new one.
 
 ## Gaps
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised since:
-
-**G19. `content.names-control`'s level in `draft` and `exam`.** 4a's brief said "`warning` in every built-in profile"; the rule was built as every quality warning is, so the built-in profiles map it as they map the others: info under `draft`, error under `exam` (a question naming "press" fails `check` under `exam`). **Recommendation:** keep it so, as built: one mechanism for every quality rule, and an exam is the quiz most likely printed, where naming a button matters most. The catalogue row says "warning", which is the default level, and stays true.
-
-**G20. Which tests a slice runs** (raised by the owner during 4a's review: should a library slice test only the library?). **Recommendation:** every slice runs the build, the typecheck, Biome, knip and all of Vitest, whatever it touches: the library uses core, and the command-graph, startup and golden tests are what catch a library slice breaking `check`. Playwright, in Chromium and Firefox, runs only for a slice that touches the page, the server, a form or a built page (`src/page/`, `src/serve/`, `src/build/`, the form folders): in step 4, **4d** (`take`, `replay`), **4e** (`grade --web`) and **4f** (the samples, acceptance), and not 4b or 4c. The last slice runs everything before step 4 is accepted. While building, an agent runs the tests it works on; the review runs the set above.
+G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 and G20 are decided too. New ones found while building are added here from G21.
 
 ## Slices
 
@@ -107,4 +104,4 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 **Done differently, accepted:** a question's `check-ignore` no longer hides a finding in another file (a bug found here: `applyIgnores` matched by line alone; fixed in `src/core/rules/check.ts` with a test); passages, `fields` labels, `scale` labels and a choice's `input` prompt are read too (text a learner reads); when several words match in one text the earliest is named; a `description` finding is on the `description:` key's line. **Not accepted yet:** the levels in `draft` and `exam`, G19.
 
-**Gaps:** G19; G20, raised by the owner during the review.
+**Gaps:** G19 and G20, decided by the owner on 2026-11-18 as recommended.
