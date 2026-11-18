@@ -1,0 +1,6 @@
+library
+template
+add
+study-fixture
+--as
+rust

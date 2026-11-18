@@ -1,0 +1,1 @@
+{"status":"error","message":"delete tidy? pass --yes to confirm","fix":"add --yes: --json never prompts"}

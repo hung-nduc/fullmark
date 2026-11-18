@@ -1,5 +1,6 @@
-2 quizzes · 7 attempts · lib
+3 quizzes · 7 attempts · lib
 
 NAME                   TITLE                  VERSIONS  ATTEMPTS  LAST  BEST  TAKEN   NOTES
 limits-and-continuity  Limits and continuity         1         0     –     –  never
 study-fixture          Study fixture                 3         7  15%*  100%  16 Nov  3 ungraded
+tidy                   Tidy notes                    1         0     –     –  never   1 flagged

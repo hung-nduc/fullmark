@@ -748,6 +748,44 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       );
     });
   library
+    .command("rename")
+    .description("change a quiz's name; its id and folder stay")
+    .argument("<old>", "a quiz's name or id")
+    .argument("<new>", "the new name: a slug no other quiz has as a name or an id")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (oldName: string, newName: string, options: { json?: boolean; plain?: boolean }) => {
+      outcome.exit = await (await import("./library-rename")).runLibraryRename(
+        oldName,
+        newName,
+        { json: Boolean(options.json), plain: Boolean(options.plain) || noColor() },
+        io,
+      );
+    });
+  library
+    .command("rm")
+    .description("delete a quiz with its versions and results, and commit, so git revert brings it back")
+    .argument("<name>", "a quiz's name or id")
+    .option("--yes", "do not ask first")
+    .option(
+      "--force",
+      "delete even when it could not be undone: no git repository, uncommitted changes, a take is open",
+    )
+    .option("--json", "print the outcome as one JSON object (never asks: needs --yes)")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (name: string, options: Record<string, unknown>) => {
+      outcome.exit = await (await import("./library-rm")).runLibraryRm(
+        name,
+        {
+          yes: Boolean(options.yes),
+          force: Boolean(options.force),
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+        },
+        io,
+      );
+    });
+  library
     .command("replay")
     .description("open a past attempt as a page already submitted, with its grades; writes nothing in the library")
     .argument("<name>", "a quiz's name or id")

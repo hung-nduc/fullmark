@@ -1,0 +1,7 @@
+library
+share
+study-fixture
+--source
+-o
+edit
+--json

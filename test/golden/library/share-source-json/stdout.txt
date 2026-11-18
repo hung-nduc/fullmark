@@ -1,0 +1,1 @@
+{"status":"written","path":"edit/study-fixture/","version":"89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27","source":true}

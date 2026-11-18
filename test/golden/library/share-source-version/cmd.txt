@@ -1,0 +1,8 @@
+library
+share
+study-fixture
+--source
+--version
+2a73
+-o
+edit

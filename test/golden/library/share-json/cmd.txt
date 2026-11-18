@@ -1,0 +1,6 @@
+library
+share
+tidy
+-o
+out
+--json

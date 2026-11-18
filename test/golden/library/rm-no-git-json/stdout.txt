@@ -1,0 +1,1 @@
+{"status":"refused","message":"the library is not a git repository, so deleting tidy could not be undone","fix":"make it one with git init in the library, or add --force"}

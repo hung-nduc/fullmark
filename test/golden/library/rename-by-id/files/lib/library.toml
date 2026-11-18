@@ -1,0 +1,27 @@
+format = "fullmark-library"
+version = 2
+created = "2026-11-18T14:22:10+00:00"
+
+[quizzes.limits]
+id = "calculus-limits"
+title = "Limits and continuity"
+source = "/home/minh/notes/limits.md"
+current = "29d92b939d8822c361ebfde3e6f19111300d11a0488d0294084c2c77741a6aed"
+versions = [{ hash = "29d92b939d8822c361ebfde3e6f19111300d11a0488d0294084c2c77741a6aed", added = "2026-11-12T09:00:00+00:00", file = "limits.md" }]
+shelves = []
+
+[quizzes.study-fixture]
+id = "study"
+title = "Study fixture"
+source = "/home/minh/notes/study.md"
+current = "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27"
+versions = [{ hash = "2a73a8379e8ec30092396aaf83fe1ffea7101f02f132be7d3cecde0298634fec", added = "2026-10-01T09:00:00+00:00", file = "study.md" }, { hash = "14322b0c919512f0f84098337d612ce6fc0a2d0e3e652505e8ff121b6329c0ae", added = "2026-10-15T09:00:00+00:00", file = "study.md" }, { hash = "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27", added = "2026-11-10T09:00:00+00:00", file = "study.md" }]
+shelves = []
+
+[quizzes.tidy]
+id = "tidy"
+title = "Tidy notes"
+source = "/home/minh/notes/tidy.md"
+current = "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce"
+versions = [{ hash = "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce", added = "2026-11-13T09:00:00+00:00", file = "tidy.md" }]
+shelves = []

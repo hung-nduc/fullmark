@@ -1,0 +1,7 @@
+library
+template
+add
+study-fixture
+--as
+study-week
+--json

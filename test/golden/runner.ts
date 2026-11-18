@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
 import {
   cpSync,
   existsSync,
@@ -21,6 +21,9 @@ import { dirname, join, relative, resolve } from "node:path";
  * - `input/`       files copied into the working directory (optional)
  * - `copy.txt`     `repo/path => dest` lines: a file or folder of the repository copied in (optional)
  * - `env.txt`      `KEY=VALUE` lines added to the environment; `<dir>` is the working directory (optional)
+ * - `git.txt`      folders (relative to the working directory) made a git repository with one commit of everything in
+ *                  them before the command runs, with the dates of `env.txt`, so a command that commits has a repository
+ *                  to commit to and its hashes are reproducible (optional)
  * - `stdout.txt`, `stderr.txt`, `exit.txt`    the expected output
  * - `files/`       every file the command wrote or changed, by its path in the working directory
  *
@@ -94,7 +97,6 @@ export async function runCase(c: Case): Promise<Run> {
     }
     // a `.git` folder stops the search for fullmark.toml here, so nothing above the case is ever read
     mkdirSync(join(tmp, ".git"), { recursive: true });
-    const before = snapshot(tmp);
 
     const env: Record<string, string> = {};
     for (const [k, v] of Object.entries(process.env)) {
@@ -111,6 +113,18 @@ export async function runCase(c: Case): Promise<Run> {
       const i = l.indexOf("=");
       env[l.slice(0, i)] = l.slice(i + 1).replaceAll("<dir>", tmp);
     }
+
+    // `git.txt`: the repositories the command commits to, made before the snapshot (`.git` is not part of it)
+    for (const folder of lines(join(c.dir, "git.txt"))) {
+      const cwd = join(tmp, folder);
+      for (const args of [
+        ["init", "-q"],
+        ["add", "-A"],
+        ["-c", "user.name=fullmark", "-c", "user.email=fullmark@localhost", "commit", "-q", "-m", "fullmark: init"],
+      ])
+        execFileSync("git", args, { cwd, env, stdio: "ignore" });
+    }
+    const before = snapshot(tmp);
 
     const args = lines(join(c.dir, "cmd.txt"));
     const result = await new Promise<{ stdout: string; stderr: string; exit: number }>((done, fail) => {

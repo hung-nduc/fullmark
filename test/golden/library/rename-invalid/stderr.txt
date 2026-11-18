@@ -1,0 +1,2 @@
+error: Tidy Notes is not a valid name
+    fix: a name is a slug: a to z, 0 to 9 and -, starting with a letter, 1 to 64 characters

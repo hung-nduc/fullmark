@@ -1,0 +1,2 @@
+you already have a template called "study-week"
+use --replace to overwrite it, or --as study-week-2

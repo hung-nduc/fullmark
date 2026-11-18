@@ -1,0 +1,30 @@
+{
+  "format": "fullmark-review",
+  "questions": {
+    "first": {
+      "hash": "a3519f11b1f3cecb44d440e5ec1b418a47c85ced67417c146e77735d9954d0a3",
+      "note": "",
+      "reasons": [],
+      "verdict": "keep"
+    },
+    "second": {
+      "hash": "88049a7997c72ce959810b059515e4abb4a53937dbd326f275035a722a094496",
+      "note": "the wording is unclear",
+      "reasons": [
+        "unclear"
+      ],
+      "source": "## What comes second? {type=single}\n\n- [x] The right one\n- [ ] A wrong one\n- [ ] Another wrong one\n\n::: explanation\nThe first choice is the right one here.\n:::\n",
+      "verdict": "fix"
+    },
+    "third": {
+      "hash": "f9cfc836fca74364f323e1eb18123fd69f28e11561643e1647b9646db30ce253",
+      "note": "",
+      "reasons": [],
+      "verdict": "keep"
+    }
+  },
+  "quizHash": "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce",
+  "quizId": "tidy",
+  "reviewedAt": "2026-11-17T09:30:00+00:00",
+  "version": 2
+}

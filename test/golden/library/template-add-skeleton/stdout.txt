@@ -1,0 +1,2 @@
+template added study-shape (a skeleton), from study-fixture version 89a5
+next: quiz new study-shape PATH

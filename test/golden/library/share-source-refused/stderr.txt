@@ -1,0 +1,2 @@
+error: edit/study-fixture already exists and is not empty
+    fix: choose another -o, or remove edit/study-fixture

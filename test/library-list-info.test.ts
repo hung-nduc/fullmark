@@ -85,7 +85,11 @@ describe("library list", () => {
     const r = await t.run((io) => runLibraryList({ json: true, plain: true }, io));
     expect(r.exit).toBe(0);
     const body = JSON.parse(r.out[0] as string);
-    expect(body.quizzes.map((q: { name: string }) => q.name)).toEqual(["limits-and-continuity", "study-fixture"]);
+    expect(body.quizzes.map((q: { name: string }) => q.name)).toEqual([
+      "limits-and-continuity",
+      "study-fixture",
+      "tidy",
+    ]);
     const fields = [
       "name",
       "id",

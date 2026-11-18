@@ -1,0 +1,2 @@
+error: the name study is taken
+    fix: quiz library rename tidy study-2

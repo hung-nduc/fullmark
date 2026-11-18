@@ -1,8 +1,11 @@
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { type LibraryGradeIo, type LibraryGradeOptions, runLibraryGrade } from "../../src/cli/library-grade";
+import { runLibraryRename } from "../../src/cli/library-rename";
 import { loadQuiz } from "../../src/cli/load";
+import type { T } from "./library-grade";
 import { newLibrary, quizText } from "./library-register";
+import { FIX, finish, KEEP, webReview } from "./library-review";
 
 /**
  * The history helper (STEP4.md, G6): a library built through the real commands, in-process, with a fixed clock and the
@@ -14,6 +17,8 @@ import { newLibrary, quizText } from "./library-register";
  * changed. 4e files the reports through the real `library grade` (no longer by hand): the first attempt is graded by an
  * AI with `--grades` and regraded by a person (two grades files kept, the newest counting), and the fourth is graded by
  * a person; both were taken on versions that are no longer current, and are graded against the version they name.
+ * 4f adds a third quiz, registered as `tidy-notes` and renamed `tidy` through `library rename`, and reviewed through
+ * `library review` (a fix on one question), so the history holds a rename and a review of its own.
  */
 const stats = resolve(import.meta.dirname, "..", "fixtures", "stats");
 const read = (path: string): string => readFileSync(join(stats, path), "utf8");
@@ -80,6 +85,27 @@ async function build() {
     ]),
   });
   await t.register(["notes/limits.md"], {}, at("2026-11-12T09:00:00+00:00"));
+  // a third quiz: registered under its title's name, renamed, and reviewed through the real commands
+  t.write({
+    "notes/tidy.md": quizText("tidy", "Tidy notes", [
+      ["first", "What comes first?"],
+      ["second", "What comes second?"],
+      ["third", "What comes third?"],
+    ]),
+  });
+  await t.register(["notes/tidy.md"], {}, at("2026-11-13T09:00:00+00:00"));
+  const renamer = t.at();
+  const renamed = await runLibraryRename("tidy-notes", "tidy", { json: false, plain: true }, renamer.io);
+  if (renamed !== 0) throw new Error(`library rename failed: ${renamer.err.join(" | ")}`);
+  // the form is driven as a person would: one question marked fix, the others kept (the review is dated 17 Nov)
+  const form = webReview(t as T, "tidy", {}, { now: () => new Date(2026, 10, 17, 9, 30, 0) });
+  const reply = await finish(await form.url(), {
+    first: KEEP,
+    second: { ...FIX, note: "the wording is unclear" },
+    third: KEEP,
+  });
+  if (reply.status !== 200 || (await form.done) !== 0)
+    throw new Error(`library review failed: ${form.err.join(" | ")}`);
   const hashes = [v1, v2, v3].map((text, i) => {
     t.write({ [`.scratch/${i}.md`]: text });
     return loadQuiz(join(t.dir, `.scratch/${i}.md`)).hash as string;

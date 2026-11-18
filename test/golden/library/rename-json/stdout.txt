@@ -1,0 +1,1 @@
+{"status":"renamed","old":"limits-and-continuity","new":"limits","id":"calculus-limits","committed":"7e2b609"}
