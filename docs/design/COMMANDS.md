@@ -91,7 +91,7 @@ A path is printed relative to the working directory when it lies under it, else 
 | `brief.yaml` plus `content/` | brief | `brief` |
 | build file (`build.toml`) | what `build --build-file` builds: files, and per entry the `build` options | the user |
 | `fullmark.toml` | check config: default profile, custom profiles, rule levels and options, custom checks | the user (agents never edit it to make `check` pass) |
-| `config.toml` | machine config: library path, shelf folders (by shelf name; `public` in v1), personal profiles, default `fonts`, the terminal style (`[terminal] style`), each brief purpose's defaults (`[brief.purpose.<purpose>]`) | `library init`, `library publish`, the user |
+| `config.toml` | machine config: library path, shelf folders (by shelf name; `public` in v1), personal profiles, default `fonts`, the terminal style (`[terminal] style`), the `git` to run when it is not on the path, each brief purpose's defaults (`[brief.purpose.<purpose>]`) | `library init`, `library publish`, the user |
 | `check.json` | the resolved rules a library version was registered with | `library register` |
 | `library.toml` | the library's index of quizzes | `library` commands |
 | `fullmark-shelf.json` | shelf manifest | `library publish` |
@@ -621,6 +621,35 @@ In a terminal, the Markdown is rendered: headings, lists, tables, wrapping to th
 
 All under `quiz library`. A library is one folder under git that holds each quiz's versions (sources, `materials` sheets and assets, never HTML), results and reports. fullmark commits after every command that changes it and **never pushes**. Every library command exits `2` when no library is set (neither `FULLMARK_LIBRARY` nor `library` in `config.toml`), with "no library: run `quiz library init PATH`".
 
+### The library folder
+
+```text
+library.toml                        the index (below)
+.gitignore                          .fullmark.lock, progress/, *.tmp
+quizzes/<id>/
+  versions/<hash>/                  one per version, never changed once written
+    <file>.md                       the source, under its original file name
+    assets/, materials/, …          every file the quiz uses, at its relative path
+    brief.yaml                      when one sat next to the source
+    check.json                      the resolved rules it was registered with
+  results/<YYYYMMDD-HHMMSS>.json    one per attempt (results-v2; the attempt names its version)
+  grades/<stamp>-<YYYYMMDD-HHMMSS>-grades.json   every grades file kept; the newest per attempt counts
+  reports/<stamp>-report.json, .md  the report of the newest grades for that attempt
+  review.json                       the learner's review (review-v2), one per quiz across its versions
+  progress/<version>.json           an attempt in progress (autosave), git-ignored
+```
+
+- **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
+- **`library.toml`** holds `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added }]` in order, and `shelves = []` (entries from step 5). No scores or counts: the results files are the truth, and `list` reads them. It is written atomically and sorted by name, so its diff reads well. A 0.x library is refused like any other foreign folder.
+
+### Git
+
+- **The repository is the library's root**, always (`git -C ROOT`), ROOT coming from `FULLMARK_LIBRARY` or `library` in `config.toml`. The library is its own repository: `init` runs `git init` there (unless `--no-git`), writes `.gitignore` and makes the first commit, `fullmark: init`. An existing repository is adopted only when the folder is its root; a folder inside another repository gets its own, with a note that the outer one should ignore it.
+- **Which `git`:** the one on the path, or `git = "PATH"` in `config.toml` when set (Git installed off the path, as GitHub Desktop does on Windows). Never in `library.toml`, which travels with the repository to machines where the path differs. fullmark runs it through one small runner (`src/library/git.ts`), passing names after `--`. With no `git` found, `init` makes the folder without a repository, as `--no-git` does, with a warning; `rm` then needs `--force`.
+- **One commit per changing command**, message `fullmark: <command> <name>` (`fullmark: take signals`; several names for a batch), holding **only the paths it wrote** (`git commit -- PATHS`), so the user's own staged or unstaged changes in the library are never swept in. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes.
+- **Identity:** the user's own git identity. fullmark never asks for one and never writes git's config. When git has none for the library, `init` prints a note with the commands to set one (`git -C ROOT config user.name "…"` and `user.email`), each commit passes `fullmark <fullmark@localhost>` for that commit only (`-c user.name=… -c user.email=…`), and `status` shows which identity commits use, as a note.
+- **Nothing more:** fullmark never pushes, pulls, fetches, branches, rebases or rewrites history. Remotes, sync between machines and their conflicts are the user's own git. `status` reads the repository and changes nothing.
+
 ### quiz library init
 
 **same**.
@@ -669,9 +698,9 @@ Checks the quiz, then copies its source, assets and brief into the library as a 
 | Option | Meaning |
 |---|---|
 | `-n`, `--name NAME` | Name for a new quiz. Default: the slugged title |
-| `--update NAME` | Add a version to this existing quiz. Warns when an attempt is in progress on the old version (an autosave from `take`); the attempt stays tied to the version it started on, and the exit is still `0` |
+| `--update NAME` | Add a version to this existing quiz. Warns when an attempt is in progress on the old version (an autosave from `take`); the attempt stays tied to the version it started on, the next `take` resumes it there, and the exit is still `0` |
 | `--build-file BUILD` | Register the files a build file lists (`quiz build`), so a folder of quizzes registers without a long command. Only `files`, `profile`, `config` and `strict` are read, top level and per entry; the delivery keys (`out`, `lang`, `print` and the rest) are for `build` and are ignored here. A file listed in several entries (a quiz built both as a page and as a printed paper) is registered once; entries that give it different `profile`, `config` or `strict` exit 2. `FILE`s given as well register only those of its entries |
-| `--profile`, `--config`, `--strict`, `--review` | As for `check`. The config is looked up from `FILE`, then from the library root |
+| `--profile`, `--config`, `--strict`, `--review` | As for `check`. The config is looked up from `FILE`, then from the library root. With `--update`, the quiz's stored `review.json` is applied as `check --review` applies one: `review.fix` and `review.drop` refuse the version (exit `1`) until every flagged question has changed or gone, and `review.unconfirmed` warns until `library review NAME --since` judges it again. `--review REVIEW` replaces the stored review for that run |
 | `--json` | `{"status": "registered" \| "unchanged" \| "problems", "registered": [{"file", "name", "version"}], "unchanged": [{"file", "name", "version"}], "refused": [{"file", "reason", "suggest"}], "committed"}`. One file gives the same object as several, with one entry |
 
 Exit: `0` registered or unchanged, `1` check errors, name taken (the output suggests a free name), id taken or mismatched, or a survey refused, `2` no library.
@@ -716,6 +745,7 @@ With `--json`: `{"quizzes": [ROW, ...]}`, sorted by name with the fixed comparis
 | `taken` | string \| null | ISO date of the last attempt; `null` if never taken |
 | `changed` | boolean | the original source still exists and differs from the current version |
 | `ungraded` | boolean | an attempt has essays or code not yet graded |
+| `flagged` | number | `fix` and `drop` verdicts in the quiz's `review.json` still open on the current version (`review.fix` and `review.drop` findings); `0` without a review |
 
 Exit: `0`, `2` no library.
 
@@ -737,6 +767,7 @@ Everything about one quiz in one place, so you need not run `inspect`, `list` an
 | Versions | hash, date added, and questions added, removed or changed against the one before |
 | Shelves | the quiz's shelf entries |
 | Attempts | count, first and last date, last and best score, the three weakest tags, attempts with essays or code still ungraded |
+| Review | the date of the last review, the counts of keep, fix and drop, and the flags still open (`flagged`) |
 | Path | the quiz's folder in the library |
 
 | Option | Meaning |
@@ -757,7 +788,7 @@ quiz library take NAME [--section S] [--missed] [--focus] [--no-open]
 
 Builds the current version with the installed fullmark, serves it, files the result next to that version and commits. Progress is autosaved, so closing the tab or the server resumes the attempt.
 
-- **Autosave and resume.** `take` serves with autosave (as `serve --autosave`) to `quizzes/<id>/progress/<version>.json`, which git ignores. The next `take` of the same version without `--section` or `--missed` resumes it, as the page's **Continue** does; the file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone.
+- **Autosave and resume.** `take` serves with autosave (as `serve --autosave`) to `quizzes/<id>/progress/<version>.json`, which git ignores. The next `take` without `--section` or `--missed` resumes a saved attempt, as the page's **Continue** does, on whatever version it was started, even one that is no longer current (the oldest first, when there are several), and says so: "resuming your attempt of 18 Nov 14:02 on version 41c0; the quiz has been updated since". It is filed against that version, and the next `take` uses the current one. The file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone.
 - **The lock.** `take` takes the library's lock only to file the result and commit, never while serving, so other commands work while a quiz is open. The progress file holds the serving process's id and URL: a second `take` of that quiz while that process is alive exits `2` and prints the URL to open; a progress file whose process is gone is resumed.
 - **`--missed` across versions.** Questions are matched by `id` across versions. A question missed on an old version and still in the current one is served as it is now; when its hash differs from the one missed, the page marks it "changed since you missed it" (one label in both catalogs, next to the question's number). A missed question no longer in the current version is left out and counted (`"gone"` in `--json`). The plan's `source` is `"missed"`.
 
@@ -788,6 +819,26 @@ Opens a past attempt as a page that is already submitted, showing your answers, 
 | `--json` | `{"status", "page", "attempt", "version", "graded"}` |
 
 Exit: `0` built, `2` unknown quiz or attempt.
+
+### quiz library review
+
+**new**.
+
+```text
+quiz library review NAME [--since] [--timeout SECONDS] [--port N] [--no-open] [--json]
+```
+
+`quiz review` with the lookup done, as `library replay` is `quiz replay`: the review form on the quiz's current version. **Finish** writes `quizzes/<id>/review.json`, under the lock, and commits (`fullmark: review NAME`). There is one review per quiz, not per version: `review-v2` keys each verdict by question id with the question's hash, and merges, so one file follows the quiz across versions, and git keeps its history. `--since` asks only about the questions new or changed since the stored review, as `quiz review --since` does; with no stored review it exits 2, as there.
+
+**An edit is the same quiz, a new version.** The quiz id and the question ids stay, so attempts, `--missed` and `stats` carry over: a fixed question has a new hash and `--missed` marks it changed; a dropped question is gone (`gone` in `take --json`). Edit the original source, or a copy from `share --source`, then `register FILE --update NAME`, which applies the stored review (`register`, `--review`). A new quiz, with a new id and no history, is only made on purpose, with `quiz new --from`.
+
+| Option | Meaning |
+|---|---|
+| `--since` | Only questions new or changed since the stored review |
+| `--timeout`, `--port`, `--no-open` | As for `quiz review` (timeout `1800`) |
+| `--json` | The `listening` line, then `{"status": "written", "review", "keep", "fix", "drop", "committed"}`, or `{"status": "unchanged", "review"}` with `--since` and nothing to ask |
+
+Exit: `0` written or nothing to ask, `2` unknown quiz, no library, timeout, Ctrl+C, a survey, or `--since` with no stored review.
 
 ### quiz library share
 

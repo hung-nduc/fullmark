@@ -31,3 +31,54 @@ Every gap of step 4 the owner has decided, in number order, as it stood when dec
 - **One table helper draws both** (`src/cli/table.ts`), no new dependency; each style has goldens for `list`, `status` and `stats`. Step 4 builds `simple`, and `boxed` in 4f with the other polish, or later if the owner prefers.
 
 **Decided by the owner on 2026-11-18, as recommended.** The boards show `simple` with B's colours (LibraryStyleMiddle) and `boxed` as A (LibraryStyleBordered); the other CLI boards draw the layout without B's shading and tags, which the implementation adds.
+
+**G1. The library's folder layout.** COMMANDS.md names `library.toml`, `check.json` and `quizzes/<id>/reports/`, but no layout. **Recommendation:** 0.x's layout, made simpler by one folder per version:
+
+```text
+library.toml                        index (G2)
+.gitignore                          .fullmark.lock, progress files, *.tmp
+quizzes/<id>/
+  versions/<hash>/                  one per version, never changed once written
+    <file>.md                       the source, under its original file name
+    assets/, materials/, …          every file the quiz uses, at its relative path
+    brief.yaml                      when one sat next to the source
+    check.json                      the resolved rules it was registered with
+  results/<YYYYMMDD-HHMMSS>.json    one per attempt (results-v2; the attempt names its version)
+  grades/<stamp>-<YYYYMMDD-HHMMSS>-grades.json   every grades file kept; the newest per attempt counts
+  reports/<stamp>-report.json, .md  the report of the newest grades for that attempt
+  progress/<version>.json           an attempt in progress (autosave), git-ignored
+```
+
+Folders are named by the quiz's `id`, never its name (so `rename` moves nothing). Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
+
+*Owner's question (2026-11-18): does the library support `review`, where are its verdicts saved, and is an edited quiz the same quiz with a new version or a new quiz?* See **G16**; if G16 is decided as recommended, the layout adds `quizzes/<id>/review.json`.
+
+**Decided by the owner on 2026-11-18, as recommended** (G1 with `review.json` added, from G16; G3 with the additions on the owner's questions). Written into COMMANDS.md ("The library folder", "Git", `quiz library review`, `take`, `register`, `list`, `info`), TECHNICAL_DESIGN.md and USER_DESIGN.md, 4.4.
+
+**G2. What `library.toml` holds.** **Recommendation:** `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added }]` in order, `shelves = []` (step 5). No scores or counts: results files are the truth, and `list` reads them (0.x did, in milliseconds at this scale). Written atomically, sorted by name, so its diff reads well.
+
+**Decided by the owner on 2026-11-18, as recommended** (G1 with `review.json` added, from G16; G3 with the additions on the owner's questions). Written into COMMANDS.md ("The library folder", "Git", `quiz library review`, `take`, `register`, `list`, `info`), TECHNICAL_DESIGN.md and USER_DESIGN.md, 4.4.
+
+**G3. Git.** **Recommendation:** fullmark runs the `git` on the path through one small runner (`src/library/git.ts`), passing names after `--`; each changing command makes **one** commit, message `fullmark: <command> <name>` (e.g. `fullmark: take signals`), with the user's own git identity, falling back to `fullmark <fullmark@localhost>` when none is set. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes. No `git` on the path: `init` makes the folder without a repository, as `--no-git` does, with a warning; `rm` then needs `--force`, as designed.
+
+*Owner's questions (2026-11-18): where does git run from, and is that set per library (`library.toml`) or per machine (`config.toml`)? Is the git identity part of setup, a warning or `status`? Does fullmark run `git init`, or does the user do their own git?* **Recommendation, added:**
+- **Which repository:** always the library's root (`git -C ROOT`), where ROOT comes from `FULLMARK_LIBRARY` or `library` in `config.toml`. The library is its own repository: `init` runs `git init` there (unless `--no-git`), writes `.gitignore` and makes the first commit, `fullmark: init`. An existing repository is adopted only when the folder is its root; a folder inside another repository gets its own, with a note that the outer one should ignore it.
+- **Which `git`:** the one on the path, or `git = "PATH"` in `config.toml` when set (Git installed off the path, as GitHub Desktop does on Windows). Never in `library.toml`: that file travels with the repository to other machines, where the path differs.
+- **Identity:** not asked for, never written into git's config. `init` and `status` say which identity commits use; when git has none for the library, `init` prints a note with the command to set one (`git -C ROOT config user.name "…"` and `user.email`), and commits pass `fullmark <fullmark@localhost>` for that commit only (`-c user.name=… -c user.email=…`). `status` shows it as a note, never a problem.
+- **What fullmark does with git, and nothing more:** `init`, and one commit per changing command holding **only the paths it wrote** (`git commit -- PATHS`), so the user's own staged or unstaged changes in the library are never swept in. It never pushes, pulls, fetches, branches, rebases or rewrites history; remotes, sync between machines and conflicts are the user's own git. `status` reads the repository (uncommitted changes, remote) and changes nothing.
+
+**Decided by the owner on 2026-11-18, as recommended** (G1 with `review.json` added, from G16; G3 with the additions on the owner's questions). Written into COMMANDS.md ("The library folder", "Git", `quiz library review`, `take`, `register`, `list`, `info`), TECHNICAL_DESIGN.md and USER_DESIGN.md, 4.4.
+
+**G16. Reviews in the library.** The design has `quiz review` on a file and `register --review REVIEW`, but no review of a quiz already in the library, and no place for its verdicts. **Recommendation:**
+- **`quiz library review NAME [--since] [--timeout SECONDS] [--port N] [--no-open] [--json]`**: `quiz review` with the lookup done, as `library replay` is `quiz replay`. It serves the review form on the current version; `--since` asks only what is new or changed since the stored review. Finish writes, under the lock, and commits (`fullmark: review NAME`).
+- **Saved at `quizzes/<id>/review.json`**: one review per quiz, not per version. `review-v2` already keys each verdict by question id with the question's hash, and merges, so one file follows the quiz across versions; git keeps its history.
+- **An edit is the same quiz, a new version.** The id stays (G12) and the question ids stay, so attempts, `--missed` and `stats` carry over: a fixed question has a new hash, and `--missed` marks it changed (G5); a dropped question is gone (counted in `gone`). The edit is made on the original source, or on a copy from `share --source`, and comes back with `register FILE --update NAME`. A new quiz (new id, no history) is only made on purpose, with `quiz new --from`.
+- **`register --update` applies the stored review** as `check --review` does: `review.fix` and `review.drop` refuse the version until every flagged question has changed or gone (exit `1`), and `review.unconfirmed` warns until a `library review NAME --since` judges it again. `--review REVIEW` given explicitly replaces the stored one for that run.
+- **`list` and `info`** gain a field `flagged`: the count of `fix` and `drop` verdicts still open on the current version (added, never renamed, as `list`'s fields promise).
+- **In slice 4f**, with `share`.
+
+**Decided by the owner on 2026-11-18, as recommended** (G1 with `review.json` added, from G16; G3 with the additions on the owner's questions). Written into COMMANDS.md ("The library folder", "Git", `quiz library review`, `take`, `register`, `list`, `info`), TECHNICAL_DESIGN.md and USER_DESIGN.md, 4.4.
+
+**G17. Resuming an attempt after `register --update`.** COMMANDS.md says an attempt saved on the old version "stays tied to the version it started on", and G4 resumes only "the same version": so after an update, `take` builds the new current version and the saved attempt can never be resumed. **Recommendation:** a plain `take` (no `--section`, `--missed`) resumes a saved attempt on any version, oldest saved first, saying so ("resuming your attempt of 18 Nov 14:02 on version 41c0; the quiz has been updated since"); it is filed against that version; the next `take` uses the current one. `register --update`'s warning says this (drawn on LibrarySetup).
+
+**Decided by the owner on 2026-11-18, as recommended** (G1 with `review.json` added, from G16; G3 with the additions on the owner's questions). Written into COMMANDS.md ("The library folder", "Git", `quiz library review`, `take`, `register`, `list`, `info`), TECHNICAL_DESIGN.md and USER_DESIGN.md, 4.4.
