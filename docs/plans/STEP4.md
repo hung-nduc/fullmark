@@ -22,12 +22,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 | 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
-| 4f | brief approved (2026-11-19), G34 to G37 decided; being built | this file |
+| 4f | built and reviewed (2026-11-19); G38 raised; step 4 waits for the owner's acceptance | `6e4f6ca`, `49e6611`, `2ff867f`, `3cb7793`, `8dc6236`, `8981d40`, `1c86cd5` |
 
 ### Next
 
-1. One implementing agent (Sonnet) builds **4f** (the last slice); the planner reviews it and the step.
-2. The owner tries the samples' library (`take`, `grade --web`, `replay`) and accepts step 4.
+1. The owner decides **G38**, looks at the `boxed` style (drawn without the board: see 4f's review), and tries the samples' library: `npm run samples`, then the `library take`, `take --missed`, `grade --web`, `replay` and `review` lines of `samples/index.html`.
+2. The owner accepts step 4; G38 is built first in step 5.
 
 ## Goal
 
@@ -51,7 +51,9 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G37 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G38.
+G1 to G37 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised in 4f's review, open:
+
+**G38. `share --source` of a quiz registered with `--profile`.** G35 writes no `fullmark.toml` when the version's profile is a built-in one with no change. But a quiz registered with `register --profile exam`, whose own front matter names no profile, then comes out as a folder that `quiz check` checks under `default`, not `exam`: G35's own aim, "`quiz check` on the folder finds what the library found", fails. Tried by hand with `examples/calculus` (clean under both, so the findings agree only by chance). **Recommendation:** no `fullmark.toml` only when the folder would get the same profile anyway (the quiz's own `profile:`, else `default`); otherwise one with `profile = NAME`, and `[profiles.NAME]` only when the rules differ from the built-in's. A test registers under `exam` a quiz with an `exam`-only finding and checks the shared folder.
 
 ## Slices
 
@@ -434,3 +436,14 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 `npm run check` passes in Chromium and Firefox; the step's "Done when" (Goal) holds, each part shown by a test named in the report; `npm run samples` builds the samples' library, and the owner tries `library take`, `library grade --web` and `library replay` from it.
 
+### Review (2026-11-19)
+
+**Built** in `6e4f6ca` (G30: an `EPIPE` on stdout ends quietly, exit 0; G31: the template's `next:` line; G32: the server's `answer` hook, so the form learns whether the grades were filed, with the unfiled card in `src/core/i18n/grade.ts`; G33: `biome.json` leaves out `.claude`), `49e6611` and `2ff867f` (`library review`: `src/cli/library-review.ts`, `LibraryReviewHooks` in `runReview`, the unfiled card in the review form, `CheckOptions.fixed` to check under a stored `check.json`), `3cb7793` (`library share`, `library template add`: `src/cli/library-share.ts`, `library-template.ts`, `src/library/profile-toml.ts` for G35), `8dc6236` (`library rename`, `library rm`; the history's third quiz `tidy`, registered as `tidy-notes`, renamed and reviewed by the real commands; the golden runner's `git.txt`, which makes a case's library a repository with one commit, so the hashes of `rename` and `rm` are reproducible), `8981d40` (the `boxed` style in `src/cli/table.ts` and `look.ts`; `check`, `inspect`, both `stats` and `library info` drawn through it) and `1c86cd5` (acceptance: `test/library-contract.test.ts`, `test/library-lock.test.ts`, the command-graph cases; the samples' library).
+
+**Checked by the planner** (the last slice: everything): `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3644 in 150 files, Playwright 843 passed (425 Chromium, 416 Firefox, and each one's budget test) and 527 skipped (the screens specs), tsc, Biome (with `.claude/` left out) and knip clean. `npm run samples` builds `samples/library/` (the history library as a repository) and `samples/config.toml`. Goldens: 35 cases added (8 `share`, 8 `template-add`, 7 `rename`, 8 `rm`, 4 `review`), each an Output block of COMMANDS.md or a refusal; 6 changed: `grade-template-json` by G31's line, and `list`, `list-json`, `list-flagged`, `list-flagged-json`, `info-unknown-far` by the history's third quiz. None of `quiz review`, `quiz grade --web`, `check`, `inspect` or `stats` changed: the `boxed` work moved code, not output. **By hand**, on a copy of the history library under real git: `share` wrote the page (259 KB) and `--source` the folder; `--source` again was refused (G36); `rename study-fixture study` committed, `rename study tidy` refused with `tidy-2`; `rm study --yes` deleted and printed `undo: git -C … revert 85873f3`, and that revert brought the quiz back with `status` healthy; with `style = "boxed"` on a terminal, `list` drew a box table and `status` its facts in a panel, and at 60 columns `list` fell back to `simple`; G38 found as above.
+
+**The step's "Done when", each part shown:** the history-based tests (`test/golden/library/list*`, `info*`, `stats*`, `replay*`, `test/golden-fn/library-missed-study*.txt`; the last test of `test/library-contract.test.ts` checks they are there and that the history has a renamed and a reviewed quiz); a `--json` contract test for every library command (`test/library-contract.test.ts` reads the `library` group from `main.ts` and fails for a command with none; `take` through `e2e/take.spec.ts`; `path`, which has no `--json`, plainly); the lock and one commit for every changing command (`test/library-lock.test.ts`: `init`, `register`, `take`, `grade`, `review`, `rename`, `rm` each wait, fail busy changing nothing, then commit once); the command graph (`test/cli-graph.test.ts`); the samples (built; the owner has not tried them yet).
+
+**Done differently, accepted:** a third quiz in the history rather than renaming one (renaming would have moved a dozen goldens for nothing); the goldens of `share` and `template add` in commit 4, and commits `2ff867f` and `3cb7793` not green on their own (their goldens need the third quiz); `share` takes `--fonts` (a common option) and does not repeat the source's own check warnings; `--json`'s `source` is a boolean; `template add`'s default name is the quiz's name; `rename` to its own name is refused, exit 1; `rm` declined exits 2, as `template rm`; `rm`'s order (aside, index, removed, commit) with a killed run's `.ID.PID.deleting` cleared by the next `rm`; "judged before" counts verdicts whose hash still matches; one function key per language for G32's words; `ProfileChoice.from` gains `"check.json"`; the samples gain a `library review` line too. **To look at:** the agent could not see the LibraryStyleBordered board and drew `boxed` with standard box characters, each header cell shaded, the facts as an untitled panel; the owner compares it with the board.
+
+**Gaps:** G38, above, waits for the owner.
