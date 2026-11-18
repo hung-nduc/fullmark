@@ -651,7 +651,7 @@ quizzes/<id>/
 ```
 
 - **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
-- **`library.toml`** holds `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added }]` in order, and `shelves = []` (entries from step 5). No scores or counts: the results files are the truth, and `list` reads them. It is written atomically and sorted by name, so its diff reads well. A 0.x library is refused like any other foreign folder.
+- **`library.toml`** holds `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added, file }]` in order (`file`: the source's name in that version's folder, which may differ between versions; every command reads a version's source by it), and `shelves = []` (entries from step 5). No scores or counts: the results files are the truth, and `list` reads them. It is written atomically and sorted by name, so its diff reads well. A 0.x library is refused like any other foreign folder.
 
 ### Git
 
