@@ -1066,7 +1066,7 @@ Writes the clean offline page to share, or with `--source` the editable folder (
 
 - **The page** is `DIR/NAME.html`, byte-identical to `quiz build` of the same source under the same profile; an existing one is replaced, as `build` replaces its output.
 - **The folder** is `DIR/NAME/`. It is refused (exit 2) when it exists and is not empty, with the fix "choose another -o, or remove DIR/NAME", so an edited copy is never overwritten.
-- **Its `fullmark.toml`.** None when the version's profile (`check.json`) is a built-in one with no change. Otherwise `profile = NAME` and `[profiles.NAME]`, with `extends` the built-in profile its chain starts from and each rule whose level or options differ from that built-in's, sorted by id, so `quiz check` on the folder finds what the library found.
+- **Its `fullmark.toml`.** None when the folder would be checked under the same rules anyway: the version's profile (`check.json`) is the one the quiz gets by itself (its own `profile:`, else `default`) and is a built-in one with no change. Otherwise `profile = NAME`, and `[profiles.NAME]` only when the rules differ from the built-in's: `extends` the built-in profile its chain starts from and each rule whose level or options differ from that built-in's, sorted by id. So `quiz check` on the folder finds what the library found, for a quiz registered with `--profile` too.
 
 **Output.**
 

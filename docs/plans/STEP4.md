@@ -22,12 +22,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 | 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
-| 4f | built and reviewed (2026-11-19); G38 raised; step 4 waits for the owner's acceptance | `6e4f6ca`, `49e6611`, `2ff867f`, `3cb7793`, `8dc6236`, `8981d40`, `1c86cd5` |
+| 4f | built and reviewed (2026-11-19); G38 decided (2026-11-19), built first in step 5; step 4 waits for the owner's acceptance | `6e4f6ca`, `49e6611`, `2ff867f`, `3cb7793`, `8dc6236`, `8981d40`, `1c86cd5` |
 
 ### Next
 
-1. The owner decides **G38**, looks at the `boxed` style (drawn without the board: see 4f's review), and tries the samples' library: `npm run samples`, then the `library take`, `take --missed`, `grade --web`, `replay` and `review` lines of `samples/index.html`.
-2. The owner accepts step 4; G38 is built first in step 5.
+1. The owner looks at the `boxed` style (drawn without the board: see 4f's review), and tries the samples' library: `npm run samples`, then the `library take`, `take --missed`, `grade --web`, `replay` and `review` lines of `samples/index.html`.
+2. The owner accepts step 4; step 5's plan starts with G38 (step 4's).
 
 ## Goal
 
@@ -51,9 +51,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G37 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). Raised in 4f's review, open:
-
-**G38. `share --source` of a quiz registered with `--profile`.** G35 writes no `fullmark.toml` when the version's profile is a built-in one with no change. But a quiz registered with `register --profile exam`, whose own front matter names no profile, then comes out as a folder that `quiz check` checks under `default`, not `exam`: G35's own aim, "`quiz check` on the folder finds what the library found", fails. Tried by hand with `examples/calculus` (clean under both, so the findings agree only by chance). **Recommendation:** no `fullmark.toml` only when the folder would get the same profile anyway (the quiz's own `profile:`, else `default`); otherwise one with `profile = NAME`, and `[profiles.NAME]` only when the rules differ from the built-in's. A test registers under `exam` a quiz with an `exam`-only finding and checks the shared folder.
+G1 to G38 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G39.
 
 ## Slices
 
@@ -446,4 +444,4 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 **Done differently, accepted:** a third quiz in the history rather than renaming one (renaming would have moved a dozen goldens for nothing); the goldens of `share` and `template add` in commit 4, and commits `2ff867f` and `3cb7793` not green on their own (their goldens need the third quiz); `share` takes `--fonts` (a common option) and does not repeat the source's own check warnings; `--json`'s `source` is a boolean; `template add`'s default name is the quiz's name; `rename` to its own name is refused, exit 1; `rm` declined exits 2, as `template rm`; `rm`'s order (aside, index, removed, commit) with a killed run's `.ID.PID.deleting` cleared by the next `rm`; "judged before" counts verdicts whose hash still matches; one function key per language for G32's words; `ProfileChoice.from` gains `"check.json"`; the samples gain a `library review` line too. **To look at:** the agent could not see the LibraryStyleBordered board and drew `boxed` with standard box characters, each header cell shaded, the facts as an untitled panel; the owner compares it with the board.
 
-**Gaps:** G38, above, waits for the owner.
+**Gaps:** G38, decided by the owner on 2026-11-19 as recommended; built first in step 5.
