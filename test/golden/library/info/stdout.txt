@@ -9,7 +9,7 @@ Versions   89a5  10 Nov  current · 1 added, 1 removed, 1 changed
            1432  15 Oct  1 added, 1 changed
            2a73   1 Oct  first version
 Shelves    none
-Attempts   6 · 3 Oct to 16 Nov · last 15%* · best 100% · weakest numbers, writing, logic
+Attempts   7 · 3 Oct to 16 Nov · last 15%* · best 100% · weakest numbers, writing, logic
            ungraded: 20261010-100000 (2 essays)
            ungraded: 20261017-100000 (2 essays)
            ungraded: 20261116-201412 (1 essay)

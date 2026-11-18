@@ -86,7 +86,14 @@ export type PageOptions = {
    * the page; `autosave` keeps the attempt out of the browser's storage, and `saved` is the attempt the server's file
    * held (the start screen offers it as Continue). A shared page has none of this in its data.
    */
-  served?: { focus?: boolean; section?: string; autosave?: boolean; saved?: Saved };
+  served?: {
+    focus?: boolean;
+    section?: string;
+    autosave?: boolean;
+    saved?: Saved;
+    plan?: { source: "missed"; questions: string[] };
+    changed?: string[];
+  };
   /** turns a registry font file's package path into a `data:` URI; absent: read from the npm package */
   fontData?: (path: string) => string;
 };
@@ -432,6 +439,21 @@ export function buildPage(quizzes: readonly BuildQuiz[], options: PageOptions): 
     if (asked.section !== undefined) {
       data.section = asked.section;
       for (const q of data.quizzes) q.sections = q.sections.filter((s) => s.id === asked.section);
+    }
+    if (asked.plan !== undefined) {
+      // the page holds only the planned questions, in their sections, so the start screen counts them and nothing else
+      const wanted = new Set(asked.plan.questions);
+      data.plan = asked.plan;
+      for (const q of data.quizzes) {
+        q.sections = q.sections
+          .map((s) => {
+            const { pick: _pick, time: _time, ...rest } = s;
+            return { ...rest, questions: s.questions.filter((x) => wanted.has(x.id)) };
+          })
+          .filter((s) => s.questions.length > 0);
+        delete q.timeLimit;
+      }
+      if (asked.changed !== undefined && asked.changed.length > 0) data.changed = asked.changed;
     }
     if (asked.autosave === true) data.autosave = true;
     if (asked.saved !== undefined) data.saved = asked.saved;

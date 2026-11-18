@@ -1,5 +1,6 @@
 import type { ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
+import { en, vi } from "../core/i18n";
 import { AppearanceButton, AppearanceMenu, TextSize } from "./Appearance";
 import type { PageQuestion, PageQuiz, PageSection } from "./data";
 import { watchDock } from "./dock";
@@ -622,8 +623,16 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
           ) : null}
           {attempt.phase === "start" ? (
             <>
+              {store.plan !== undefined ? (
+                <p class="fm-plan" data-plan={store.plan.source}>
+                  <strong>{(page.uiLang === "vi" ? vi : en).report.source.missed}</strong>
+                  {` · ${store.plan.questions.length}`}
+                </p>
+              ) : null}
               <Facts t={t} page={page} />
-              {state.resume.value === null && store.section === undefined ? <Picker t={t} state={state} /> : null}
+              {state.resume.value === null && store.section === undefined && store.plan === undefined ? (
+                <Picker t={t} state={state} />
+              ) : null}
               <Rules t={t} state={state} autosave={store.autosave} />
               <FocusBox t={t} store={store} />
               {state.resume.value === null ? (
@@ -697,6 +706,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
                       number={number}
                       current={question.id === currentId}
                       hidden={!shown(question.id)}
+                      changed={store.changed.has(question.id)}
                     />
                   );
                 })}

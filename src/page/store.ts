@@ -141,6 +141,9 @@ export type Store = {
   autosave: boolean;
   /** `serve --section`: the one section the page offers (its id) */
   section: string | undefined;
+  /** `library take --missed`: Start makes this plan; the questions whose text changed since they were missed */
+  plan: { source: "missed"; questions: string[] } | undefined;
+  changed: ReadonlySet<string>;
   screen: Screen;
   look: Look;
   /** `Map<QuizId, Attempt>` (TECHNICAL_DESIGN.md, seam 2), with the rest of each quiz's state beside it */
@@ -598,6 +601,8 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
     served: data.served === true,
     autosave: data.autosave === true,
     section: data.section,
+    plan: data.plan,
+    changed: new Set(data.changed ?? []),
     screen,
     quizzes,
     dispatch(quizId, action) {
@@ -628,13 +633,15 @@ export function createStore(data: PageData, deps: Deps = {}): Store {
       const part = o.part === undefined ? state.part.value : o.part;
       const seed = o.seed ?? drawSeed(bytes);
       const plan: Plan =
-        part === null
-          ? planFor(key.quiz, {
-              source: key.quiz.sections.some((s) => s.pick !== null) ? "bank" : "full",
-              seed,
-              quizHash: state.page.hash,
-            })
-          : planFor(key.quiz, { source: "section", section: part, seed, quizHash: state.page.hash });
+        data.plan !== undefined
+          ? planFor(key.quiz, { source: "missed", questions: data.plan.questions, seed, quizHash: state.page.hash })
+          : part === null
+            ? planFor(key.quiz, {
+                source: key.quiz.sections.some((s) => s.pick !== null) ? "bank" : "full",
+                seed,
+                quizHash: state.page.hash,
+              })
+            : planFor(key.quiz, { source: "section", section: part, seed, quizHash: state.page.hash });
       state.startedAt = at;
       store.dispatch(quizId, { type: "start", at: localIso(new Date(at)), plan });
       beginRun(state, at, at);

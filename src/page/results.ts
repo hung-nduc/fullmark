@@ -4,7 +4,7 @@ import type { PageQuiz } from "./data";
 
 /** The time limit this attempt runs under: a retry has none (TECHNICAL_DESIGN.md, section 8, "Retry missed"). */
 export const limitOf = (page: Pick<PageQuiz, "timeLimit">, attempt: Pick<Attempt, "plan">): number | undefined =>
-  attempt.plan.source === "retry" ? undefined : page.timeLimit;
+  attempt.plan.source === "retry" || attempt.plan.source === "missed" ? undefined : page.timeLimit;
 
 /** A question that counts towards the score: a graded one, or one waiting for a grader. */
 const scored = (q: GradedQuestion): boolean => q.points > 0;

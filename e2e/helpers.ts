@@ -161,6 +161,36 @@ export function replayOf(extra: string[], name: string): string {
   return `file:///${join(dir, `${name}-replay.html`).replaceAll("\\", "/")}`;
 }
 
+/**
+ * A copy of the history library (`test/fixtures/library-history/lib`, STEP4.md, G6) in a temporary folder, as a
+ * repository of its own, and the environment that points `quiz library` at it with the identity and dates fixed.
+ */
+export function historyLibrary(): { dir: string; lib: string; env: Record<string, string> } {
+  const dir = mkdtempSync(join(tmpdir(), "fm-library-"));
+  const lib = join(dir, "lib");
+  cpSync(join(root, "test", "fixtures", "library-history", "lib"), lib, { recursive: true });
+  const env = {
+    FULLMARK_LIBRARY: lib,
+    GIT_AUTHOR_NAME: "Minh Tran",
+    GIT_AUTHOR_EMAIL: "minh@example.com",
+    GIT_COMMITTER_NAME: "Minh Tran",
+    GIT_COMMITTER_EMAIL: "minh@example.com",
+    GIT_AUTHOR_DATE: "2026-11-18T14:22:10+00:00",
+    GIT_COMMITTER_DATE: "2026-11-18T14:22:10+00:00",
+    GIT_CONFIG_GLOBAL: join(dir, "gitconfig"),
+    GIT_CONFIG_NOSYSTEM: "1",
+    FULLMARK_TEST_NOW: "2026-11-18T14:22:10+00:00",
+    TZ: "UTC",
+  };
+  writeFileSync(join(dir, "gitconfig"), "[init]\n\tdefaultBranch = main\n");
+  const vcs = (...args: string[]) =>
+    execFileSync("git", ["-C", lib, ...args], { env: { ...process.env, ...env }, stdio: "ignore" });
+  vcs("init", "-q");
+  vcs("add", "-A");
+  vcs("commit", "-q", "-m", "fullmark: init");
+  return { dir, lib, env };
+}
+
 // -- the one-shot server ---------------------------------------------------------------------------------------------
 
 export type ServedEnd = {
@@ -192,10 +222,10 @@ export type Served = {
  * Starts `quiz serve QUIZ --json ...args` in `dir` and waits for its `listening` line. Every served command's contract
  * test uses this (STEP3.md, "Rules for every slice"): drive the page or the form, or POST, then read `end()`.
  */
-export async function serveProcess(dir: string, args: string[]): Promise<Served> {
+export async function serveProcess(dir: string, args: string[], env: Record<string, string> = {}): Promise<Served> {
   const child = spawn(process.execPath, [cli, ...args, "--json"], {
     cwd: dir,
-    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1" },
+    env: { ...process.env, FORCE_COLOR: undefined, NO_COLOR: "1", ...env },
     stdio: ["ignore", "pipe", "pipe"],
   });
   let out = "";

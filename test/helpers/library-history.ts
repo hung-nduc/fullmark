@@ -8,7 +8,9 @@ import { newLibrary, quizText } from "./library-register";
  * git test environment. One quiz, `study`, in three versions (the stats fixtures' two, then a third that changes one
  * question, removes one and adds one), and the attempts the stats fixtures hold, filed into `results/` as `take` will
  * file them: on the first version, on the second, and one on the third that leaves an essay ungraded; reports for two
- * of them. 4d and 4e extend it.
+ * of them. 4d adds a practice of two questions on the second version (one wrong and later removed, one wrong and later
+ * reworded) and leaves `even` unanswered in the last attempt, so that `--missed` has something gone and something
+ * changed; 4e extends it with grades and regrades.
  */
 const stats = resolve(import.meta.dirname, "..", "fixtures", "stats");
 const read = (path: string): string => readFileSync(join(stats, path), "utf8");
@@ -93,7 +95,7 @@ async function build() {
     expectHash(r.quizHash, hashes[version] as string);
     return stamp;
   };
-  const stamps = {
+  const stamps: Record<string, string> = {
     a1: file1("a1-v1", 0),
     a2: file1("a2-v1", 0),
     a3: file1("a3-v2", 1),
@@ -104,11 +106,31 @@ async function build() {
   file(`reports/${stamps.a1}-report.json`, read("reports/a1-v1-report.json"));
   file(`reports/${stamps.a4}-report.json`, read("reports/a4-v2-report.json"));
 
-  // an attempt on the third version, with an essay nobody has graded
+  // a practice of the two questions the retry did not cover, on the second version, both answered wrong: `odd` goes
+  // from the third version, `even` is reworded in it (4d: what `--missed` counts as gone and as changed)
+  const practice: Results = {
+    quizHash: hashes[1] as string,
+    plan: { source: "missed", questions: ["odd", "even"] },
+    state: {
+      answers: { odd: { choice: 0 }, even: { value: false } },
+      startedAt: "2026-11-05T19:00:00",
+      submittedAt: "2026-11-05T19:03:00",
+      timeUsed: 180,
+      sectionTime: {},
+      flagged: [],
+      checked: [],
+      timedOut: false,
+    } as unknown as Results["state"],
+  };
+  stamps.p1 = stampOf("2026-11-05T19:03:00");
+  file(`results/${stamps.p1}.json`, json({ format: "fullmark-results", version: 2, ...practice, phase: "submitted" }));
+
+  // an attempt on the third version, with an essay nobody has graded; `even` is left unanswered in it
   const six = JSON.parse(read("results/a4-v2.json")) as Results;
   six.quizHash = hashes[2] as string;
   six.plan.questions = six.plan.questions.filter((id) => id !== "odd");
   delete six.state.answers.odd;
+  delete six.state.answers.even;
   six.state.answers.ielts = null;
   six.state.startedAt = "2026-11-16T20:00:00";
   six.state.submittedAt = "2026-11-16T20:14:12";

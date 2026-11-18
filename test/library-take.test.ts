@@ -6,6 +6,7 @@ import type { Attempt } from "../src/core/attempt";
 import { readIndex } from "../src/library/index-file";
 import { realLockEnv } from "../src/library/lock";
 import { cleanTemps, git } from "./helpers/library";
+import { buildHistory } from "./helpers/library-history";
 import { newLibrary, quizText } from "./helpers/library-register";
 
 /**
@@ -32,6 +33,7 @@ const quizOf = (t: T, name = "signals") => indexOf(t).quizzes.find((q) => q.name
 
 const options = (extra: Partial<LibraryTakeOptions> = {}): LibraryTakeOptions => ({
   section: null,
+  missed: false,
   focus: false,
   open: false,
   timeout: null,
@@ -411,5 +413,67 @@ describe("library register beside a take", () => {
     const r = await t.register(["notes/signals.md"], { update: "signals" });
     expect(r.exit).toBe(0);
     expect(r.out.join("\n")).not.toContain("warning");
+  });
+});
+
+describe("library take --missed", () => {
+  it("serves only the missed questions of the history library, marks the changed one, and files a plan of source missed", async () => {
+    const t = (await buildHistory()) as unknown as T;
+    const run = take(t, "study-fixture", { missed: true });
+    const url = await run.url();
+    expect(run.err[0]).toBe(
+      "study-fixture · missed questions · 4 from 7 attempts · 1 changed since you missed them · 1 no longer in the quiz",
+    );
+    const data = (await dataOf(url)) as {
+      plan: { source: string; questions: string[] };
+      changed: string[];
+      quizzes: { sections: { id: string; questions: { id: string }[] }[]; timeLimit?: number }[];
+    };
+    expect(data.plan).toEqual({ source: "missed", questions: ["prime", "even", "add", "ielts"] });
+    expect(data.changed).toEqual(["even"]);
+    expect(data.quizzes[0]?.sections.map((s) => [s.id, s.questions.map((q) => q.id)])).toEqual([
+      ["part-one", ["prime", "even"]],
+      ["part-two", ["add", "ielts"]],
+    ]);
+    const hash = quizOf(t, "study-fixture").current;
+    const attempt = attemptOf(hash, {}, ["prime", "even"]);
+    attempt.plan = { source: "missed", questions: ["prime", "even", "add", "ielts"] };
+    attempt.state.answers = { prime: { choice: 1 }, even: { value: true }, add: null, ielts: null };
+    expect((await postTo(url, "submit", { quizId: "study", attempt })).status).toBe(200);
+    expect(await run.done).toBe(0);
+    const filed = JSON.parse(run.out.at(-1) ?? "");
+    expect(filed).toMatchObject({
+      status: "filed",
+      plan: { source: "missed", questions: ["prime", "even", "add", "ielts"] },
+      gone: 1,
+    });
+    expect(run.err.join("\n")).toMatch(/filed results\/\d{8}-\d{6}\.json · 2 of 4 right · /);
+    expect(names(progressDir(t, "study"))).toEqual([]);
+  });
+
+  it("with --section keeps the missed questions of that section", async () => {
+    const t = (await buildHistory()) as unknown as T;
+    const run = take(t, "study-fixture", { missed: true, section: "part-two" });
+    const url = await run.url();
+    expect(run.err[0]).toBe("study-fixture · missed questions of part-two · 2 from 7 attempts");
+    expect(((await dataOf(url)) as { plan: { questions: string[] } }).plan.questions).toEqual(["add", "ielts"]);
+    run.interrupt();
+    await run.done;
+  });
+
+  it("says nothing missed, serves nothing, and exits 0 (with --json: {status: nothing_missed})", async () => {
+    const t = await library();
+    const none = take(t, "signals", { missed: true, json: false });
+    expect(await none.done).toBe(0);
+    expect(none.out).toEqual(["nothing missed: there is no attempt yet"]);
+    // an attempt with everything right: nothing is missed
+    const hash = quizOf(t).current;
+    const run = take(t, "signals");
+    await postTo(await run.url(), "submit", { quizId: "signals", attempt: attemptOf(hash, {}, ["q1"]) });
+    expect(await run.done).toBe(0);
+    const again = take(t, "signals", { missed: true });
+    expect(await again.done).toBe(0);
+    expect(again.out).toEqual(['{"status":"nothing_missed"}']);
+    expect(again.err).toEqual(["nothing missed: every question you got wrong has been answered right since"]);
   });
 });

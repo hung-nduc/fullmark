@@ -4,13 +4,15 @@ import { random, shuffled } from "./random";
 
 export { random, shuffled } from "./random";
 
-/** What to build a plan from. `missed` and `retry` plans come from the library and the page, not from here. */
+/** What to build a plan from. The questions of a `missed` and of a `retry` plan come from the library and the page. */
 export type PlanRequest = (
   | { source: "full"; seed?: string }
   | { source: "bank"; seed?: string }
   | { source: "section"; section: string; seed?: string }
   /** the questions to retry, in the order the page showed them; the page decides which are missed, not core */
   | { source: "retry"; questions: readonly string[]; seed?: string }
+  /** the missed questions of a library quiz (`library take --missed`): the library chose them, in source order */
+  | { source: "missed"; questions: readonly string[]; seed?: string }
 ) & {
   /** the quiz hash: without a `seed`, its first 4 characters (the short version) are the seed (section 4, Seeds) */
   quizHash: string;
@@ -98,7 +100,7 @@ export function planFor(quiz: Quiz, request: PlanRequest): Plan {
   }
   const seed = request.seed ?? request.quizHash.slice(0, 4);
   let sections = quiz.sections;
-  if (request.source === "retry") sections = retrySections(quiz, request.questions);
+  if (request.source === "retry" || request.source === "missed") sections = retrySections(quiz, request.questions);
   if (request.source === "section") {
     const found = sections.find((s) => s.id === request.section && s.title !== null);
     if (!found) {

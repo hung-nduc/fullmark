@@ -24,11 +24,14 @@ import {
   openLibrary,
   painterFor,
 } from "./library-common";
+import { missedFor } from "./library-missed";
 import { findSection, localStamp, type ServeIo, serveLoaded } from "./serve";
 import { plural } from "./table";
 
 export type LibraryTakeOptions = {
   section: string | null;
+  /** only the questions wrong or partly right in earlier attempts and not answered fully right since */
+  missed: boolean;
   focus: boolean;
   open: boolean;
   /** seconds, as given; null: 0 (no limit) */
@@ -145,6 +148,13 @@ export function scoreText(score: Report["score"]): string {
   const percent = score.percent === null ? "–" : `${Math.round(score.percent)}%`;
   const waiting = score.pending > 0 ? `, ${score.pending} waiting for a grade` : "";
   return `${percent}${star} (${score.earned} of ${score.points} points${waiting})`;
+}
+
+/** `4 of 6 right · 67%`: what a `--missed` attempt scored, by the questions it had. */
+function missedScoreText(right: number, total: number, score: Report["score"]): string {
+  const percent = score === null || score.percent === null ? "–" : `${Math.round(score.percent)}%`;
+  const waiting = score !== null && score.pending > 0 ? `, ${score.pending} waiting for a grade` : "";
+  return `${right} of ${total} right · ${percent}${score !== null && score.pending > 0 ? "*" : ""}${waiting}`;
 }
 
 type Filed = {
@@ -267,6 +277,8 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     await rm(s.file, { force: true });
   }
 
+  /** the missed questions no longer in the quiz, for `--json`'s `gone` */
+  let gone = 0;
   const report = (filed: Filed, stampName: string): void => {
     const score = filed.report?.score ?? null;
     if (opts.json) {
@@ -276,11 +288,16 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
           results: filed.results,
           score,
           plan: { source: filed.plan.source, questions: filed.plan.questions },
-          gone: 0,
+          gone,
         }),
       );
     }
-    out(`${p.green("filed")} ${filed.results} · ${scoreText(score)}`);
+    const right = filed.report?.questions.filter((q) => q.status === "correct").length ?? 0;
+    out(
+      `${p.green("filed")} ${filed.results} · ${
+        filed.plan.source === "missed" ? missedScoreText(right, filed.plan.questions.length, score) : scoreText(score)
+      }`,
+    );
     if ((score?.pending ?? 0) > 0) out(p.dim(`next: quiz library grade ${stampName} --web`));
     if (filed.warning !== null) out(`${p.yellow("warning")} ${filed.warning}`);
     if (filed.committed !== null) out(p.dim(`committed ${filed.committed}`));
@@ -305,7 +322,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
   }
 
   // which version, and which attempt: a plain take resumes the oldest saved attempt, on whatever version it began
-  const plain = opts.section === null;
+  const plain = opts.section === null && !opts.missed;
   const saved = plain ? (savedAttempts(paths, quiz)[0] ?? null) : null;
   const hash = saved?.hash ?? quiz.current;
   const loaded = loadStored(root, quiz, hash);
@@ -321,12 +338,30 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     if (typeof found === "string") return libraryFail(io, opts.json, found);
     sectionId = found.id;
   }
+  // `--missed`: the plan the library chooses from the attempts (nothing is served when none is missed)
+  const missed = opts.missed ? missedFor(root, quiz, served, sectionId) : null;
+  if (missed !== null) {
+    gone = missed.gone;
+    if (missed.questions.length === 0) {
+      const why =
+        missed.attempts === 0
+          ? "there is no attempt yet"
+          : missed.gone > 0
+            ? `${plural(missed.gone, "question")} you got wrong ${missed.gone === 1 ? "is" : "are"} no longer in the quiz, and every other one has been answered right since`
+            : "every question you got wrong has been answered right since";
+      if (opts.json) io.out(JSON.stringify({ status: "nothing_missed" }));
+      out(`nothing missed: ${why}`);
+      return EXIT.done;
+    }
+  }
   const questionCount =
-    saved !== null
-      ? saved.attempt.plan.questions.length
-      : served.sections
-          .filter((s) => sectionId === null || s.id === sectionId)
-          .reduce((n, s) => n + s.questions.length, 0);
+    missed !== null
+      ? missed.questions.length
+      : saved !== null
+        ? saved.attempt.plan.questions.length
+        : served.sections
+            .filter((s) => sectionId === null || s.id === sectionId)
+            .reduce((n, s) => n + s.questions.length, 0);
 
   // the progress file of this attempt; a saved attempt of the version is never overwritten by a new one
   const progressFile = paths.progressFile(hash);
@@ -343,6 +378,15 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
         hash === quiz.current ? "" : `; the quiz has been updated since (now ${short(quiz.current)})`
       }`,
     );
+  } else if (missed !== null) {
+    heading.splice(
+      1,
+      2,
+      sectionId === null ? "missed questions" : `missed questions of ${opts.section}`,
+      `${missed.questions.length} from ${plural(missed.attempts, "attempt")}`,
+    );
+    if (missed.changed.length > 0) heading.push(`${missed.changed.length} changed since you missed them`);
+    if (missed.gone > 0) heading.push(`${missed.gone} no longer in the quiz`);
   } else {
     heading.push(plural(questionCount, "question"), timeout === 0 ? "no time limit" : `time limit ${timeout} s`);
   }
@@ -365,12 +409,16 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
         config: null,
         fonts: opts.fonts,
         focus: opts.focus,
-        section: opts.section,
+        // a missed plan holds its own questions (those of the section, when there is one): the page needs no section
+        section: missed !== null ? null : opts.section,
         autosave: autosave ? progressFile : null,
         version: opts.version,
       },
       io,
       {
+        ...(missed !== null
+          ? { plan: { source: "missed" as const, questions: missed.questions }, changed: missed.changed }
+          : {}),
         announce({ url, port: listening }) {
           writeFileSync(
             servingFile,

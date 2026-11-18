@@ -154,7 +154,7 @@ export function readSaved(text: string | null, quiz: PageQuiz): Saved | null {
     if (a.phase !== "answering" && a.phase !== "submitted") return null;
     const { plan, state } = a;
     if (!isObject(plan) || !isObject(state)) return null;
-    if (!["full", "bank", "section", "retry"].includes(plan.source as string)) return null;
+    if (!["full", "bank", "section", "missed", "retry"].includes(plan.source as string)) return null;
     if (plan.section !== undefined && typeof plan.section !== "string") return null;
     if (plan.seed !== undefined && typeof plan.seed !== "string") return null;
     if (!isStrings(plan.questions) || plan.questions.length === 0) return null;

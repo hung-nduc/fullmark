@@ -144,7 +144,7 @@ function AnsweringMap({
   const attempt = state.attempt.value;
   const parts = answeringMap(state.page, attempt, state.current.value);
   const chosen = state.mapOpen.value;
-  const headless = parts.length === 1 || attempt.plan.source === "retry";
+  const headless = parts.length === 1 || attempt.plan.source === "retry" || attempt.plan.source === "missed";
   const grid = (cells: Cell[]) => (
     <div class="fm-grid">
       {cells.map((cell) => (
@@ -250,7 +250,7 @@ function ResultsMap({
   const attempt = state.attempt.value;
   const parts = resultsMap(page, attempt, graded);
   const missed = new Set(missedIds(graded));
-  const headless = parts.length === 1 || attempt.plan.source === "retry";
+  const headless = parts.length === 1 || attempt.plan.source === "retry" || attempt.plan.source === "missed";
   const grid = (cells: ResultCell[]) => (
     <div class="fm-grid">
       {cells.map((cell) => (
@@ -388,7 +388,7 @@ function StackedMap({
 }) {
   const attempt = state.attempt.value;
   const parts: Part<Cell>[] = answeringMap(state.page, attempt, state.current.value);
-  const headless = parts.length === 1 || attempt.plan.source === "retry";
+  const headless = parts.length === 1 || attempt.plan.source === "retry" || attempt.plan.source === "missed";
   const part = chosenPart(parts, state.miniPart.value);
   const counts = (p: Part<Cell>) => ({
     answered: p.cells.filter((c) => c.answered).length,

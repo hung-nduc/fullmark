@@ -38,11 +38,11 @@ describe("the history helper", () => {
     for (const rel of files) expect(readFileSync(join(FIXTURE, "lib", rel), "utf8"), rel).toBe(here(rel));
   });
 
-  it("has the study quiz in three versions, five attempts from the stats fixtures and one more on the third version", async () => {
+  it("has the study quiz in three versions, five attempts from the stats fixtures, a practice on the second version and one more on the third", async () => {
     const h = await buildHistory();
     expect(h.hashes).toHaveLength(3);
     expect(new Set(h.hashes).size).toBe(3);
-    expect(readdirSync(join(h.lib, "quizzes", "study", "results"))).toHaveLength(6);
+    expect(readdirSync(join(h.lib, "quizzes", "study", "results"))).toHaveLength(7);
     expect(readdirSync(join(h.lib, "quizzes", "study", "reports"))).toHaveLength(2);
   });
 });

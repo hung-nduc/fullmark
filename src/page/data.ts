@@ -167,6 +167,12 @@ export type PageData = {
   /** `serve --autosave`: the attempt lives in a file, not in the browser's storage; `saved` is what the file held */
   autosave?: true;
   saved?: Saved;
+  /**
+   * `library take --missed`: the plan Start makes, in place of the whole quiz (the page holds only these questions);
+   * `changed`: the ids of those whose text differs from the version they were missed on. Only `src/serve/` sets them.
+   */
+  plan?: { source: "missed"; questions: string[] };
+  changed?: string[];
   /** the quiz's recommended `theme` (the first quiz's, on a page of several): the page opens in it (absent: `auto`) */
   theme?: Choice;
   /** `free`: the Appearance menu; `locked`: no menu, and a stored look is ignored (absent: `free`) */

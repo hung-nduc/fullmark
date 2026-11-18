@@ -369,6 +369,7 @@ export const vi = {
     sendFailed: "Không lưu được kết quả. Hãy dùng Tải kết quả về để giữ lại.",
     flagForReview: "Đánh dấu để xem lại",
     flaggedMark: "Đã đánh dấu",
+    changedMark: "đã sửa sau lần bạn làm sai",
     flag: "Đánh dấu",
     acceptedAnswers: "Các đáp án được chấp nhận",
     trueLetter: "Đ",

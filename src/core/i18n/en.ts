@@ -311,6 +311,7 @@ export const en = {
     sendFailed: "Could not save the results. Use Download results to keep them.",
     flagForReview: "Flag for review",
     flaggedMark: "Flagged",
+    changedMark: "changed since you missed it",
     sidebarLabel: "Questions",
     sidebarTitle: "The question map (Q)",
     sidebarLabelMaterials: "Questions & materials",

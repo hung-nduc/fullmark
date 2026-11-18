@@ -595,6 +595,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .description("serve a quiz from the library, file the result next to its version and commit")
     .argument("<name>", "a quiz's name or id")
     .option("--section <s>", "only this section (its slug or title)")
+    .option("--missed", "only the questions you got wrong or partly right and have not answered right since")
     .option("--focus", "tick Focus mode on the start screen")
     .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
     .option("--no-open", "do not open the page in the browser")
@@ -608,6 +609,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         name,
         {
           section: text("section"),
+          missed: Boolean(options.missed),
           focus: Boolean(options.focus),
           open: options.open !== false,
           timeout: text("timeout"),

@@ -169,7 +169,7 @@ export function findSection(quiz: Quiz, name: string): Quiz["sections"][number] 
 
 /** What a caller other than `serve` (`library take`) changes about a served quiz. */
 export type ServeHooks = {
-  /** a plan of some questions the page starts as it starts a retry (`take --missed`) */
+  /** a plan of some questions the page starts as it starts a retry (`take --missed`): the page holds only these */
   plan?: { source: "missed"; questions: string[] };
   /** the ids of the questions the page marks "changed since you missed it" */
   changed?: string[];
@@ -305,6 +305,7 @@ export async function serveLoaded(
       ...(section !== null ? { section } : {}),
       ...(progressFile !== null ? { autosave: true } : {}),
       ...(saved !== undefined ? { saved } : {}),
+      ...(hooks.plan !== undefined ? { plan: hooks.plan, changed: hooks.changed ?? [] } : {}),
     },
   });
 

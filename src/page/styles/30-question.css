@@ -43,6 +43,7 @@
   }
 
   .fm-question-points,
+  .fm-changed-mark,
   .fm-flag-mark {
     font-size: 0.85em;
     color: var(--muted);
@@ -50,6 +51,7 @@
 
   .fm-question-points::before,
   .fm-tag::before,
+  .fm-changed-mark::before,
   .fm-flag-mark::before {
     color: var(--muted);
     white-space: pre;

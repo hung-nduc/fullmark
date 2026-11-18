@@ -57,6 +57,7 @@ export function QuestionCard({
   number,
   current = false,
   hidden = false,
+  changed = false,
 }: {
   state: QuizState;
   api: Api;
@@ -66,6 +67,8 @@ export function QuestionCard({
   current?: boolean;
   /** the review filter hides the card; the DOM order never changes */
   hidden?: boolean;
+  /** `library take --missed`: the question's text differs from the version it was missed on */
+  changed?: boolean;
 }) {
   const quiz = state.page;
   const t = messagesFor(quiz);
@@ -123,6 +126,11 @@ export function QuestionCard({
       <header class="fm-question-head">
         <span class="fm-question-meta">
           <span class="fm-question-number">{t.questionLabel(number)}</span>
+          {changed ? (
+            <span class="fm-changed-mark" data-changed-mark>
+              {t.changedMark}
+            </span>
+          ) : null}
           {question.graded ? (
             <span class="fm-question-points">{t.pointsLabel(num(question.points, quiz.uiLang))}</span>
           ) : null}

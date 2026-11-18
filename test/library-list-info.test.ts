@@ -42,6 +42,7 @@ describe("the attempts of a quiz (library-history)", () => {
       "20261017-100000",
       "20261024-100000",
       "20261031-100000",
+      "20261105-190300",
       "20261116-201412",
     ]);
     // a report was filed for the first and the fourth: its score, not a re-grade (the fixtures' own numbers)
@@ -129,7 +130,7 @@ describe("library list", () => {
       questions: 7,
       points: 17,
       versions: 3,
-      attempts: 6,
+      attempts: 7,
       best: 100,
       added: "2026-10-01",
       updated: "2026-11-10",

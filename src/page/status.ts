@@ -97,7 +97,7 @@ export function statusFor({
     segments.push({
       kind: "taken",
       text:
-        source === "retry"
+        source === "retry" || source === "missed"
           ? t.takenRetry(count)
           : partTitle !== null
             ? t.takenPart(part + 1, partTitle, count)
@@ -135,7 +135,12 @@ export function statusFor({
   }
   const at = currentId === null ? undefined : owner.get(currentId);
   const section = at === undefined ? undefined : page.sections[at];
-  if (attempt.plan.source !== "retry" && section?.time !== undefined && at !== undefined) {
+  if (
+    attempt.plan.source !== "retry" &&
+    attempt.plan.source !== "missed" &&
+    section?.time !== undefined &&
+    at !== undefined
+  ) {
     const n = parts.indexOf(at) + 1;
     const left = section.time - (sectionSeconds[section.id] ?? 0);
     const title = section.title;
