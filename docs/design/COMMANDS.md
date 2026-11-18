@@ -648,6 +648,8 @@ quizzes/<id>/
   reports/<stamp>-report.json, .md  the report of the newest grades for that attempt
   review.json                       the learner's review (review-v2), one per quiz across its versions
   progress/<version>.json           an attempt in progress (autosave), git-ignored
+  progress/<version>.serving.json   the take serving it: process id, URL, start
+  progress/<version>.submitted.json a submit waiting to be filed
 ```
 
 - **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
@@ -934,8 +936,8 @@ quiz library take NAME [--section S] [--missed] [--focus] [--no-open]
 
 Builds the current version with the installed fullmark, serves it, files the result next to that version and commits. Progress is autosaved, so closing the tab or the server resumes the attempt.
 
-- **Autosave and resume.** `take` serves with autosave (as `serve --autosave`) to `quizzes/<id>/progress/<version>.json`, which git ignores. The next `take` without `--section` or `--missed` resumes a saved attempt, as the page's **Continue** does, on whatever version it was started, even one that is no longer current (the oldest first, when there are several), and says so: "resuming your attempt of 18 Nov 14:02 on version 41c0; the quiz has been updated since". It is filed against that version, and the next `take` uses the current one. The file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone.
-- **The lock.** `take` takes the library's lock only to file the result and commit, never while serving, so other commands work while a quiz is open. The progress file holds the serving process's id and URL: a second `take` of that quiz while that process is alive exits `2` and prints the URL to open; a progress file whose process is gone is resumed.
+- **Autosave and resume.** `take` serves with autosave (as `serve --autosave`) to `quizzes/<id>/progress/<version>.json`, which git ignores. The next `take` without `--section` or `--missed` resumes a saved attempt, as the page's **Continue** does, on whatever version it was started, even one that is no longer current (the oldest first, when there are several), and says so in its heading: "version 41c0 · resuming your attempt of 18 Nov 14:02 (7 of 18 answered); the quiz has been updated since (now 9f3a)". It is filed against that version, and the next `take` uses the current one. The file is removed when the attempt is filed. A `take` with `--section` or `--missed` starts its own attempt and leaves a saved one alone: when an attempt of that version is saved, the new one is served without autosave, and `take` says so ("this attempt is not saved: another attempt of this version is in progress and is left alone"). A saved attempt of missed questions resumes as one: its questions keep the "changed since you missed it" mark, worked out again against the version it is on.
+- **The lock.** `take` takes the library's lock only to file the result and commit, never while serving, so other commands work while a quiz is open. While serving, `progress/<version>.serving.json` holds the serving process's id and URL, beside the progress file, which stays a `results-v2` document: a second `take` of that quiz while that process is alive exits `2` and prints the URL to open; a serving file whose process is gone is removed, and the progress file is resumed. A submit is written to `progress/<version>.submitted.json`, then filed under the lock. When the lock cannot be had in 10 seconds, the submitted file stays and `take` exits `2`, saying the answers are safe; the next `take` of the quiz files it first, says so, and ends without serving, with `next: quiz library take NAME` after the commit.
 - **`--missed` across versions.** Questions are matched by `id` across versions. A question missed on an old version and still in the current one is served as it is now; when its hash differs from the one missed, the page marks it "changed since you missed it" (one label in both catalogs, next to the question's number). A missed question no longer in the current version is left out and counted (`"gone"` in `--json`). The plan's `source` is `"missed"`.
 
 | Option | Meaning |
@@ -961,6 +963,13 @@ committed 4d2e9f1 fullmark: take rust-basics
 $ quiz library take rust-basics
 rust-basics · Rust basics · version 9f3a · resuming your attempt of 18 Nov 14:02 (7 of 18 answered)
 serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
+
+$ quiz library take rust-basics
+note filing the answers an earlier take left in progress/9f3a….submitted.json
+filed results/20261118-142212.json · 80%* (20 of 21 points, 4 waiting for a grade)
+next: quiz library grade rust-basics --web
+committed 4d2e9f1 fullmark: take rust-basics
+next: quiz library take rust-basics
 
 $ quiz library take rust-basics --missed
 rust-basics · missed questions · 6 from 17 attempts · 2 changed since you missed them · 1 no longer in the quiz

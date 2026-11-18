@@ -20,12 +20,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4a | built and reviewed (2026-11-18); G19 and G20 decided | `24d99e0`, `ac90c6b` |
 | 4b | built and reviewed (2026-11-18); G21 decided, built first in 4c | `c070213`, `eb89812` |
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
-| 4d | built and reviewed (2026-11-18); G23 to G26 raised, wait for the owner | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
+| 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 
 ### Next
 
-1. The owner decides **G23 to G26** (4d's review).
-2. The planner writes **4e**'s brief (`grade`, `stats`), with the decided gaps first.
+1. The planner writes **4e**'s brief (`grade`, `stats`), with G25 and G26 first (G23 and G24 need no code: the docs follow the build).
+2. The owner approves it; one implementing agent (Sonnet) builds it.
 
 ## Goal
 
@@ -49,15 +49,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G18 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). G19 to G22 are decided too. Raised in 4d's review, open:
-
-**G23. Where the serving process is recorded.** COMMANDS.md (`library take`, "The lock") says the progress file holds the serving process's id and URL; the brief, and the build, keep them in `progress/<version>.serving.json` beside it, so the progress file stays a `results-v2` document as `serve --autosave` writes it, and a submit waits in `progress/<version>.submitted.json` until it is filed. The resume line also reads differently: built, the heading names the version (`version 41c0 · resuming your attempt of 18 Nov 14:02 (7 of 18 answered); the quiz has been updated since (now 9f3a)`), where COMMANDS.md's prose has "on version 41c0". **Recommendation:** COMMANDS.md follows the build: the three files of `progress/` named in "The library folder" and in `take`, and the resume line as built.
-
-**G24. A `--section` or `--missed` take while an attempt of that version is saved.** Both use `progress/<version>.json`; the build serves the new attempt **without autosave**, says so ("this attempt is not saved: another attempt of this version is in progress and is left alone"), and a Ctrl+C loses it. **Recommendation:** accept as built: the saved attempt is never touched, the learner is told, and a second saved attempt per version would need a choice of which to resume that the design does not have.
-
-**G25. A saved `--missed` attempt resumed by a plain `take`.** A `--missed` take interrupted is saved like any other; the next plain `take` resumes it with its plan (the missed questions), but without the "changed since you missed it" marks, since a plain page has no `changed`. **Recommendation:** when the attempt resumed has `plan.source` `missed`, `take` works the marks out again for those questions (`missedOf` against the version resumed) and serves them, so a resumed attempt looks as it did; a test resumes one.
-
-**G26. A take that files a leftover submit.** When `take` finds a `submitted.json` left by an earlier take (the lock was busy, or the process died), it files it and ends (exit 0) without serving. **Recommendation:** accept, with one more line after the commit, `next: quiz library take NAME` to start a new attempt, so the learner is not left wondering why no page opened.
+G1 to G26 are decided ([STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G27.
 
 ## Slices
 
@@ -311,4 +303,4 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 **A leak, cause shown, not 4d's:** the agent's one failed run (44 Firefox failures, "Unknown system error -122" on a write) was `/tmp` full. The e2e specs and serve tests make `fm-*` folders with `mkdtempSync` and never remove them: one `npm run check` here left 1,179 new ones (most `fm-e2e-*`, then `fm-review-`, `fm-grade-`, `fm-brief-`, from steps 2 and 3). A fix for its own (remove them after each test) is offered to the owner.
 
-**Gaps:** G23 to G26, above, wait for the owner.
+**Gaps:** G23 to G26, decided by the owner on 2026-11-19 as recommended.
