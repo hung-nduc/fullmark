@@ -438,6 +438,22 @@
       "h": 1714,
       "is_interactive": true,
       "title": "G15, share, template add, rename, rm, path (Tweaks: dark, light, plain)"
+    },
+    "LibraryStyleBordered.dc.html": {
+      "x": 0,
+      "y": 27118,
+      "w": 1280,
+      "h": 1654,
+      "is_interactive": true,
+      "title": "Variant A, for comparison: bordered tables, scores by band, tags and badges; and how it wraps at 80 columns (Tweaks: dark, light, plain)"
+    },
+    "LibraryStyleMiddle.dc.html": {
+      "x": 1360,
+      "y": 27118,
+      "w": 1280,
+      "h": 954,
+      "is_interactive": true,
+      "title": "Variant B, for comparison: no borders, a shaded header, scores by band, tags and badges (Tweaks: dark, light, plain)"
     }
   },
   "createdOnFiles": {
@@ -555,7 +571,9 @@
     "LibrarySetup.dc.html",
     "LibraryTake.dc.html",
     "LibraryGrade.dc.html",
-    "LibraryTidy.dc.html"
+    "LibraryTidy.dc.html",
+    "LibraryStyleBordered.dc.html",
+    "LibraryStyleMiddle.dc.html"
   ],
   "pages": [],
   "title": "fullmark themes"

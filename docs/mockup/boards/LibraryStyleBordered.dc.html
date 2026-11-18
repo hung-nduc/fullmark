@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Variant A: bordered, more colour</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;650&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ln{white-space:pre-wrap;overflow-wrap:anywhere;min-height:20px}
+.t-dark .term{background:#16181d;color:#d6d9de}
+.t-dark .term .d{color:#8b929c} .t-dark .term .r{color:#ff7b72} .t-dark .term .g{color:#7ee787} .t-dark .term .y{color:#e3b341} .t-dark .term .c{color:#56d4dd} .t-dark .term .b{color:#ffffff;font-weight:700}
+.t-light .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-light .term .d{color:#59636e} .t-light .term .r{color:#cf222e} .t-light .term .g{color:#1a7f37} .t-light .term .y{color:#9a6700} .t-light .term .c{color:#0b7a83} .t-light .term .b{color:#000000;font-weight:700}
+.t-plain .term{background:#ffffff;color:#1f2328;box-shadow:inset 0 0 0 1px #d0d7de}
+.t-plain .term span{color:inherit;font-weight:400}
+.term.plainbox span{color:inherit !important;font-weight:400 !important}
+.t-dark .term.plainbox{color:#d6d9de}
+
+.t-dark .term .h{background:#2d323b;color:#ffffff;font-weight:700}
+.t-dark .term .R{background:#ff7b72;color:#16181d;font-weight:700} .t-dark .term .Y{background:#e3b341;color:#16181d} .t-dark .term .C{background:#56d4dd;color:#16181d;font-weight:700} .t-dark .term .G{background:#7ee787;color:#16181d}
+.t-light .term .h{background:#e6eaef;color:#000000;font-weight:700}
+.t-light .term .R{background:#cf222e;color:#ffffff;font-weight:700} .t-light .term .Y{background:#9a6700;color:#ffffff} .t-light .term .C{background:#0b7a83;color:#ffffff;font-weight:700} .t-light .term .G{background:#1a7f37;color:#ffffff}
+.t-plain .term span{background:none}
+</style>
+</helmet>
+<div class="t-{{term}}" style="width: 1280px; min-height: 1654px; box-sizing: border-box; padding: 40px 48px; background: #f5f6f8; font-family: Inter, system-ui, sans-serif; color: #1f2328; display: flex; flex-direction: column; gap: 24px">
+  <header style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 650">Variant A: bordered, more colour</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 21px; color: #59636e; max-width: 1080px">For comparison with LibraryList and LibraryStatus. The table drawn with box characters by fullmark’s own table helper (no new library); names bold, scores by band (80% and up green, under 65% yellow), marks as coloured tags; status as a panel with PROBLEM and NOTE badges. About 110 columns wide: at 80 columns the table wraps. Under --plain the colour goes but the borders stay, unless --plain also drops them. Tweaks: a dark or light terminal, or --plain.</p>
+  </header>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">list</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e"></p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library list</span></div>
+      <div class="ln"><span class="b">5 quizzes</span> · 38 attempts · /home/minh/quiz-library</div>
+      <div class="ln"> </div>
+      <div class="ln"><span class="d">┌─────────────────┬───────────────────────┬──────────┬──────────┬──────┬──────┬────────┬──────────────────┐</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">NAME           </span> <span class="d">│</span> <span class="b">TITLE                </span> <span class="d">│</span> <span class="b">VERSIONS</span> <span class="d">│</span> <span class="b">ATTEMPTS</span> <span class="d">│</span> <span class="b">LAST</span> <span class="d">│</span> <span class="b">BEST</span> <span class="d">│</span> <span class="b">TAKEN </span> <span class="d">│</span> <span class="b">NOTES           </span> <span class="d">│</span></div>
+      <div class="ln"><span class="d">├─────────────────┼───────────────────────┼──────────┼──────────┼──────┼──────┼────────┼──────────────────┤</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">calculus-limits</span> <span class="d">│</span> Limits and continuity <span class="d">│</span>        1 <span class="d">│</span>        0 <span class="d">│</span> <span class="d">   –</span> <span class="d">│</span> <span class="d">   –</span> <span class="d">│</span> <span class="d">never </span> <span class="d">│</span>                  <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">chem-bonds     </span> <span class="d">│</span> Chemical bonding      <span class="d">│</span>        2 <span class="d">│</span>        6 <span class="d">│</span>  74% <span class="d">│</span> <span class="g"> 81%</span> <span class="d">│</span> 12 Nov <span class="d">│</span>                  <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">ielts-writing  </span> <span class="d">│</span> IELTS Writing Task 2  <span class="d">│</span>        1 <span class="d">│</span>        4 <span class="d">│</span> <span class="y">61%*</span> <span class="d">│</span>  68% <span class="d">│</span> 15 Nov <span class="d">│</span> <span class="C"> 1 ungraded </span>     <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">rust-basics    </span> <span class="d">│</span> Rust basics           <span class="d">│</span>        3 <span class="d">│</span>       17 <span class="d">│</span> <span class="g"> 80%</span> <span class="d">│</span> <span class="g"> 86%</span> <span class="d">│</span> 17 Nov <span class="d">│</span> <span class="Y"> source changed </span> <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> <span class="b">signals        </span> <span class="d">│</span> Signals and systems   <span class="d">│</span>        2 <span class="d">│</span>       11 <span class="d">│</span>  71% <span class="d">│</span>  77% <span class="d">│</span> 16 Nov <span class="d">│</span>                  <span class="d">│</span></div>
+      <div class="ln"><span class="d">└─────────────────┴───────────────────────┴──────────┴──────────┴──────┴──────┴────────┴──────────────────┘</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">list, as an 80-column terminal shows it</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e">Each row wraps after its 80th character, so the table falls apart. The current board’s list wraps too, but only its NOTES column.</p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library list</span></div>
+      <div class="ln">┌─────────────────┬───────────────────────┬──────────┬──────────┬──────┬──────┬─</div>
+      <div class="ln"><span class="d">───────┬──────────────────┐</span></div>
+      <div class="ln">│ NAME            │ TITLE                 │ VERSIONS │ ATTEMPTS │ LAST │ BEST │ </div>
+      <div class="ln"><span class="d">TAKEN  │ NOTES            │</span></div>
+      <div class="ln">├─────────────────┼───────────────────────┼──────────┼──────────┼──────┼──────┼─</div>
+      <div class="ln"><span class="d">───────┼──────────────────┤</span></div>
+      <div class="ln">│ calculus-limits │ Limits and continuity │        1 │        0 │    – │    – │ </div>
+      <div class="ln"><span class="d">never  │                  │</span></div>
+      <div class="ln">│ chem-bonds      │ Chemical bonding      │        2 │        6 │  74% │  81% │ </div>
+      <div class="ln"><span class="d">12 Nov │                  │</span></div>
+      <div class="ln">│ ielts-writing   │ IELTS Writing Task 2  │        1 │        4 │ 61%* │  68% │ </div>
+      <div class="ln"><span class="d">15 Nov │  1 ungraded      │</span></div>
+      <div class="ln">│ rust-basics     │ Rust basics           │        3 │       17 │  80% │  86% │ </div>
+      <div class="ln"><span class="d">17 Nov │  source changed  │</span></div>
+      <div class="ln">│ signals         │ Signals and systems   │        2 │       11 │  71% │  77% │ </div>
+      <div class="ln"><span class="d">16 Nov │                  │</span></div>
+      <div class="ln">└─────────────────┴───────────────────────┴──────────┴──────────┴──────┴──────┴─</div>
+      <div class="ln"><span class="d">───────┴──────────────────┘</span></div>
+    </div>
+  </section>
+  <section style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 650; color: #1f2328">status, with problems</h2>
+      <p style="margin: 0; font-size: 13px; color: #59636e"></p>
+    </div>
+    <div class="term" style="border-radius: 8px; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace; font-size: 13px; line-height: 20px; overflow: hidden">
+      <div class="ln"><span class="d">$</span> <span class="b">quiz library status</span></div>
+      <div class="ln"><span class="d">╭─</span> <span class="b">library status</span> <span class="d">────────────────────────────────────────────────────╮</span></div>
+      <div class="ln"><span class="d">│</span> Library   /home/minh/tmp/lib <span class="y">(from FULLMARK_LIBRARY)</span>              <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> Config    /home/minh/.config/fullmark/config.toml                 <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> Git       repository · clean · remote origin                      <span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> Commits   fullmark &lt;fullmark@localhost&gt; <span class="y">(git has no identity here)</span><span class="d">│</span></div>
+      <div class="ln"><span class="d">│</span> Counts    5 quizzes · 9 versions · 38 attempts · 21 reports       <span class="d">│</span></div>
+      <div class="ln"><span class="d">╰────────────────────────────────────────────────────────────────────╯</span></div>
+      <div class="ln"> </div>
+      <div class="ln"><span class="R"> PROBLEM </span> library.hash  quizzes/chem-bonds/versions/b81e</div>
+      <div class="ln">            the files no longer match the version’s hash</div>
+      <div class="ln">            <span class="d">fix:</span> git -C /home/minh/tmp/lib checkout -- quizzes/chem-bonds/versions/b81e</div>
+      <div class="ln"><span class="R"> PROBLEM </span> config.unknown-rule  fullmark.toml:4</div>
+      <div class="ln">            no rule named answers.posiiton-skew</div>
+      <div class="ln">            <span class="d">fix:</span> the rules are listed by quiz rules --all</div>
+      <div class="ln"><span class="C">  NOTE   </span> env.library  FULLMARK_LIBRARY is set; the config’s library is /home/minh/quiz-library</div>
+      <div class="ln"><span class="C">  NOTE   </span> git.identity  commits are made as fullmark &lt;fullmark@localhost&gt;</div>
+      <div class="ln">            <span class="d">set one:</span> git -C /home/minh/tmp/lib config user.name "Your Name"</div>
+      <div class="ln"><span class="C">  NOTE   </span> lock.stale  removed a lock left by pid 48211 (quiz library take signals)</div>
+      <div class="ln"> </div>
+      <div class="ln"><span class="R"> 2 PROBLEMS </span> <span class="d">3 notes</span></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"term": {"editor": "enum", "options": ["dark", "light", "plain"], "default": "dark"}, "$preview": {"width": 1280, "height": 1654}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { term: this.props.term ?? 'dark' };
+  }
+}
+</script>
+</body>
+</html>
