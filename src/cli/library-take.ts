@@ -314,6 +314,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     try {
       const filed = await fileSubmitted(io, root, all, quiz, leftover, "submit", lockWords, hooks, git);
       report(filed, quiz.name);
+      out(p.dim(`next: quiz library take ${quiz.name}`));
       return EXIT.done;
     } catch (error) {
       if (error instanceof LockBusy) return busy(error, `progress/${leftover.hash}.submitted.json`);
@@ -340,6 +341,14 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
   }
   // `--missed`: the plan the library chooses from the attempts (nothing is served when none is missed)
   const missed = opts.missed ? missedFor(root, quiz, served, sectionId) : null;
+  // a saved attempt of missed questions resumes as one: the "changed since you missed it" marks are worked out again (G25)
+  const resumedChanged =
+    saved !== null && saved.attempt.plan.source === "missed"
+      ? (() => {
+          const inPlan = new Set(saved.attempt.plan.questions);
+          return missedFor(root, quiz, served).changed.filter((id) => inPlan.has(id));
+        })()
+      : null;
   if (missed !== null) {
     gone = missed.gone;
     if (missed.questions.length === 0) {
@@ -418,7 +427,9 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
       {
         ...(missed !== null
           ? { plan: { source: "missed" as const, questions: missed.questions }, changed: missed.changed }
-          : {}),
+          : resumedChanged !== null
+            ? { changed: resumedChanged }
+            : {}),
         announce({ url, port: listening }) {
           writeFileSync(
             servingFile,

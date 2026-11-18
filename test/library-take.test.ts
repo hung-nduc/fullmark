@@ -351,6 +351,11 @@ describe("library take", () => {
       status: "filed",
       results: expect.stringMatching(/^results\/\d{8}-\d{6}\.json$/),
     });
+    // after the commit line, the next step (G26)
+    expect(next.err.slice(-2)).toEqual([
+      expect.stringMatching(/^committed [0-9a-f]+ fullmark: take signals$/),
+      "next: quiz library take signals",
+    ]);
     expect(names(progressDir(t))).toEqual([]);
     expect(readdirSync(join(t.lib, "quizzes", "signals", "results"))).toHaveLength(1);
     expect((await git(t.lib, t.env, "log", "--format=%s", "-1")).trim()).toBe("fullmark: take signals");
@@ -449,6 +454,27 @@ describe("library take --missed", () => {
     });
     expect(run.err.join("\n")).toMatch(/filed results\/\d{8}-\d{6}\.json · 2 of 4 right · /);
     expect(names(progressDir(t, "study"))).toEqual([]);
+  });
+
+  it("resumes a saved attempt of missed questions as one: the changed mark is worked out again (G25)", async () => {
+    const t = (await buildHistory()) as unknown as T;
+    const hash = quizOf(t, "study-fixture").current;
+    const first = take(t, "study-fixture", { missed: true });
+    const partial = attemptOf(hash, { phase: "answering" }, ["prime", "even", "add", "ielts"]);
+    partial.plan = { source: "missed", questions: ["prime", "even", "add", "ielts"] };
+    partial.state.answers = { prime: { choice: 1 }, even: null, add: null, ielts: null };
+    partial.state.submittedAt = null;
+    expect((await postTo(await first.url(), "progress", { quizId: "study", attempt: partial })).status).toBe(204);
+    first.interrupt();
+    await first.done;
+
+    const run = take(t, "study-fixture");
+    const data = (await dataOf(await run.url())) as { changed: string[]; saved: { attempt: Attempt } };
+    expect(run.err.join("\n")).toContain("resuming your attempt of 18 Nov 14:00 (1 of 4 answered)");
+    expect(data.saved.attempt.plan.source).toBe("missed");
+    expect(data.changed).toEqual(["even"]);
+    run.interrupt();
+    await run.done;
   });
 
   it("with --section keeps the missed questions of that section", async () => {

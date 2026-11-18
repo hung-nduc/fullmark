@@ -453,8 +453,8 @@ export function buildPage(quizzes: readonly BuildQuiz[], options: PageOptions): 
           .filter((s) => s.questions.length > 0);
         delete q.timeLimit;
       }
-      if (asked.changed !== undefined && asked.changed.length > 0) data.changed = asked.changed;
     }
+    if (asked.changed !== undefined && asked.changed.length > 0) data.changed = asked.changed;
     if (asked.autosave === true) data.autosave = true;
     if (asked.saved !== undefined) data.saved = asked.saved;
   }

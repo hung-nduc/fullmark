@@ -305,7 +305,8 @@ export async function serveLoaded(
       ...(section !== null ? { section } : {}),
       ...(progressFile !== null ? { autosave: true } : {}),
       ...(saved !== undefined ? { saved } : {}),
-      ...(hooks.plan !== undefined ? { plan: hooks.plan, changed: hooks.changed ?? [] } : {}),
+      ...(hooks.plan !== undefined ? { plan: hooks.plan } : {}),
+      ...(hooks.changed !== undefined ? { changed: hooks.changed } : {}),
     },
   });
 
