@@ -621,6 +621,17 @@ In a terminal, the Markdown is rendered: headings, lists, tables, wrapping to th
 
 All under `quiz library`. A library is one folder under git that holds each quiz's versions (sources, `materials` sheets and assets, never HTML), results and reports. fullmark commits after every command that changes it and **never pushes**. Every library command exits `2` when no library is set (neither `FULLMARK_LIBRARY` nor `library` in `config.toml`), with "no library: run `quiz library init PATH`".
 
+### How library commands print
+
+The CLI boards on the Design canvas (row "CLI: quiz library") draw every command; the text under each command below is theirs, as `--plain` prints it, and the goldens check it. Colour and the style are [Terminal style](#terminal-style)'s.
+
+- **A heading** names the quiz, and the attempt and version when there is one: `rust-basics · Rust basics · version 9f3a`.
+- **One word per outcome**, coloured: `registered`, `filed`, `report`, `grades kept`, `written`, `renamed`, `deleted`.
+- **Findings** in `check`'s issue format, `PATH:LINE: level rule: message` with `fix:` under it; `library status` uses it for its problems and notes.
+- **Then, dim:** `next:` with the command to run next, and `committed HASH MESSAGE` for the commit the command made.
+- **Paths** inside the library are printed relative to the quiz's folder (`results/20261118-142210.json`) after the heading has named the quiz; others follow [Paths in output](#paths-in-output).
+- **Waiting for the lock** prints one dim line naming the holder, and after 10 seconds the error: "the library is busy: quiz library register notes/*.md (pid 48300) has held it for 10 s", with the fix "run the command again when it finishes" (exit 2).
+
 ### The library folder
 
 ```text
@@ -665,6 +676,25 @@ Makes `PATH` (default: here) this machine's library and records it in the config
 | `--force` | Switch from another library already in the config |
 | `--no-git` | Don't make a git repository. `rm` then needs `--force` |
 
+**Output.**
+
+```text
+$ quiz library init /home/minh/quiz-library
+library ready /home/minh/quiz-library (new folder, git repository)
+recorded in /home/minh/.config/fullmark/config.toml
+note git has no identity here: commits are made as fullmark <fullmark@localhost>
+    set one: git -C /home/minh/quiz-library config user.name "Your Name"
+             git -C /home/minh/quiz-library config user.email you@example.com
+committed 3c1e0a2 fullmark: init
+next: quiz library register FILE
+
+$ quiz library init /home/minh/Documents
+error: /home/minh/Documents is not empty and is not a library (12 files)
+    fix: choose an empty or new folder
+```
+
+With `--json`: `{"status": "created" | "adopted", "library", "config", "git", "identity", "committed"}`; `git` is false with `--no-git` or no `git` found, `identity` is `"Name <email>"`, or null when the fallback is used; `committed` is the commit hash, or null.
+
 Exit: `0` done, `2` folder refused or another library is set without `--force`.
 
 ### quiz library status
@@ -680,6 +710,42 @@ Diagnostics: config, library path, git (repository, uncommitted changes, remote)
 **Problems** (exit `1`): the configured folder is missing or is not a library; `library.toml` does not parse or names a version folder that is missing; a version whose files no longer match its hash; a library `fullmark.toml` that does not parse or names unknown rules. **Notes** (printed, exit `0`): uncommitted changes, no remote, no git repository (`--no-git`), orphan files, a stale lock, `FULLMARK_LIBRARY` set.
 
 `--json`: `{"status": "healthy" | "problems", "library", "config", "git": {"repository", "uncommitted", "remote"}, "counts": {"quizzes", "versions", "attempts", "reports"}, "problems": [{"code", "path", "message", "fix"}], "notes": [{"code", "path", "message"}]}`.
+
+**Output.**
+
+```text
+$ quiz library status
+Library    /home/minh/quiz-library
+Config     /home/minh/.config/fullmark/config.toml
+Git        repository · 2 uncommitted changes · no remote
+Commits as Minh Tran <minh@example.com> (git’s own identity)
+Counts     5 quizzes · 9 versions · 38 attempts · 21 reports
+Checks     fullmark.toml: none · hashes: 9 of 9 match
+
+quizzes/signals/results: note git.uncommitted: 2 files not committed
+    see: git -C /home/minh/quiz-library status
+note git.no-remote: the library is only on this machine
+
+healthy (2 notes)
+
+$ quiz library status
+Library    /home/minh/tmp/lib (from FULLMARK_LIBRARY)
+Config     /home/minh/.config/fullmark/config.toml
+Git        repository · clean · remote origin
+Commits as fullmark <fullmark@localhost> (git has no identity here)
+Counts     5 quizzes · 9 versions · 38 attempts · 21 reports
+
+quizzes/chem-bonds/versions/b81e: problem library.hash: the files no longer match the version’s hash
+    fix: git -C /home/minh/tmp/lib checkout -- quizzes/chem-bonds/versions/b81e
+fullmark.toml:4: problem config.unknown-rule: no rule named answers.posiiton-skew
+    fix: the rules are listed by quiz rules --all
+note env.library: FULLMARK_LIBRARY is set; the config’s library is /home/minh/quiz-library
+note git.identity: commits are made as fullmark <fullmark@localhost>
+    set one: git -C /home/minh/tmp/lib config user.name "Your Name"
+note lock.stale: removed a lock left by pid 48211 (quiz library take signals)
+
+2 problems (3 notes)
+```
 
 Exit: `0` healthy (notes may be printed), `1` problems, `2` no library.
 
@@ -702,6 +768,39 @@ Checks the quiz, then copies its source, assets and brief into the library as a 
 | `--build-file BUILD` | Register the files a build file lists (`quiz build`), so a folder of quizzes registers without a long command. Only `files`, `profile`, `config` and `strict` are read, top level and per entry; the delivery keys (`out`, `lang`, `print` and the rest) are for `build` and are ignored here. A file listed in several entries (a quiz built both as a page and as a printed paper) is registered once; entries that give it different `profile`, `config` or `strict` exit 2. `FILE`s given as well register only those of its entries |
 | `--profile`, `--config`, `--strict`, `--review` | As for `check`. The config is looked up from `FILE`, then from the library root. With `--update`, the quiz's stored `review.json` is applied as `check --review` applies one: `review.fix` and `review.drop` refuse the version (exit `1`) until every flagged question has changed or gone, and `review.unconfirmed` warns until `library review NAME --since` judges it again. `--review REVIEW` replaces the stored review for that run |
 | `--json` | `{"status": "registered" \| "unchanged" \| "problems", "registered": [{"file", "name", "version"}], "unchanged": [{"file", "name", "version"}], "refused": [{"file", "reason", "suggest"}], "committed"}`. One file gives the same object as several, with one entry |
+
+**Output.**
+
+```text
+$ quiz library register rust/quiz.md
+rust/quiz.md:41: warning answers.position-skew: 5 of 8 single-choice keys are B
+    fix: move some correct choices to other positions
+registered rust-basics, a new quiz · version e7d2 · 18 questions
+committed 5f20b4c fullmark: register rust-basics
+
+$ quiz library register notes/*.md
+registered 3 calculus-limits (new, 5a1f) · ielts-writing (new, 77b2) · signals (new, 0c9d)
+unchanged 2  chem-bonds, rust-basics
+committed 9a0b1c2 fullmark: register calculus-limits, ielts-writing, signals
+
+$ quiz library register notes/*.md
+notes/chem.md:2: error: library.id-taken: the id chem-bonds is already in the library, as chem-bonds
+    fix: if it is the same quiz, quiz library register notes/chem.md --update chem-bonds;
+         if not, give it a new id:
+notes/rust2.md: error: library.name-taken: the name rust-basics is taken
+    fix: -n rust-basics-2 (one file at a time)
+notes/limits.md:12: error: question.id-missing: a question without an id
+    fix: quiz ids notes/limits.md
+nothing registered 2 of 5 files ready, 3 refused
+
+$ quiz library register rust/quiz.md --update rust-basics
+registered rust-basics · version 9f3a (was 41c0) · 2 added, 1 removed, 3 changed
+warning an attempt in progress on 41c0 (7 of 17 answered, 18 Nov 14:02) stays on that version
+    the next quiz library take rust-basics resumes it there (G17)
+committed 4b77e01 fullmark: register rust-basics
+```
+
+On a terminal, `[3/5] notes/signals.md` updates in place while the files are checked.
 
 Exit: `0` registered or unchanged, `1` check errors, name taken (the output suggests a free name), id taken or mismatched, or a survey refused, `2` no library.
 
@@ -747,6 +846,26 @@ With `--json`: `{"quizzes": [ROW, ...]}`, sorted by name with the fixed comparis
 | `ungraded` | boolean | an attempt has essays or code not yet graded |
 | `flagged` | number | `fix` and `drop` verdicts in the quiz's `review.json` still open on the current version (`review.fix` and `review.drop` findings); `0` without a review |
 
+**Output.**
+
+```text
+$ quiz library list --plain
+5 quizzes · 38 attempts · /home/minh/quiz-library
+
+NAME             TITLE                  VERSIONS  ATTEMPTS  LAST  BEST  TAKEN   NOTES
+calculus-limits  Limits and continuity         1         0     –     –  never
+chem-bonds       Chemical bonding              2         6   74%   81%  12 Nov
+ielts-writing    IELTS Writing Task 2          1         4  61%*   68%  15 Nov  1 ungraded
+rust-basics      Rust basics                   3        17   80%   86%  17 Nov  source changed
+signals          Signals and systems           2        11   71%   77%  16 Nov
+
+$ quiz library list
+0 quizzes · /home/minh/quiz-library
+next: quiz library register FILE
+```
+
+The columns are fixed; `NOTES` holds the marks: `source changed` (`changed`), `N ungraded`, `N flagged` (open review flags), and from step 5 `public`. A score with grades pending carries `*`, as on the page. Dates are `17 Nov`, with the year when it is not this year.
+
 Exit: `0`, `2` no library.
 
 ### quiz library info
@@ -775,6 +894,33 @@ Everything about one quiz in one place, so you need not run `inspect`, `list` an
 | `--version HASH` | Show the content of this version. Default: the current one |
 | `--json` | The quiz's `library list` row, with the same field names and meanings, plus `{"generated_by", "source": {"path", "exists"}, "sections": [{"slug", "title", "questions", "points"}], "banks", "history": [{"hash", "added", "added_questions", "removed_questions", "changed_questions"}], "first_taken", "path"}`. With `--version HASH`, the fields that describe content (`kind`, `lang`, `profile`, `tags`, `types`, `questions`, `points`, `sections`, `banks`) are that version's |
 
+**Output.**
+
+```text
+$ quiz library info rust-basics
+rust-basics · Rust basics · version 9f3a
+Identity   id rust-basics · quiz · en · profile practice · generated by Claude Opus 5.5
+Source     /home/minh/notes/rust/quiz.md · changed since 9f3a
+Content    18 questions · 25 points · 3 sections · time limit 25m
+Sections   ownership 6 questions, 8 points · collections 6, 10, pick 4 · traits 6, 7
+Types      single 8 (10 points) · multi 3 (5) · code 2 (6) · essay 1 (4)
+Tags       rust 18 · borrowing 5 · traits 4 · no tag 2
+Banks      collections: pick 4 of 6
+Versions   9f3a  17 Nov  current · 2 added, 1 removed, 3 changed
+           41c0   2 Nov  1 changed
+           e7d2  20 Oct  first version
+Shelves    none
+Attempts   17 · 20 Oct to 17 Nov · last 80% · best 86% · weakest borrowing, traits
+           ungraded: 20261117-201412 (1 essay)
+Path       /home/minh/quiz-library/quizzes/rust-basics
+
+$ quiz library info rust
+error: no quiz named rust
+    did you mean: rust-basics
+```
+
+Versions are listed newest first, the current one marked, each counted against the version before. With `--version HASH`, the heading says `(not current: HASH is)` and the content blocks are that version's. An unknown name exits 2 with the nearest names.
+
 Exit: `0`, `2` unknown quiz or version, or no library.
 
 ### quiz library take
@@ -800,6 +946,39 @@ Builds the current version with the installed fullmark, serves it, files the res
 | `--timeout SECONDS` | Default `0` (no limit) |
 | `--json` | `{"status", "results", "score", "plan": {"source", "questions"}, "gone"}` (`gone`: with `--missed`, the missed questions no longer in the current version, else `0`), or `{"status": "nothing_missed"}` |
 
+**Output.**
+
+```text
+$ quiz library take rust-basics
+rust-basics · Rust basics · version 9f3a · 18 questions · no time limit
+serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
+progress is saved: close the tab or press Ctrl+C, and take resumes it
+
+filed results/20261118-142212.json · 80%* (20 of 21 points, 4 waiting for a grade)
+next: quiz library grade rust-basics --web
+committed 4d2e9f1 fullmark: take rust-basics
+
+$ quiz library take rust-basics
+rust-basics · Rust basics · version 9f3a · resuming your attempt of 18 Nov 14:02 (7 of 18 answered)
+serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
+
+$ quiz library take rust-basics --missed
+rust-basics · missed questions · 6 from 17 attempts · 2 changed since you missed them · 1 no longer in the quiz
+serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
+
+filed results/20261118-151012.json · 4 of 6 right · 67%
+committed 0e6c3b8 fullmark: take rust-basics
+
+$ quiz library take signals --missed
+nothing missed: every question you got wrong has been answered right since
+
+$ quiz library take rust-basics
+error: rust-basics is already open in another take (pid 48211)
+    open: http://127.0.0.1:52811/?t=8f3a…
+```
+
+The URL is printed even when the browser opens, for a closed tab.
+
 Exit: `0` filed, or nothing missed (with a message); `2` unknown quiz or section, or timeout.
 
 ### quiz library replay
@@ -817,6 +996,14 @@ Opens a past attempt as a page that is already submitted, showing your answers, 
 | `--attempt STAMP` | Default: the newest attempt |
 | `-o`, `--output DIR` | Write the page here instead of a temp folder |
 | `--json` | `{"status", "page", "attempt", "version", "graded"}` |
+
+**Output.**
+
+```text
+$ quiz library replay rust-basics
+rust-basics · attempt 20261117-201412 · version 41c0 (not current: 9f3a is) · graded 17 Nov
+page: /tmp/fullmark/rust-basics-20261117-201412.html  (opened in your browser)
+```
 
 Exit: `0` built, `2` unknown quiz or attempt.
 
@@ -838,6 +1025,18 @@ quiz library review NAME [--since] [--timeout SECONDS] [--port N] [--no-open] [-
 | `--timeout`, `--port`, `--no-open` | As for `quiz review` (timeout `1800`) |
 | `--json` | The `listening` line, then `{"status": "written", "review", "keep", "fix", "drop", "committed"}`, or `{"status": "unchanged", "review"}` with `--since` and nothing to ask |
 
+**Output.**
+
+```text
+$ quiz library review rust-basics
+rust-basics · Rust basics · version 9f3a · 18 questions, 15 judged before
+serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
+
+written review.json: 14 keep (6 not looked at), 3 fix, 1 drop
+next: edit the quiz, then quiz library register FILE --update rust-basics
+committed 5d1e9a0 fullmark: review rust-basics
+```
+
 Exit: `0` written or nothing to ask, `2` unknown quiz, no library, timeout, Ctrl+C, a survey, or `--since` with no stored review.
 
 ### quiz library share
@@ -845,10 +1044,23 @@ Exit: `0` written or nothing to ask, `2` unknown quiz, no library, timeout, Ctrl
 **same**.
 
 ```text
-quiz library share NAME [-o DIR] [--version HASH] [--source]
+quiz library share NAME [-o DIR] [--version HASH] [--source] [--json]
 ```
 
 Writes the clean offline page to share, or with `--source` the editable folder (the original file name, assets, brief, and a `fullmark.toml` with the custom profile the quiz uses, if any). Default `DIR`: here.
+
+**Output.**
+
+```text
+$ quiz library share rust-basics
+written rust-basics.html · version 9f3a · 412 KB
+
+$ quiz library share rust-basics --source -o edit
+written edit/rust-basics/ · quiz.md, 4 assets, brief.yaml · version 9f3a
+next: edit it, then quiz library register edit/rust-basics/quiz.md --update rust-basics
+```
+
+With `--json`: `{"status": "written", "path", "version", "source"}`.
 
 Exit: `0` written, `2` unknown quiz or version.
 
@@ -861,6 +1073,14 @@ quiz library template add NAME [--as TEMPLATE] [--version HASH] [--skeleton] [--
 ```
 
 Stores a quiz from the library as a user template (`quiz template add`, for a library quiz): its source and assets at the current version, or at `--version HASH` as for `share`. The version is checked under the rules it was registered with (`check.json`), so a version that registered can be stored; the other options and the name rules are those of `quiz template add`. It reads the library and does not change it, so nothing is committed. This is the only `library template` command: templates live in your config folder, not in the library, so you list and remove them with `quiz template list` and `quiz template rm`.
+
+**Output.**
+
+```text
+$ quiz library template add rust-basics --as rust-week
+template added rust-week, from rust-basics version 9f3a
+next: quiz new rust-week PATH
+```
 
 Exit: `0` added or unchanged, `1` check errors or name taken, `2` unknown quiz or no library.
 
@@ -875,6 +1095,32 @@ quiz library grade NAME --web [--attempt STAMP] [--name NAME] [--timeout SECONDS
 
 Grades an attempt against the version it was taken on and writes the report into `quizzes/<id>/reports/` (never `results/`). With `--json`, also the grades template. `--web` opens the grading form as for `quiz grade`, pre-filled with the newest grades for that attempt. Every grades file is kept, and the newest counts. Commits.
 
+**Output.**
+
+```text
+$ quiz library grade ielts-writing
+ielts-writing · attempt 20261115-093012 · version 77b2
+report reports/20261115-093012-report.md · 61%* · 1 essay waiting for a grade
+next: quiz library grade ielts-writing --web, or --json for a grades template
+committed 2b9d0f4 fullmark: grade ielts-writing
+
+$ quiz library grade ielts-writing --grades ~/Downloads/grades.json
+ielts-writing · attempt 20261115-093012 · version 77b2
+grades kept grades/20261115-093012-20261118-150212-grades.json · ai, Claude Opus 5.5
+report reports/20261115-093012-report.md · 68% · nothing pending
+committed 6a01c55 fullmark: grade ielts-writing
+
+$ quiz library grade ielts-writing --web
+ielts-writing · attempt 20261115-093012 · version 77b2 · pre-filled from Claude Opus 5.5’s grades
+serving http://127.0.0.1:52990/?t=c41e…  (opened in your browser)
+
+grades kept grades/20261115-093012-20261118-154012-grades.json · human, Minh Tran
+report reports/20261115-093012-report.md · 70% · nothing pending
+committed 81f4e2a fullmark: grade ielts-writing
+```
+
+With `--json`: `{"status": "written", "attempt", "version", "report", "grades", "template", "graded", "pending", "committed"}`; `grades` is the grades file kept (null without `--grades` or `--web`), `template` the grades template written for an attempt with essays or code (null when there is nothing to grade). With `--web`, the `listening` line comes first.
+
 Exit: `0` written, `1` invalid grades, `2` unknown quiz or attempt, timeout, or the form was cancelled.
 
 ### quiz library stats
@@ -886,6 +1132,20 @@ quiz library stats NAME [--json]
 ```
 
 Progress over every attempt at a quiz, across versions, using the grades each attempt was made with. Writes nothing. One attempt is shown like several (Weakest stays empty until a tag is seen in two attempts, as its rule says).
+
+**Output.**
+
+```text
+$ quiz library stats rust-basics
+rust-basics · Rust basics · 17 attempts, 3 versions
+Attempts   20 Oct 62% · … · 10 Nov 71% (section ownership) · 17 Nov 80% · 18 Nov 67% (missed)
+Tags       borrowing 54% (13 of 24 points) · traits 70% · ownership 88% · no tag 75%
+Weakest    borrowing, traits
+Missed     q-k7m2qx "Which borrow…" wrong in 4 of 5 · q-a1b2c3 3 of 5
+Criteria   design 60% over 4 attempts
+```
+
+`--json` is `quiz stats`'s object, over every attempt at the quiz.
 
 Exit: `0`, `2` unknown quiz or no attempts.
 
@@ -899,6 +1159,16 @@ quiz library rename OLD NEW [--json]
 
 Changes a quiz's name. Its id and folder stay, and so do its shelf entries. Commits. One quiz per command: a batch rename is a pattern language for a rare job.
 
+**Output.**
+
+```text
+$ quiz library rename rust-basics rust
+renamed rust-basics to rust · id and folder unchanged (quizzes/rust-basics)
+committed 1c9a7d3 fullmark: rename rust-basics rust
+```
+
+With `--json`: `{"status": "renamed", "old", "new", "id", "committed"}`.
+
 Exit: `0`, `1` name taken, `2` unknown quiz.
 
 ### quiz library rm
@@ -911,6 +1181,21 @@ quiz library rm NAME [--yes] [--force] [--json]
 
 **Deletes** a quiz with its versions and results, and commits, so `git -C LIBRARY revert HEAD` brings it back. Asks for confirmation unless `--yes`; with `--json` and without `--yes` it exits 2, with the fix "add `--yes`", since `--json` never prompts (as `template rm`). Refused when the library is not its own git repository or the quiz folder has uncommitted changes (`--force` skips both). A quiz on the `public` shelf is removed from it at the next `publish`. One quiz per command, on purpose: a glob or a list makes a mass deletion one typo away, and each deletion is its own commit to revert.
 
+**Output.**
+
+```text
+$ quiz library rm chem-bonds
+delete chem-bonds (Chemical bonding): 2 versions, 6 attempts, 4 reports? [y/N] y
+deleted chem-bonds
+undo: git -C /home/minh/quiz-library revert 7e1f3a0
+
+$ quiz library rm chem-bonds
+error: quizzes/chem-bonds has uncommitted changes, so deleting it could not be undone
+    fix: commit or discard them, or add --force
+```
+
+With `--json` (and `--yes`): `{"status": "deleted", "name", "id", "committed"}`.
+
 Exit: `0` deleted, `1` refused, `2` unknown quiz.
 
 ### quiz library path
@@ -922,6 +1207,15 @@ quiz library path [NAME]
 ```
 
 Prints the library folder, or a quiz's folder.
+
+**Output.**
+
+```text
+$ quiz library path rust-basics
+/home/minh/quiz-library/quizzes/rust-basics
+```
+
+The path alone and nothing else, never coloured, so it can be used as `$(quiz library path NAME)`. A path under the working directory is still printed absolute here.
 
 ### quiz library publish
 

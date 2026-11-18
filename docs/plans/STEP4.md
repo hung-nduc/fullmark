@@ -8,7 +8,7 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](archive/STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
 
-**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G18; all decided but G7 and G15, the output, which wait for the owner's review of the CLI boards), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
+**Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G18, all decided on 2026-11-18), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
 
 **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
 
@@ -16,12 +16,12 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md | this file |
+| plan | written (2026-11-16); G8 to G15 added (2026-11-18); the owner decided G4 to G6 and G8 to G14 as recommended (2026-11-18), written into COMMANDS.md and TECHNICAL_DESIGN.md; G3 extended and G16 raised on the owner's questions; G7 and G15 drawn on the canvas; G18 raised and decided as recommended (2026-11-18), written into COMMANDS.md ("Terminal style") and TECHNICAL_DESIGN.md ; G1 to G3, G16 and G17 decided as recommended (2026-11-18), written into COMMANDS.md, TECHNICAL_DESIGN.md and USER_DESIGN.md ; the CLI boards approved (G7, G15) and written into COMMANDS.md (2026-11-18) | this file |
 
 ### Next
 
-1. The owner reviews the CLI boards on the canvas (G7, G15; row "CLI: quiz library").
-2. The planner writes the boards' text and JSON shapes into COMMANDS.md (G7, G15 decided), then **4a**'s brief. 4a needs none of the gaps and may start before the boards are approved.
+1. The owner approves **4a**'s brief (below, in its slice section).
+2. One implementing agent (Sonnet) builds 4a; the planner reviews it.
 
 ## Goal
 
@@ -44,9 +44,7 @@ Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-**G7. The output of the reading commands.** *Drawn on the canvas (2026-11-18), row "CLI: quiz library (G7, G15)": LibraryList, LibraryInfo, LibraryStatus. Done differently from the recommendation below: `list`'s marks are a last column, NOTES ("source changed", "1 ungraded", and "public" from step 5), not marks after the name, so the name column stays a plain name to copy; a score with grades pending carries an asterisk, as on the page.* `list`, `info` and `status` have `--plain` and `--json`; their terminal look is not drawn. **Recommendation:** the look of `stats` and `inspect` (step 3): a heading line, aligned columns, `--plain` with no colour; `list` one row per quiz, sorted by name, columns name, title, versions, attempts, last, best, taken, with `changed` and `ungraded` as marks after the name. No board: the goldens are the review.
-
-**G15. The output of every other library command.** *Drawn on the canvas (2026-11-18): LibrarySetup, LibraryTake, LibraryGrade, LibraryTidy, with the missing `--json` shapes. The common shape: a bold heading naming the quiz, attempt and version; one coloured verb per outcome (`registered`, `filed`, `report`, `written`, `deleted`); findings in `check`'s issue format with `fix:`; then, dim, `next:` and `committed <hash> <message>`. Once approved, the planner writes them into COMMANDS.md.* G7 covers `list`, `info` and `status`; the human output of `init`, `register`, `take`, `replay`, `grade`, `share`, `template add`, `rename`, `rm` and `path` is not drawn, and `init`, `share`, `rename`, `rm` and `path` have no `--json` shape (`library stats`'s is presumably `quiz stats`'s; `take`'s `status` values are not listed). **Recommendation:** before 4b, the planner writes a text sample and a `--json` shape for every library command into COMMANDS.md, in the style of `inspect` (G7), as one commit for the owner to read; the slices then build to them and the goldens check them.
+Every gap of step 4 is decided (G1 to G18, in [STEP4-GAPS.md](STEP4-GAPS.md)). New ones found while building are added here from G19.
 
 ## Slices
 
