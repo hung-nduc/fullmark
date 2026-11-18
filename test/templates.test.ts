@@ -42,7 +42,8 @@ describe("the built-in templates in dist/templates", () => {
 describe("content.names-control over what ships", () => {
   const quizzes = [
     ...readdirSync(join(root, "examples"), { withFileTypes: true })
-      .filter((e) => e.isDirectory())
+      // a build may leave a folder of its own beside the examples
+      .filter((e) => e.isDirectory() && existsSync(join(root, "examples", e.name, "quiz.md")))
       .map((e) => join(root, "examples", e.name, "quiz.md")),
     join(root, "templates", "blank", "quiz.md"),
   ];
