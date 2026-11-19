@@ -24,7 +24,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 ### Next
 
 1. Slice 5b is with one implementing agent on Sonnet; the planner reviews it when it reports.
-2. The shelf's index page is chosen (G16): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`; 5c builds it.
+2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
 
