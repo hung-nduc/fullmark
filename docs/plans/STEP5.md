@@ -19,11 +19,11 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | built and reviewed (2026-11-19), with G18 and G19's fixes; G20 and G21 decided as recommended (2026-11-19), G20's fix with an implementing agent | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475` |
+| 5c | built and reviewed (2026-11-19), with the fixes of G18, G19 and G20; G21 decided; step 5 waits for the owner's acceptance | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475`, `b071e07` |
 
 ### Next
 
-1. G20's fix (below) is built and checked; then the owner accepts step 5.
+1. The owner accepts step 5; the planner then archives this plan, as step 4's was, and step 6 (moving the owner's 0.x history in) is planned.
 2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
@@ -195,3 +195,5 @@ Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium 
 ### Fix (G20)
 
 **Approved by the owner on 2026-11-19** ([STEP5-GAPS.md](STEP5-GAPS.md), G20; COMMANDS.md, "The index page"). In `src/build/shelf-index.ts`, under 520 px, the line above a card's numbers is drawn once, across the card (on the row of numbers, or as the row's own border), not on each cell; the cells keep G19's columns and gap below it. `e2e/shelf.spec.ts`: at 360 × 780, the line's box spans the card's content width as one element. The goldens whose index pages change (count them; only `index.html` and the commit hashes that follow may move); the phone screens of `docs/screens/5c/` taken again. One commit; the full check in both browsers; `npm run samples`.
+
+**G20's fix, reviewed (2026-11-19):** built by an agent on Sonnet in `b071e07`: the line above a phone card's numbers is one `::after` across the card, the cells keeping G19's columns and gap below it; `e2e/shelf.spec.ts` checks, at 360 × 780, that the line spans the card's content width and that no cell draws its own. Goldens: the same 5 as G18 and G19's fix (the index pages, and `publish-sync-git`'s hash with them), nothing else. Screens: `02-five-phone-light`, `02-five-phone-dark` and `05-long-phone` taken again; the planner looked at the phone ones: one continuous line per card. The agent's full check passed (Vitest 3776; Playwright 879 passed, 543 skipped, both browsers). The planner's own run passed the startup tests alone and was then stopped from outside during Vitest, so the planner's last complete run is the one after G18 and G19 (877 passed); G20 changed one CSS rule and added one test per browser. The agent's bare `npx vitest run` under load failed the two startup-time tests, which pass when run alone first, as `npm run check` runs them: load, shown by the timings (120 ms and 339 ms against 60 and 180), not a fault.
