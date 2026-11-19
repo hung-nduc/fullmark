@@ -17,13 +17,13 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
-| 5a | brief written (2026-11-19), waiting for the owner's approval | |
+| 5a | brief approved (2026-11-19), with an implementing agent | |
 | 5b | | |
 | 5c | | |
 
 ### Next
 
-1. The owner approves slice 5a's brief; it goes to one implementing agent on Sonnet.
+1. Slice 5a is with one implementing agent on Sonnet; the planner reviews it when it reports.
 2. Before 5c: the shelf's index page is drawn on the "fullmark themes" canvas (G9).
 
 ## Goal
@@ -65,7 +65,7 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 
 ## Slice 5a: shelf entries, `publish --on | --off`, the sync
 
-**Brief written on 2026-11-19, waiting for the owner's approval.** What the commands do is written in COMMANDS.md, `quiz library publish` (the whole section, with its Output block) and `quiz library share` (G38); this brief says how to build it and how to show it works. `import` is slice 5b; the index page's final look is 5c.
+**Approved by the owner on 2026-11-19.** What the commands do is written in COMMANDS.md, `quiz library publish` (the whole section, with its Output block) and `quiz library share` (G38); this brief says how to build it and how to show it works. `import` is slice 5b; the index page's final look is 5c.
 
 ### Read first
 
