@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { expect, test } from "@playwright/test";
 import { historyLibrary, root, submitAttempt } from "./helpers";
 
@@ -55,7 +56,7 @@ test("following a quiz's link from the file system opens the quiz, which loads a
   page,
 }) => {
   const { shelf } = publishedShelf();
-  const home = `file:///${join(shelf, "index.html").replaceAll("\\", "/")}`;
+  const home = pathToFileURL(join(shelf, "index.html")).href;
   const problems: string[] = [];
   page.on("pageerror", (e) => problems.push(e.message));
   page.on("console", (m) => {
