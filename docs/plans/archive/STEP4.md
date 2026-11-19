@@ -1,12 +1,16 @@
 # Step 4: the library
 
+> **Archived (2026-11-19).** Step 4 (the library: `init`, `status`, `path`, `register`, `list`, `info`, `take` with `--section`, `--missed` and `--focus`, `replay`, `grade` with `--grades` and `--web`, `stats`, `review`, `share`, `template add`, `rename`, `rm`, and the `boxed` terminal style) is closed: every "Done when" criterion passed in Chromium and Firefox (slice 4f's review shows each part test by test), and the owner accepted the step on 2026-11-19 after trying the samples' `library take` (one attempt filed and committed). The owner chose to stop there: `take --missed`, `grade --web`, `replay` and `review` were not tried from the samples, and the `boxed` style was not compared with the LibraryStyleBordered board; the tests cover them. Its decided gaps, G1 to G38, are in [STEP4-GAPS.md](STEP4-GAPS.md); the decisions themselves live in `docs/design/`, which wins over anything here. Its "Rules for every slice" still hold, extended by the next plan. The rest is kept below as it was.
+>
+> **Step 5 starts here:** `publish` and `import`, planned in [docs/plans/STEP5.md](../STEP5.md), which starts with step 4's G38 (decided, not built).
+
 ## Handoff (2026-11-16): start here
 
 A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](archive/STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
+As in step 3 ([archive/STEP3.md](STEP3.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox, the screens when there are any) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again in each step; outside the plan one is cited with its step ("step 4, G3"; "STEP4.md, G3" in a code comment), so step 3's G1 to G148 ([archive/STEP3-GAPS.md](STEP3-GAPS.md)) are never confused with these. Decided ones move to [STEP4-GAPS.md](STEP4-GAPS.md).
 
 **Run faster than step 3** (for the owner to confirm with this plan): the design's open questions are raised **together, now** (G1 to G18, all decided on 2026-11-18), not one per slice; slices are fewer and larger, since the library is mostly files and history with little new on screen; any visual polish waits for the last slice. The screens are reproducible (TECHNICAL_DESIGN.md, foundation 8), so a slice's screen diff shows only what it changed.
 
@@ -22,7 +26,7 @@ As in step 3 ([archive/STEP3.md](archive/STEP3.md), Handoff): the planner writes
 | 4c | built and reviewed (2026-11-18); G22 decided, built first in 4d | `6a72610`, `9ed801f`, `3432db5` |
 | 4d | built and reviewed (2026-11-18); G23 to G26 decided (2026-11-19), G25 and G26 built first in 4e | `ac3301f`, `da851a0`, `75be49c`, `6df65f2` |
 | 4e | built and reviewed (2026-11-19); G30 to G33 decided (2026-11-19), built first in 4f | `aa78170`, `fa0b3dd`, `63c2d5e`, `a945e7d` |
-| 4f | built and reviewed (2026-11-19); G38 decided (2026-11-19), built first in step 5; step 4 waits for the owner's acceptance | `6e4f6ca`, `49e6611`, `2ff867f`, `3cb7793`, `8dc6236`, `8981d40`, `1c86cd5` |
+| 4f | built and reviewed (2026-11-19); G38 decided (2026-11-19), built first in step 5; step 4 accepted by the owner (2026-11-19) | `6e4f6ca`, `49e6611`, `2ff867f`, `3cb7793`, `8dc6236`, `8981d40`, `1c86cd5` |
 
 ### Next
 
@@ -39,7 +43,7 @@ The library: one folder under git that keeps each quiz's versions, the attempts 
 
 ## Rules for every slice
 
-Step 3's rules hold ([archive/STEP3.md](archive/STEP3.md), "Rules for every slice", extending step 2's): goldens are the contract; a failure is environmental only when its cause is shown; no real network or real timers in unit tests; a command loads only what it uses; shared pages carry no server code; commits end with the `Co-Authored-By` line of the model that made them, with explicit paths only (never `git add -A`, `-a` or `--amend`); the implementing agent never pushes. Added for step 4:
+Step 3's rules hold ([archive/STEP3.md](STEP3.md), "Rules for every slice", extending step 2's): goldens are the contract; a failure is environmental only when its cause is shown; no real network or real timers in unit tests; a command loads only what it uses; shared pages carry no server code; commits end with the `Co-Authored-By` line of the model that made them, with explicit paths only (never `git add -A`, `-a` or `--amend`); the implementing agent never pushes. Added for step 4:
 
 - **`src/library/` uses core's public API only**, and nothing in `core`, `build` or `serve` imports it (section 7; the lint boundary is added in 4b).
 - **Git is real in tests, in a temp folder**: a library test runs real `git` in a fresh temporary folder with a fixed author, committer and date (`GIT_AUTHOR_DATE`, `GIT_COMMITTER_DATE`), so commits are reproducible. Failure cases (no `git` on the path, a commit that fails) use an injected runner, never a broken machine.
@@ -72,7 +76,7 @@ Each slice's brief is written here when the one before it is reviewed; 4a's can 
 
 ### Read first
 
-- This plan: "Rules for every slice"; [archive/STEP3-GAPS.md](archive/STEP3-GAPS.md), G146 to G148 (the texts found by reading that this rule would have caught).
+- This plan: "Rules for every slice"; [archive/STEP3-GAPS.md](STEP3-GAPS.md), G146 to G148 (the texts found by reading that this rule would have caught).
 - TECHNICAL_DESIGN.md, section 5: "Rule catalogue (v1)", "Ignoring one finding", "Rules for agents"; QUIZ_SYNTAX.md, section 8, and the `check-ignore` attribute (section 6).
 - Code: `src/core/rules/quality.ts` (how a quality rule is declared: `id`, `level`, `summary`, `why`, `example`, `fix`, `options`, `run`; `explanation.short` is a close model), `src/core/ir.ts` (where each text a learner reads lives, and its line), `src/core/i18n/en.ts` and `vi.ts` (the control labels: keys `check`, `submit`, `flag`, `hint`), `test/rules/quality.test.ts` and `test/rules/registry.test.ts`, `test/templates.test.ts`.
 
