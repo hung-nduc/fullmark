@@ -182,8 +182,14 @@ export function openLibrary(
 export const findQuiz = (index: LibraryIndex, name: string): IndexQuiz | undefined =>
   index.quizzes.find((q) => q.name === name) ?? index.quizzes.find((q) => q.id === name);
 
-/** `error: no quiz named NAME`, with the nearest names (exit 2). */
-export function noSuchQuiz(io: LibraryIo, json: boolean, index: LibraryIndex, name: string): ExitCode {
+/** `error: no quiz named NAME`, with the nearest names (exit 2; `publish` exits 1, as its section says). */
+export function noSuchQuiz(
+  io: LibraryIo,
+  json: boolean,
+  index: LibraryIndex,
+  name: string,
+  code: ExitCode = EXIT.usage,
+): ExitCode {
   const names = index.quizzes.flatMap((q) => (q.name === q.id ? [q.name] : [q.name, q.id]));
   const near = suggest(name, names);
   const hint =
@@ -195,7 +201,7 @@ export function noSuchQuiz(io: LibraryIo, json: boolean, index: LibraryIndex, na
   if (json) io.out(JSON.stringify({ status: "error", message: `no quiz named ${name}`, fix: hint.trim() }));
   io.err(`error: no quiz named ${name}`);
   io.err(hint);
-  return EXIT.usage;
+  return code;
 }
 
 /**

@@ -18,6 +18,29 @@ const VersionSchema = z
   })
   .strict();
 
+/**
+ * One shelf entry of a quiz: `{ shelf = "public", kind = "quiz" }` (COMMANDS.md, `quiz library publish`; `version` is
+ * reserved). v1 commands touch only the shelf `public` and `kind = "quiz"`; every other entry is kept, field for field.
+ */
+const ShelfEntrySchema = z.looseObject({
+  shelf: z.string().min(1),
+  kind: z.string().min(1),
+});
+export type ShelfEntry = z.infer<typeof ShelfEntrySchema>;
+
+/** The shelf the v1 commands know, and the one kind of entry they put on it. */
+export const PUBLIC_SHELF = "public";
+export const QUIZ_KIND = "quiz";
+
+/** Whether the quiz is on the public shelf as a quiz (an entry of another kind is not published by v1). */
+export const isPublished = (quiz: { shelves: readonly ShelfEntry[] }): boolean =>
+  quiz.shelves.some((e) => e.shelf === PUBLIC_SHELF && e.kind === QUIZ_KIND);
+
+/** The names of the shelves a quiz has entries on, each once, in the order of its entries. */
+export const shelfNames = (quiz: { shelves: readonly ShelfEntry[] }): string[] => [
+  ...new Set(quiz.shelves.map((e) => e.shelf)),
+];
+
 const QuizSchema = z
   .object({
     id: z.string().min(1),
@@ -25,11 +48,11 @@ const QuizSchema = z
     source: z.string(),
     current: z.string().regex(HASH, "must be a hash: 64 lowercase hexadecimal characters"),
     versions: z.array(VersionSchema).min(1),
-    shelves: z.array(z.string()).default([]),
+    shelves: z.array(ShelfEntrySchema).default([]),
   })
   .strict();
 
-/** A quiz of the index, with its name; `shelves` is reserved for step 5. */
+/** A quiz of the index, with its name. */
 export type IndexQuiz = z.infer<typeof QuizSchema> & { name: string };
 export type LibraryIndex = {
   format: typeof FORMAT;
@@ -151,6 +174,27 @@ export function readIndex(text: string): IndexRead {
 /** A TOML basic string. `JSON.stringify` writes one, except that TOML wants DEL escaped too. */
 const str = (s: string): string => JSON.stringify(s).replaceAll("\u007f", "\\u007f");
 
+const bareKey = /^[A-Za-z0-9_-]+$/;
+
+/** A TOML value as an inline one: strings, numbers, booleans, times, arrays and tables. */
+function inline(v: unknown): string {
+  if (typeof v === "string") return str(v);
+  if (typeof v === "number" || typeof v === "boolean" || typeof v === "bigint") return String(v);
+  if (Array.isArray(v)) return `[${v.map(inline).join(", ")}]`;
+  if (v !== null && typeof v === "object") {
+    if (typeof (v as { toISOString?: unknown }).toISOString === "function") return (v as Date).toISOString();
+    const parts = Object.entries(v).map(([k, x]) => `${bareKey.test(k) ? k : str(k)} = ${inline(x)}`);
+    return parts.length === 0 ? "{}" : `{ ${parts.join(", ")} }`;
+  }
+  return str(String(v));
+}
+
+/** One shelf entry: `shelf` and `kind` first, then every other field in the order it was read. */
+const renderEntry = (e: ShelfEntry): string => {
+  const { shelf, kind, ...rest } = e;
+  return inline({ shelf, kind, ...rest });
+};
+
 /** The text of an index: the same bytes for the same index (keys in a fixed order, quizzes sorted, a final newline). */
 export function renderIndex(index: LibraryIndex): string {
   const lines = [`format = ${str(index.format)}`, `version = ${index.version}`, `created = ${str(index.created)}`];
@@ -163,7 +207,7 @@ export function renderIndex(index: LibraryIndex): string {
       `source = ${str(q.source)}`,
       `current = ${str(q.current)}`,
       `versions = [${q.versions.map((v) => `{ hash = ${str(v.hash)}, added = ${str(v.added)}, file = ${str(v.file)} }`).join(", ")}]`,
-      `shelves = [${q.shelves.map(str).join(", ")}]`,
+      `shelves = [${q.shelves.map(renderEntry).join(", ")}]`,
     );
   }
   return `${lines.join("\n")}\n`;

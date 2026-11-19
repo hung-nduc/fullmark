@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { formatDuration, summarise, summaryLines } from "../core/inspect";
 import { reviewCounts, reviewRow } from "../core/review/counts";
 import { readReview } from "../core/review/read";
-import type { IndexQuiz } from "../library/index-file";
+import { type IndexQuiz, shelfNames } from "../library/index-file";
 import { libraryPaths, shortHash } from "../library/layout";
 import { diffVersions, questionHashes } from "../library/versions";
 import { EXIT, type ExitCode } from "./exit-codes";
@@ -173,7 +173,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
     return `${short(h.hash)}  ${shortDay(h.added, now).padStart(6)}  ${joined}`;
   });
   versionLines.forEach((l, i) => facts.push(i === 0 ? row("Versions", l) : row("", l)));
-  facts.push(row("Shelves", quiz.shelves.length > 0 ? quiz.shelves.join(", ") : "none"));
+  facts.push(row("Shelves", shelfNames(quiz).length > 0 ? shelfNames(quiz).join(", ") : "none"));
 
   if (history.attempts.length === 0) facts.push(row("Attempts", "none"));
   else {

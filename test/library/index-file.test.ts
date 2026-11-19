@@ -2,7 +2,15 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { writeFileAtomic } from "../../src/cli/atomic";
-import { emptyIndex, type LibraryIndex, readIndex, renderIndex, writeIndex } from "../../src/library/index-file";
+import {
+  emptyIndex,
+  isPublished,
+  type LibraryIndex,
+  readIndex,
+  renderIndex,
+  shelfNames,
+  writeIndex,
+} from "../../src/library/index-file";
 import { cleanTemps, tempDir } from "../helpers/library";
 
 afterEach(cleanTemps);
@@ -32,7 +40,7 @@ const index: LibraryIndex = {
       source: "C:\\quizzes\\rust.md",
       current: H1,
       versions: [{ hash: H1, added: "2026-11-17T09:00:00+07:00", file: "rust.md" }],
-      shelves: ["public"],
+      shelves: [{ shelf: "public", kind: "quiz" }],
     },
   ],
 };
@@ -56,7 +64,7 @@ describe("library.toml", () => {
     expect(read.index.quizzes.map((q) => q.name)).toEqual(["rust-basics", "signals"]);
     expect(read.index.quizzes[1]?.title).toBe('Signals "and" systems');
     expect(read.index.quizzes[0]?.source).toBe("C:\\quizzes\\rust.md");
-    expect(read.index.quizzes[0]?.shelves).toEqual(["public"]);
+    expect(read.index.quizzes[0]?.shelves).toEqual([{ shelf: "public", kind: "quiz" }]);
     expect(renderIndex(read.index)).toBe(text);
   });
 
@@ -78,6 +86,36 @@ describe("library.toml", () => {
   it("reads a quiz with `shelves` left out, as empty", () => {
     const r = readIndex(head + quiz());
     expect(r.ok && r.index.quizzes[0]?.shelves).toEqual([]);
+  });
+
+  it("reads shelf entries as tables, and writes them back byte for byte, unknown entries and fields included", () => {
+    const entries = `{ shelf = "public", kind = "quiz", version = "${H1}" }, { shelf = "notes", kind = "bundle", items = ["a", "b"], extra = { n = 2, ok = true } }, { shelf = "x", kind = "quiz", "odd key" = 1.5 }`;
+    const text = head + quiz(`shelves = [${entries}]\n`);
+    const r = readIndex(text);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.index.quizzes[0]?.shelves).toHaveLength(3);
+    expect(r.index.quizzes[0]?.shelves[1]).toEqual({
+      shelf: "notes",
+      kind: "bundle",
+      items: ["a", "b"],
+      extra: { n: 2, ok: true },
+    });
+    expect(renderIndex(r.index)).toBe(text);
+    expect(shelfNames(r.index.quizzes[0] as never)).toEqual(["public", "notes", "x"]);
+    expect(isPublished(r.index.quizzes[0] as never)).toBe(true);
+  });
+
+  it("an entry of another kind on `public` does not make a quiz published; an old `shelves = []` reads as before", () => {
+    const r = readIndex(head + quiz('shelves = [{ shelf = "public", kind = "bundle" }]\n'));
+    expect(r.ok && isPublished(r.index.quizzes[0] as never)).toBe(false);
+    const old = readIndex(head + quiz("shelves = []\n"));
+    expect(old.ok && old.index.quizzes[0]?.shelves).toEqual([]);
+  });
+
+  it("refuses a shelf entry with no string `shelf` or `kind`, with its line", () => {
+    expect(problemsOf(head + quiz('shelves = [{ shelf = "public" }]\n'))[0]).toMatch(/^11: quiz `a`:/);
+    expect(problemsOf(head + quiz('shelves = ["public"]\n'))[0]).toMatch(/^11: quiz `a`:/);
   });
 
   it("names a foreign library: another version, another format, none (0.x)", () => {

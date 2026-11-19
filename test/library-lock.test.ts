@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryGrade } from "../src/cli/library-grade";
 import { runLibraryInit } from "../src/cli/library-init";
+import { runLibraryPublish } from "../src/cli/library-publish";
 import { runLibraryRename } from "../src/cli/library-rename";
 import { runLibraryRm } from "../src/cli/library-rm";
 import { runLibraryTake, type TakeIo } from "../src/cli/library-take";
@@ -10,6 +11,7 @@ import type { LockEnv } from "../src/library/lock";
 import { capture } from "./helpers/cli";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { fileAttempt, gradeOptions, quizOf, type T, writingLibrary } from "./helpers/library-grade";
+import { publishOptions } from "./helpers/library-publish";
 import { quizText } from "./helpers/library-register";
 import { finish, KEEP, webReview } from "./helpers/library-review";
 
@@ -235,6 +237,22 @@ describe("a library command that changes the library waits for the lock, fails b
     expect(await commits(t)).toBe(before);
     rmSync(lockIn(t.lib));
     expect(await runLibraryRename("writing", "essays", { json: false, plain: true }, t.at().io)).toBe(0);
+    expect(await commits(t)).toBe(before + 1);
+  });
+
+  it("publish NAME --on", async () => {
+    const t = await writing();
+    const before = await commits(t);
+    hold(t.lib);
+    const { env: lock, sleeps } = held();
+    const c = t.at();
+    expect(await runLibraryPublish("writing", publishOptions({ on: true }), { ...c.io, lock })).toBe(2);
+    expect(busyIn(c.err)).toBe(true);
+    expect(sleeps).toHaveLength(100);
+    expect(await commits(t)).toBe(before);
+    expect(readFileSync(join(t.lib, "library.toml"), "utf8")).not.toContain("public");
+    rmSync(lockIn(t.lib));
+    expect(await runLibraryPublish("writing", publishOptions({ on: true }), t.at().io)).toBe(0);
     expect(await commits(t)).toBe(before + 1);
   });
 

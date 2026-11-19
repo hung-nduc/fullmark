@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { recordLibrary, withLibraryKey } from "../src/cli/config-write";
+import { recordLibrary, recordShelf, withLibraryKey, withShelfKey } from "../src/cli/config-write";
 import { parseConfig } from "../src/core/config/parse";
 import { cleanTemps, tempDir } from "./helpers/library";
 
@@ -79,5 +79,39 @@ describe("the machine config's library, git and [terminal]", () => {
     expect(parseConfig('library = "x"\n', "fullmark.toml", "project").errors.map((e) => e.message)).toEqual([
       "unknown key `library`",
     ]);
+  });
+});
+
+describe("recording a shelf's folder in config.toml (step 5, G4)", () => {
+  it("adds [shelves] at the end, keeping the rest of the file", () => {
+    const before = '# mine\nlibrary = "/lib"\n\n[terminal]\nstyle = "boxed"\n';
+    const after = withShelfKey(before, "public", "/sites/quizzes");
+    expect(after).toBe(`${before}\n[shelves]\npublic = "/sites/quizzes"\n`);
+    expect(parseConfig(after, "config.toml", "user").data?.shelves).toEqual({ public: "/sites/quizzes" });
+    expect(withShelfKey("", "public", "/s")).toBe('[shelves]\npublic = "/s"\n');
+  });
+
+  it("replaces the value of an existing key, with its comment; adds the key under an existing header", () => {
+    const has = '[shelves]\npublic = "/old" # the site\nother = "/o"\n\n[terminal]\nstyle = "boxed"\n';
+    expect(withShelfKey(has, "public", "/new")).toBe(has.replace('"/old"', '"/new"'));
+    const bare = '# c\n[shelves]\nother = "/o"\n\n[terminal]\nstyle = "boxed"\n';
+    expect(withShelfKey(bare, "public", "/new")).toBe(
+      '# c\n[shelves]\npublic = "/new"\nother = "/o"\n\n[terminal]\nstyle = "boxed"\n',
+    );
+  });
+
+  it("writes an inline table again, escapes a Windows path, keeps CRLF, and writes atomically", async () => {
+    expect(withShelfKey('shelves = { other = "/o" }\n', "public", "/p")).toBe(
+      'shelves = { other = "/o", public = "/p" }\n',
+    );
+    const crlf = withShelfKey('library = "/l"\r\n', "public", "C:\\sites\\q");
+    expect(crlf).toBe('library = "/l"\r\n\r\n[shelves]\r\npublic = "C:\\\\sites\\\\q"\r\n');
+    expect(parseConfig(crlf, "c", "user").data?.shelves.public).toBe("C:\\sites\\q");
+    const dir = tempDir();
+    const file = join(dir, "x", "config.toml");
+    await recordShelf(file, "public", "/s");
+    expect(readFileSync(file, "utf8")).toBe('[shelves]\npublic = "/s"\n');
+    await recordShelf(file, "public", "/t");
+    expect(readFileSync(file, "utf8")).toBe('[shelves]\npublic = "/t"\n');
   });
 });

@@ -69,6 +69,7 @@ export function parseConfig(text: string, file: string, kind: "project" | "user"
     check: { profile: null, profileLine: 1, failOn: null, failOnLine: 1 },
     fonts: null,
     library: null,
+    shelves: {},
     git: null,
     terminalStyle: null,
     profiles: new Map(),
@@ -392,6 +393,17 @@ function readMachineKeys(
     if (value === undefined) continue;
     if (typeof value === "string" && value !== "") data[key] = value;
     else fail([key], `\`${key}\` must be a path, in quotes, not ${describe(value)}`, fix);
+  }
+  const shelves = doc.shelves;
+  if (shelves !== undefined) {
+    if (!isTable(shelves))
+      fail(["shelves"], `\`shelves\` must be a table, not ${describe(shelves)}`, "write [shelves]");
+    else {
+      for (const [name, value] of Object.entries(shelves)) {
+        if (typeof value === "string" && value !== "") data.shelves[name] = value;
+        else fail(["shelves", name], `\`${name}\` must be a folder, in quotes, not ${describe(value)}`);
+      }
+    }
   }
   const terminal = doc.terminal;
   if (terminal === undefined) return;

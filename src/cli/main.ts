@@ -725,6 +725,41 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         io,
       );
     });
+  library
+    .command("publish")
+    .description("mark a quiz for the public shelf (--on, --off), or sync the shelf folder with the library")
+    .argument(
+      "[target]",
+      "a quiz's name or id with --on or --off; else the shelf's folder (default: the remembered one)",
+    )
+    .option("--on", "put the quiz on the public shelf")
+    .option("--off", "take the quiz off the public shelf")
+    .option("--with-brief", "copy each quiz's brief.yaml too")
+    .option("--no-brief", "copy no brief.yaml (the default)")
+    .option("--ui-lang <lang>", "the index page's interface language: en or vi (default: en)")
+    .option("--fonts <which>", "which fonts the pages embed: quiz (the quiz's own), all or none")
+    .option("--dry-run", "print what would be added, updated and removed, and write nothing")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (target: string | undefined, options: Record<string, unknown>) => {
+      const text = (key: string): string | null => (options[key] as string | undefined) ?? null;
+      outcome.exit = await (await import("./library-publish")).runLibraryPublish(
+        target ?? null,
+        {
+          on: Boolean(options.on),
+          off: Boolean(options.off),
+          withBrief: Boolean(options.withBrief),
+          noBrief: options.brief === false,
+          uiLang: text("uiLang"),
+          fonts: text("fonts"),
+          dryRun: Boolean(options.dryRun),
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+          program: VERSION,
+        },
+        io,
+      );
+    });
   const libraryTemplate = library.command("template").description("templates from the library");
   libraryTemplate
     .command("add")

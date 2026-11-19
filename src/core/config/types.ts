@@ -50,6 +50,8 @@ export type ConfigFileData = {
   fonts: "quiz" | "all" | "none" | null;
   /** `library = "PATH"` at the top of the machine `config.toml`, as written (a relative path is relative to the file) */
   library: string | null;
+  /** `[shelves]`: the folder of each shelf by its name (`public = "/abs/path"`), as written */
+  shelves: Record<string, string>;
   /** `git = "PATH"`: the `git` to run when it is not on the path, as written */
   git: string | null;
   /** `[terminal] style`: how tables and blocks are drawn (COMMANDS.md, "Terminal style") */

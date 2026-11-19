@@ -54,6 +54,7 @@ describe("the library commands have contract tests", () => {
       "init",
       "list",
       "path",
+      "publish",
       "register",
       "rename",
       "replay",

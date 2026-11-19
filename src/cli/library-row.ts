@@ -4,7 +4,7 @@ import type { Quiz } from "../core/ir";
 import { readReview } from "../core/review/read";
 import { reviewFindings } from "../core/rules/review";
 import { CHECK_FILE, readCheck } from "../library/check-file";
-import type { IndexQuiz } from "../library/index-file";
+import { type IndexQuiz, shelfNames } from "../library/index-file";
 import { libraryPaths } from "../library/layout";
 import { loadStored } from "./library-common";
 import { type QuizHistory, readHistory } from "./library-history";
@@ -115,7 +115,7 @@ export function listRow(
     profile: content.profile,
     tags: [...new Set((summary?.tags ?? []).flatMap((t) => (t.tag === null ? [] : [t.tag])))].sort(compare),
     types: (summary?.types ?? []).map((t) => t.type).sort(compare),
-    shelves: quiz.shelves,
+    shelves: shelfNames(quiz),
     questions: summary?.questions ?? 0,
     points: summary?.points ?? 0,
     versions: quiz.versions.length,

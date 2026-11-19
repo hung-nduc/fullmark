@@ -1,3 +1,4 @@
+import { type IndexQuiz, isPublished } from "../library/index-file";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { type LibraryIo, machineOf, nowOf, openLibrary, painterFor } from "./library-common";
 import { readHistory } from "./library-history";
@@ -43,6 +44,7 @@ export function runLibraryList(opts: LibraryListOptions, io: LibraryIo): ExitCod
     const score = r.score === null ? "–" : p.band(`${percentText(r.score)}${star}`, r.score);
     const notes = [
       r.changed ? p.tag("source changed", "yellow") : null,
+      isPublished(quizzes[i] as IndexQuiz) ? p.tag("public", "green") : null,
       r.ungraded ? p.tag(`${h?.ungraded.length ?? 0} ungraded`, "cyan") : null,
       r.flagged > 0 ? p.tag(`${r.flagged} flagged`, "yellow") : null,
     ].filter((x): x is string => x !== null);
