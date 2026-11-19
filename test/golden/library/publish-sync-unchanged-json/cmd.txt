@@ -1,0 +1,3 @@
+library
+publish
+--json

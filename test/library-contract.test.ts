@@ -128,4 +128,29 @@ describe("the library commands have contract tests", () => {
     expect(readFileSync(join(fixture, "library.toml"), "utf8")).toContain("[quizzes.tidy]");
     expect(existsSync(join(fixture, "quizzes", "tidy", "review.json"))).toBe(true);
   });
+
+  it("publish and import: the --json goldens cover both forms of publish and every status of import, each stdout one object", () => {
+    const object = (name: string): Record<string, unknown> => {
+      const lines = readFileSync(join(golden, name, "stdout.txt"), "utf8")
+        .split("\n")
+        .filter(Boolean);
+      expect(lines, name).toHaveLength(1);
+      return JSON.parse(lines[0] as string) as Record<string, unknown>;
+    };
+    // publish NAME --on
+    expect(object("publish-on-json")).toMatchObject({ status: "on", name: "limits-and-continuity" });
+    // publish DIR: published, unchanged and the dry run
+    expect(object("publish-sync-json")).toMatchObject({ status: "published", added: ["study", "tidy"], removed: [] });
+    expect(object("publish-sync-unchanged-json")).toMatchObject({
+      status: "unchanged",
+      added: [],
+      updated: [],
+      removed: [],
+    });
+    expect(object("publish-sync-dry-run-json")).toMatchObject({ dry_run: true, added: ["study", "tidy"] });
+    // import: imported, unchanged and problems
+    expect(object("import-json")).toMatchObject({ status: "imported", imported: ["study-fixture", "tidy"] });
+    expect(object("import-unchanged-json")).toMatchObject({ status: "unchanged", imported: [] });
+    expect(object("import-problems-json")).toMatchObject({ status: "problems", imported: [] });
+  });
 });
