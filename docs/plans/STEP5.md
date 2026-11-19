@@ -18,12 +18,12 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
-| 5b | brief written (2026-11-19), waiting for the owner's approval | |
+| 5b | brief approved (2026-11-19), with an implementing agent | |
 | 5c | | |
 
 ### Next
 
-1. The owner approves slice 5b's brief; it goes to one implementing agent on Sonnet.
+1. Slice 5b is with one implementing agent on Sonnet; the planner reviews it when it reports.
 2. Before 5c: the shelf's index page is drawn on the "fullmark themes" canvas (G9).
 
 ## Goal
@@ -107,7 +107,7 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 
 ## Slice 5b: `import`, the round trip, the samples' shelf
 
-**Brief written on 2026-11-19, waiting for the owner's approval.** What `import` does is written in COMMANDS.md, `quiz library import` (the whole section, with its Output block); this brief says how to build it and how to show it works. The index page's final look is 5c.
+**Approved by the owner on 2026-11-19.** What `import` does is written in COMMANDS.md, `quiz library import` (the whole section, with its Output block); this brief says how to build it and how to show it works. The index page's final look is 5c.
 
 ### Read first
 
