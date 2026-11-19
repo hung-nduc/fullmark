@@ -454,6 +454,58 @@
       "h": 954,
       "is_interactive": true,
       "title": "Variant B, for comparison: no borders, a shaded header, scores by band, tags and badges (Tweaks: dark, light, plain)"
+    },
+    "ShelfTable.dc.html": {
+      "x": 0,
+      "y": 30320,
+      "w": 1280,
+      "h": 940,
+      "is_interactive": true,
+      "title": "Alternative B, a table: the type (Exam under the exam profile, else Practice; instant feedback noted), the question types under each title, questions, points, time limit, pass mark; a count of quizzes and languages (Tweaks: light or dark, en or vi, desktop or phone, five or a long shelf)"
+    },
+    "ShelfTableDark.dc.html": {
+      "x": 1360,
+      "y": 30320,
+      "w": 1280,
+      "h": 940,
+      "title": "Alternative B, dark"
+    },
+    "ShelfTableVi.dc.html": {
+      "x": 2720,
+      "y": 30320,
+      "w": 1280,
+      "h": 940,
+      "title": "Alternative B, --ui-lang vi"
+    },
+    "ShelfTablePhone.dc.html": {
+      "x": 4080,
+      "y": 30320,
+      "w": 390,
+      "h": 844,
+      "title": "Alternative B on a phone: each row becomes a card, the numbers in a row of four"
+    },
+    "ShelfTablePhoneDark.dc.html": {
+      "x": 4550,
+      "y": 30320,
+      "w": 390,
+      "h": 844,
+      "title": "Alternative B on a phone, dark"
+    },
+    "ShelfTableLong.dc.html": {
+      "x": 5020,
+      "y": 30320,
+      "w": 1280,
+      "h": 940,
+      "is_interactive": true,
+      "title": "Alternative B, a long shelf (24 quizzes): the page scrolls and the column headings stay at the top (CSS only, no script). Scroll it"
+    },
+    "ShelfTablePhoneLong.dc.html": {
+      "x": 6380,
+      "y": 30320,
+      "w": 390,
+      "h": 844,
+      "is_interactive": true,
+      "title": "A long shelf on a phone: the cards scroll with the page. Scroll it"
     }
   },
   "createdOnFiles": {

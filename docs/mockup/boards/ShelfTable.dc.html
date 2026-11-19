@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>The shelf's index page as a table</title>
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <style>
+          body {
+            margin: 0;
+          }
+          a {
+            color: inherit;
+          }
+        </style>
+      </helmet>
+      <div style="{{rootStyle}}">
+        <main style="{{mainStyle}}">
+          <div style="width: 100%; max-width: 1040px; display: flex; flex-direction: column; gap: {{gap}}">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <h1 style="margin: 0; font-size: {{h1Size}}; line-height: 1.2; font-weight: 700; overflow-wrap: anywhere">{{folder}}</h1>
+              <span style="font-size: 0.9em; color: {{t.muted}}">{{summary}}</span>
+            </div>
+
+            <sc-if value="{{wide}}" hint-placeholder-val="{{ true }}">
+              <div style="{{boxStyle}}">
+                <table style="width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums">
+                  <caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{listLabel}}</caption>
+                  <thead>
+                    <tr style="background: {{t.sunken}}">
+                      <th scope="col" style="{{thLeft}}">{{h.quiz}}</th>
+                      <th scope="col" style="{{thLeft}}">{{h.type}}</th>
+                      <th scope="col" style="{{thRight}}">{{h.questions}}</th>
+                      <th scope="col" style="{{thRight}}">{{h.points}}</th>
+                      <th scope="col" style="{{thRight}}">{{h.time}}</th>
+                      <th scope="col" style="{{thRight}}">{{h.pass}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+                      <tr style="border-top: 1px solid {{t.line}}">
+                        <th scope="row" style="{{tdQuiz}}">
+                          <span style="display: flex; flex-direction: column; gap: 4px">
+                            <span style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+                              <a href="{{r.href}}" lang="{{r.lang}}" style="font-weight: 700; color: {{t.accent}}; text-decoration: none; overflow-wrap: anywhere">{{r.title}}</a>
+                              <span title="{{r.langName}}" style="{{badge}}">{{r.badge}}</span>
+                            </span>
+                            <span style="font-size: 0.85em; font-weight: 400; color: {{t.muted}}">{{r.kinds}}</span>
+                          </span>
+                        </th>
+                        <td style="{{tdLeft}}">
+                          <span style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start">
+                            <span style="{{r.typeStyle}}">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="{{r.typeIcon}}"></path>
+                              </svg>
+                              {{r.type}}
+                            </span>
+                            <sc-if value="{{r.instant}}" hint-placeholder-val="{{ false }}">
+                              <span style="font-size: 0.8em; color: {{t.muted}}">{{instantText}}</span>
+                            </sc-if>
+                          </span>
+                        </td>
+                        <td style="{{tdRight}}">{{r.questions}}</td>
+                        <td style="{{tdRight}}">{{r.points}}</td>
+                        <td style="{{tdRight}}">{{r.time}}</td>
+                        <td style="{{tdRight}}">{{r.pass}}</td>
+                      </tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{phone}}" hint-placeholder-val="{{ false }}">
+              <ul aria-label="{{listLabel}}" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+                <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+                  <li style="{{cardStyle}}">
+                    <span style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px">
+                      <a href="{{r.href}}" lang="{{r.lang}}" style="font-weight: 700; color: {{t.accent}}; text-decoration: none; overflow-wrap: anywhere">{{r.title}}</a>
+                      <span title="{{r.langName}}" style="{{badge}}; flex-shrink: 0">{{r.badge}}</span>
+                    </span>
+                    <span style="font-size: 0.85em; color: {{t.muted}}">{{r.kinds}}</span>
+                    <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+                      <span style="{{r.typeStyle}}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="{{r.typeIcon}}"></path>
+                        </svg>
+                        {{r.type}}
+                      </span>
+                      <sc-if value="{{r.instant}}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size: 0.8em; color: {{t.muted}}">{{instantText}}</span>
+                      </sc-if>
+                    </span>
+                    <dl style="margin: 4px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid {{t.line}}; padding-top: 8px; font-variant-numeric: tabular-nums">
+                      <span style="display: flex; flex-direction: column"><dt style="{{dt}}">{{h.questions}}</dt><dd style="{{dd}}">{{r.questions}}</dd></span>
+                      <span style="display: flex; flex-direction: column"><dt style="{{dt}}">{{h.points}}</dt><dd style="{{dd}}">{{r.points}}</dd></span>
+                      <span style="display: flex; flex-direction: column"><dt style="{{dt}}">{{h.timeShort}}</dt><dd style="{{dd}}">{{r.time}}</dd></span>
+                      <span style="display: flex; flex-direction: column"><dt style="{{dt}}">{{h.passShort}}</dt><dd style="{{dd}}">{{r.pass}}</dd></span>
+                    </dl>
+                  </li>
+                </sc-for>
+              </ul>
+            </sc-if>
+          </div>
+        </main>
+      </div>
+    </x-dc>
+    <script
+      type="text/x-dc"
+      data-dc-script
+      data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"lang":{"editor":"enum","options":["en","vi"],"default":"en"},"device":{"editor":"enum","options":["desktop","phone"],"default":"desktop"},"shelf":{"editor":"enum","options":["five","long"],"default":"five"},"$preview":{"width":1280,"height":940}}'
+    >
+      class Component extends DCLogic {
+        renderVals() {
+          // Alternative B: the same static page (no script, system fonts, light or dark from the browser), as a table.
+          // Type: Exam when the quiz is checked under the exam profile (or one extending it), else Practice;
+          // instant feedback is noted under it. The second line under a title lists its question types.
+          var T = {
+            light: { bg: "#eceae5", card: "#fcfcfa", sunken: "#e4e2dc", line: "#d6d4cd", lineStrong: "#8c8b83", text: "#2a2b31", muted: "#55554f", accent: "#46608a", onAccent: "#fcfcfa", info: "#365b84", infoWash: "#e2e8f0", shadow: "0 1px 2px rgba(40,38,30,0.06), 0 2px 8px rgba(40,38,30,0.04)" },
+            dark: { bg: "#1b1d22", card: "#2c3038", sunken: "#15171b", line: "#464c57", lineStrong: "#7b8394", text: "#d9dce2", muted: "#a9afba", accent: "#8fa8d4", onAccent: "#15171b", info: "#8fb0d6", infoWash: "#243042", shadow: "0 1px 3px rgba(0,0,0,0.35)" }
+          };
+          var t = T[this.props.theme || "light"] || T.light;
+          var vi = (this.props.lang || "en") === "vi";
+          var phone = (this.props.device || "desktop") === "phone";
+          var H = vi
+            ? { quiz: "Bài", type: "Loại", questions: "Câu hỏi", points: "Điểm", time: "Thời gian", timeShort: "Thời gian", pass: "Điểm đạt", passShort: "Đạt" }
+            : { quiz: "Quiz", type: "Type", questions: "Questions", points: "Points", time: "Time limit", timeShort: "Time", pass: "Pass mark", passShort: "Pass" };
+          var K = vi
+            ? { single: "trắc nghiệm", numeric: "điền số", essay: "tự luận", code: "lập trình", short: "trả lời ngắn", truefalse: "đúng sai", blanks: "điền chỗ trống" }
+            : { single: "multiple choice", numeric: "numeric", essay: "essay", code: "code", short: "short answer", truefalse: "true or false", blanks: "fill in the blanks" };
+          var cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
+          // [id, title, lang, exam?, instant?, question types, questions, points, minutes or 0, pass mark or 0]
+          var quizzes = [
+            ["calculus-limits", "Calculus: limits and continuity", "en", false, false, ["single", "numeric"], 12, 12, 0, 0],
+            ["ielts-task2", "IELTS Writing Task 2: practice set", "en", true, false, ["essay"], 1, 9, 40, 0],
+            ["rust-ownership", "Rust basics: ownership and borrowing", "en", false, true, ["single", "short", "code"], 15, 20, 0, 0],
+            ["signals-final", "Signals and Systems: final review", "en", true, false, ["single", "truefalse", "numeric", "essay"], 82, 100, 140, 60],
+            ["tin-hieu-giua-ky", "Tín hiệu và hệ thống: ôn tập giữa kỳ", "vi", false, false, ["single", "blanks", "numeric"], 32, 40, 45, 50]
+          ];
+          // A long shelf: a term's worth of courses. The page scrolls; the column headings stay at the top.
+          if ((this.props.shelf || "five") === "long") {
+            quizzes = quizzes.concat([
+              ["calculus-derivatives", "Calculus: derivatives and their uses", "en", false, true, ["single", "numeric"], 18, 18, 0, 0],
+              ["calculus-integrals", "Calculus: integrals", "en", false, false, ["numeric", "short"], 14, 20, 30, 0],
+              ["calculus-midterm", "Calculus: midterm", "en", true, false, ["single", "numeric", "essay"], 25, 50, 90, 50],
+              ["circuits-week1", "Circuits: Ohm's and Kirchhoff's laws", "en", false, true, ["single", "numeric"], 10, 10, 0, 0],
+              ["circuits-final", "Circuits: final exam", "en", true, false, ["single", "numeric", "essay"], 40, 100, 120, 50],
+              ["giai-tich-chuong-1", "Giải tích: giới hạn và liên tục", "vi", false, false, ["single", "numeric"], 20, 20, 0, 0],
+              ["giai-tich-cuoi-ky", "Giải tích: thi cuối kỳ", "vi", true, false, ["single", "numeric", "essay"], 30, 100, 90, 50],
+              ["ielts-reading-1", "IELTS Reading: academic test 1", "en", true, false, ["single", "truefalse", "blanks"], 40, 40, 60, 0],
+              ["ielts-task1", "IELTS Writing Task 1: charts", "en", true, false, ["essay"], 1, 9, 20, 0],
+              ["linear-algebra-1", "Linear algebra: vectors and matrices", "en", false, true, ["single", "numeric"], 16, 16, 0, 0],
+              ["linear-algebra-2", "Linear algebra: eigenvalues", "en", false, false, ["numeric", "short"], 12, 15, 0, 0],
+              ["probability-1", "Probability: counting and events", "en", false, true, ["single", "numeric"], 15, 15, 0, 0],
+              ["probability-final", "Probability: final review", "en", true, false, ["single", "numeric", "essay"], 36, 80, 120, 55],
+              ["rust-traits", "Rust: traits and generics", "en", false, true, ["single", "code"], 12, 18, 0, 0],
+              ["rust-errors", "Rust: error handling", "en", false, false, ["short", "code"], 8, 14, 0, 0],
+              ["signals-fourier", "Signals and Systems: the Fourier transform", "en", false, false, ["single", "numeric"], 16, 20, 25, 0],
+              ["signals-sampling", "Signals and Systems: sampling", "en", false, true, ["single", "numeric"], 12, 12, 0, 0],
+              ["tin-hieu-cuoi-ky", "Tín hiệu và hệ thống: thi cuối kỳ", "vi", true, false, ["single", "numeric", "essay"], 40, 100, 120, 50],
+              ["xac-suat-on-tap", "Xác suất thống kê: ôn tập", "vi", false, true, ["single", "numeric"], 24, 24, 0, 0]
+            ]);
+            quizzes.sort(function (a, b) { return a[1].localeCompare(b[1], "vi"); });
+          }
+          var EXAM_ICON = "M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM12 9v4l2.5 2.5M9 2h6";
+          var PRACTICE_ICON = "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4";
+          var typeStyle = function (exam) {
+            return "display: inline-flex; align-items: center; gap: 6px; font-size: 0.85em; font-weight: 700; line-height: 1.5; padding: 1px 10px; border-radius: 999px; white-space: nowrap; " +
+              (exam ? "background: " + t.infoWash + "; color: " + t.info + "; border: 1px solid " + t.info : "background: " + t.card + "; color: " + t.text + "; border: 1px solid " + t.lineStrong);
+          };
+          var dash = "–";
+          var rows = quizzes.map(function (q) {
+            return {
+              href: q[0] + "/index.html",
+              title: q[1],
+              lang: q[2],
+              badge: q[2].toUpperCase(),
+              langName: vi ? (q[2] === "vi" ? "Tiếng Việt" : "Tiếng Anh") : (q[2] === "vi" ? "Vietnamese" : "English"),
+              type: q[3] ? (vi ? "Thi" : "Exam") : (vi ? "Luyện tập" : "Practice"),
+              typeIcon: q[3] ? EXAM_ICON : PRACTICE_ICON,
+              typeStyle: typeStyle(q[3]),
+              instant: q[4],
+              kinds: cap(q[5].map(function (k) { return K[k]; }).join(" · ")),
+              questions: String(q[6]),
+              points: String(q[7]),
+              time: q[8] > 0 ? (q[8] >= 60 ? Math.floor(q[8] / 60) + " h " + (q[8] % 60 ? (q[8] % 60) + (vi ? " phút" : " min") : "") : q[8] + (vi ? " phút" : " min")) : dash,
+              pass: q[9] > 0 ? q[9] + "%" : dash
+            };
+          });
+          var langs = {};
+          quizzes.forEach(function (q) { langs[q[2]] = true; });
+          var nLang = Object.keys(langs).length;
+          var cell = "padding: 14px 16px; vertical-align: middle";
+          // The headings stick to the top of the page while it scrolls (CSS only, no script). The box clips its
+          // corners with overflow: clip, which makes no scroll box of its own, so the headings stick to the page.
+          var th = "position: sticky; top: 0; z-index: 1; background: " + t.sunken + "; box-shadow: inset 0 -1px 0 " + t.line + "; padding: 10px 16px; font-size: 0.72em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: " + t.muted + "; white-space: nowrap";
+          return {
+            t: t,
+            h: H,
+            folder: "quizzes",
+            summary: vi ? quizzes.length + " bài · " + nLang + " ngôn ngữ" : quizzes.length + " quizzes · " + nLang + " languages",
+            listLabel: vi ? "Các bài" : "Quizzes",
+            instantText: vi ? "phản hồi ngay" : "instant feedback",
+            wide: !phone,
+            phone: phone,
+            rows: rows,
+            gap: phone ? "16px" : "24px",
+            h1Size: phone ? "1.6em" : "2em",
+            boxStyle: "position: relative; overflow: clip; background: " + t.card + "; border: 1px solid " + t.line + "; border-radius: 12px; box-shadow: " + t.shadow,
+            thLeft: th + "; text-align: left",
+            thRight: th + "; text-align: right",
+            tdQuiz: cell + "; text-align: left; font-weight: 400; width: 46%",
+            tdLeft: cell + "; text-align: left",
+            tdRight: cell + "; text-align: right; white-space: nowrap",
+            cardStyle: "display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 12px; background: " + t.card + "; border: 1px solid " + t.line + "; box-shadow: " + t.shadow,
+            dt: "font-size: 0.7em; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: " + t.muted,
+            dd: "margin: 0; font-weight: 700",
+            badge: "font-size: 0.72em; font-weight: 700; letter-spacing: 0.06em; line-height: 1.5; padding: 0 6px; border-radius: 4px; border: 1px solid " + t.lineStrong + "; color: " + t.text,
+            mainStyle: "flex: 1; min-height: 0; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; padding: " + (phone ? "24px 8px" : "48px 28px"),
+            rootStyle: "width: " + (phone ? 390 : 1280) + "px; height: " + (phone ? 844 : 940) + "px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: " + t.bg + "; color: " + t.text + "; font-family: 'Segoe UI', system-ui, -apple-system, Roboto, 'Noto Sans', sans-serif; font-size: " + (phone ? 16 : 17) + "px; line-height: 1.6"
+          };
+        }
+      }
+    </script>
+  </body>
+</html>
