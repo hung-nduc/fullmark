@@ -24,7 +24,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 ### Next
 
 1. Slice 5b is with one implementing agent on Sonnet; the planner reviews it when it reports.
-2. Before 5c: the shelf's index page is drawn on the "fullmark themes" canvas (G9).
+2. The owner looks at the shelf's index page, drawn on the "fullmark themes" canvas on 2026-11-19 under "Shelf: the index page (step 5, G9)": ShelfIndex (interactive, with Tweaks for light or dark, en or vi, desktop or phone, an empty shelf), ShelfIndexDark, ShelfIndexVi, ShelfIndexPhone, ShelfIndexPhoneDark. Once approved, the boards are copied into `docs/mockup/boards/` and 5c builds the page from them.
 
 ## Goal
 
