@@ -3,7 +3,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { expect, test } from "@playwright/test";
-import { historyLibrary, root, submitAttempt } from "./helpers";
+import { historyLibrary, noViolations, PHONES, root, submitAttempt } from "./helpers";
+import { fiveQuizzes, longShelf, writeShelf } from "./shelf-fixture";
 
 /**
  * A shelf, as a learner meets it (STEP5.md, slices 5a and 5b): the history library published to a folder with the real
@@ -39,12 +40,12 @@ test("the shelf's index page opens from the file system and lists the quizzes, w
   });
   await page.goto(`file:///${join(shelf, "index.html").replaceAll("\\", "/")}`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("shelf");
-  const links = page.locator("ul a");
+  const links = page.locator("tbody th a");
   await expect(links).toHaveText(["Limits and continuity", "Study fixture"]);
   await expect(links.nth(0)).toHaveAttribute("href", "calculus-limits/index.html");
   await expect(links.nth(1)).toHaveAttribute("href", "study/index.html");
-  await expect(page.locator("li").first()).toContainText("EN");
-  await expect(page.locator("li").first()).toContainText("2 questions");
+  await expect(page.locator("tbody tr").first()).toContainText("EN");
+  await expect(page.locator("tbody tr").first().locator("td").nth(1)).toHaveText("2");
   expect(await page.locator("script").count()).toBe(0);
   const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
   expect(policy).toContain("script-src 'none'");
@@ -76,4 +77,100 @@ test("following a quiz's link from the file system opens the quiz, which loads a
   await expect(total).toHaveAttribute("data-earned", "1");
   await expect(total).toHaveAttribute("data-points", "2");
   expect(problems).toEqual([]);
+});
+
+/**
+ * The index page as a table (STEP5.md, slice 5c; the look is the ShelfTable boards): axe in light and dark, no sideways
+ * scroll and 44 px links at the three phone sizes, the headings kept at the top while a long shelf scrolls, and a phone
+ * card's link opening the quiz from the file system.
+ */
+for (const scheme of ["light", "dark"] as const) {
+  test(`axe finds nothing on the index page, en and vi, with five quizzes and with none (${scheme})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    for (const [entries, ui] of [
+      [fiveQuizzes(), "en"],
+      [fiveQuizzes(), "vi"],
+      [[], "en"],
+    ] as const) {
+      await page.goto(writeShelf([...entries], ui));
+      await noViolations(page);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(writeShelf(fiveQuizzes()));
+    await noViolations(page);
+  });
+
+  test(`the page takes its colours from the device (${scheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto(writeShelf(fiveQuizzes()));
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).toBe(scheme === "light" ? "rgb(236, 234, 229)" : "rgb(27, 29, 34)");
+  });
+}
+
+for (const phone of PHONES) {
+  test(`at ${phone.width} x ${phone.height} the index page does not scroll sideways, each row is a card and its link is 44 px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: phone.width, height: phone.height });
+    await page.goto(writeShelf(longShelf()));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(phone.width);
+    expect(await page.evaluate(() => document.body.scrollWidth)).toBeLessThanOrEqual(phone.width);
+    // one card per row: each row's cells are in a grid, the column headings are not drawn
+    expect(
+      await page
+        .locator("tbody tr")
+        .first()
+        .evaluate((e) => getComputedStyle(e).display),
+    ).toBe("grid");
+    expect((await page.locator("thead").boundingBox())?.width ?? 0).toBeLessThanOrEqual(1);
+    const links = page.locator("tbody th a");
+    const n = await links.count();
+    expect(n).toBe(24);
+    for (let i = 0; i < n; i++) {
+      const box = await links.nth(i).boundingBox();
+      expect(box?.height ?? 0, `link ${i}`).toBeGreaterThanOrEqual(43.9); // Firefox reports 43.99999 for a 44 px box
+      expect(box?.width ?? 0, `link ${i}`).toBeGreaterThanOrEqual(43.9); // Firefox reports 43.99999 for a 44 px box
+    }
+    // the numbers are labelled by the card
+    const label = await page
+      .locator("tbody td")
+      .nth(1)
+      .evaluate((e) => getComputedStyle(e, "::before").content);
+    expect(label).toBe('"Questions"');
+  });
+}
+
+test("on a long shelf the column headings stay at the top of the window while the page scrolls", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(writeShelf(longShelf()));
+  const head = page.locator("thead th").first();
+  expect((await head.boundingBox())?.y).toBeGreaterThan(20);
+  // the page is the scroller: nothing in it has a scroll box of its own
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(1500);
+  expect(
+    await page.evaluate(() =>
+      [...document.querySelectorAll("*")].some(
+        (e) =>
+          /(auto|scroll)/.test(getComputedStyle(e).overflowY) &&
+          e !== document.documentElement &&
+          e.scrollHeight > e.clientHeight,
+      ),
+    ),
+  ).toBe(false);
+  await page.evaluate(() => window.scrollTo(0, Math.floor(document.documentElement.scrollHeight / 2)));
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+  for (const th of await page.locator("thead th").all()) expect((await th.boundingBox())?.y).toBeCloseTo(0, 0);
+});
+
+test("a phone card's link opens the quiz from the file system", async ({ page }) => {
+  const { shelf } = publishedShelf();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const home = pathToFileURL(join(shelf, "index.html")).href;
+  await page.goto(home);
+  await page.getByRole("link", { name: "Study fixture" }).click();
+  await expect(page).toHaveURL(home.replace(/index\.html$/, "study/index.html"));
+  await expect(page.locator(".fm-start")).toBeVisible();
 });
