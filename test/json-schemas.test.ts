@@ -53,7 +53,11 @@ const FORMATS: Record<string, SchemaName> = {
   "fullmark-report": "report",
   "fullmark-grades": "grades",
   "fullmark-review": "review",
+  "fullmark-shelf": "fullmark-shelf",
 };
+
+/** A schema's name without the `fullmark-` the manifest's name already has: the others get it in their `$id` and title. */
+const short = (name: string): string => name.replace(/^fullmark-/, "");
 
 function walk(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -82,7 +86,7 @@ describe("schemas/", () => {
     expect(readFileSync(join(root, "schemas", schemaFile(name)), "utf8")).toBe(jsonSchemaText(name));
   });
 
-  it("holds the four schemas and nothing else", () => {
+  it("holds the five schemas and nothing else", () => {
     expect(readdirSync(join(root, "schemas")).sort()).toEqual(SCHEMA_NAMES.map(schemaFile).sort());
   });
 
@@ -108,9 +112,9 @@ describe("schemas/", () => {
   it.each(SCHEMA_NAMES)("%s: draft 2020-12, with its $id, title and description", (name) => {
     const schema = JSON.parse(readFileSync(join(root, "schemas", schemaFile(name)), "utf8"));
     expect(schema.$schema).toBe("https://json-schema.org/draft/2020-12/schema");
-    expect(schema.$id).toBe(`fullmark-${name}-v2`);
-    expect(schema.title).toBe(`fullmark ${name}, version 2`);
-    expect(schema.description).toMatch(new RegExp(`^fullmark-${name}, version 2: `));
+    expect(schema.$id).toBe(`fullmark-${short(name)}-v2`);
+    expect(schema.title).toBe(`fullmark ${short(name)}, version 2`);
+    expect(schema.description).toMatch(new RegExp(`^fullmark-${short(name)}, version 2: `));
   });
 });
 
@@ -126,8 +130,9 @@ describe("every results, report, grades and review file in the tests and example
     documents(path).map((d) => ({ ...d, file: relative(root, path).split(sep).join("/") })),
   );
 
-  it("finds files of each of the four formats", () => {
-    for (const name of SCHEMA_NAMES) expect(files.filter((f) => f.name === name).length, name).toBeGreaterThan(0);
+  it("finds files of each of the formats a command writes into the tests (the shelf's, in the sync's goldens)", () => {
+    for (const name of SCHEMA_NAMES.filter((n) => n !== "fullmark-shelf"))
+      expect(files.filter((f) => f.name === name).length, name).toBeGreaterThan(0);
   });
 
   const valid = files.filter((f) => !REFUSED.includes(f.file));

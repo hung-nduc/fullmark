@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fullmark-shelf-v2",
+  "title": "fullmark shelf, version 2",
+  "description": "fullmark-shelf, version 2: the manifest `quiz library publish` writes into a shelf folder, `fullmark-shelf.json` (COMMANDS.md, `quiz library publish`, \"The manifest\").",
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "const": "fullmark-shelf"
+    },
+    "version": {
+      "type": "number",
+      "const": 2
+    },
+    "ui_lang": {
+      "type": "string",
+      "enum": [
+        "en",
+        "vi"
+      ]
+    },
+    "with_brief": {
+      "type": "boolean"
+    },
+    "fonts": {
+      "type": "string",
+      "enum": [
+        "quiz",
+        "all",
+        "none"
+      ]
+    },
+    "quizzes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "en",
+              "vi"
+            ]
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "added": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "title",
+          "lang",
+          "hash",
+          "added",
+          "file",
+          "files"
+        ]
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "format",
+    "version",
+    "ui_lang",
+    "with_brief",
+    "fonts",
+    "quizzes",
+    "files"
+  ]
+}

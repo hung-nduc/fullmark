@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { ResultsSchema } from "./attempt/results";
+import { ShelfManifestSchema } from "./ir";
 import { ReportSchema } from "./report/schema";
 import { ReviewSchema } from "./review/schema";
 import { GradesFileShapeSchema } from "./rubric/grades";
 
 /**
- * The JSON Schemas of the four 1.0 file formats (TECHNICAL_DESIGN.md, the 0.x-to-1.0 table, "JSON Schemas"), made from
+ * The JSON Schemas of the five 1.0 file formats (TECHNICAL_DESIGN.md, the 0.x-to-1.0 table, "JSON Schemas"), made from
  * their zod schemas with zod's own `toJSONSchema`. `npm run schemas` (scripts/schemas.mjs) writes them to `schemas/`
  * at the repository's root, the build copies them into `dist/schemas/`, and test/json-schemas.test.ts fails when a
  * committed one differs from a fresh one. No command loads this module.
@@ -34,19 +35,26 @@ const FORMATS = {
     description:
       "fullmark-review, version 2: the learner's verdict on each question, written by `quiz review` (TECHNICAL_DESIGN.md, section 4, review-v2).",
   },
+  "fullmark-shelf": {
+    schema: ShelfManifestSchema,
+    description:
+      'fullmark-shelf, version 2: the manifest `quiz library publish` writes into a shelf folder, `fullmark-shelf.json` (COMMANDS.md, `quiz library publish`, "The manifest").',
+  },
 } as const;
 
 export type SchemaName = keyof typeof FORMATS;
 export const SCHEMA_NAMES = Object.keys(FORMATS) as SchemaName[];
 
-/** The file a schema is written to, in `schemas/` and `dist/schemas/`. */
+/** The file a schema is written to, in `schemas/` and `dist/schemas/`: `results-v2.schema.json`, `fullmark-shelf-v2.schema.json`. */
 export const schemaFile = (name: SchemaName): string => `${name}-v2.schema.json`;
 
 /** One format's JSON Schema, draft 2020-12, with its `$id`, `title` and `description` first. */
 export function jsonSchema(name: SchemaName): Record<string, unknown> {
   const { schema, description } = FORMATS[name];
   const { $schema, ...rest } = z.toJSONSchema(schema, { target: "draft-2020-12", io: "input" });
-  return { $schema, $id: `fullmark-${name}-v2`, title: `fullmark ${name}, version 2`, description, ...rest };
+  // the manifest's format is `fullmark-shelf` already: its name carries the prefix the others get here
+  const short = name.replace(/^fullmark-/, "");
+  return { $schema, $id: `fullmark-${short}-v2`, title: `fullmark ${short}, version 2`, description, ...rest };
 }
 
 /** The text of a schema's file, as `npm run schemas` writes it. */

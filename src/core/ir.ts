@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FONT_CHOICES } from "./fonts";
 
 /**
  * The quiz IR (TECHNICAL_DESIGN.md, section 4): what `parse` builds from a quiz file. Every node carries `line`,
@@ -306,3 +307,44 @@ export const BriefSchema = z
   })
   .strict();
 export type Brief = z.infer<typeof BriefSchema>;
+
+// -- the shelf manifest -------------------------------------------------------------------------------------------
+
+export const SHELF_FORMAT = "fullmark-shelf";
+export const SHELF_VERSION = 2;
+
+/** One published quiz in `fullmark-shelf.json`: what `import` needs, and every path the sync wrote for it. */
+export const ShelfQuizSchema = z.object({
+  /** the quiz's id: its folder's name on the shelf */
+  id: z.string().min(1),
+  /** the name it has in the library */
+  name: z.string().min(1),
+  title: z.string(),
+  lang: z.enum(["en", "vi"]),
+  /** the published version's hash, and the time it was added to the library */
+  hash: z.string().regex(/^[0-9a-f]{64}$/, "must be a hash: 64 lowercase hexadecimal characters"),
+  added: z.string().min(1),
+  /** the source's file name in the quiz's folder */
+  file: z.string().min(1),
+  /** every path the sync wrote for this quiz, relative to the shelf, with `/` */
+  files: z.array(z.string().min(1)),
+});
+
+/**
+ * `fullmark-shelf.json` (COMMANDS.md, `quiz library publish`, "The manifest"; TECHNICAL_DESIGN.md, section 3): which
+ * quizzes a shelf holds, how it was made, and every path the sync wrote, so that a later sync removes only those. It
+ * holds no time of publishing, so the same library state gives the same bytes.
+ */
+export const ShelfManifestSchema = z.object({
+  format: z.literal(SHELF_FORMAT),
+  version: z.literal(SHELF_VERSION),
+  /** the index page's interface language */
+  ui_lang: z.enum(["en", "vi"]),
+  with_brief: z.boolean(),
+  fonts: z.enum(FONT_CHOICES),
+  /** sorted by id */
+  quizzes: z.array(ShelfQuizSchema),
+  /** the paths written at the shelf's root, relative to it */
+  files: z.array(z.string().min(1)),
+});
+export type ShelfManifest = z.infer<typeof ShelfManifestSchema>;
