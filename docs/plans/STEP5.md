@@ -18,12 +18,12 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
-| 5b | brief approved (2026-11-19), with an implementing agent | |
+| 5b | built and reviewed (2026-11-19); G17 raised, waiting for the owner | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
 | 5c | | |
 
 ### Next
 
-1. Slice 5b is with one implementing agent on Sonnet; the planner reviews it when it reports.
+1. The owner decides G17; then the planner writes slice 5c's brief (the index page from the ShelfTable boards, and acceptance).
 2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
@@ -52,6 +52,8 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
 G1 to G16 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G17.
+
+**G17. What 5b chose where `import`'s design was silent.** **Recommendation:** accept these and write them into COMMANDS.md, `quiz library import`: (a) without a manifest, a quiz is any `DIR/FOLDER/*.md` that opens with a closed `---` block; a broken front matter is then refused by `check`, not skipped; files with no front matter (a `materials` sheet) and dot folders are skipped; (b) with a manifest, a listed quiz whose front matter has another id is refused (`import.id-mismatch`), one whose file is missing is refused (`import.missing`), and quiz folders the manifest does not list are ignored; (c) a quiz unchanged but without the `public` entry gets it and counts as imported, its `source` kept; (d) a taken name's fix reads "FREE is free: rename the quiz that has NAME (`quiz library rename NAME NEW`), or this one"; (e) a missing `DIR`, or one that is not a folder, exits 2; (f) an unchanged import prints `unchanged N quizzes: NAMES`, and the closing note on a backup comes on every import; (g) in `--json`, `refused[].name` is the manifest's name, else the front matter's id.
 
 ## Slices
 
@@ -135,3 +137,11 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 ### Done when
 
 Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium and Firefox (this slice changes the index page's links; the rest of Playwright runs in 5c); the round-trip test passes; by hand, the planner imports the samples' shelf into a new library and publishes it back with `unchanged`.
+
+### Review (2026-11-19)
+
+**Built** by one agent on Sonnet in `82cf47d` (G12: an unknown name exits 2; G13: the index links `ID/index.html`, and the spec follows it from `file://`), `d64fe29` (`src/cli/library-batch.ts`: the check, the refusals, the names, the version files and the one commit, shared by `register` and `import`), `3d785d0` (`src/cli/library-import.ts`; `findProjectConfig` gains `stopAt`, so the nearest `fullmark.toml` is never looked for above `DIR`; `init` gains a `record` option for G11), `0d7e712` (`test/shelf-round-trip.test.ts`), `da503bf` (the samples' shelf in `samples/shelf/`, a git repository, and the `library publish` and `library import` lines), `325cf26` and `e5de30d` (two test fixes for G13).
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3765 in 158 files, Playwright 847 passed (686 lines each in Chromium and Firefox) and 527 skipped, tsc, Biome and knip clean; the whole of Playwright ran, though the brief asked only for the shelf spec. No `register` test or golden changed (the brief's condition for the shared path). Goldens: 6 changed (`publish-unknown` by G12; the index pages of `publish-sync`, `-sync-json`, `-sync-swap`, `-sync-git` by G13, and `publish-sync-git`'s commit hash with them), 5 added (`import-into`, `import-into-config-kept`, `import-json`, `import-unchanged-json`, `import-problems-json`). **By hand**, on the copy of the samples' library from 5a's review: with `study-fixture` and `tidy` on the shelf, `import site --into lib2` on a machine with a library made `lib2`, left the config alone with the note, registered both quizzes on the public shelf in one commit; `list` in `lib2` marked both `public`; publishing `lib2` back to the shelf was `unchanged`, and the shelf's git status stayed clean; `import site` into the first library was `unchanged`.
+
+**Done differently, accepted:** `import --into` runs `init` through a dynamic import (a static one would merge `init` into a shared chunk and break the command graph); `register`'s failed branch no longer pushes an empty warning (it printed nothing); the three `--into` goldens run without git (`library.toml` keeps `source` as an absolute temp path, so the commit hash differs on every run), so their stdout has no `committed` line, which `test/library-import.test.ts` checks instead; the import cases copy their shelf from `publish-sync`'s golden, so a change there reaches them. Raised as G17: the agent's choices where the design was silent.
