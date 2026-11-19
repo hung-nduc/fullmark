@@ -19,7 +19,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | brief approved (2026-11-19), with an implementing agent | |
+| 5c | built (2026-11-19); G18 and G19 found in its screens and decided (2026-11-19), its fixes with an implementing agent; the review follows them | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639` |
 
 ### Next
 
@@ -51,7 +51,7 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G17 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G18.
+G1 to G19 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G20.
 
 ## Slices
 
@@ -173,3 +173,11 @@ Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium 
 ### Done when
 
 `npm run check` passes in Chromium and Firefox (everything: the last slice); the screens are committed; the step's "Done when" is shown test by test in the report; by hand, the planner publishes the samples' library and opens `samples/shelf/index.html` in both colour schemes and at phone width, and compares it with the boards.
+
+### Fixes (G18, G19)
+
+**Approved by the owner on 2026-11-19.** Two findings from 5c's screens, decided before the review ([STEP5-GAPS.md](STEP5-GAPS.md), G18, G19; COMMANDS.md, "The index page").
+
+1. **G18:** in `src/build/shelf-index.ts`, every question type name after the first wholly in lower case, the first with only its first letter capitalised. Unit test: a `vi` index lists "Một lựa chọn · đúng/sai · …"; an `en` one "Single choice · true or false · …".
+2. **G19:** in the index's phone style (under 520 px), the card's four numbers in a grid whose time column is wider than the others, with a gap between cells, each value free to wrap at a space. `e2e/shelf.spec.ts`: at 360 × 780, 390 × 844 and 430 × 932, in `en` and `vi`, with the longest time limit of the fixture ("2 h 20 min", "2 giờ 20 phút"), no two value boxes in a card overlap or touch (at least 8 px apart), and nothing overflows its card.
+3. The goldens whose index pages change (count them; only `index.html` and the commit hashes that follow may move), the screens of `docs/screens/5c/` that change, taken again (name them). One commit. The full check in both browsers; `npm run samples`.
