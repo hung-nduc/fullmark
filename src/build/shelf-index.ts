@@ -68,7 +68,7 @@ export function buildShelfIndex(heading: string, entries: readonly ShelfEntry[],
       `<span>${t.questions(e.questions)}</span>`,
       ...(e.timeLimit === null ? [] : [`<span>${t.timeLimit(limitText(e.timeLimit, t))}</span>`]),
     ];
-    return `<li><a href="${escapeHtml(encodeURIComponent(e.id))}/" lang="${e.lang}">${escapeHtml(e.title)}</a><div class="meta">${facts.join("")}</div></li>`;
+    return `<li><a href="${escapeHtml(encodeURIComponent(e.id))}/index.html" lang="${e.lang}">${escapeHtml(e.title)}</a><div class="meta">${facts.join("")}</div></li>`;
   });
   const body =
     items.length === 0

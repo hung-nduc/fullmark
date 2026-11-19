@@ -120,11 +120,11 @@ describe("library publish NAME --on | --off", () => {
     expect(again.out).toEqual(["rust-basics is already not on the public shelf"]);
   });
 
-  it("an unknown name exits 1 with the near names; --on with --off, a missing name and the sync's options exit 2", async () => {
+  it("an unknown name exits 2 with the near names; --on with --off, a missing name and the sync's options exit 2", async () => {
     const t = await twoQuizzes();
     const before = await subjects(t);
     const unknown = await t.publish("rustbasics", { on: true });
-    expect(unknown.exit).toBe(1);
+    expect(unknown.exit).toBe(2);
     expect(unknown.err).toEqual(["error: no quiz named rustbasics", "    did you mean: rust-basics"]);
     const both = await t.publish("rust-basics", { on: true, off: true });
     expect(both.exit).toBe(2);

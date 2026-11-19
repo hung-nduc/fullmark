@@ -81,7 +81,7 @@ async function runMark(
   const opened = openLibrary(io, opts.json);
   if ("exit" in opened) return opened.exit;
   const { root, git } = opened.located;
-  if (findQuiz(opened.index, name) === undefined) return noSuchQuiz(io, opts.json, opened.index, name, EXIT.problems);
+  if (findQuiz(opened.index, name) === undefined) return noSuchQuiz(io, opts.json, opened.index, name);
 
   try {
     return await withLock(
@@ -98,7 +98,7 @@ async function runMark(
         if ("exit" in fresh) return fresh.exit;
         const index = fresh.index;
         const quiz = findQuiz(index, name);
-        if (quiz === undefined) return noSuchQuiz(io, opts.json, index, name, EXIT.problems);
+        if (quiz === undefined) return noSuchQuiz(io, opts.json, index, name);
         if (isPublished(quiz) === on) {
           if (opts.json) io.out(JSON.stringify({ status: "unchanged", name: quiz.name, committed: null }));
           out(`${quiz.name} is already ${on ? "on" : "not on"} the ${PUBLIC_SHELF} shelf`);
