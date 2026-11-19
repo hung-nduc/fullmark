@@ -17,13 +17,13 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
-| 5a | built and reviewed (2026-11-19); G12 to G15 raised, waiting for the owner | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
-| 5b | | |
+| 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
+| 5b | brief written (2026-11-19), waiting for the owner's approval | |
 | 5c | | |
 
 ### Next
 
-1. The owner decides G12 to G15 (each has a recommendation); then the planner writes slice 5b's brief, starting with them.
+1. The owner approves slice 5b's brief; it goes to one implementing agent on Sonnet.
 2. Before 5c: the shelf's index page is drawn on the "fullmark themes" canvas (G9).
 
 ## Goal
@@ -45,21 +45,13 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 
 - **A shelf is written like the library**: the shelf folder in a test is a fresh temporary folder, a git repository with a fixed author, committer and date when the test needs commits, and the sync's writes are atomic per file under the shelf's lock (TECHNICAL_DESIGN.md, foundation "Library and shelf writes take a lock"). A test kills a sync mid-way (or simulates it) and checks the next sync repairs the folder.
 - **What goes out is checked by bytes, not by eye**: the privacy test walks every file of the shelf; the determinism and round-trip tests compare folders byte by byte.
-- **Which tests a slice runs** (step 4's G20): every slice runs `npm run build`, the typecheck, Biome, knip and all of Vitest (the startup tests alone first). Playwright, in Chromium and Firefox, runs for a slice that writes pages: **5a** (the shelf's pages and index) and **5c** (everything, before the step is accepted), not 5b.
+- **Which tests a slice runs** (step 4's G20): every slice runs `npm run build`, the typecheck, Biome, knip and all of Vitest (the startup tests alone first). Playwright, in Chromium and Firefox, runs for a slice that writes pages: **5a** (the shelf's pages and index) and **5c** (everything, before the step is accepted); 5b runs only `e2e/shelf.spec.ts`, since G13 changes the index page's links.
 
 ## Gaps
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G11 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G12.
-
-**G12. An unknown quiz name in `publish NAME --on | --off`.** G10's text, written into COMMANDS.md, says an unknown name "exits 1 as in every library command", but every other library command exits **2** for an unknown quiz (`info`, `take`, `replay`, `review`, `share`, `template add`, `grade`); the slip was the planner's. 5a followed the text and exits 1. **Recommendation:** exit 2, as every library command; COMMANDS.md's `publish` Exit list corrected, the code and its golden (`publish-unknown`) changed first in 5b.
-
-**G13. The index page's links from a file.** The index links each quiz as `ID/`. Over http (GitHub Pages) that serves `ID/index.html`, but a shelf opened from the disk (`file://`), which is how an owner looks at it before pushing, shows a folder listing instead of the quiz. **Recommendation:** link `ID/index.html`, which works both ways; COMMANDS.md's "The index page" says so.
-
-**G14. The favicon request on a shared page over http.** A browser asks a served page for `/favicon.ico`; the CSP of every shared page (since step 2) blocks it, and Firefox logs a CSP error in the console. Nothing breaks and nothing is sent. An empty icon would need `img-src data:` in the CSP. **Recommendation:** no change: the blocked request is the CSP doing its job, and the message is only in the console. The 5a spec ignores that one message, with a comment saying why.
-
-**G15. What 5a chose where the design was silent.** **Recommendation:** accept these and write them into COMMANDS.md, `publish`: (a) a path the sync would write that exists in `DIR`, differs and is not in the manifest (the owner's `rust/index.html` in a folder that is not a quiz folder) exits 1, nothing written, with the fix "move it, or publish into an empty folder"; (b) a manifest that is not valid JSON or not of the schema's shape exits 2, as a foreign one, and one whose `version` is below 2 is foreign; (c) `--json`'s `added`, `updated` and `removed` are arrays of quiz ids, and a dry run gives the same object with `"dry_run": true`; (d) `NAME --on | --off --json` gives `{"status": "on" | "off" | "unchanged", "name", "committed"}`; (e) `--on` or `--off` with a sync option, or both together, exits 2; (f) outside a git repository each sync says "not in a git repository, so nothing was committed".
+G1 to G15 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G16.
 
 ## Slices
 
@@ -111,4 +103,35 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 
 **Checked by the planner:** `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3737 in 156 files, Playwright 847 passed (686 lines each in Chromium and Firefox) and 527 skipped (the screens specs), tsc, Biome and knip clean. Goldens: 15 cases added (`publish-on`, `-on-json`, `-off-not-on`, `-unknown`; `publish-sync`, `-sync-json`, `-sync-dry-run`, `-sync-unchanged`, `-sync-swap`, `-sync-git`, `-no-dir`, `-inside-library`, `-foreign-manifest`, `-quiz-folder-unlisted`, `-index-in-the-way`), none changed; no `share` golden moved with G38. **By hand**, on a copy of the samples' library: `publish study-fixture --on` and `tidy --on` committed once each, a second `--on` said "already on the public shelf", exit 0; `list` marked both `public`; `--dry-run` into an empty git repository holding a README listed `study/`, `tidy/` and `index.html` (folders by id: `study-fixture`'s is `study`); the sync wrote them and the manifest, left the README alone, recorded `[shelves] public`, and committed only its paths; a second publish was `unchanged` with no commit; `tidy --off` then a publish removed `tidy/` and updated the index; no results, grades, report or review JSON anywhere in the shelf.
 
-**Done differently, accepted:** the sync in its own chunk; fonts always passed to the build explicitly (otherwise the page's Information tab differs between the first sync and the next, and the second is not `unchanged`), so a shelf page equals `quiz build --fonts X`, not a build with no flag; G38's test uses `draft` rather than `exam` (an `exam` finding is an error, which `register` refuses); `list --json`'s `shelves` lists every entry's shelf name, the `public` mark only `kind = "quiz"`; a dry run lists a manifest line when only the manifest would change, and "files changed" when a quiz's files change with its hash (fonts, the program's version). Raised as gaps: the unknown-name exit (G12), the links (G13), the favicon (G14), the rest of the agent's choices (G15). **To look at in 5c:** the index page carries every theme's token set though it uses only light and dark.
+**Done differently, accepted:** the sync in its own chunk; fonts always passed to the build explicitly (otherwise the page's Information tab differs between the first sync and the next, and the second is not `unchanged`), so a shelf page equals `quiz build --fonts X`, not a build with no flag; G38's test uses `draft` rather than `exam` (an `exam` finding is an error, which `register` refuses); `list --json`'s `shelves` lists every entry's shelf name, the `public` mark only `kind = "quiz"`; a dry run lists a manifest line when only the manifest would change, and "files changed" when a quiz's files change with its hash (fonts, the program's version). Raised as gaps and decided by the owner on 2026-11-19 as recommended: the unknown-name exit (G12), the links (G13), the favicon (G14), the rest of the agent's choices (G15). **To look at in 5c:** the index page carries every theme's token set though it uses only light and dark.
+
+## Slice 5b: `import`, the round trip, the samples' shelf
+
+**Brief written on 2026-11-19, waiting for the owner's approval.** What `import` does is written in COMMANDS.md, `quiz library import` (the whole section, with its Output block); this brief says how to build it and how to show it works. The index page's final look is 5c.
+
+### Read first
+
+- This plan: "Goal" (the round trip), "Rules for every slice", slice 5a's brief and review; [STEP5-GAPS.md](STEP5-GAPS.md), G3, G7, G8, G11, G12, G13.
+- COMMANDS.md: `quiz library import`, `quiz library publish`, `quiz library register` (all or nothing, names, `--update`, `library.survey`, the refusals and their suggestions), `quiz library init` (which folders it takes, the config), "The library folder", "Git".
+- Code: `src/cli/library-register.ts` (the batch: check, names, ids, version files, one commit), `library-init.ts`, `library-publish.ts`, `library-sync.ts`, `src/library/shelf.ts` (the manifest reader), `index-file.ts`, `src/cli/config.ts` (the nearest `fullmark.toml`), `config-write.ts`; `scripts/samples.mjs`; `test/library-contract.test.ts`, `test/library-lock.test.ts`, `test/cli-graph.test.ts`, `test/shelf-determinism.test.ts`.
+
+### Decided for this slice
+
+- **G12 and G13 first:** `publish NAME --on | --off` with an unknown name exits 2 (the `publish-unknown` golden changes; say so); the index page links `ID/index.html` (the `publish-sync*` goldens' index pages change; count them), and `e2e/shelf.spec.ts` follows the link from `file://`, with no static server.
+- **One register path.** `import` registers through the same code as `register`: move the batch's core (check under the nearest `fullmark.toml`, the survey refusal, ids, names and their suggestions, the version's files, the index entry, all or nothing) out of `runLibraryRegister` into a function both commands call, with what differs passed in: the id and name each quiz takes (G7, G8), the `added` time, the shelf entry, `source`. **No `register` golden or test changes**; if one has to, stop and report it.
+- **`import` in `src/cli/library-import.ts`**, loaded by a dynamic import like every library command. Order: `--into` first (G11: `init`'s folder rules; the config written only when it names no library yet, else the note line); read the manifest when `DIR/fullmark-shelf.json` exists (refused as `publish` refuses: foreign or newer, exit 2) and match each listed quiz by id (G7), else find every `DIR/*/*.md` whose front matter parses (G8); check them all, each under its nearest `fullmark.toml` (the quiz folder's, else one higher up, never above `DIR`); if anything is refused, print every problem and exit 1 with nothing written; else, under the library's lock, write the versions and the index and make one commit, `fullmark: import NAME…` (the names sorted). An `import` that changes nothing (every quiz unchanged) writes and commits nothing, status `unchanged`.
+- **The times.** A version imported from a manifest keeps the manifest's `added` when its file's hash is the manifest's; otherwise, and without a manifest, `added` is the injected clock's now. The round trip depends on this: the second library's versions carry the first's times, so its pages are built with the same `built_at`.
+- **What comes back with a version:** the quiz folder's files the way `publish` wrote them, less `index.html` and `fullmark.toml` (the rules travel as the version's `check.json`, which `import` writes from the profile it checked under); `brief.yaml` when the shelf has one.
+
+### Tasks
+
+1. **G12 and G13** (one commit), with their goldens counted and the spec changed.
+2. **The shared register path** (one commit): the move, with every `register` test and golden unchanged.
+3. **`import`** (one commit, or two if large): the command, every case of COMMANDS.md and G7, G8, G11 with a test (a new library from a shelf; into a library that has the quizzes: same hash, an older version with its note, a new hash made current, a file edited after publishing with its warning, a name the library changed with its note, a name taken by another quiz refused with its suggestion; without a manifest, a taken id refused; two `.md` in one folder; a survey refused; a check error refused, nothing written; `--into` an existing library's folder, a non-empty folder (exit 2), with and without a library in the config; each quiz under its own `fullmark.toml` and under one at `DIR`'s top); the lock and its single commit in `test/library-lock.test.ts`; `import` in `test/library-contract.test.ts` and `test/cli-graph.test.ts` (it loads nothing from `src/serve/` or `src/build/`); goldens of COMMANDS.md's two Output blocks and of `--json` for `imported`, `unchanged` and `problems`.
+4. **The round trip** (one commit): `test/shelf-round-trip.test.ts`: publish the history library, with quizzes registered under a profile other than their own (G38) and one with a brief published `--with-brief`, into an empty folder; `import --into` a second empty folder; publish the second library into the first folder: `unchanged`, no commit, and every byte of the folder the same; then the same with the second library publishing into a third empty folder, compared byte for byte with the first.
+5. **The samples** (one commit): `npm run samples` puts two of the samples' library's quizzes on the shelf and publishes it into `samples/shelf/` (a git repository made when the samples are built), and gains a line for `library publish` (with `--dry-run`, and after `--off`) and one for `library import` (`--into samples/library-2`, then `FULLMARK_LIBRARY` to list it), each with a "try" text like the others; the samples' config is never the owner's.
+6. **Do not edit** `docs/plans/` or `docs/design/`. The report as for every slice: every golden added or changed, counted and explained; anything done differently; anything the design left open, as a question, not a choice.
+
+### Done when
+
+Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium and Firefox (this slice changes the index page's links; the rest of Playwright runs in 5c); the round-trip test passes; by hand, the planner imports the samples' shelf into a new library and publishes it back with `unchanged`.

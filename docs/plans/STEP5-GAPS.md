@@ -77,3 +77,19 @@ note a shelf holds no results, reports or older versions: import restores quizze
 **G11. `import --into` when the machine already has a library.** "Create a library at `PATH` first, with the rules of `library init`": `init` records the new library in `config.toml` and, without `--force`, refuses to switch from another one. `import` has no `--force`, so on a machine with a library `--into` would always fail, the round-trip test included. **Recommendation:** `--into` creates the library with `init`'s rules for the folder (new, missing or empty; refused otherwise, exit 2) and records it in the config only when the config names no library yet. Otherwise the config is left alone, and the output adds a line "your library is still OLD; use this one with `FULLMARK_LIBRARY=PATH` or `quiz library init PATH --force`".
 
 **Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library import` ("`--into PATH`", Output).
+
+**G12. An unknown quiz name in `publish NAME --on | --off`.** G10's text, written into COMMANDS.md, says an unknown name "exits 1 as in every library command", but every other library command exits **2** for an unknown quiz (`info`, `take`, `replay`, `review`, `share`, `template add`, `grade`); the slip was the planner's. 5a followed the text and exits 1. **Recommendation:** exit 2, as every library command; COMMANDS.md's `publish` Exit list corrected, the code and its golden (`publish-unknown`) changed first in 5b.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` (Exit); built first in 5b.
+
+**G13. The index page's links from a file.** The index links each quiz as `ID/`. Over http (GitHub Pages) that serves `ID/index.html`, but a shelf opened from the disk (`file://`), which is how an owner looks at it before pushing, shows a folder listing instead of the quiz. **Recommendation:** link `ID/index.html`, which works both ways; COMMANDS.md's "The index page" says so.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` ("The index page"); built first in 5b.
+
+**G14. The favicon request on a shared page over http.** A browser asks a served page for `/favicon.ico`; the CSP of every shared page (since step 2) blocks it, and Firefox logs a CSP error in the console. Nothing breaks and nothing is sent. An empty icon would need `img-src data:` in the CSP. **Recommendation:** no change: the blocked request is the CSP doing its job, and the message is only in the console. The 5a spec ignores that one message, with a comment saying why.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into nothing to write into the design: no change; the 5a spec keeps ignoring that one console message, with its comment.
+
+**G15. What 5a chose where the design was silent.** **Recommendation:** accept these and write them into COMMANDS.md, `publish`: (a) a path the sync would write that exists in `DIR`, differs and is not in the manifest (the owner's `rust/index.html` in a folder that is not a quiz folder) exits 1, nothing written, with the fix "move it, or publish into an empty folder"; (b) a manifest that is not valid JSON or not of the schema's shape exits 2, as a foreign one, and one whose `version` is below 2 is foreign; (c) `--json`'s `added`, `updated` and `removed` are arrays of quiz ids, and a dry run gives the same object with `"dry_run": true`; (d) `NAME --on | --off --json` gives `{"status": "on" | "off" | "unchanged", "name", "committed"}`; (e) `--on` or `--off` with a sync option, or both together, exits 2; (f) outside a git repository each sync says "not in a git repository, so nothing was committed".
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` ("`NAME --on | --off`", "What a sync refuses", "Git", the `--json` row, Exit); nothing to build, as 5a built it.
