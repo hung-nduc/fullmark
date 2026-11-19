@@ -1,0 +1,2 @@
+test/golden/library/publish-sync/files/shelf => shelf
+test/fixtures/library-history/lib => lib

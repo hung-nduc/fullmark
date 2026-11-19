@@ -1,0 +1,2 @@
+git = "no-such-git"
+library = "<dir>/lib2"

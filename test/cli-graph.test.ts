@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server; `library import` loads neither the page builder nor the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -316,6 +316,7 @@ describe("what each command loads", () => {
     ["rename", "// src/cli/library-rename.ts"],
     ["rm", "// src/cli/library-rm.ts"],
     ["publish NAME --on | --off", "// src/cli/library-publish.ts"],
+    ["import", "// src/cli/library-import.ts"],
   ] as const) {
     it(`library ${command} is a chunk of its own, reached by a dynamic import() from main, and never loads the page builder, the renderer or the server`, () => {
       const chunk = chunkWith(marker);

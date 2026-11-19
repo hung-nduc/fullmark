@@ -1,0 +1,1 @@
+{"status":"problems","library":"<dir>/lib2","imported":[],"unchanged":[],"refused":[{"name":"poll","reason":"library.survey: a survey is not kept in the library: the library is one learner's history of their own attempts","suggest":"`quiz serve` and `quiz stats` handle a survey with no library"}],"warnings":[],"committed":null}

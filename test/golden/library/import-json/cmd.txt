@@ -1,0 +1,6 @@
+library
+import
+shelf
+--into
+lib2
+--json

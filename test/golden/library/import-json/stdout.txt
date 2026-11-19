@@ -1,0 +1,1 @@
+{"status":"imported","library":"<dir>/lib2","imported":["study-fixture","tidy"],"unchanged":[],"refused":[],"warnings":[],"committed":null}

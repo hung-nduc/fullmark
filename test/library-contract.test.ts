@@ -50,6 +50,7 @@ describe("the library commands have contract tests", () => {
   it("finds the commands of the library group", () => {
     expect(commands).toEqual([
       "grade",
+      "import",
       "info",
       "init",
       "list",

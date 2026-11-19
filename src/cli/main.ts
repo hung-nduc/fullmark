@@ -760,6 +760,24 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         io,
       );
     });
+  library
+    .command("import")
+    .description("register the quizzes of a published folder into a library, keeping ids and names")
+    .argument("<dir>", "the folder `quiz library publish` wrote (or one with a quiz in each folder)")
+    .option("--into <path>", "create a library at this path first (a new, missing or empty folder)")
+    .option("--json", "print the outcome as one JSON object")
+    .option("--plain", "no colours, even in a terminal")
+    .action(async (dir: string, options: Record<string, unknown>) => {
+      outcome.exit = await (await import("./library-import")).runLibraryImport(
+        dir,
+        {
+          into: (options.into as string | undefined) ?? null,
+          json: Boolean(options.json),
+          plain: Boolean(options.plain) || noColor(),
+        },
+        io,
+      );
+    });
   const libraryTemplate = library.command("template").description("templates from the library");
   libraryTemplate
     .command("add")

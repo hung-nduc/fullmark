@@ -39,6 +39,8 @@ export type CheckOptions = {
    * config still gives `fail_on`.
    */
   fixed?: ResolvedProfile;
+  /** look for the quiz's `fullmark.toml` no higher than this folder (`library import`: the shelf's folder) */
+  stopAt?: string;
 };
 
 /** An `Io` plus what the config commands read from the machine; both default to the real ones. */
@@ -114,7 +116,7 @@ export function checkFile(file: string, opts: CheckOptions, io: CheckIo): FileOu
     review = got.review;
   }
   const dir = dirname(path);
-  const config: LoadedConfig = loadConfig(machine, dir, opts.config);
+  const config: LoadedConfig = loadConfig(machine, dir, opts.config, opts.stopAt ?? null);
   if (config.errors.length > 0) {
     return { status: "error", file, message: "the config has errors", configErrors: config.errors };
   }

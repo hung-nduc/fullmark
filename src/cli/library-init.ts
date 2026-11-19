@@ -24,7 +24,14 @@ import {
 import { shownPath } from "./paths";
 import { localIso } from "./time";
 
-export type LibraryInitOptions = { force: boolean; noGit: boolean; json: boolean; plain: boolean };
+export type LibraryInitOptions = {
+  force: boolean;
+  noGit: boolean;
+  json: boolean;
+  plain: boolean;
+  /** record the library in `config.toml` (the default); `library import --into` records it only when none is set */
+  record?: boolean;
+};
 
 /** Files under a folder, `.git` left out, counted for "N files". */
 function countFiles(dir: string): number {
@@ -151,7 +158,8 @@ export async function runLibraryInit(
     }
   }
 
-  await recordLibrary(config.path, target);
+  const record = opts.record !== false;
+  if (record) await recordLibrary(config.path, target);
 
   // who commits: git's own identity, or the fallback
   const id = repository && !opts.noGit && (await git.available()) ? await git.identity() : null;
@@ -181,7 +189,7 @@ export async function runLibraryInit(
   const lines = [
     ...stale,
     `${p.green("library ready")} ${shown} (${what}, ${repository ? "git repository" : "no git repository"})`,
-    `recorded in ${shownPath(config.path, machine.cwd)}`,
+    ...(record ? [`recorded in ${shownPath(config.path, machine.cwd)}`] : []),
     ...found,
   ];
   if (fallback) {

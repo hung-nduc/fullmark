@@ -41,11 +41,13 @@ const isFile = (p: string): boolean => {
  * The nearest `fullmark.toml`, looking up from `start` and stopping at a git root or a library root (a folder with a
  * `.git` or a `library.toml`): that folder is still looked in, and nothing above it.
  */
-export function findProjectConfig(start: string): string | null {
+export function findProjectConfig(start: string, stopAt: string | null = null): string | null {
   let dir = resolve(start);
+  const top = stopAt === null ? null : resolve(stopAt);
   for (;;) {
     const candidate = join(dir, "fullmark.toml");
     if (isFile(candidate)) return candidate;
+    if (dir === top) return null;
     if (existsSync(join(dir, ".git")) || isFile(join(dir, "library.toml"))) return null;
     const parent = dirname(dir);
     if (parent === dir) return null;
@@ -89,10 +91,16 @@ function readConfig(path: string, shown: string, kind: "project" | "user", mustE
 
 /**
  * Reads the config layers for a quiz in `quizDir` (TECHNICAL_DESIGN.md, section 5): the user config, then the nearest
- * `fullmark.toml` or `override` (`--config`). Errors from both are returned together, each with file and line,
+ * `fullmark.toml` (never above `stopAt` when it is given: `library import` looks no higher than the shelf's folder) or
+ * `override` (`--config`). Errors from both are returned together, each with file and line,
  * including the profile mistakes that only show when a profile is followed (`validateLayers`).
  */
-export function loadConfig(m: Machine, quizDir: string, override: string | null): LoadedConfig {
+export function loadConfig(
+  m: Machine,
+  quizDir: string,
+  override: string | null,
+  stopAt: string | null = null,
+): LoadedConfig {
   const files: string[] = [];
   const errors: ConfigError[] = [];
 
@@ -106,7 +114,7 @@ export function loadConfig(m: Machine, quizDir: string, override: string | null)
   if (override !== null) {
     projectPath = resolve(m.cwd, override);
     mustExist = true;
-  } else projectPath = findProjectConfig(quizDir);
+  } else projectPath = findProjectConfig(quizDir, stopAt);
   let project: ConfigFileData | null = null;
   if (projectPath !== null) {
     const shown = shownPath(projectPath, m.cwd);

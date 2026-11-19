@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryGrade } from "../src/cli/library-grade";
+import { runLibraryImport } from "../src/cli/library-import";
 import { runLibraryInit } from "../src/cli/library-init";
 import { runLibraryPublish } from "../src/cli/library-publish";
 import { runLibraryRename } from "../src/cli/library-rename";
@@ -11,6 +12,7 @@ import type { LockEnv } from "../src/library/lock";
 import { capture } from "./helpers/cli";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { fileAttempt, gradeOptions, quizOf, type T, writingLibrary } from "./helpers/library-grade";
+import { importOptions, importWorld } from "./helpers/library-import";
 import { publishOptions, shelfLibrary } from "./helpers/library-publish";
 import { quizText } from "./helpers/library-register";
 import { finish, KEEP, webReview } from "./helpers/library-review";
@@ -273,6 +275,22 @@ describe("a library command that changes the library waits for the lock, fails b
     rmSync(lockIn(shelf));
     expect(await runLibraryPublish("site", publishOptions(), t.at().io)).toBe(0);
     expect((await git(shelf, t.env, "rev-list", "--count", "HEAD")).trim()).toBe("1");
+  });
+
+  it("import (the destination library's lock)", async () => {
+    const w = await importWorld();
+    const before = await commits(w.b);
+    hold(w.b.lib);
+    const { env: lock, sleeps } = held();
+    const c = w.b.at();
+    expect(await runLibraryImport(w.shelf, importOptions(), { ...c.io, lock })).toBe(2);
+    expect(busyIn(c.err)).toBe(true);
+    expect(sleeps).toHaveLength(100);
+    expect(await commits(w.b)).toBe(before);
+    expect(readFileSync(join(w.b.lib, "library.toml"), "utf8")).not.toContain("[quizzes.");
+    rmSync(lockIn(w.b.lib));
+    expect(await runLibraryImport(w.shelf, importOptions(), w.b.at().io)).toBe(0);
+    expect(await commits(w.b)).toBe(before + 1);
   });
 
   it("rm", async () => {

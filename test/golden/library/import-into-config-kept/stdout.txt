@@ -1,0 +1,7 @@
+library ready lib2 (new folder, no git repository)
+warning git was not found: the library has no repository (rm will need --force)
+note your library is still <dir>/lib; use this one with FULLMARK_LIBRARY=<dir>/lib2 or quiz library init <dir>/lib2 --force
+<dir>/shelf/study/study.md:23: warning choice.correct-longest: the right choice is much longer than every wrong one, which gives it away
+    fix: shorten the right choice, or lengthen the wrong ones to match
+imported 2 quizzes: study-fixture, tidy (on the public shelf)
+note a shelf holds no results, reports or older versions: import restores quizzes, not a backup
