@@ -24,7 +24,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 ### Next
 
 1. Slice 5b is with one implementing agent on Sonnet; the planner reviews it when it reports.
-2. The owner looks at the shelf's index page, drawn on the "fullmark themes" canvas on 2026-11-19 under "Shelf: the index page (step 5, G9)": ShelfIndex (interactive, with Tweaks for light or dark, en or vi, desktop or phone, an empty shelf), ShelfIndexDark, ShelfIndexVi, ShelfIndexPhone, ShelfIndexPhoneDark. Once approved, the boards are copied into `docs/mockup/boards/` and 5c builds the page from them.
+2. The owner chooses the shelf's index page (G16): alternative A, cards, or B, a table, both drawn on the "fullmark themes" canvas on 2026-11-19 under "Shelf: the index page (step 5, G9)". The chosen boards are copied into `docs/mockup/boards/` and 5c builds the page from them.
 
 ## Goal
 
@@ -52,6 +52,8 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
 G1 to G15 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G16.
+
+**G16. The index page: cards or a table.** G9 decided cards with the title, the `EN`/`VI` badge, the number of questions and the time limit. On seeing the boards, the owner asked for a richer page with the kind of exam, perhaps a table, as an alternative. Both are on the canvas under "Shelf: the index page (step 5, G9)": **A**, the cards (ShelfIndex and its variants), and **B**, a table (ShelfTable, ShelfTableDark, ShelfTableVi, ShelfTablePhone, ShelfTablePhoneDark). B adds a **Type** column (**Exam** when the quiz is checked under the `exam` profile or one extending it, else **Practice**, with "instant feedback" under it when `feedback: instant`), the question types under each title, the points and the pass mark, and a line under the heading counting the quizzes and the languages; on a phone each row becomes a card. All of it comes from the published version, so the manifest does not change. Neither has a font choice: the page has no script, so a choice could not be kept, and each quiz's own page already has Appearance; the page uses system fonts. **Recommendation:** B, the table, if the owner wants the type on the page; the type from the profile is the only signal fullmark has of an exam, so a quiz whose author never named a profile reads as Practice.
 
 ## Slices
 
