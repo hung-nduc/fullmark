@@ -18,12 +18,12 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
-| 5b | built and reviewed (2026-11-19); G17 raised, waiting for the owner | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | | |
+| 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
+| 5c | brief written (2026-11-19), waiting for the owner's approval | |
 
 ### Next
 
-1. The owner decides G17; then the planner writes slice 5c's brief (the index page from the ShelfTable boards, and acceptance).
+1. The owner approves slice 5c's brief; it goes to one implementing agent on Sonnet.
 2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
@@ -51,9 +51,7 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G16 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G17.
-
-**G17. What 5b chose where `import`'s design was silent.** **Recommendation:** accept these and write them into COMMANDS.md, `quiz library import`: (a) without a manifest, a quiz is any `DIR/FOLDER/*.md` that opens with a closed `---` block; a broken front matter is then refused by `check`, not skipped; files with no front matter (a `materials` sheet) and dot folders are skipped; (b) with a manifest, a listed quiz whose front matter has another id is refused (`import.id-mismatch`), one whose file is missing is refused (`import.missing`), and quiz folders the manifest does not list are ignored; (c) a quiz unchanged but without the `public` entry gets it and counts as imported, its `source` kept; (d) a taken name's fix reads "FREE is free: rename the quiz that has NAME (`quiz library rename NAME NEW`), or this one"; (e) a missing `DIR`, or one that is not a folder, exits 2; (f) an unchanged import prints `unchanged N quizzes: NAMES`, and the closing note on a backup comes on every import; (g) in `--json`, `refused[].name` is the manifest's name, else the front matter's id.
+G1 to G17 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G18.
 
 ## Slices
 
@@ -144,4 +142,34 @@ Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium 
 
 **Checked by the planner:** `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3765 in 158 files, Playwright 847 passed (686 lines each in Chromium and Firefox) and 527 skipped, tsc, Biome and knip clean; the whole of Playwright ran, though the brief asked only for the shelf spec. No `register` test or golden changed (the brief's condition for the shared path). Goldens: 6 changed (`publish-unknown` by G12; the index pages of `publish-sync`, `-sync-json`, `-sync-swap`, `-sync-git` by G13, and `publish-sync-git`'s commit hash with them), 5 added (`import-into`, `import-into-config-kept`, `import-json`, `import-unchanged-json`, `import-problems-json`). **By hand**, on the copy of the samples' library from 5a's review: with `study-fixture` and `tidy` on the shelf, `import site --into lib2` on a machine with a library made `lib2`, left the config alone with the note, registered both quizzes on the public shelf in one commit; `list` in `lib2` marked both `public`; publishing `lib2` back to the shelf was `unchanged`, and the shelf's git status stayed clean; `import site` into the first library was `unchanged`.
 
-**Done differently, accepted:** `import --into` runs `init` through a dynamic import (a static one would merge `init` into a shared chunk and break the command graph); `register`'s failed branch no longer pushes an empty warning (it printed nothing); the three `--into` goldens run without git (`library.toml` keeps `source` as an absolute temp path, so the commit hash differs on every run), so their stdout has no `committed` line, which `test/library-import.test.ts` checks instead; the import cases copy their shelf from `publish-sync`'s golden, so a change there reaches them. Raised as G17: the agent's choices where the design was silent.
+**Done differently, accepted:** `import --into` runs `init` through a dynamic import (a static one would merge `init` into a shared chunk and break the command graph); `register`'s failed branch no longer pushes an empty warning (it printed nothing); the three `--into` goldens run without git (`library.toml` keeps `source` as an absolute temp path, so the commit hash differs on every run), so their stdout has no `committed` line, which `test/library-import.test.ts` checks instead; the import cases copy their shelf from `publish-sync`'s golden, so a change there reaches them. Raised as G17 and decided by the owner on 2026-11-19 as recommended: the agent's choices where the design was silent.
+
+## Slice 5c: the index page as a table; acceptance
+
+**Brief written on 2026-11-19, waiting for the owner's approval.** The last slice of step 5. What the index page shows and how it behaves is written in COMMANDS.md, `quiz library publish`, "The index page" (G9, G13, G16); how it looks is the ShelfTable boards in `docs/mockup/boards/` (ShelfTable, ShelfTableDark, ShelfTableVi, ShelfTablePhone, ShelfTablePhoneDark, ShelfTableLong, ShelfTablePhoneLong), whose values (colours, sizes, spacing, borders, radii, shadows) are in each board's inline styles and `renderVals()`. Where a board and COMMANDS.md disagree, COMMANDS.md wins; report it.
+
+### Read first
+
+- This plan: "Goal" (the step's "Done when"), "Rules for every slice", the briefs and reviews of 5a and 5b; [STEP5-GAPS.md](STEP5-GAPS.md), G9, G13, G16.
+- COMMANDS.md: `quiz library publish` (all of it), `quiz library import`; TECHNICAL_DESIGN.md section 7 (foundations 8 "Where pages work", with the phone sizes and reproducible screens, and 9), section 11 ("Determinism", "Round trip", "Privacy").
+- `docs/mockup/README.md` (how boards are read) and the ShelfTable boards; `ShelfTable.dc.html` holds everything, the others only import it.
+- Code: `src/build/shelf-index.ts` (5a's plain page) and its test, `src/cli/library-sync.ts`, the page's theme tokens (where `build` takes the light and dark sets), the catalogs (`src/core/i18n/`: the question type names in `paper.ts`, the start screen's time limit wording), `e2e/shelf.spec.ts`, `e2e/phone-sizes.spec.ts`, a recent screens spec (`e2e/screens-4d.spec.ts`) and how `docs/screens/4d/` was made.
+
+### Decided for this slice
+
+- **One table, restyled on a phone.** The index page is one `<table>` (a caption for screen readers, `<th scope="col">` headings, each row's quiz title in a `<th scope="row">`). Under 520 px the same table is restyled by CSS into one card per row, the numbers labelled from a `data-label` attribute through `::before`, as ShelfTablePhone draws it; no second copy of the content. No `style` attribute anywhere (foundation 3): one style sheet, by hash in the CSP.
+- **What each cell holds** (COMMANDS.md, "The index page"): Type is Exam when the published version's stored profile (its `check.json`) is `exam` or extends it, else Practice; "instant feedback" under it when the quiz has `feedback: instant`. The question types under the title are the type names of the paper's catalog (`paper.ts`) in the index's `--ui-lang`, in the default type order (QUIZ_SYNTAX.md, `type_order`), first letter capitalised, joined with " · ". Questions and points as the start screen counts them; the time limit as the start screen's tile writes it; a pass mark as `60%`; a dash for none. The count line uses the catalogs' plurals in both languages. Everything comes from the published version, so the manifest does not change.
+- **Light and dark only**, each from the page's own token sets, light by default and dark under `prefers-color-scheme: dark` (5a's review: the plain page carried every theme's tokens). System fonts.
+- **The headings stay at the top** while the page scrolls (`position: sticky` on the heading cells; the table's box clips its corners with `overflow: clip`, never `overflow: auto`, so the headings stick to the page). The page has no scroll box of its own.
+- **Screens** go to `docs/screens/5c/`, taken by `e2e/screens-5c.spec.ts` as the step-4 screens are (fixed clock, the `FULLMARK_SCREENS` run): the samples-like shelf of five quizzes in light and dark, `--ui-lang vi`, a phone at 390 × 844 in light and dark, a long shelf of 24 quizzes scrolled half-way (the headings at the top), an empty shelf.
+
+### Tasks
+
+1. **The index page** (one commit): `shelf-index.ts` rebuilt as above; its unit tests (each column's value for an exam, a practice quiz with instant feedback, a quiz with no time limit or pass mark, a `vi` quiz on an `en` index, a `vi` index; the type order; the count line in both languages; no `style` attribute; the CSP hash matches the style sheet); the 5a and 5b goldens whose index pages change, counted and explained (only `index.html` and the commit hashes that follow it may move; a manifest or quiz page that changes is a bug).
+2. **The browser** (one commit): `e2e/shelf.spec.ts` gains: axe on the index in light and dark; no sideways scroll at 360 × 780, 390 × 844 and 430 × 932, with 44 px targets for each row's link; the headings at the top of the viewport after scrolling a long shelf (desktop); the link from a phone card opens the quiz from `file://`. The screens spec and `docs/screens/5c/`.
+3. **Acceptance** (one commit): show the step's "Done when" (Goal) test by test in the report: the round trip, privacy and determinism tests; a `--json` contract test for `publish` (both forms) and `import`; `test/library-lock.test.ts` for `publish NAME --on`, the sync (the shelf's lock) and `import`; the command graph (`check` loads nothing from `src/library/`; `publish` and `import` nothing from `src/serve/`; `import` nothing from `src/build/`); the samples' shelf and lines. Add any test that is missing. Run `npm run samples`.
+4. **Do not edit** `docs/plans/` or `docs/design/`. The report as for every slice: every golden and screen added or changed, counted and explained; anything done differently; anything the boards or the design left open, as a question, not a choice.
+
+### Done when
+
+`npm run check` passes in Chromium and Firefox (everything: the last slice); the screens are committed; the step's "Done when" is shown test by test in the report; by hand, the planner publishes the samples' library and opens `samples/shelf/index.html` in both colour schemes and at phone width, and compares it with the boards.

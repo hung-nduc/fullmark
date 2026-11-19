@@ -1319,12 +1319,13 @@ Registers the quizzes of a published folder into a library, keeping ids and name
   - **A file edited after publishing** (its hash is not the manifest's) is registered with `added` now, and a warning names it; otherwise `added` is the manifest's time.
 - **Without a manifest:** every `DIR/*/*.md` whose front matter parses is registered as `register` would: under its front matter's `id`, named by its slugged title (else its id), with `added` now and no shelf entry. A taken id or name refuses the import, with its suggestion. Two `.md` files in one folder are two quizzes, each with the folder's assets.
 - **`--into PATH`** creates the library first, with `library init`'s rules for the folder (new, missing or empty; another folder exits 2). It records the new library in `config.toml` only when the config names no library yet; otherwise the config is left alone and the output says how to use the new one.
-- The output ends by noting that a published folder holds no results, reports or older versions, so import is not a backup.
+- **What counts.** Without a manifest, a quiz is any `DIR/FOLDER/*.md` that opens with a closed `---` block: a broken front matter is refused by `check`, not skipped, while a file with no front matter (a `materials` sheet) and dot folders are skipped. With a manifest, only the quizzes it lists are read, and other folders are ignored; a listed quiz whose front matter has another id is refused (`import.id-mismatch`), and one whose file is missing (`import.missing`). A quiz unchanged but without the `public` entry gets it and counts as imported, its `source` kept. A taken name is refused with the fix "FREE is free: rename the quiz that has NAME (`quiz library rename NAME NEW`), or this one".
+- The output ends, on every import, by noting that a published folder holds no results, reports or older versions, so import is not a backup. An import that changes nothing prints `unchanged N quizzes: NAMES`.
 
 | Option | Meaning |
 |---|---|
 | `--into PATH` | Create a library at `PATH` first, as above. The location is the user's choice, so agents pass it only when the user named it |
-| `--json` | `{"status": "imported" \| "unchanged" \| "problems", "library", "imported", "unchanged", "refused": [{"name", "reason", "suggest"}], "warnings", "committed"}` |
+| `--json` | `{"status": "imported" \| "unchanged" \| "problems", "library", "imported", "unchanged", "refused": [{"name", "reason", "suggest"}], "warnings", "committed"}`: `refused[].name` is the manifest's name, else the front matter's id |
 
 **Output.**
 
@@ -1343,7 +1344,7 @@ committed 2f1e0d9 fullmark: import calculus rust-basics signals
 note a shelf holds no results, reports or older versions: import restores quizzes, not a backup
 ```
 
-Exit: `0` imported or unchanged, `1` a quiz refused or check errors (nothing imported), `2` `--into` folder refused, or no library and no `--into`.
+Exit: `0` imported or unchanged, `1` a quiz refused or check errors (nothing imported), `2` `DIR` missing or not a folder, a foreign or newer manifest, `--into` folder refused, or no library and no `--into`.
 
 ## Removed or merged
 
