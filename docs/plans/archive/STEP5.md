@@ -1,12 +1,18 @@
 # Step 5: `publish` and `import`
 
+> **Archived (2026-11-19).** Step 5 (`quiz library publish`, both forms, and `quiz library import`; the shelf folder, its manifest `fullmark-shelf-v2` and its index page as a table; step 4's G38) is closed: every "Done when" criterion passed in Chromium and Firefox (slice 5c's review shows each part test by test: the round trip, privacy, determinism, the contract, lock and command-graph tests, the samples' shelf), and the owner accepted the step on 2026-11-19. The planner's last full check is the one after G18 and G19's fix; G20's one-rule fix was checked in full by its agent (see 5c's review). Its decided gaps, G1 to G21, are in [STEP5-GAPS.md](STEP5-GAPS.md); the decisions themselves live in `docs/design/`, which wins over anything here. Its "Rules for every slice" still hold, extended by the next plan. The rest is kept below as it was.
+>
+> **Step 6 starts here:** moving the owner's 0.x history into a 1.0 library (TECHNICAL_DESIGN.md, section 12: a throwaway script, written by an agent and kept outside the product; done when `stats` and `--missed` in the new library agree with 0.x's on the same history). Its plan, `docs/plans/STEP6.md`, is not written yet: the planner writes it, with a Handoff on top, for the owner to approve, starting with where the owner's 0.x library is and what it holds.
+>
+> **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
+
 ## Handoff (2026-11-19): start here
 
 A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox when the slice runs Playwright, the screens when there are any, and the commands by hand) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again; outside this plan one is cited with its step ("step 5, G3"; "STEP5.md, G3" in a code comment). Decided ones move to `STEP5-GAPS.md`.
+As in step 4 ([archive/STEP4.md](STEP4.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits on branch `1.0` (never pushes) and reports; the planner reviews (`npm run build`, `npm run check` in Chromium and Firefox when the slice runs Playwright, the screens when there are any, and the commands by hand) and brings every gap to the owner with a recommendation; the owner decides; the decisions go into `docs/design/` as plain statements and become the next brief's first tasks. Commit after every round. Gaps are numbered from **G1** again; outside this plan one is cited with its step ("step 5, G3"; "STEP5.md, G3" in a code comment). Decided ones move to `STEP5-GAPS.md`.
 
 **Run like step 4:** the design's open questions were raised **together** at the start (G1 to G11, decided on 2026-11-19), not one per slice; three slices; the one new screen (the shelf's index page) is drawn on the owner's canvas before the last slice and styled there.
 
@@ -19,7 +25,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | built and reviewed (2026-11-19), with the fixes of G18, G19 and G20; G21 decided; step 5 waits for the owner's acceptance | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475`, `b071e07` |
+| 5c | built and reviewed (2026-11-19), with the fixes of G18, G19 and G20; G21 decided; step 5 accepted by the owner (2026-11-19) | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475`, `b071e07` |
 
 ### Next
 
@@ -28,7 +34,7 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 
 ## Goal
 
-`quiz library publish` and `quiz library import`: TECHNICAL_DESIGN.md section 12, step 5; COMMANDS.md, `quiz library publish` and `quiz library import`; USER_DESIGN.md, 4.5; TECHNICAL_DESIGN.md section 11 ("Determinism", "Round trip", "Privacy") and section 5 ("In the library"). Plus step 4's **G38**, decided and not built ([archive/STEP4-GAPS.md](archive/STEP4-GAPS.md)): `share --source` writes `profile = NAME` when the version's profile is not the one the quiz gets by itself.
+`quiz library publish` and `quiz library import`: TECHNICAL_DESIGN.md section 12, step 5; COMMANDS.md, `quiz library publish` and `quiz library import`; USER_DESIGN.md, 4.5; TECHNICAL_DESIGN.md section 11 ("Determinism", "Round trip", "Privacy") and section 5 ("In the library"). Plus step 4's **G38**, decided and not built ([archive/STEP4-GAPS.md](STEP4-GAPS.md)): `share --source` writes `profile = NAME` when the version's profile is not the one the quiz gets by itself.
 
 **Done when** (section 12): **the round-trip and privacy tests pass.** Read here as:
 
@@ -37,11 +43,11 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 - **Determinism:** two publishes of the same library state into two empty folders give byte-identical folders, and a second publish into the same folder is `unchanged` and commits nothing.
 - **And:** `publish` and `import` have contract tests run as subprocesses with `--json`; every command that changes the library or a shelf takes its lock and commits once (`test/library-lock.test.ts` gains `publish NAME --on`, the sync and `import`); `check` and the core commands still load nothing from `src/library/`, and `publish` and `import` load nothing from `src/serve/` (the command-graph test); `npm run samples` gains a shelf published from the samples' library and a line for `library publish` and `library import`.
 
-**Not in step 5:** moving the owner's 0.x history in (step 6); the `shelf ...` commands, several shelves and bundles ([proposals/shelves.md](../design/proposals/shelves.md)); `import --clone` ([proposals/import-clone.md](../design/proposals/import-clone.md)); pushing; the other proposals, unless the owner picks one.
+**Not in step 5:** moving the owner's 0.x history in (step 6); the `shelf ...` commands, several shelves and bundles ([proposals/shelves.md](../../design/proposals/shelves.md)); `import --clone` ([proposals/import-clone.md](../../design/proposals/import-clone.md)); pushing; the other proposals, unless the owner picks one.
 
 ## Rules for every slice
 
-Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slice", extending step 3's): goldens are the contract; a failure is environmental only when its cause is shown; no real network or real timers in unit tests; a command loads only what it uses; shared pages carry no server code; `src/library/` uses core's public API only; git is real in tests, in a temp folder, with a fixed author, committer and date; the clock and the config folder are injected; every write is atomic, under the lock; commits end with the `Co-Authored-By` line of the model that made them, with explicit paths only (never `git add -A`, `-a` or `--amend`); the implementing agent never pushes. Added for step 5:
+Step 4's rules hold ([archive/STEP4.md](STEP4.md), "Rules for every slice", extending step 3's): goldens are the contract; a failure is environmental only when its cause is shown; no real network or real timers in unit tests; a command loads only what it uses; shared pages carry no server code; `src/library/` uses core's public API only; git is real in tests, in a temp folder, with a fixed author, committer and date; the clock and the config folder are injected; every write is atomic, under the lock; commits end with the `Co-Authored-By` line of the model that made them, with explicit paths only (never `git add -A`, `-a` or `--amend`); the implementing agent never pushes. Added for step 5:
 
 - **A shelf is written like the library**: the shelf folder in a test is a fresh temporary folder, a git repository with a fixed author, committer and date when the test needs commits, and the sync's writes are atomic per file under the shelf's lock (TECHNICAL_DESIGN.md, foundation "Library and shelf writes take a lock"). A test kills a sync mid-way (or simulates it) and checks the next sync repairs the folder.
 - **What goes out is checked by bytes, not by eye**: the privacy test walks every file of the shelf; the determinism and round-trip tests compare folders byte by byte.
@@ -69,7 +75,7 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 
 ### Read first
 
-- This plan: "Goal", "Rules for every slice"; [STEP5-GAPS.md](STEP5-GAPS.md), G1 to G6 and G10; [archive/STEP4-GAPS.md](archive/STEP4-GAPS.md), G35 and G38.
+- This plan: "Goal", "Rules for every slice"; [STEP5-GAPS.md](STEP5-GAPS.md), G1 to G6 and G10; [archive/STEP4-GAPS.md](STEP4-GAPS.md), G35 and G38.
 - COMMANDS.md: `quiz library publish`, `quiz library share`, `quiz library list` (the `NOTES` marks and the `shelves` field), `quiz library info`, "The library folder" (`library.toml`), "Git", the common options (`--fonts`, `--json`), "Exit codes".
 - TECHNICAL_DESIGN.md: section 3 (schemas from zod), section 5 "In the library", section 7 (foundations 6, 9 and "Library and shelf writes take a lock"; the layer boundaries), section 11 ("Determinism", "Privacy").
 - Code: `src/library/index-file.ts` (`shelves`, read as strings today), `profile-toml.ts`, `lock.ts`, `git.ts`, `layout.ts`; `src/cli/library-share.ts` (how a stored version is loaded and built, and its `fullmark.toml`), `library-common.ts`, `library-list.ts`, `library-row.ts`, `library-info.ts`, `library-rename.ts` (a small changing command: lock, write, commit), `config-write.ts`, `build.ts` and `src/build/page.ts` (`buildPage`, `builtAt`); `scripts/schemas.mjs`; `test/helpers/library-history.ts`, `test/library-contract.test.ts`, `test/library-lock.test.ts`, `test/cli-graph.test.ts`, the golden runner (`test/golden/runner.ts`, its `git.txt`).
