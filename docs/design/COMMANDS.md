@@ -657,7 +657,7 @@ quizzes/<id>/
 ```
 
 - **Folders are named by the quiz's `id`**, never its name, so `rename` moves nothing. Assets are stored per version, not shared across versions: git stores a file that did not change once, so the repository does not grow, and a version folder is complete on its own (`share --source` copies it).
-- **`library.toml`** holds `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added, file }]` in order (`file`: the source's name in that version's folder, which may differ between versions; every command reads a version's source by it), and `shelves = []` (entries from step 5). No scores or counts: the results files are the truth, and `list` reads them. It is written atomically and sorted by name, so its diff reads well. A 0.x library is refused like any other foreign folder.
+- **`library.toml`** holds `format`, `version = 2`, `created`, and one table per quiz: `name`, `id`, `source` (the absolute path it was registered from, for the `changed` flag), `current` (a version hash), `versions = [{ hash, added, file }]` in order (`file`: the source's name in that version's folder, which may differ between versions; every command reads a version's source by it), and `shelves = [{ shelf, kind }]`, the quiz's shelf entries (`quiz library publish`; empty until a quiz is put on a shelf). No scores or counts: the results files are the truth, and `list` reads them. It is written atomically and sorted by name, so its diff reads well. A 0.x library is refused like any other foreign folder.
 
 ### Git
 
@@ -826,7 +826,7 @@ Exit: `0` registered or unchanged, `1` check errors, name taken (the output sugg
 
 ### quiz library list
 
-**changed**: adds a `public` column (a quiz with an entry on the shelf named `public`).
+**changed**: says whether a quiz is public, with the mark `public` in `NOTES` (a quiz with an entry on the shelf named `public`).
 
 ```text
 quiz library list [--plain] [--json]
@@ -870,7 +870,7 @@ $ quiz library list
 next: quiz library register FILE
 ```
 
-The columns are fixed; `NOTES` holds the marks: `source changed` (`changed`), `N ungraded`, `N flagged` (open review flags), and from step 5 `public`. A score with grades pending carries `*`, as on the page. Dates are `17 Nov`, with the year when it is not this year.
+The columns are fixed; `NOTES` holds the marks: `source changed` (`changed`), `N ungraded`, `N flagged` (open review flags), and `public`. A score with grades pending carries `*`, as on the page. Dates are `17 Nov`, with the year when it is not this year.
 
 Exit: `0`, `2` no library.
 
@@ -1246,29 +1246,61 @@ The path alone and nothing else, never coloured, so it can be used as `$(quiz li
 
 ```text
 quiz library publish NAME --on | --off [--json]
-quiz library publish [DIR] [--with-brief | --no-brief] [--ui-lang en|vi] [--dry-run] [--json]
+quiz library publish [DIR] [--with-brief | --no-brief] [--ui-lang en|vi] [--fonts quiz|all|none] [--dry-run] [--json]
 ```
 
-Keeps a separate folder (a public repository, GitHub Pages) holding the current Markdown, assets and built page of every quiz on the `public` shelf, plus an index page, a `fullmark-shelf.json` manifest and a `fullmark.toml` with the custom profiles those quizzes use (written only when there are any). Results, reports, progress and older versions are never copied. Briefs are copied only with `--with-brief`.
+Keeps a separate folder (a public repository, GitHub Pages) holding the current Markdown, assets and built page of every quiz on the `public` shelf, plus an index page and a `fullmark-shelf.json` manifest. Results, grades, reports, reviews, progress and older versions are never copied. Briefs are copied only with `--with-brief`.
 
-- **`NAME --on | --off`** adds or removes the quiz's entry on the shelf named `public` and commits in the library. It writes nothing to any shelf.
-- **Shelf entries.** A quiz's record in `library.toml` holds `shelves = [{ shelf = "public", kind = "quiz" }]`; `version` is reserved (optional, unused in v1). The folder to publish into is kept per machine in `config.toml`, keyed by shelf name. v1 commands touch only the shelf named `public` and only `kind = "quiz"` entries. Entries they do not know (another shelf name, `kind = "bundle"`) are kept as they are, never rejected, and never published. The `shelf ...` commands and several shelves are a proposal ([proposals/shelves.md](proposals/shelves.md)).
-- **The index page** lists every quiz on the shelf, whatever its language, each marked with its `lang` (`EN`, `VI`): one learner's courses can be taught in several languages, such as an English-taught programme at a Vietnamese university. Each quiz's page keeps its own `ui_lang`; `--ui-lang` sets only the index page's own chrome.
-- **The sync** builds every quiz on the `public` shelf into memory first, with `built_at` pinned to the version's `added` time, so the same library state always gives the same bytes. If any build fails, nothing is written. It then writes only the files that changed, removes only paths listed in the old manifest, and leaves everything else (README, LICENSE, `.github/`) alone. If `DIR` is its own git repository, it commits only the paths it wrote or removed. It never pushes.
+- **`NAME --on | --off`** adds or removes the quiz's entry on the shelf named `public` and commits in the library (`fullmark: publish NAME --on`). It writes nothing to any shelf. `--on` for a quiz already on the shelf, or `--off` for one that is not, says so, commits nothing and exits 0.
+- **Shelf entries.** A quiz's record in `library.toml` holds `shelves = [{ shelf = "public", kind = "quiz" }]`; `version` is reserved (optional, unused in v1). v1 commands touch only the shelf named `public` and only `kind = "quiz"` entries. Entries they do not know (another shelf name, `kind = "bundle"`) are kept as they are, never rejected, and never published. The `shelf ...` commands and several shelves are a proposal ([proposals/shelves.md](proposals/shelves.md)).
+- **The shelf folder.** One folder per quiz at the top level, **named by the quiz's id** (as in the library, so `rename` moves nothing and a saved link keeps working). It holds the current version's source under its own file name, every asset and `materials` sheet at its relative path, the built page as `index.html` (served at `…/ID/`), `brief.yaml` only with `--with-brief`, and the `fullmark.toml` that `share --source` writes for that version, when it writes one (`quiz check` on the folder then finds what the library found). Never `check.json`. The top level holds the index page as `index.html` and the manifest; nothing else there is fullmark's, and the owner's own files (README, LICENSE, `.github/`) are left alone.
+- **The manifest**, `fullmark-shelf.json` (schema `fullmark-shelf-v2`): `{"format": "fullmark-shelf", "version": 2, "ui_lang", "with_brief", "fonts", "quizzes": [{"id", "name", "title", "lang", "hash", "added", "file", "files"}], "files"}`. Quizzes are sorted by id; `hash` and `added` are the published version's; `file` is the source's name; a quiz's `files` are every path the sync wrote for it, and the top-level `files` the paths it wrote at the root. It holds no time of publishing, and is written with sorted keys and a trailing newline.
+- **The index page** lists every quiz on the shelf, whatever its language, sorted by title: the title as a link to `ID/`, its `lang` (`EN`, `VI`), its number of questions and its time limit when it has one, under a heading with the shelf folder's name. One learner's courses can be taught in several languages, such as an English-taught programme at a Vietnamese university. It is a static page with no script, the page's theme tokens with light and dark from `prefers-color-scheme`, system fonts and a CSP with only its own style sheet's hash. Each quiz's page keeps its own `ui_lang`; `--ui-lang` sets only the index page's own chrome.
+- **The sync** builds every quiz on the `public` shelf into memory first, with `built_at` pinned to the version's `added` time, so the same library state always gives the same bytes. If any build fails, nothing is written. It takes the shelf's lock (`.fullmark.lock` in `DIR`), writes only the files that changed, each atomically, and removes only paths listed in the old manifest. A missing `DIR` is created, with its parents.
+- **What a sync refuses.** A *quiz folder* is a top-level folder holding an `.md` file and an `index.html` at its top level. With a manifest, a quiz folder the manifest does not list exits 1, naming it, with the fix "move it out of DIR, or import it into the library first". With no manifest (the first sync into a folder), the folder may hold anything except a quiz folder (the same exit) or an `index.html` at its top level (exit 1, fix "move it, or publish into an empty folder"). A sync never removes or changes a path its manifest does not list.
+- **Git.** When `DIR` is anywhere inside a git work tree (its own repository, or a repository's `docs/` folder served by GitHub Pages), the sync commits only the paths it wrote or removed (`git -C DIR commit -- PATHS`, message `fullmark: publish`), so the owner's own changes are never swept in. A failed commit is a warning, as in the library. fullmark never runs `git init` in `DIR` and never pushes.
+- **Remembered.** Each successful sync records `DIR` in `config.toml` as `public` under `[shelves]` (`[shelves]` then `public = "/abs/path"`), replacing the one before, and says so in a line when it changes.
 
 | Argument or option | Meaning |
 |---|---|
-| `DIR` | The shelf folder. Remembered in the config after the first successful sync |
+| `DIR` | The shelf folder. Default: the one remembered in the config |
 | `--with-brief`, `--no-brief` | Copy briefs or not. Default: not. Remembered in the manifest |
 | `--ui-lang en\|vi` | The index page's interface language. Default: `en`. Remembered in the manifest |
+| `--fonts quiz\|all\|none` | As for `build`. Remembered in the manifest |
 | `--dry-run` | Print what would be added, updated and removed, and write nothing |
 | `--json` | `{"status": "published" \| "unchanged", "dir", "added", "updated", "removed", "committed", "warnings"}` |
 
+**Output.**
+
+```text
+$ quiz library publish signals --on
+signals is on the public shelf
+committed 1a2b3c4 fullmark: publish signals --on
+next: quiz library publish
+
+$ quiz library publish ~/sites/quizzes --dry-run
+would publish 3 quizzes to /home/minh/sites/quizzes
+  add     signals/    new on the shelf
+  update  calculus/   version 7c1e → 2b9d
+  remove  old-quiz/   off the shelf
+  update  index.html
+nothing written (--dry-run)
+
+$ quiz library publish ~/sites/quizzes
+published 3 quizzes to /home/minh/sites/quizzes: 1 added, 1 updated, 1 removed
+remembered /home/minh/sites/quizzes as the public shelf
+committed 5d6e7f8 fullmark: publish (in /home/minh/sites/quizzes)
+next: git -C /home/minh/sites/quizzes push   (fullmark never pushes)
+
+$ quiz library publish
+unchanged: /home/minh/sites/quizzes already matches the library (3 quizzes)
+```
+
 Exit:
 
-- `0`: published or unchanged.
-- `1`: a build failed, or a quiz folder in `DIR` is not in the manifest (nothing written).
-- `2`: `DIR` is inside the library or contains a `library.toml`, or the manifest is foreign or newer.
+- `0`: published or unchanged, and `NAME --on | --off`.
+- `1`: a build failed, a quiz folder in `DIR` is not in the manifest, or an `index.html` sits in a folder with no manifest (nothing written); an unknown `NAME`.
+- `2`: `DIR` is inside the library or contains a `library.toml`, or the manifest is foreign (its `format` is not `fullmark-shelf`) or newer (its `version` is above 2).
 - `3`: no `DIR` given and none remembered.
 
 ### quiz library import
@@ -1279,16 +1311,37 @@ Exit:
 quiz library import DIR [--into PATH] [--json]
 ```
 
-Registers the quizzes of a published folder into a library, keeping ids and names, so a shelf restores into a new library. The shelf's `fullmark.toml`, if any, supplies the custom profiles. All or nothing, as batch `library register` is: every quiz must pass `check` under its profile, and none may be a survey (`library.survey`, as for `register`), before anything is written. Commits once at the end.
+Registers the quizzes of a published folder into a library, keeping ids and names, so a shelf restores into a new library. Each quiz is checked under its nearest `fullmark.toml`, as `register` checks it: the quiz folder's own, as `publish` writes it, or one at the folder's top level, as in a folder made by hand. All or nothing, as batch `library register` is: every quiz must pass `check` under its profile, and none may be a survey (`library.survey`, as for `register`), before anything is written. Commits once at the end. Each quiz's `source` is its file's absolute path in `DIR`, so `list` shows `changed` when the shelf's file is edited later.
 
-- **With a manifest:** each listed quiz is registered under its id and name with an entry on the `public` shelf, with the manifest's `added` time. A quiz already in the library with the same hash is unchanged. A different hash adds a version, with a warning if the file was edited after publishing.
-- **Without a manifest:** every `DIR/*/*.md` whose front matter parses is registered with a new id and its slugged title.
+- **With a manifest:** quizzes are matched **by id**.
+  - **A new id** is registered under the shelf's name, with an entry on the `public` shelf and the manifest's `added` time. A name already taken by another quiz refuses the import, with a free name suggested as `register` does.
+  - **An id the library has** keeps the library's name (a rename there is the owner's), with a note when the shelf calls it otherwise, and gets the `public` shelf entry. When the shelf's file is the quiz's current version, it is unchanged. When it is an older version of the quiz, it is unchanged too, with a note "the shelf has an older version (HASH)": nothing goes backwards. A new hash adds a version and makes it current, as `register --update` does.
+  - **A file edited after publishing** (its hash is not the manifest's) is registered with `added` now, and a warning names it; otherwise `added` is the manifest's time.
+- **Without a manifest:** every `DIR/*/*.md` whose front matter parses is registered as `register` would: under its front matter's `id`, named by its slugged title (else its id), with `added` now and no shelf entry. A taken id or name refuses the import, with its suggestion. Two `.md` files in one folder are two quizzes, each with the folder's assets.
+- **`--into PATH`** creates the library first, with `library init`'s rules for the folder (new, missing or empty; another folder exits 2). It records the new library in `config.toml` only when the config names no library yet; otherwise the config is left alone and the output says how to use the new one.
 - The output ends by noting that a published folder holds no results, reports or older versions, so import is not a backup.
 
 | Option | Meaning |
 |---|---|
-| `--into PATH` | Create a library at `PATH` first, with the rules of `library init`. The location is the user's choice, so agents pass it only when the user named it |
+| `--into PATH` | Create a library at `PATH` first, as above. The location is the user's choice, so agents pass it only when the user named it |
 | `--json` | `{"status": "imported" \| "unchanged" \| "problems", "library", "imported", "unchanged", "refused": [{"name", "reason", "suggest"}], "warnings", "committed"}` |
+
+**Output.**
+
+```text
+$ quiz library import ~/sites/quizzes --into ~/quiz-library-2
+library ready /home/minh/quiz-library-2 (new folder, git repository)
+imported 3 quizzes: calculus, rust-basics, signals (on the public shelf)
+committed 9a8b7c6 fullmark: import calculus rust-basics signals
+note a shelf holds no results, reports or older versions: import restores quizzes, not a backup
+
+$ quiz library import ~/sites/quizzes --into ~/quiz-library-3
+library ready /home/minh/quiz-library-3 (new folder, git repository)
+note your library is still /home/minh/quiz-library; use this one with FULLMARK_LIBRARY=/home/minh/quiz-library-3 or quiz library init /home/minh/quiz-library-3 --force
+imported 3 quizzes: calculus, rust-basics, signals (on the public shelf)
+committed 2f1e0d9 fullmark: import calculus rust-basics signals
+note a shelf holds no results, reports or older versions: import restores quizzes, not a backup
+```
 
 Exit: `0` imported or unchanged, `1` a quiz refused or check errors (nothing imported), `2` `--into` folder refused, or no library and no `--into`.
 

@@ -311,7 +311,7 @@ The profile is the user's choice, like the brief's purpose. An agent never chang
 
 ### In the library
 
-`register` resolves the profile and stores the resolved rules with the version (`check.json`), so re-checking an old version later gives the same answer even if `fullmark.toml` changed or is gone. `share --source` and `publish` write a `fullmark.toml` holding just the custom profiles their quizzes use, and `import` reads it back.
+`register` resolves the profile and stores the resolved rules with the version (`check.json`), so re-checking an old version later gives the same answer even if `fullmark.toml` changed or is gone. `share --source` writes a `fullmark.toml` beside the quiz only when the quiz would not get the same rules by itself: `profile = NAME` when the version's profile is not the quiz's own (its `profile:`, else `default`), and `[profiles.NAME]` only when its rules differ from the built-in's. `publish` writes that same file into each quiz's folder on the shelf, never one at the shelf's root, since one file names one profile; `import` checks each quiz under its nearest `fullmark.toml`, as `register` does.
 
 `register` and `import` also refuse a survey, with the rule `library.survey`. It is a refusal, not a check finding: `check` does not report it and no config can change it ([COMMANDS.md](COMMANDS.md), `quiz library register`).
 
