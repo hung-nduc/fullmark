@@ -19,11 +19,11 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | brief written (2026-11-19), waiting for the owner's approval | |
+| 5c | brief approved (2026-11-19), with an implementing agent | |
 
 ### Next
 
-1. The owner approves slice 5c's brief; it goes to one implementing agent on Sonnet.
+1. Slice 5c is with one implementing agent on Sonnet; the planner reviews it when it reports, then the owner accepts step 5.
 2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
@@ -146,7 +146,7 @@ Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium 
 
 ## Slice 5c: the index page as a table; acceptance
 
-**Brief written on 2026-11-19, waiting for the owner's approval.** The last slice of step 5. What the index page shows and how it behaves is written in COMMANDS.md, `quiz library publish`, "The index page" (G9, G13, G16); how it looks is the ShelfTable boards in `docs/mockup/boards/` (ShelfTable, ShelfTableDark, ShelfTableVi, ShelfTablePhone, ShelfTablePhoneDark, ShelfTableLong, ShelfTablePhoneLong), whose values (colours, sizes, spacing, borders, radii, shadows) are in each board's inline styles and `renderVals()`. Where a board and COMMANDS.md disagree, COMMANDS.md wins; report it.
+**Approved by the owner on 2026-11-19.** The last slice of step 5. What the index page shows and how it behaves is written in COMMANDS.md, `quiz library publish`, "The index page" (G9, G13, G16); how it looks is the ShelfTable boards in `docs/mockup/boards/` (ShelfTable, ShelfTableDark, ShelfTableVi, ShelfTablePhone, ShelfTablePhoneDark, ShelfTableLong, ShelfTablePhoneLong), whose values (colours, sizes, spacing, borders, radii, shadows) are in each board's inline styles and `renderVals()`. Where a board and COMMANDS.md disagree, COMMANDS.md wins; report it.
 
 ### Read first
 
