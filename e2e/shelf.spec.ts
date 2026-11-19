@@ -143,6 +143,43 @@ for (const phone of PHONES) {
   });
 }
 
+/** G19: the four numbers of a phone card never touch, at the three phone sizes, in both languages, with the longest time limit. */
+for (const phone of PHONES) {
+  for (const ui of ["en", "vi"] as const) {
+    test(`at ${phone.width} x ${phone.height} (${ui}) the numbers of a card are 8 px apart and stay in the card`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: phone.width, height: phone.height });
+      await page.goto(writeShelf(fiveQuizzes(), ui));
+      const longest = ui === "en" ? "2 h 20 min" : "2 giờ 20 phút";
+      await expect(page.locator("tbody td.n", { hasText: longest })).toHaveCount(1);
+      const rows = page.locator("tbody tr");
+      for (let i = 0; i < (await rows.count()); i++) {
+        const row = rows.nth(i);
+        const card = await row.boundingBox();
+        const cells = await row.locator("td.n").all();
+        const boxes = [];
+        for (const c of cells) {
+          const b = await c.boundingBox();
+          expect(b, `row ${i}`).not.toBeNull();
+          if (!b || !card) continue;
+          boxes.push(b);
+          expect(b.x, `row ${i}`).toBeGreaterThanOrEqual(card.x);
+          expect(b.x + b.width, `row ${i}`).toBeLessThanOrEqual(card.x + card.width + 0.5);
+          // the text does not spill out of its cell
+          expect(await c.evaluate((e) => e.scrollWidth <= e.clientWidth + 1), `row ${i}`).toBe(true);
+        }
+        for (let a = 0; a < boxes.length - 1; a++) {
+          const [l, r] = [boxes[a], boxes[a + 1]];
+          if (!l || !r) continue;
+          const gap = r.x - (l.x + l.width);
+          expect(gap, `row ${i}, cells ${a} and ${a + 1}`).toBeGreaterThanOrEqual(7.9);
+        }
+      }
+    });
+  }
+}
+
 test("on a long shelf the column headings stay at the top of the window while the page scrolls", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(writeShelf(longShelf()));

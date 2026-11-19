@@ -140,6 +140,13 @@ describe("buildShelfIndex", () => {
     const vi = buildShelfIndex("s", entries, "vi");
     expect(rowOf(vi, "toan")).toContain('<span class="kinds">Nhiều lựa chọn · điền vào chỗ trống · ');
     expect(rowOf(vi, "toan")).toContain("Thi</span>");
+    // G18: no capital inside the list ("Đúng/Sai" is "đúng/sai")
+    const first = entries[0] as ShelfEntry;
+    const mixed = buildShelfIndex("s", [{ ...first, types: ["single", "truefalse", "essay"] }], "vi");
+    expect(mixed).toContain('<span class="kinds">Một lựa chọn · đúng/sai · tự luận</span>');
+    expect(buildShelfIndex("s", [{ ...first, types: ["single", "truefalse", "essay"] }], "en")).toContain(
+      '<span class="kinds">Single choice · true or false · essays</span>',
+    );
     expect(rowOf(vi, "toan")).toContain('data-label="Thời gian">1 giờ 30 phút</td>');
     expect(rowOf(vi, "toan")).toContain('data-label="Điểm">2,5</td>');
     expect(rowOf(vi, "rust")).toContain("phản hồi ngay");

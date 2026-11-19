@@ -75,23 +75,23 @@ const CSS =
   ".box{overflow:visible;background:none;border:0;border-radius:0;box-shadow:none}" +
   "table,tbody{display:block}" +
   "thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}" +
-  "tbody tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px;margin-bottom:10px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow)}" +
-  "tbody th,tbody td{padding:0;width:auto;text-align:left}" +
+  "tbody tr{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr) minmax(0,1.4fr) minmax(0,.8fr);gap:6px 12px;margin-bottom:10px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow)}" +
+  "tbody th,tbody td{padding:0;width:auto;text-align:left;white-space:normal}" +
   "tbody th,tbody td.type{grid-column:1/-1}" +
   ".top{justify-content:space-between;flex-wrap:nowrap}" +
   "a{display:inline-flex;align-items:center;min-height:44px;min-width:44px}" +
   "tbody td.n{margin-top:4px;border-top:1px solid var(--line);padding-top:8px;font-weight:700}" +
-  "tbody td.n::before{content:attr(data-label);display:block;font-size:.7em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}" +
+  "tbody td.n::before{content:attr(data-label);display:block;font-size:.7em;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}" +
   "}";
 
-/** The name of a question type in the paper's catalog, lower case but for the first letter of the whole list. */
+/** The name of a question type in the paper's catalog, wholly lower case, then the first letter of the whole list capitalised. */
 function kindsText(types: readonly QuestionType[], ui: "en" | "vi"): string {
   const names = (ui === "vi" ? paperVi : paperEn).typeNames;
   const order: QuestionType[] = [...DEFAULT_TYPE_ORDER.flat(), ...QUESTION_TYPES];
   const seen = [...new Set(order)].filter((t) => types.includes(t));
   const text = seen
     .map((t) => names[t] ?? t)
-    .map((n) => n.charAt(0).toLowerCase() + n.slice(1))
+    .map((n) => n.toLowerCase())
     .join(" · ");
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
