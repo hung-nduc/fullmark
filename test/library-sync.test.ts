@@ -113,7 +113,7 @@ describe("library publish DIR: the first sync", () => {
     expect(html).toContain('href="rust/index.html"');
     expect(html).toContain('href="calculus-limits/index.html"');
     expect(html).toContain(">EN</span>");
-    expect(html).toContain("2 questions");
+    expect(html).toContain('data-label="Questions">2</td>');
   });
 
   it("--with-brief copies brief.yaml, never check.json; --no-brief takes it away again; the manifest remembers the choice", async () => {
@@ -137,7 +137,7 @@ describe("library publish DIR: the first sync", () => {
     const dir = join(t.dir, "shelf");
     await t.sync("shelf", { uiLang: "vi" });
     expect(read(dir, "index.html")).toContain('<html lang="vi">');
-    expect(read(dir, "index.html")).toContain("2 câu hỏi");
+    expect(read(dir, "index.html")).toContain("Câu hỏi");
     expect(manifestOf(dir).ui_lang).toBe("vi");
     expect((await t.sync("shelf")).out[0]).toMatch(/^unchanged:/);
     await t.sync("shelf", { uiLang: "en" });

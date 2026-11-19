@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { mkdir, readdir, rm, rmdir } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
-import { buildShelfIndex } from "../build/shelf-index";
+import { buildShelfIndex, type ShelfEntry } from "../build/shelf-index";
 import { FONT_CHOICES, type FontsChoice } from "../core/fonts";
 import { summarise } from "../core/inspect";
-import type { ShelfManifest } from "../core/ir";
+import type { QuestionType, ShelfManifest } from "../core/ir";
 import { SHELF_FORMAT, SHELF_VERSION } from "../core/ir";
 import type { Git } from "../library/git";
 import { type IndexQuiz, isPublished, PUBLIC_SHELF } from "../library/index-file";
@@ -66,7 +66,7 @@ const isInside = (folder: string, path: string): boolean => {
 type Built = {
   quiz: ShelfManifest["quizzes"][number];
   files: Map<string, Uint8Array>;
-  summary: { questions: number; timeLimit: number | null };
+  summary: Omit<ShelfEntry, "id" | "title" | "lang">;
 };
 
 /** `needs input` (exit 3): no folder was given and none is remembered. */
@@ -192,8 +192,7 @@ export async function runLibrarySync(
           id: b.quiz.id,
           title: b.quiz.title,
           lang: b.quiz.lang,
-          questions: b.summary.questions,
-          timeLimit: b.summary.timeLimit,
+          ...b.summary,
         })),
         uiLang,
       ),
@@ -527,6 +526,7 @@ async function buildQuiz(
   const toml = profile === null ? null : profileToml(profile, loaded.quiz.frontMatter.profile);
   if (toml !== null) wanted.set(`${prefix}fullmark.toml`, bytesOf(toml));
   const stats = summarise(loaded.quiz, loaded.hash);
+  const sections = loaded.quiz.sections;
   return {
     quiz: {
       id: quiz.id,
@@ -539,6 +539,19 @@ async function buildQuiz(
       files: [...wanted.keys()].sort(compare),
     },
     files: wanted,
-    summary: { questions: stats.questions, timeLimit: stats.timeLimit },
+    summary: {
+      // as the start screen counts them: a bank counts the questions drawn, and its points are unknown when they differ
+      questions: sections.reduce((n, sec) => n + (sec.pick ?? sec.questions.length), 0),
+      points: sections.some(
+        (sec) => sec.pick !== null && sec.questions.some((q) => q.points !== sec.questions[0]?.points),
+      )
+        ? null
+        : stats.points,
+      timeLimit: stats.timeLimit,
+      passMark: loaded.quiz.frontMatter.passMark,
+      exam: profile?.chain.some((c) => c.name === "exam") ?? false,
+      instant: loaded.quiz.frontMatter.feedback === "instant",
+      types: stats.types.map((x) => x.type as QuestionType),
+    },
   };
 }

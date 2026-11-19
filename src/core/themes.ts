@@ -308,6 +308,15 @@ export function deviceThemeCss(): string {
   return `${themeCss("light")}@media (prefers-color-scheme:dark){:root{${setOf(SETS.dark)}}}`;
 }
 
+/**
+ * The token CSS of a page that carries only the light and the dark set (the shelf's index page): light by default, dark
+ * when the device asks for it.
+ */
+export function lightDarkCss(): string {
+  const common = `:root{--font:${FONT_REGISTRY.system.stack};--mono:"Cascadia Code",Consolas,Menlo,monospace}`;
+  return `${common}:root{${setOf(SETS.light)}}@media (prefers-color-scheme:dark){:root{${setOf(SETS.dark)}}}`;
+}
+
 // ---- which theme is shown ----
 
 /** What the page shows: `auto` follows the device; high contrast turns `light` and `paper` into `white`, `dark` into `oled`. */

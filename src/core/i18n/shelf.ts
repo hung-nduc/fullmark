@@ -8,11 +8,15 @@ export const shelfEn = {
   empty: "No quizzes on this shelf yet.",
   /** the screen reader's name for the list of quizzes */
   listLabel: "Quizzes",
-  questions: (n: number) => `${n} ${n === 1 ? "question" : "questions"}`,
-  timeLimit: (time: string) => `time limit ${time}`,
-  hours: (n: number) => `${n} h`,
-  minutes: (n: number) => `${n} min`,
-  seconds: (n: number) => `${n} s`,
+  /** the line under the heading: "5 quizzes · 2 languages" */
+  summary: (quizzes: number, languages: number) =>
+    `${quizzes} ${quizzes === 1 ? "quiz" : "quizzes"} · ${languages} ${languages === 1 ? "language" : "languages"}`,
+  /** the column headings; the phone's card labels its numbers with the short forms */
+  head: { quiz: "Quiz", type: "Type", questions: "Questions", points: "Points", time: "Time limit", pass: "Pass mark" },
+  headShort: { questions: "Questions", points: "Points", time: "Time", pass: "Pass" },
+  exam: "Exam",
+  practice: "Practice",
+  instant: "instant feedback",
   /** what a quiz's language badge says, for the screen reader */
   language: { en: "English", vi: "Vietnamese" },
 };
@@ -23,10 +27,11 @@ export const shelfVi = {
   heading: "Bài kiểm tra",
   empty: "Kệ này chưa có bài kiểm tra nào.",
   listLabel: "Bài kiểm tra",
-  questions: (n: number) => `${n} câu hỏi`,
-  timeLimit: (time: string) => `thời gian làm bài ${time}`,
-  hours: (n: number) => `${n} giờ`,
-  minutes: (n: number) => `${n} phút`,
-  seconds: (n: number) => `${n} giây`,
+  summary: (quizzes: number, languages: number) => `${quizzes} bài · ${languages} ngôn ngữ`,
+  head: { quiz: "Bài", type: "Loại", questions: "Câu hỏi", points: "Điểm", time: "Thời gian", pass: "Điểm đạt" },
+  headShort: { questions: "Câu hỏi", points: "Điểm", time: "Thời gian", pass: "Đạt" },
+  exam: "Thi",
+  practice: "Luyện tập",
+  instant: "phản hồi ngay",
   language: { en: "Tiếng Anh", vi: "Tiếng Việt" },
 } satisfies ShelfMessages;
