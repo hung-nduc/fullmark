@@ -35,14 +35,14 @@ describe("buildShelfIndex", () => {
     expect(style).toContain("--bg:");
   });
 
-  it("has the shelf folder's name as the heading and title, and each quiz as a link to ID/ sorted by title", () => {
+  it("has the shelf folder's name as the heading and title, and each quiz as a link to ID/index.html sorted by title", () => {
     expect(html).toContain("<title>my-shelf</title>");
     expect(html).toContain("<h1>my-shelf</h1>");
     const order = ["Limits &amp;", "Rust basics", "Toán rời rạc"].map((t) => html.indexOf(t));
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(order.every((i) => i > 0)).toBe(true);
-    expect(html).toContain('<a href="rust/" lang="en">Rust basics</a>');
-    expect(html).toContain('<a href="toan/" lang="vi">Toán rời rạc</a>');
+    expect(html).toContain('<a href="rust/index.html" lang="en">Rust basics</a>');
+    expect(html).toContain('<a href="toan/index.html" lang="vi">Toán rời rạc</a>');
   });
 
   it("shows the language badge, the number of questions and the time limit when there is one", () => {
@@ -65,7 +65,7 @@ describe("buildShelfIndex", () => {
     expect(vi).toContain('<html lang="vi">');
     expect(vi).toContain("12 câu hỏi");
     expect(vi).toContain("thời gian làm bài 1 giờ 30 phút");
-    expect(vi).toContain('<a href="rust/" lang="en">Rust basics</a>');
+    expect(vi).toContain('<a href="rust/index.html" lang="en">Rust basics</a>');
     expect(vi).toContain("<h1>kệ</h1>");
   });
 
