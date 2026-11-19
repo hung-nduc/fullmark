@@ -2,22 +2,31 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { parseResults } from "../core/attempt";
 import { summarise } from "../core/inspect";
-import type { Quiz } from "../core/ir";
 import type { ParseTex } from "../core/parse/tex";
 import { shortDate } from "../core/review/counts";
-import { ID_FORMAT, slug } from "../core/slug";
-import { CHECK_FILE, renderCheck } from "../library/check-file";
-import { type IndexQuiz, type LibraryIndex, writeIndex } from "../library/index-file";
+import { ID_FORMAT } from "../core/slug";
+import type { IndexQuiz, LibraryIndex } from "../library/index-file";
 import { libraryPaths, shortHash } from "../library/layout";
 import { LockBusy, withLock } from "../library/lock";
-import { diffVersions, questionHashes, removeVersionTemps, type VersionFile, writeVersion } from "../library/versions";
-import { writeFileAtomic } from "./atomic";
+import { diffVersions, questionHashes, removeVersionTemps } from "../library/versions";
 import type { BuildOptions } from "./build";
 import { planBuildFile } from "./build-file";
-import { type CheckOptions, checkFile, clearProgress, humanIssue, showProgress } from "./check";
+import { type CheckOptions, checkFile, clearProgress, showProgress } from "./check";
 import { findProjectConfig } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { expandInputs } from "./files";
+import {
+  type Checked,
+  defaultName,
+  type Finding,
+  freeName,
+  judge,
+  NAME_FIX,
+  quizOf,
+  type VersionToWrite,
+  versionFiles,
+  writeBatch,
+} from "./library-batch";
 import {
   findQuiz,
   type LibraryIo,
@@ -48,49 +57,12 @@ export type LibraryRegisterOptions = {
 
 type RegisterIo = LibraryIo & { parseTex?: ParseTex };
 
-/** A finding in `check`'s issue format: `FILE:LINE: level rule: message`, then `fix:` lines. */
-type Finding = { file: string; line: number | null; rule: string; message: string; fix: string[] };
-
-type Checked = NonNullable<ReturnType<typeof okOutcome>>;
-/** The quiz of a file whose check passed. */
-const quizOf = (checked: Checked): Quiz => {
-  if (checked.loaded.quiz === null) throw new Error("a quiz that passed its check has no parsed quiz");
-  return checked.loaded.quiz;
-};
-const okOutcome = (r: ReturnType<typeof checkFile>) => (r.status === "error" ? null : r);
-
 /** What becomes of one file. */
 type Plan =
   | { what: "new"; file: string; abs: string; checked: Checked; name: string; hash: string }
   | { what: "version"; file: string; abs: string; checked: Checked; quiz: IndexQuiz; hash: string }
   | { what: "again"; file: string; abs: string; checked: Checked; quiz: IndexQuiz; hash: string }
   | { what: "unchanged"; file: string; quiz: IndexQuiz; hash: string };
-
-const NAME_FIX = "a name is a slug: a to z, 0 to 9 and -, starting with a letter, 1 to 64 characters";
-
-/** The name a quiz gets by default: its slugged title, else its id. */
-function defaultName(title: string, id: string): string {
-  const slugged = slug(title).slice(0, 64).replace(/-+$/, "");
-  return ID_FORMAT.test(slugged) ? slugged : id;
-}
-
-/** A free name beside `name`: `name-2`, `name-3`, … */
-function freeName(name: string, taken: ReadonlySet<string>): string {
-  const base = name.slice(0, 60).replace(/-+$/, "");
-  for (let n = 2; ; n++) if (!taken.has(`${base}-${n}`)) return `${base}-${n}`;
-}
-
-/** The files of a version: the source under its own name, every asset and sheet at its path, the brief, `check.json`. */
-function versionFiles(abs: string, checked: Checked): VersionFile[] {
-  const enc = new TextEncoder();
-  const files: VersionFile[] = [{ path: basename(abs), bytes: enc.encode(checked.loaded.text) }];
-  for (const a of checked.loaded.assets) files.push({ path: a.path, bytes: a.bytes });
-  for (const s of checked.loaded.sheets) files.push({ path: s.path, bytes: enc.encode(s.source) });
-  const brief = join(dirname(abs), "brief.yaml");
-  if (existsSync(brief)) files.push({ path: "brief.yaml", bytes: new Uint8Array(readFileSync(brief)) });
-  files.push({ path: CHECK_FILE, bytes: enc.encode(renderCheck(checked.resolved)) });
-  return files;
-}
 
 /** `2 added, 1 removed, 3 changed`, leaving out what is zero; `no question changed` when all are. */
 function diffText(d: { added: string[]; removed: string[]; changed: string[] }): string {
@@ -313,65 +285,21 @@ export async function runLibraryRegister(
         result = checkFile(job.file, optionsFor(job, shownPath(paths.quiz(target.id).review, cwd)), io);
       }
       if (progress) clearProgress(io);
-      if (result.status === "error") {
-        const lines = [`${result.file}: ${result.message}`];
-        for (const p of result.problems ?? []) lines.push(`    ${p}`);
-        for (const e of result.configErrors ?? []) {
-          lines.push(`${e.file}:${e.line}: ${e.message}`);
-          if (e.fix) lines.push(`    fix: ${e.fix}`);
-        }
-        errored.push(lines);
+      const judged = judge(job.file, result, opts.strict, p.color);
+      if (judged.kind === "error") {
+        errored.push(judged.lines);
         continue;
       }
-      const issueFindings = (): Finding[] =>
-        result.issues
-          .filter((i) => i.level === "error" || (opts.strict && i.level === "warning"))
-          .map((i) => ({
-            file: i.file,
-            line: i.line,
-            rule: i.rule,
-            message: i.message,
-            fix: i.fix ? [i.fix] : [],
-          }));
+      if (judged.kind === "refused") {
+        refused.push({ file: job.file, findings: judged.findings });
+        continue;
+      }
       const refuse = (finding: Finding): void => {
         refused.push({ file: job.file, findings: [finding] });
       };
-      // 1. check errors, or a survey
-      if (result.status === "failed") {
-        const found = issueFindings();
-        refused.push({
-          file: job.file,
-          findings:
-            found.length > 0
-              ? found
-              : [{ file: job.file, line: null, rule: "check.failed", message: "the quiz failed its check", fix: [] }],
-        });
-        warnings.push({ file: job.file, text: [] });
-        continue;
-      }
-      const fm = result.loaded.frontMatter;
-      const hash = result.loaded.hash;
-      if (fm.kind === "survey") {
-        refuse({
-          file: job.file,
-          line: fm.keyLines.kind ?? 1,
-          rule: "library.survey",
-          message: "a survey is not kept in the library: the library is one learner's history of their own attempts",
-          fix: ["`quiz serve` and `quiz stats` handle a survey with no library"],
-        });
-        continue;
-      }
-      if (hash === null) {
-        refuse({
-          file: job.file,
-          line: null,
-          rule: "check.failed",
-          message: "a file the quiz uses could not be read",
-          fix: [],
-        });
-        continue;
-      }
-      const shownIssues = result.issues.map((i) => humanIssue(i, p.color).join("\n"));
+      const fm = judged.frontMatter;
+      const hash = judged.hash;
+      const shownIssues = judged.shownIssues;
       const idLine = fm.keyLines.id ?? 1;
 
       // 2 to 4: what the file is, against the library
@@ -409,8 +337,8 @@ export async function runLibraryRegister(
         note();
         plans.push(
           target.versions.some((v) => v.hash === hash)
-            ? { what: "again", file: job.file, abs: job.abs, checked: result, quiz: target, hash }
-            : { what: "version", file: job.file, abs: job.abs, checked: result, quiz: target, hash },
+            ? { what: "again", file: job.file, abs: job.abs, checked: judged.checked, quiz: target, hash }
+            : { what: "version", file: job.file, abs: job.abs, checked: judged.checked, quiz: target, hash },
         );
         continue;
       }
@@ -449,7 +377,7 @@ export async function runLibraryRegister(
       namesInBatch.set(wanted, job.file);
       idsInBatch.set(fm.id, job.file);
       note();
-      plans.push({ what: "new", file: job.file, abs: job.abs, checked: result, name: wanted, hash });
+      plans.push({ what: "new", file: job.file, abs: job.abs, checked: judged.checked, name: wanted, hash });
     }
 
     // nothing is written when any file is refused or could not be used
@@ -491,73 +419,69 @@ export async function runLibraryRegister(
 
     // write: each version into its folder, then library.toml last, then one commit
     const writes = plans.filter((x): x is Exclude<Plan, { what: "unchanged" }> => x.what !== "unchanged");
-    const written: string[] = [];
     const now = localIso(nowOf(io));
     const quizzes = new Map(index.quizzes.map((q) => [q.name, q]));
     const lines: string[] = [];
-    let committed: { hash: string; message: string } | null = null;
-    let commitWarning: string | null = null;
     const previous = new Map<string, ReturnType<typeof loadStored>>();
 
     for (const w of writes) {
       if (w.what === "version" || w.what === "again")
         previous.set(w.quiz.name, loadStored(root, w.quiz, w.quiz.current));
     }
-    try {
-      const atomic = io.atomic ?? writeFileAtomic;
-      for (const w of writes) {
-        if (w.what === "new" || w.what === "version") {
-          const id = w.what === "new" ? w.checked.loaded.frontMatter.id : w.quiz.id;
-          await writeVersion(paths.quiz(id).versions, w.hash, versionFiles(w.abs, w.checked));
-          written.push(`quizzes/${id}/versions/${w.hash}`);
-        }
+    const versions: VersionToWrite[] = [];
+    for (const w of writes) {
+      if (w.what === "new" || w.what === "version")
+        versions.push({
+          id: w.what === "new" ? w.checked.loaded.frontMatter.id : w.quiz.id,
+          hash: w.hash,
+          files: versionFiles(w.abs, w.checked),
+        });
+    }
+    for (const w of writes) {
+      const fm = w.checked.loaded.frontMatter;
+      if (w.what === "new" && fm) {
+        quizzes.set(w.name, {
+          name: w.name,
+          id: fm.id,
+          title: fm.title,
+          source: w.abs,
+          current: w.hash,
+          versions: [{ hash: w.hash, added: now, file: basename(w.abs) }],
+          shelves: [],
+        });
+      } else if ((w.what === "version" || w.what === "again") && fm) {
+        const old = w.quiz;
+        quizzes.set(old.name, {
+          ...old,
+          title: fm.title,
+          source: w.abs,
+          current: w.hash,
+          versions:
+            w.what === "version"
+              ? [...old.versions, { hash: w.hash, added: now, file: basename(w.abs) }]
+              : old.versions,
+        });
       }
-      for (const w of writes) {
-        const fm = w.checked.loaded.frontMatter;
-        if (w.what === "new" && fm) {
-          quizzes.set(w.name, {
-            name: w.name,
-            id: fm.id,
-            title: fm.title,
-            source: w.abs,
-            current: w.hash,
-            versions: [{ hash: w.hash, added: now, file: basename(w.abs) }],
-            shelves: [],
-          });
-        } else if ((w.what === "version" || w.what === "again") && fm) {
-          const old = w.quiz;
-          quizzes.set(old.name, {
-            ...old,
-            title: fm.title,
-            source: w.abs,
-            current: w.hash,
-            versions:
-              w.what === "version"
-                ? [...old.versions, { hash: w.hash, added: now, file: basename(w.abs) }]
-                : old.versions,
-          });
-        }
-      }
-      await writeIndex(paths.index, { ...index, quizzes: [...quizzes.values()] }, atomic);
-    } catch (error) {
-      // the library goes back to what it was: the folders this run made are removed
-      const { rm } = await import("node:fs/promises");
-      for (const w of written)
-        await rm(join(root, ...w.split("/")), { recursive: true, force: true }).catch(() => undefined);
-      return libraryFail(io, opts.json, `cannot write the library: ${(error as Error).message}`, {
+    }
+    const names = writes.map((w) => (w.what === "new" ? w.name : w.quiz.name)).sort();
+    const batch = await writeBatch({
+      root,
+      git,
+      index,
+      versions,
+      quizzes: [...quizzes.values()],
+      message: writes.length > 0 ? `fullmark: register ${names.join(", ")}` : null,
+      ...(io.atomic ? { atomic: io.atomic } : {}),
+    });
+    if (!batch.ok)
+      return libraryFail(io, opts.json, `cannot write the library: ${batch.error.message}`, {
         fix: "nothing was registered; run the command again",
       });
-    }
-
-    const names = writes.map((w) => (w.what === "new" ? w.name : w.quiz.name)).sort();
-    if (writes.length > 0) {
-      const message = `fullmark: register ${names.join(", ")}`;
-      const commitPaths = ["library.toml", ...written];
-      const result = await git.commit(commitPaths, message);
-      if (result.status === "committed") committed = { hash: result.hash, message };
-      else if (result.status === "failed")
-        commitWarning = `${p.yellow("warning")} the commit failed: ${result.message}; the files are written`;
-    }
+    const committed = batch.committed;
+    const commitWarning =
+      batch.commitWarning === null
+        ? null
+        : `${p.yellow("warning")} the commit failed: ${batch.commitWarning}; the files are written`;
 
     // what to say
     const shortOf = (q: IndexQuiz, hash: string): string =>

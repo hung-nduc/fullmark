@@ -110,8 +110,8 @@ describe("library publish DIR: the first sync", () => {
     expect(html).toContain("script-src 'none'");
     expect(html).toContain("<title>shelf</title>");
     expect(html.indexOf("Limits")).toBeLessThan(html.indexOf("Rust basics"));
-    expect(html).toContain('href="rust/"');
-    expect(html).toContain('href="calculus-limits/"');
+    expect(html).toContain('href="rust/index.html"');
+    expect(html).toContain('href="calculus-limits/index.html"');
     expect(html).toContain(">EN</span>");
     expect(html).toContain("2 questions");
   });
