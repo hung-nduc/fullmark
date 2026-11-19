@@ -1,0 +1,2 @@
+error: no DIR given and none remembered
+    fix: quiz library publish DIR

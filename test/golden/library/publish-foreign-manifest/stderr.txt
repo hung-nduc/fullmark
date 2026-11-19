@@ -1,0 +1,2 @@
+error: not a fullmark shelf: fullmark-shelf.json has format "fullmark-publish"
+    fix: publish into an empty folder, or one that fullmark published to

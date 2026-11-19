@@ -1,0 +1,3 @@
+test/fixtures/library-history/lib => lib
+test/fixtures/library-history/library-public-alt.toml => lib/library.toml
+test/golden/library/publish-sync/files/shelf => shelf

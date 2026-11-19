@@ -1,0 +1,4 @@
+library
+publish
+shelf
+--dry-run

@@ -1,9 +1,10 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { FONT_CHOICES } from "../core/fonts";
 import { libraryPaths, shortHash } from "../library/layout";
 import { profileToml } from "../library/profile-toml";
+import { filesUnder } from "../library/shelf";
 import { type BuildIo, type BuildOptions, runBuild } from "./build";
 import { EXIT, type ExitCode } from "./exit-codes";
 import {
@@ -36,17 +37,6 @@ export type LibraryShareOptions = {
 
 /** `LibraryIo` with what `build` needs: the page runtime and the clock, which tests control. */
 export type ShareIo = LibraryIo & BuildIo;
-
-/** Every file under a folder, as paths relative to it with `/`, sorted. */
-function filesUnder(dir: string, prefix = ""): string[] {
-  const out: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
-    const rel = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
-    if (entry.isDirectory()) out.push(...filesUnder(join(dir, entry.name), rel));
-    else if (entry.isFile()) out.push(rel);
-  }
-  return out;
-}
 
 /**
  * `quiz library share NAME [-o DIR] [--version HASH] [--source] [--json]` (COMMANDS.md; STEP4-GAPS.md, G35, G36): the

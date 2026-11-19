@@ -1,0 +1,5 @@
+would publish 2 quizzes to <dir>/shelf
+  add     study/   new on the shelf
+  add     tidy/    new on the shelf
+  add     index.html
+nothing written (--dry-run)

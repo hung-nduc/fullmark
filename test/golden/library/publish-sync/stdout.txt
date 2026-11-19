@@ -1,0 +1,3 @@
+published 2 quizzes to <dir>/shelf: 2 added
+remembered <dir>/shelf as the public shelf
+note <dir>/shelf is not in a git repository, so nothing was committed

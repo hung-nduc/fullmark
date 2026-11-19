@@ -1,0 +1,2 @@
+test/fixtures/library-history/lib => lib
+test/fixtures/library-history/library-public.toml => lib/library.toml

@@ -130,6 +130,23 @@ export class Git {
    */
   async commit(paths: readonly string[], message: string): Promise<CommitResult> {
     if (!this.hasRepository()) return { status: "no-repository" };
+    return this.commitPaths(paths, message);
+  }
+
+  /**
+   * Whether the root is anywhere inside a git work tree: its own repository, or a folder of another (a shelf served from
+   * a repository's `docs/`). The library is always a repository's root; a shelf need not be (STEP5-GAPS.md, G5).
+   */
+  async insideWorkTree(): Promise<boolean> {
+    const r = await this.run(["rev-parse", "--is-inside-work-tree"]);
+    return r.code === 0 && r.stdout.trim() === "true";
+  }
+
+  /**
+   * `commit` for a root that is inside a work tree without being its top: no `.git` of its own is asked for, and the
+   * `paths` are relative to the root, which is git's working folder here (`git -C ROOT`). Only those paths are committed.
+   */
+  async commitPaths(paths: readonly string[], message: string): Promise<CommitResult> {
     const add = await this.run(["add", "-A", "--", ...paths]);
     if (add.code !== 0) return { status: "failed", message: firstLine(add.stderr) || "git add failed" };
     const staged = await this.run(["diff", "--cached", "--quiet", "--", ...paths]);

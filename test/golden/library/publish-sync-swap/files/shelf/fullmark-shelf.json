@@ -1,0 +1,38 @@
+{
+  "files": [
+    "index.html"
+  ],
+  "fonts": "quiz",
+  "format": "fullmark-shelf",
+  "quizzes": [
+    {
+      "added": "2026-11-12T09:00:00+00:00",
+      "file": "limits.md",
+      "files": [
+        "calculus-limits/index.html",
+        "calculus-limits/limits.md"
+      ],
+      "hash": "29d92b939d8822c361ebfde3e6f19111300d11a0488d0294084c2c77741a6aed",
+      "id": "calculus-limits",
+      "lang": "en",
+      "name": "limits-and-continuity",
+      "title": "Limits and continuity"
+    },
+    {
+      "added": "2026-11-10T09:00:00+00:00",
+      "file": "study.md",
+      "files": [
+        "study/index.html",
+        "study/study.md"
+      ],
+      "hash": "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27",
+      "id": "study",
+      "lang": "en",
+      "name": "study-fixture",
+      "title": "Study fixture"
+    }
+  ],
+  "ui_lang": "en",
+  "version": 2,
+  "with_brief": false
+}

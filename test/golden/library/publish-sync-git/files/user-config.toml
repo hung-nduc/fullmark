@@ -1,0 +1,4 @@
+library = "lib"
+
+[shelves]
+public = "<dir>/shelf"

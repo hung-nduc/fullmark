@@ -1,0 +1,2 @@
+error: copied/ in <dir>/shelf is a quiz folder, and the folder has no fullmark-shelf.json
+    fix: move it out of <dir>/shelf, or import it into the library first

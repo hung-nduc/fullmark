@@ -11,7 +11,7 @@ import type { LockEnv } from "../src/library/lock";
 import { capture } from "./helpers/cli";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { fileAttempt, gradeOptions, quizOf, type T, writingLibrary } from "./helpers/library-grade";
-import { publishOptions } from "./helpers/library-publish";
+import { publishOptions, shelfLibrary } from "./helpers/library-publish";
 import { quizText } from "./helpers/library-register";
 import { finish, KEEP, webReview } from "./helpers/library-review";
 
@@ -254,6 +254,25 @@ describe("a library command that changes the library waits for the lock, fails b
     rmSync(lockIn(t.lib));
     expect(await runLibraryPublish("writing", publishOptions({ on: true }), t.at().io)).toBe(0);
     expect(await commits(t)).toBe(before + 1);
+  });
+
+  it("publish DIR (the sync takes the shelf's lock)", async () => {
+    const t = await shelfLibrary();
+    const shelf = join(t.dir, "site");
+    mkdirSync(shelf);
+    await git(shelf, t.env, "init", "-q");
+    hold(shelf);
+    const { env: lock, sleeps } = held();
+    const c = t.at();
+    expect(await runLibraryPublish("site", publishOptions(), { ...c.io, lock })).toBe(2);
+    expect(c.err.find((l) => l.startsWith("error:"))).toMatch(
+      /^error: the shelf is busy: quiz library register notes\/\*\.md \(pid 4242\) has held it for 10 s$/,
+    );
+    expect(sleeps).toHaveLength(100);
+    expect(existsSync(join(shelf, "fullmark-shelf.json"))).toBe(false);
+    rmSync(lockIn(shelf));
+    expect(await runLibraryPublish("site", publishOptions(), t.at().io)).toBe(0);
+    expect((await git(shelf, t.env, "rev-list", "--count", "HEAD")).trim()).toBe("1");
   });
 
   it("rm", async () => {

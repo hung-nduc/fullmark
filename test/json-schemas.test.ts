@@ -7,7 +7,7 @@ import { jsonSchemaText, SCHEMA_NAMES, type SchemaName, schemaFile } from "../sr
 /**
  * The JSON Schemas of `results`, `report`, `grades` and `review` (TECHNICAL_DESIGN.md, the 0.x-to-1.0 table, "JSON
  * Schemas"): made from the zod schemas by `npm run schemas`, committed in schemas/. A stale one fails here as a golden
- * does, and every file of the four formats in the tests and the examples is valid against its schema.
+ * does, and every file of the five formats in the tests and the examples is valid against its schema.
  */
 const root = resolve(import.meta.dirname, "..");
 const FOLDERS = ["test/golden", "e2e/golden", "examples"];
@@ -20,7 +20,7 @@ const UNMASK: Record<string, string> = { "<time>": "2026-11-16T09:30:00+07:00", 
 
 /**
  * The inputs that exist to be refused, each by the command its golden runs (a 0.x file, a missing key, a broken rule):
- * their schema refuses them too. Every other file of the four formats is valid.
+ * their schema refuses them too. Every other file of the five formats is valid.
  *
  * The grades schema holds each entry's shape (3z2), so four more grades inputs of the `rubrics-grades-invalid-*` goldens
  * are refused by it, each for a shape no rubric can take: a grader of kind "robot" and a nameless one (`everything`), an
@@ -67,7 +67,7 @@ function walk(dir: string): string[] {
   });
 }
 
-/** The documents of one of the four formats in a file: a `.json` file is one document, a served golden may be one too. */
+/** The documents of one of the five formats in a file: a `.json` file is one document, a served golden may be one too. */
 function documents(path: string): { name: SchemaName; json: unknown }[] {
   const text = readFileSync(path, "utf8").replace(/^﻿/, "");
   let json: unknown;
@@ -130,9 +130,8 @@ describe("every results, report, grades and review file in the tests and example
     documents(path).map((d) => ({ ...d, file: relative(root, path).split(sep).join("/") })),
   );
 
-  it("finds files of each of the formats a command writes into the tests (the shelf's, in the sync's goldens)", () => {
-    for (const name of SCHEMA_NAMES.filter((n) => n !== "fullmark-shelf"))
-      expect(files.filter((f) => f.name === name).length, name).toBeGreaterThan(0);
+  it("finds files of each of the formats (the shelf's manifests are in the sync's goldens)", () => {
+    for (const name of SCHEMA_NAMES) expect(files.filter((f) => f.name === name).length, name).toBeGreaterThan(0);
   });
 
   const valid = files.filter((f) => !REFUSED.includes(f.file));
@@ -144,7 +143,7 @@ describe("every results, report, grades and review file in the tests and example
 
   it.each(REFUSED)("%s, refused by its command, is refused by its schema", (file) => {
     const f = files.find((x) => x.file === file);
-    expect(f, `${file} is not found as a file of the four formats`).toBeDefined();
+    expect(f, `${file} is not found as a file of the five formats`).toBeDefined();
     if (f) expect(validators[f.name](f.json)).toBe(false);
   });
 });

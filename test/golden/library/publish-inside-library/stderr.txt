@@ -1,0 +1,2 @@
+error: <dir>/lib/shelf is the library or inside it, or holds a library.toml
+    fix: a shelf is a folder of its own: choose another DIR

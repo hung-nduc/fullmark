@@ -1,0 +1,38 @@
+{
+  "files": [
+    "index.html"
+  ],
+  "fonts": "quiz",
+  "format": "fullmark-shelf",
+  "quizzes": [
+    {
+      "added": "2026-11-10T09:00:00+00:00",
+      "file": "study.md",
+      "files": [
+        "study/index.html",
+        "study/study.md"
+      ],
+      "hash": "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27",
+      "id": "study",
+      "lang": "en",
+      "name": "study-fixture",
+      "title": "Study fixture"
+    },
+    {
+      "added": "2026-11-13T09:00:00+00:00",
+      "file": "tidy.md",
+      "files": [
+        "tidy/index.html",
+        "tidy/tidy.md"
+      ],
+      "hash": "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce",
+      "id": "tidy",
+      "lang": "en",
+      "name": "tidy",
+      "title": "Tidy notes"
+    }
+  ],
+  "ui_lang": "en",
+  "version": 2,
+  "with_brief": false
+}

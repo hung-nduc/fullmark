@@ -129,6 +129,8 @@ export type RunContext = {
   runtime: () => Runtime | null;
   /** `dist/paper.css`, which only the printed paper carries */
   paperCss: () => string | null;
+  /** `library publish` builds every page in memory first: the page is returned in `FileResult.page` and nothing is written */
+  memory?: boolean;
   /** `--watch`: told what each file's quiz covers, from the load, good or failed */
   onLoaded?: (job: Job, loaded: LoadedQuiz) => void;
 };
@@ -370,7 +372,7 @@ export async function buildOne(job: Job, c: RunContext): Promise<FileResult> {
   const source = resolve(io.cwd, file);
   const target = job.target;
   try {
-    await writeFileAtomic(target, page);
+    if (c.memory !== true) await writeFileAtomic(target, page);
   } catch (error) {
     const e = error as WriteError;
     const shown = shownPath(e.file ?? target, io.cwd);
@@ -398,6 +400,35 @@ export async function buildOne(job: Job, c: RunContext): Promise<FileResult> {
     };
   }
   return written;
+}
+
+/**
+ * What a build reads from `dist/`: the page runtime and styles, read once, when the first file needs them, and the
+ * paper's styles. `null` when they are missing next to the program.
+ */
+export function runtimeReaders(io: BuildIo): Pick<RunContext, "runtime" | "paperCss"> {
+  let loaded: Runtime | null | undefined;
+  const runtime = (): Runtime | null => {
+    if (loaded !== undefined) return loaded;
+    const folder = io.runtimeDir ?? runtimeFolder();
+    try {
+      loaded = {
+        runtime: readFileSync(join(folder, "page.js"), "utf8"),
+        css: readFileSync(join(folder, "page.css"), "utf8"),
+      };
+    } catch {
+      loaded = null;
+    }
+    return loaded;
+  };
+  const paperCss = (): string | null => {
+    try {
+      return readFileSync(join(io.runtimeDir ?? runtimeFolder(), "paper.css"), "utf8");
+    } catch {
+      return null;
+    }
+  };
+  return { runtime, paperCss };
 }
 
 /** `quiz build FILE...` (COMMANDS.md): each file is checked as `check` does, then written as one page; nothing on errors. */
@@ -523,34 +554,11 @@ export async function runBuild(patterns: readonly string[], opts: BuildOptions, 
   const several = items.length > 1;
   const jobCount = items.filter((i) => "job" in i).length;
 
-  // the runtime is read once per run, when the first file needs it
-  let loaded: Runtime | null | undefined;
-  const runtime = (): Runtime | null => {
-    if (loaded !== undefined) return loaded;
-    const folder = io.runtimeDir ?? runtimeFolder();
-    try {
-      loaded = {
-        runtime: readFileSync(join(folder, "page.js"), "utf8"),
-        css: readFileSync(join(folder, "page.css"), "utf8"),
-      };
-    } catch {
-      loaded = null;
-    }
-    return loaded;
-  };
-  const paperCss = (): string | null => {
-    try {
-      return readFileSync(join(io.runtimeDir ?? runtimeFolder(), "paper.css"), "utf8");
-    } catch {
-      return null;
-    }
-  };
   const context: RunContext = {
     io,
     several,
     builtAt: opts.builtAt ?? (io.now?.() ?? new Date()).toISOString(),
-    runtime,
-    paperCss,
+    ...runtimeReaders(io),
   };
 
   if (opts.watch) {

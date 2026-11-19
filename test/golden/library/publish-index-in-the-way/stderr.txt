@@ -1,0 +1,2 @@
+error: index.html in <dir>/shelf is not fullmark's: the folder has no fullmark-shelf.json, and the sync would overwrite it
+    fix: move it, or publish into an empty folder

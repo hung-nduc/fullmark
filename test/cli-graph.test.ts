@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -258,6 +258,24 @@ describe("what each command loads", () => {
     expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
   });
 
+  it("the sync of library publish is a chunk of its own with the page builder and the library but not the server, reached by a dynamic import() from library publish, which loads neither", () => {
+    const publish = chunkWith("// src/cli/library-publish.ts");
+    const sync = chunkWith("// src/cli/library-sync.ts");
+    expect(sync).not.toBe(publish);
+    const text = textOf(closure(sync));
+    for (const m of [...BUILD_ONLY, "// src/library/", "// src/build/shelf-index.ts"]) expect(text, m).toContain(m);
+    for (const m of [...SERVE_ONLY, ...CLACK]) expect(text, m).not.toContain(m);
+    // `publish NAME --on` reaches it by a dynamic import only: no page builder, no server
+    expect(closure(publish)).not.toContain(sync);
+    expect(readFileSync(join(dist, publish), "utf8")).toContain(`import("./${sync}")`);
+    expect(closure(entry("main"))).not.toContain(sync);
+    expect(closure(entry("main"))).not.toContain(publish);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${publish}")`);
+    // `check` and the core commands never reach the shelf's code
+    for (const name of ["check", "grade", "inspect", "stats"])
+      expect(textOf(closure(entry(name))), name).not.toContain("// src/build/shelf-index.ts");
+  });
+
   it("library review is a chunk of its own, reached by a dynamic import() from main, and loads the form's server and page builder through quiz review's chunk by a dynamic import() only", () => {
     const chunk = chunkWith("// src/cli/library-review.ts");
     const form = chunkWith("// src/cli/review.ts");
@@ -297,6 +315,7 @@ describe("what each command loads", () => {
     ["grade", "// src/cli/library-grade.ts"],
     ["rename", "// src/cli/library-rename.ts"],
     ["rm", "// src/cli/library-rm.ts"],
+    ["publish NAME --on | --off", "// src/cli/library-publish.ts"],
   ] as const) {
     it(`library ${command} is a chunk of its own, reached by a dynamic import() from main, and never loads the page builder, the renderer or the server`, () => {
       const chunk = chunkWith(marker);

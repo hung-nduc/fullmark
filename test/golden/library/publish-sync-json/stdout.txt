@@ -1,0 +1,1 @@
+{"status":"published","dir":"<dir>/shelf","added":["study","tidy"],"updated":[],"removed":[],"committed":null,"warnings":[]}

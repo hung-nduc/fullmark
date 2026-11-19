@@ -213,3 +213,14 @@ export function planSync(input: {
   const unchanged = writes.length === 0 && removes.length === 0 && manifest === null;
   return { writes, removes, conflicts, union, quizzes, index, manifest, unchanged };
 }
+
+/** Every file under a folder, as paths relative to it with `/`, sorted. */
+export function filesUnder(dir: string, prefix = ""): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+    const rel = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
+    if (entry.isDirectory()) out.push(...filesUnder(join(dir, entry.name), rel));
+    else if (entry.isFile()) out.push(rel);
+  }
+  return out;
+}
