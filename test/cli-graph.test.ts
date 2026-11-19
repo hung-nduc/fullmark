@@ -304,7 +304,7 @@ describe("what each command loads", () => {
     expect(textOf(closure(entry("template")))).not.toContain("// src/library/");
   });
 
-  it("`check` and the core commands load nothing from src/library/, and publish and import load nothing from src/serve/ (import nothing from src/build/ either)", () => {
+  it("`check` and the core commands load nothing from src/library/, and publish and import load nothing from src/serve/ (import no page builder either)", () => {
     for (const name of ["check", "grade", "inspect", "stats"])
       expect(textOf(closure(entry(name))), name).not.toContain("// src/library/");
     for (const marker of [
@@ -313,7 +313,8 @@ describe("what each command loads", () => {
       "// src/cli/library-import.ts",
     ])
       expect(textOf(closure(chunkWith(marker))), marker).not.toContain("// src/serve/");
-    expect(textOf(closure(chunkWith("// src/cli/library-import.ts")))).not.toContain("// src/build/");
+    // import loads no page builder (the BUILD_ONLY files), as the loop below also shows
+    for (const m of BUILD_ONLY) expect(textOf(closure(chunkWith("// src/cli/library-import.ts"))), m).not.toContain(m);
   });
 
   for (const [command, marker] of [
