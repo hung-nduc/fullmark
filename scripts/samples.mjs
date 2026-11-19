@@ -128,6 +128,16 @@ const SERVED = [
     command: "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library review tidy",
     try: "quiz library review: the review form on the current version of tidy (renamed from tidy-notes by quiz library rename; the history already holds one review of it, with a fix on the second question), opened with that verdict in place and the heading counting what was judged before. Change a verdict, press Finish: review.json is filed in the library and one commit holds it. For --since: quiz library share tidy --source -o samples/edit writes an editable copy; change a question in samples/edit/tidy/tidy.md and register it with quiz library register samples/edit/tidy/tidy.md --update tidy (the review marks the second question fix, so the update is refused until that question has changed); then quiz library review tidy --since asks only about the question that changed.",
   },
+  {
+    command:
+      "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library publish --dry-run   # then without --dry-run",
+    try: "quiz library publish: samples/shelf (a git repository made when the samples are built, and the folder the samples' config remembers as the public shelf) already holds study-fixture and tidy, published when the samples were built; open samples/shelf/index.html from the disk (the page lists both, and each link opens its quiz with no server). The dry run prints 'unchanged'. Put another quiz on the shelf with quiz library publish limits-and-continuity --on, run it with --dry-run: it lists the quiz as an add and the index page as an update, and writes nothing; run it without --dry-run: it writes the folder, commits only its own paths (git -C samples/shelf log --stat -1) and never pushes. Take one off with quiz library publish tidy --off and run quiz library publish again: tidy/ is removed (a 'removed' count), and your own files in samples/shelf (add a README) are left alone. Add --with-brief, --ui-lang vi or --fonts all to see the manifest remember them. Nothing private is ever there: no results, grades, reports, reviews, progress or older versions (find samples/shelf -type f).",
+  },
+  {
+    command:
+      "FULLMARK_CONFIG=samples/config.toml node dist/cli.js library import samples/shelf --into samples/library-2   # then FULLMARK_LIBRARY=samples/library-2 node dist/cli.js library list",
+    try: "quiz library import: the samples' shelf is registered into a new library, samples/library-2 (made by --into, a git repository; the samples' config names a library already, so the config is left alone and the output says how to use the new one). The two quizzes come back with their ids, names and times, on the public shelf, in one commit (git -C samples/library-2 log). List it with FULLMARK_LIBRARY=samples/library-2 node dist/cli.js library list (it shows study-fixture and tidy with the public mark and no attempts: a shelf holds no results, so import is not a backup). Publish it back with FULLMARK_LIBRARY=samples/library-2 FULLMARK_CONFIG=samples/config.toml node dist/cli.js library publish samples/shelf: it says unchanged, and git -C samples/shelf status shows nothing changed. Run the import again: it says unchanged and commits nothing. Edit samples/shelf/tidy/tidy.md by hand and import again: the new version is registered with a warning that it was edited after publishing.",
+  },
 ];
 
 // extra `build` flags for a page
@@ -185,6 +195,24 @@ try {
   console.error(
     `samples/library: git could not make it a repository (library rm needs one, or --force)\n${e.stderr?.toString() ?? e}`,
   );
+}
+
+// the samples' shelf (STEP5.md, slice 5b): two quizzes of the library on the public shelf, published into a folder made a
+// git repository, which the samples' config remembers; the owner's own config is never touched (FULLMARK_CONFIG)
+const SHELF = join(OUT, "shelf");
+{
+  const env = { ...process.env, FULLMARK_CONFIG: join(OUT, "config.toml"), NO_COLOR: "1" };
+  const quiz = (...args) => execFileSync(process.execPath, [CLI, ...args], { env, stdio: "pipe" });
+  try {
+    mkdirSync(SHELF, { recursive: true });
+    execFileSync("git", ["-C", SHELF, "init", "-q"], { stdio: "pipe" });
+    quiz("library", "publish", "study-fixture", "--on");
+    quiz("library", "publish", "tidy", "--on");
+    quiz("library", "publish", SHELF);
+  } catch (e) {
+    console.error(`samples/shelf: library publish failed\n${e.stderr?.toString() ?? e}`);
+    process.exitCode = 1;
+  }
 }
 
 const built = [];
@@ -291,6 +319,7 @@ writeFileSync(
 <ul>
 ${rows}
 </ul>
+<p>The samples' shelf, published by <code>quiz library publish</code>: <a href="shelf/index.html">shelf/index.html</a> (two quizzes of the samples' library; see <code>library publish</code> below).</p>
 <h2>Served commands</h2>
 <p>These start a small server on this machine and wait for you, so they are run from a terminal in the repository, not opened as files.</p>
 <ul>
