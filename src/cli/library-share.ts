@@ -101,7 +101,7 @@ export async function runLibraryShare(name: string, opts: LibraryShareOptions, i
         });
     }
     const files = filesUnder(folder).filter((f) => f !== "check.json");
-    const toml = profile === null ? null : profileToml(profile);
+    const toml = profile === null ? null : profileToml(profile, loaded.frontMatter.profile);
     // written beside the target, then renamed into place: a killed run leaves no half-written folder under its name
     const temp = join(dir, `.${quiz.name}.${process.pid}.tmp`);
     try {

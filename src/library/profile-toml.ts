@@ -33,17 +33,20 @@ function checkLines(name: string, c: CustomCheck, level: string): string[] {
 }
 
 /**
- * The `fullmark.toml` that `library share --source` writes beside a shared quiz (STEP4-GAPS.md, G35), or null when the
- * version's profile is a built-in one with no change, which `quiz check` knows by name.
+ * The `fullmark.toml` that `library share --source` and `library publish` write beside a shared quiz (STEP4-GAPS.md,
+ * G35 and G38). `own` is the profile the quiz gets by itself: its front matter's `profile:`, else `default`.
  *
- * Otherwise `[check] profile = NAME` and `[profiles.NAME]`: `extends` the nearest built-in profile of the chain, then
- * each rule whose level or options differ from that built-in's, sorted by id, the custom checks, and `allow-ignore`
- * when it differs. A profile that changes a built-in one of its own name (an overlay) has no `extends`, as in the
- * original. `quiz check` on the shared folder finds the issues the library found under `check.json`.
+ * Null when the version's profile is `own` and a built-in one with no change: `quiz check` knows it by name. A built-in
+ * profile that is not `own` (a quiz registered with `--profile exam`) is `[check] profile = NAME` alone. Otherwise
+ * `[check] profile = NAME` and `[profiles.NAME]`: `extends` the nearest built-in profile of the chain, then each rule
+ * whose level or options differ from that built-in's, sorted by id, the custom checks, and `allow-ignore` when it
+ * differs. A profile that changes a built-in one of its own name (an overlay) has no `extends`, as in the original.
+ * `quiz check` on the shared folder finds the issues the library found under `check.json`.
  */
-export function profileToml(profile: ResolvedProfile): string | null {
+export function profileToml(profile: ResolvedProfile, own: string): string | null {
   // a leaf that is a built-in definition is a built-in profile with no change
-  if (profile.chain[0]?.origin === "built-in") return null;
+  if (profile.chain[0]?.origin === "built-in")
+    return profile.name === own ? null : `[check]\nprofile = ${str(profile.name)}\n`;
   const parent = profile.chain.find((c) => c.origin === "built-in")?.name ?? "default";
   const base = resolveProfile(parent, { user: null, project: null }).profile;
   const name = profile.name;

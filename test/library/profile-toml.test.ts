@@ -16,8 +16,14 @@ const resolved = (name: string, text = "") => {
 };
 
 describe("profileToml", () => {
-  it("writes nothing for a built-in profile with no change", () => {
-    for (const name of ["default", "draft", "exam", "survey"]) expect(profileToml(resolved(name)), name).toBeNull();
+  it("writes nothing for a built-in profile with no change that is the quiz's own", () => {
+    for (const name of ["default", "draft", "exam", "survey"])
+      expect(profileToml(resolved(name), name), name).toBeNull();
+  });
+
+  it("names a built-in profile with no change when it is not the quiz's own (G38), without a [profiles] table", () => {
+    expect(profileToml(resolved("exam"), "default")).toBe(`[check]\nprofile = "exam"\n`);
+    expect(profileToml(resolved("default"), "exam")).toBe(`[check]\nprofile = "default"\n`);
   });
 
   it("writes the custom profile: its parent, each rule that differs from the parent (by id), the checks, allow-ignore", () => {
@@ -42,7 +48,7 @@ id = "custom.tags"
 kind = "require"
 field = "tags"
 `;
-    const toml = profileToml(resolved("signals-exam", text));
+    const toml = profileToml(resolved("signals-exam", text), "default");
     expect(toml).toBe(`[check]
 profile = "signals-exam"
 
@@ -79,7 +85,10 @@ level = "error"
   });
 
   it("writes a change to a built-in profile with no extends, as the original has none", () => {
-    const toml = profileToml(resolved("exam", `[profiles.exam]\nrules."explanation.short" = { min-words = 12 }\n`));
+    const toml = profileToml(
+      resolved("exam", `[profiles.exam]\nrules."explanation.short" = { min-words = 12 }\n`),
+      "exam",
+    );
     expect(toml).toBe(`[check]
 profile = "exam"
 
@@ -89,7 +98,9 @@ rules."explanation.short" = { min-words = 12 }
   });
 
   it("a profile that extends nothing extends default", () => {
-    expect(profileToml(resolved("plain", `[profiles.plain]\nrules."choice.in-stem" = "off"\n`))).toBe(`[check]
+    expect(
+      profileToml(resolved("plain", `[profiles.plain]\nrules."choice.in-stem" = "off"\n`), "default"),
+    ).toBe(`[check]
 profile = "plain"
 
 [profiles.plain]

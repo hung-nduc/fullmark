@@ -262,6 +262,30 @@ message = "Two questions at most."
     expect(shared.profile).toBe("practice");
   });
 
+  it("a quiz registered under another built-in profile than its own gets `[check] profile = NAME`, and quiz check on the folder reports what the library found (step 5, G38)", async () => {
+    const t = await newLibrary();
+    // a one-word explanation: a warning under default, an info under draft
+    const text = quizText("rust", "Rust basics", QUESTIONS).replaceAll(
+      "The first choice is the right one here.",
+      "Short.",
+    );
+    t.write({ "notes/rust.md": text });
+    expect((await t.register(["notes/rust.md"], { name: "rust-basics", profile: "draft" })).exit).toBe(0);
+    const c = t.at();
+    expect(
+      await runLibraryShare("rust-basics", shareOptions({ source: true, output: "edit" }), { ...c.io, now: clock }),
+    ).toBe(0);
+    const folder = join(t.dir, "edit", "rust-basics");
+    expect(names(folder)).toEqual(["fullmark.toml", "rust.md"]);
+    expect(readFileSync(join(folder, "fullmark.toml"), "utf8")).toBe(`[check]\nprofile = "draft"\n`);
+    const options = { profile: null, config: null, strict: false, review: null, json: false, plain: true } as const;
+    const shared = checkFile(join(folder, "rust.md"), options, t.at(folder).io);
+    if (shared.status === "error") throw new Error(shared.message);
+    expect(shared.profile).toBe("draft");
+    const levels = shared.issues.filter((i) => i.rule === "explanation.short").map((i) => i.level);
+    expect(levels).toEqual(["info", "info", "info"]);
+  });
+
   it("a page of a custom-profile version builds under check.json's profile (a profile the config lacks)", async () => {
     const t = await newLibrary();
     t.write({
