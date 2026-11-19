@@ -80,7 +80,8 @@ const CSS =
   "tbody th,tbody td.type{grid-column:1/-1}" +
   ".top{justify-content:space-between;flex-wrap:nowrap}" +
   "a{display:inline-flex;align-items:center;min-height:44px;min-width:44px}" +
-  "tbody td.n{margin-top:4px;border-top:1px solid var(--line);padding-top:8px;font-weight:700}" +
+  'tbody tr::after{content:"";grid-column:1/-1;margin-top:4px;border-top:1px solid var(--line)}' +
+  "tbody td.n{order:1;padding-top:2px;font-weight:700}" +
   "tbody td.n::before{content:attr(data-label);display:block;font-size:.7em;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}" +
   "}";
 

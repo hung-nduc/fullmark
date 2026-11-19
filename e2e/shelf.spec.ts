@@ -180,6 +180,32 @@ for (const phone of PHONES) {
   }
 }
 
+/** G20: the line above a phone card's numbers is one line across the card, not one per cell. */
+test("at 360 x 780 the line above a card's numbers is one element across the card's content width", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.goto(writeShelf(fiveQuizzes()));
+  const rows = page.locator("tbody tr");
+  for (let i = 0; i < (await rows.count()); i++) {
+    const r = await rows.nth(i).evaluate((tr) => {
+      const rs = getComputedStyle(tr);
+      const line = getComputedStyle(tr, "::after");
+      return {
+        content: line.content,
+        lineWidth: Number.parseFloat(line.width),
+        lineTop: Number.parseFloat(line.borderTopWidth),
+        inner: tr.clientWidth - Number.parseFloat(rs.paddingLeft) - Number.parseFloat(rs.paddingRight),
+        cellTops: [...tr.querySelectorAll("td.n")].map((c) => Number.parseFloat(getComputedStyle(c).borderTopWidth)),
+      };
+    });
+    expect(r.content, `row ${i}`).toBe('""');
+    expect(r.lineTop, `row ${i}`).toBe(1);
+    expect(Math.abs(r.lineWidth - r.inner), `row ${i}`).toBeLessThanOrEqual(1);
+    expect(r.cellTops, `row ${i}`).toEqual([0, 0, 0, 0]);
+  }
+});
+
 test("on a long shelf the column headings stay at the top of the window while the page scrolls", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto(writeShelf(longShelf()));
