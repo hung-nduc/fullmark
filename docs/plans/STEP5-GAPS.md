@@ -109,3 +109,11 @@ note a shelf holds no results, reports or older versions: import restores quizze
 **G19. The phone card's numbers touch.** At 390 px, "2 h 20 min" in TIME runs into "60%" in PASS (02-five-phone-dark); in Vietnamese ("2 giờ 20 phút") and at 360 px it is worse. **Recommendation:** the time column wider than the other three, a gap between the cells, and each value free to wrap at a space; tested at 360 × 780 with the longest value.
 
 **Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` ("The index page"); built in 5c's fixes.
+
+**G20. The line above a phone card's numbers is broken.** G19's fix puts a 12 px gap between the four cells, and each cell draws its own top border, so the line over the numbers is four segments (02-five-phone-light) where ShelfTablePhone draws one. **Recommendation:** the line belongs to the row of numbers, not to each cell: one continuous line across the card, the cells keeping their gap below it.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` ("The index page"); built in step 5's last fix.
+
+**G21. Two choices 5c made where the design was silent.** **Recommendation:** accept both and write them into COMMANDS.md, "The index page": (a) the question types are listed in the default type order (QUIZ_SYNTAX.md, `type_order`), whatever the quiz's own `type_order`, so every row reads the same way; (b) an empty shelf shows only its message ("No quizzes on this shelf yet."), with no count line.
+
+**Decided by the owner on 2026-11-19, as recommended.** Written into COMMANDS.md, `quiz library publish` ("The index page"); nothing to build, as 5c built it.

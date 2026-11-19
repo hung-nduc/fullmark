@@ -19,11 +19,11 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
 | 5a | built and reviewed (2026-11-19); G12 to G15 decided as recommended (2026-11-19), G12 and G13 built first in 5b | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | built and reviewed (2026-11-19); G17 decided as recommended (2026-11-19) | `82cf47d`, `d64fe29`, `3d785d0`, `0d7e712`, `da503bf`, `325cf26`, `e5de30d` |
-| 5c | built and reviewed (2026-11-19), with G18 and G19's fixes; G20 and G21 raised; step 5 waits for the owner's acceptance | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475` |
+| 5c | built and reviewed (2026-11-19), with G18 and G19's fixes; G20 and G21 decided as recommended (2026-11-19), G20's fix with an implementing agent | `53c4bf7`, `20adbf5`, `dfbf158`, `bdd0639`, `ee75475` |
 
 ### Next
 
-1. The owner decides G20 and G21, and accepts step 5 (it can be accepted with G20's fix still to build).
+1. G20's fix (below) is built and checked; then the owner accepts step 5.
 2. The shelf's index page is chosen (G16) and its boards approved by the owner (2026-11-19): the table, ShelfTable and its variants on the canvas and in `docs/mockup/boards/`, the page scrolling with the headings kept at the top (no scroll box of its own); 5c builds it.
 
 ## Goal
@@ -51,11 +51,7 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
-G1 to G19 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G20.
-
-**G20. The line above a phone card's numbers is broken.** G19's fix puts a 12 px gap between the four cells, and each cell draws its own top border, so the line over the numbers is four segments (02-five-phone-light) where ShelfTablePhone draws one. **Recommendation:** the line belongs to the row of numbers, not to each cell: one continuous line across the card, the cells keeping their gap below it.
-
-**G21. Two choices 5c made where the design was silent.** **Recommendation:** accept both and write them into COMMANDS.md, "The index page": (a) the question types are listed in the default type order (QUIZ_SYNTAX.md, `type_order`), whatever the quiz's own `type_order`, so every row reads the same way; (b) an empty shelf shows only its message ("No quizzes on this shelf yet."), with no count line.
+G1 to G21 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G22.
 
 ## Slices
 
@@ -194,4 +190,8 @@ Vitest, the typecheck, Biome and knip pass, and `e2e/shelf.spec.ts` in Chromium 
 
 **The step's "Done when", each part shown:** the round trip (`test/shelf-round-trip.test.ts`); privacy (`test/shelf-privacy.test.ts`); determinism (`test/shelf-determinism.test.ts`); a `--json` contract for `publish`, both forms, and `import` (`test/library-contract.test.ts`); the lock and one commit for `publish NAME --on`, the sync (the shelf's lock) and `import` (`test/library-lock.test.ts`); the command graph (`test/cli-graph.test.ts`: `check`, `grade`, `inspect`, `stats` load nothing from `src/library/`; `publish`, the sync and `import` nothing from `src/serve/`; `import` no page builder); the samples' shelf and their `library publish` and `library import` lines (`npm run samples`, 33 pages).
 
-**Done differently, accepted:** the screens built from `buildShelfIndex` on the boards' quizzes rather than a published shelf (the narrowest way to five varied quizzes); the command graph checks that `import` loads no page builder, not nothing from `src/build/` (it reads the manifest's schema from there); the type names are the paper's ("Single choice", not the board's "Multiple choice"); the time limit as the start screen writes it ("1 h 30 min"); `line-strong` from the theme (`#88877f`), a hair off the board's; a phone link's 44 px minimum leaves a little more room above the types than the board; G19's fix uses the columns `1.1fr .9fr 1.4fr .8fr`, a 12 px gap and narrower letter-spacing on the labels so "QUESTIONS" fits at 360 px. Raised: G20 (the broken line), G21 (the type order and the empty shelf).
+**Done differently, accepted:** the screens built from `buildShelfIndex` on the boards' quizzes rather than a published shelf (the narrowest way to five varied quizzes); the command graph checks that `import` loads no page builder, not nothing from `src/build/` (it reads the manifest's schema from there); the type names are the paper's ("Single choice", not the board's "Multiple choice"); the time limit as the start screen writes it ("1 h 30 min"); `line-strong` from the theme (`#88877f`), a hair off the board's; a phone link's 44 px minimum leaves a little more room above the types than the board; G19's fix uses the columns `1.1fr .9fr 1.4fr .8fr`, a 12 px gap and narrower letter-spacing on the labels so "QUESTIONS" fits at 360 px. Raised, and decided by the owner on 2026-11-19 as recommended: G20 (the broken line), G21 (the type order and the empty shelf).
+
+### Fix (G20)
+
+**Approved by the owner on 2026-11-19** ([STEP5-GAPS.md](STEP5-GAPS.md), G20; COMMANDS.md, "The index page"). In `src/build/shelf-index.ts`, under 520 px, the line above a card's numbers is drawn once, across the card (on the row of numbers, or as the row's own border), not on each cell; the cells keep G19's columns and gap below it. `e2e/shelf.spec.ts`: at 360 × 780, the line's box spans the card's content width as one element. The goldens whose index pages change (count them; only `index.html` and the commit hashes that follow may move); the phone screens of `docs/screens/5c/` taken again. One commit; the full check in both browsers; `npm run samples`.
