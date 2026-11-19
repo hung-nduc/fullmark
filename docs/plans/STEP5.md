@@ -17,13 +17,13 @@ As in step 4 ([archive/STEP4.md](archive/STEP4.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-19); G1 to G11 decided as recommended (2026-11-19), written into COMMANDS.md and TECHNICAL_DESIGN.md | this file |
-| 5a | brief approved (2026-11-19), with an implementing agent | |
+| 5a | built and reviewed (2026-11-19); G12 to G15 raised, waiting for the owner | `fd845f5`, `03976b3`, `5d091f8`, `1f04c50`, `1ea9dec`, `818ae45` |
 | 5b | | |
 | 5c | | |
 
 ### Next
 
-1. Slice 5a is with one implementing agent on Sonnet; the planner reviews it when it reports.
+1. The owner decides G12 to G15 (each has a recommendation); then the planner writes slice 5b's brief, starting with them.
 2. Before 5c: the shelf's index page is drawn on the "fullmark themes" canvas (G9).
 
 ## Goal
@@ -52,6 +52,14 @@ Step 4's rules hold ([archive/STEP4.md](archive/STEP4.md), "Rules for every slic
 The design leaves these open. Each needs the owner's yes before the slice that depends on it; the recommendation is written so it can go into the docs as it stands.
 
 G1 to G11 are decided ([STEP5-GAPS.md](STEP5-GAPS.md)). New ones found while building are added here from G12.
+
+**G12. An unknown quiz name in `publish NAME --on | --off`.** G10's text, written into COMMANDS.md, says an unknown name "exits 1 as in every library command", but every other library command exits **2** for an unknown quiz (`info`, `take`, `replay`, `review`, `share`, `template add`, `grade`); the slip was the planner's. 5a followed the text and exits 1. **Recommendation:** exit 2, as every library command; COMMANDS.md's `publish` Exit list corrected, the code and its golden (`publish-unknown`) changed first in 5b.
+
+**G13. The index page's links from a file.** The index links each quiz as `ID/`. Over http (GitHub Pages) that serves `ID/index.html`, but a shelf opened from the disk (`file://`), which is how an owner looks at it before pushing, shows a folder listing instead of the quiz. **Recommendation:** link `ID/index.html`, which works both ways; COMMANDS.md's "The index page" says so.
+
+**G14. The favicon request on a shared page over http.** A browser asks a served page for `/favicon.ico`; the CSP of every shared page (since step 2) blocks it, and Firefox logs a CSP error in the console. Nothing breaks and nothing is sent. An empty icon would need `img-src data:` in the CSP. **Recommendation:** no change: the blocked request is the CSP doing its job, and the message is only in the console. The 5a spec ignores that one message, with a comment saying why.
+
+**G15. What 5a chose where the design was silent.** **Recommendation:** accept these and write them into COMMANDS.md, `publish`: (a) a path the sync would write that exists in `DIR`, differs and is not in the manifest (the owner's `rust/index.html` in a folder that is not a quiz folder) exits 1, nothing written, with the fix "move it, or publish into an empty folder"; (b) a manifest that is not valid JSON or not of the schema's shape exits 2, as a foreign one, and one whose `version` is below 2 is foreign; (c) `--json`'s `added`, `updated` and `removed` are arrays of quiz ids, and a dry run gives the same object with `"dry_run": true`; (d) `NAME --on | --off --json` gives `{"status": "on" | "off" | "unchanged", "name", "committed"}`; (e) `--on` or `--off` with a sync option, or both together, exits 2; (f) outside a git repository each sync says "not in a git repository, so nothing was committed".
 
 ## Slices
 
@@ -96,3 +104,11 @@ Each slice's brief is written here when the one before it is reviewed; 5a's once
 ### Done when
 
 `npm run check` passes in Chromium and Firefox; each task's tests are named in the report; by hand, on a copy of the samples' history library under real git, the planner puts two quizzes on the shelf, publishes into an empty git repository, publishes again (`unchanged`), takes one off and publishes (`removed`), and finds no private file in the shelf.
+
+### Review (2026-11-19)
+
+**Built** by one agent on Sonnet in `fd845f5` (step 4's G38: `profileToml(profile, own)`, null only for the quiz's own built-in profile with no change; another built-in gives `[check] profile = NAME` alone), `03976b3` (shelf entries as tables in `library.toml`, unknown entries and fields kept; `publish NAME --on | --off`; `list`'s `public` mark, `info`'s shelves; `[shelves]` in `config-write.ts`), `5d091f8` (the manifest's zod schema in `src/core/ir.ts`, `schemas/fullmark-shelf-v2.schema.json`, `src/library/shelf.ts` with the pure `planSync`), `1f04c50` (the sync in `src/cli/library-sync.ts`, loaded by a dynamic import from `library-publish.ts` so `--on` loads no page builder; `buildOne` gains an in-memory build; `Git` gains `insideWorkTree()` and `commitPaths()`; the plain index page in `src/build/shelf-index.ts`), `1ea9dec` (`test/shelf-privacy.test.ts`, `test/shelf-determinism.test.ts`) and `818ae45` (`e2e/shelf.spec.ts`).
+
+**Checked by the planner:** `npm run build` and `npm run check` pass: the startup tests 2 (alone, first), Vitest 3737 in 156 files, Playwright 847 passed (686 lines each in Chromium and Firefox) and 527 skipped (the screens specs), tsc, Biome and knip clean. Goldens: 15 cases added (`publish-on`, `-on-json`, `-off-not-on`, `-unknown`; `publish-sync`, `-sync-json`, `-sync-dry-run`, `-sync-unchanged`, `-sync-swap`, `-sync-git`, `-no-dir`, `-inside-library`, `-foreign-manifest`, `-quiz-folder-unlisted`, `-index-in-the-way`), none changed; no `share` golden moved with G38. **By hand**, on a copy of the samples' library: `publish study-fixture --on` and `tidy --on` committed once each, a second `--on` said "already on the public shelf", exit 0; `list` marked both `public`; `--dry-run` into an empty git repository holding a README listed `study/`, `tidy/` and `index.html` (folders by id: `study-fixture`'s is `study`); the sync wrote them and the manifest, left the README alone, recorded `[shelves] public`, and committed only its paths; a second publish was `unchanged` with no commit; `tidy --off` then a publish removed `tidy/` and updated the index; no results, grades, report or review JSON anywhere in the shelf.
+
+**Done differently, accepted:** the sync in its own chunk; fonts always passed to the build explicitly (otherwise the page's Information tab differs between the first sync and the next, and the second is not `unchanged`), so a shelf page equals `quiz build --fonts X`, not a build with no flag; G38's test uses `draft` rather than `exam` (an `exam` finding is an error, which `register` refuses); `list --json`'s `shelves` lists every entry's shelf name, the `public` mark only `kind = "quiz"`; a dry run lists a manifest line when only the manifest would change, and "files changed" when a quiz's files change with its hash (fonts, the program's version). Raised as gaps: the unknown-name exit (G12), the links (G13), the favicon (G14), the rest of the agent's choices (G15). **To look at in 5c:** the index page carries every theme's token set though it uses only light and dark.
