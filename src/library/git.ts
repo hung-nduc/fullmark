@@ -45,12 +45,20 @@ export class Git {
       bin?: string | null;
       exec?: GitExec;
       env?: Record<string, string | undefined>;
+      /** the system git runs on (default: this one); on `win32` every command runs with `-c core.longpaths=true` */
+      platform?: NodeJS.Platform;
     } = {},
   ) {}
 
   private run(args: string[], config: string[] = []): Promise<GitResult> {
     const exec = this.options.exec ?? realGitExec;
-    return exec(this.options.bin ?? "git", ["-C", this.root, ...config, ...args], this.options.env ?? process.env);
+    // a library deep in the folder tree must not fail on paths over 260 characters (COMMANDS.md, "Git"; step 6, G23)
+    const lead = (this.options.platform ?? process.platform) === "win32" ? ["-c", "core.longpaths=true"] : [];
+    return exec(
+      this.options.bin ?? "git",
+      [...lead, "-C", this.root, ...config, ...args],
+      this.options.env ?? process.env,
+    );
   }
 
   /** Whether `git` can be run at all. */

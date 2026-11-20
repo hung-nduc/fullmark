@@ -123,7 +123,8 @@ describe("the git runner, with failures injected", () => {
   const exec =
     (handler: (args: string[]) => { code: number; stdout?: string; stderr?: string; missing?: true }): GitExec =>
     async (_bin, args) => {
-      const r = handler(args.slice(2));
+      // the platform's own `-c core.longpaths=true` (Windows) comes first, then `-C ROOT`
+      const r = handler(args.slice(args[0] === "-c" ? 4 : 2));
       return {
         code: r.code,
         stdout: r.stdout ?? "",
@@ -144,6 +145,7 @@ describe("the git runner, with failures injected", () => {
     const seen: { bin: string; args: string[] }[] = [];
     const runner = new Git(dir, {
       bin: "/opt/git/bin/git",
+      platform: "linux",
       exec: async (bin, args) => {
         seen.push({ bin, args });
         // `diff --cached --quiet` finds changes; `config --get` finds no identity
@@ -159,6 +161,30 @@ describe("the git runner, with failures injected", () => {
       expect.arrayContaining(["-c", "user.name=fullmark", "-c", "user.email=fullmark@localhost"]),
     );
     expect(commit?.args.slice(-3)).toEqual(["--", "a b.txt", "-weird"]);
+  });
+
+  it("runs every command on Windows with -c core.longpaths=true before -C, and on no other system", async () => {
+    const dir = tempDir();
+    writeTree(dir, { ".git/HEAD": "ref: refs/heads/main\n" });
+    const run = async (platform: NodeJS.Platform) => {
+      const seen: string[][] = [];
+      const runner = new Git(dir, {
+        platform,
+        exec: async (_bin, args) => {
+          seen.push(args);
+          return { code: args.includes("--quiet") || args.includes("config") ? 1 : 0, stdout: "abc1234\n", stderr: "" };
+        },
+      });
+      await runner.commit(["a.txt"], "fullmark: take x");
+      await runner.uncommitted();
+      await runner.remote();
+      return seen;
+    };
+    const windows = await run("win32");
+    expect(windows.length).toBeGreaterThan(4);
+    for (const args of windows) expect(args.slice(0, 4)).toEqual(["-c", "core.longpaths=true", "-C", dir]);
+    for (const args of await run("linux")) expect(args.slice(0, 2)).toEqual(["-C", dir]);
+    for (const args of await run("darwin")) expect(args).not.toContain("core.longpaths=true");
   });
 
   it("a commit that fails is a result with git's own first line, never a throw", async () => {
