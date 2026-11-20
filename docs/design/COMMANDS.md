@@ -611,6 +611,8 @@ quiz agent-guide [--plain] [--no-pager]
 
 `guide` prints the authoring reference (the Markdown format), in English or, with `--lang vi`, Vietnamese. `agent-guide` prints the instructions for AI agents (`AGENTS.md`), in English only.
 
+**First form.** Both commands first ship printing the Markdown source as it is, in every case; the styled terminal rendering and the pager described below come later, and until then `--plain` and `--no-pager` are accepted and change nothing. The repository also ships the Claude Code skill `skill/SKILL.md`: the workflow and the judgment for making, taking and grading quizzes, which sends the agent to these two commands for the syntax and the rules.
+
 In a terminal, the Markdown is rendered: headings, lists, tables, wrapping to the terminal width, and code blocks highlighted with the same highlighter the pages use. Output taller than the screen goes through `$PAGER`, or `less` if found. When stdout is not a terminal (piped, redirected, or run by an agent), or with `--plain` or `NO_COLOR`, the output is the Markdown source byte for byte, so `quiz agent-guide > AGENTS.md` writes the real file.
 
 | Option | Meaning |

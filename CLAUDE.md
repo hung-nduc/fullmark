@@ -4,7 +4,7 @@ fullmark 1.0 is a TypeScript rewrite: Markdown quizzes in, one offline HTML page
 
 ## Start here
 
-1. Read the **Handoff** at the top of the current step's plan in `docs/plans/`. Steps 1 to 6 are done and archived, and fullmark `1.0.0` is installed; no step is open. The last one, [docs/plans/archive/STEP6.md](docs/plans/archive/STEP6.md), says on top where new work starts (a proposal, then `STEP7.md` for the owner to approve).
+1. Read the **Handoff** at the top of the current step's plan, [docs/plans/STEP7.md](docs/plans/STEP7.md). It says what is done, what waits for the owner and what comes next, and a session needs nothing else to pick up.
 2. The design docs in `docs/design/` say what 1.0 is; the plans say how it is built. Where they disagree, the design docs win. [docs/README.md](docs/README.md) maps them.
 
 ## How the work runs
