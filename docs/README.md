@@ -4,7 +4,7 @@ The design of fullmark 1.0 (the TypeScript rewrite) and the plans it is built fr
 
 ## Where to start
 
-- **Working on the code:** read the Handoff at the top of the current step's plan ([plans/STEP6.md](plans/STEP6.md)) first. It says what is done, what waits for the owner and what comes next.
+- **Working on the code:** read the Handoff at the top of the current step's plan in `plans/` first. No step is open: steps 1 to 6 are done, and the last plan ([plans/archive/STEP6.md](plans/archive/STEP6.md)) says on top where new work starts.
 - **Learning the design:** [USER_DESIGN.md](design/USER_DESIGN.md) (why), then [TECHNICAL_DESIGN.md](design/TECHNICAL_DESIGN.md) (how), then [COMMANDS.md](design/COMMANDS.md) and [QUIZ_SYNTAX.md](design/QUIZ_SYNTAX.md) as references.
 
 ## Design (`design/`)
@@ -31,11 +31,11 @@ The full table, with what each step contains and when it is done, is [TECHNICAL_
 | 3 | `serve`, `review`, `grade --web`, `brief`, `stats`, `inspect`, `new`, `template`, `build --watch` | done, archived: [plans/archive/STEP3.md](plans/archive/STEP3.md), its decided gaps in [plans/archive/STEP3-GAPS.md](plans/archive/STEP3-GAPS.md) |
 | 4 | The library | done, archived: [plans/archive/STEP4.md](plans/archive/STEP4.md), its decided gaps in [plans/archive/STEP4-GAPS.md](plans/archive/STEP4-GAPS.md) |
 | 5 | `publish` and `import` | done, archived: [plans/archive/STEP5.md](plans/archive/STEP5.md), its decided gaps in [plans/archive/STEP5-GAPS.md](plans/archive/STEP5-GAPS.md) |
-| 6 | The suite on Windows, then moving the owner's 0.x history into a 1.0 library | in progress: [plans/STEP6.md](plans/STEP6.md), its decided gaps in [plans/STEP6-GAPS.md](plans/STEP6-GAPS.md) |
+| 6 | The suite on Windows, then moving the owner's 0.x history into a 1.0 library | done, archived: [plans/archive/STEP6.md](plans/archive/STEP6.md), its decided gaps in [plans/archive/STEP6-GAPS.md](plans/archive/STEP6-GAPS.md) |
 
 ## Plans (`plans/`)
 
-One file per step (`STEP1.md`, `STEP2.md` and so on), written when the step starts. Each is cut into slices small enough to hand to one agent and review before the next. A slice's brief is written in full before it is delegated; the Handoff at the top of the file keeps the current state. From step 3 on, each slice's section ends with its review, the open gaps are in the plan's "Gaps" list, and every decided one, in number order, in the step's gaps file (step 3's: [plans/archive/STEP3-GAPS.md](plans/archive/STEP3-GAPS.md), G1 to G148). A closed step's plan moves to [plans/archive/](plans/archive/) with a short summary on top; `STEP1.md` to `STEP5.md` are kept there, and code comments cite them by name and item ("STEP2.md, slice 2k").
+One file per step (`STEP1.md`, `STEP2.md` and so on), written when the step starts. Each is cut into slices small enough to hand to one agent and review before the next. A slice's brief is written in full before it is delegated; the Handoff at the top of the file keeps the current state. From step 3 on, each slice's section ends with its review, the open gaps are in the plan's "Gaps" list, and every decided one, in number order, in the step's gaps file (step 3's: [plans/archive/STEP3-GAPS.md](plans/archive/STEP3-GAPS.md), G1 to G148). A closed step's plan moves to [plans/archive/](plans/archive/) with a short summary on top; `STEP1.md` to `STEP6.md` are kept there, and code comments cite them by name and item ("STEP2.md, slice 2k").
 
 ## Screens and boards
 

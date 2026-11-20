@@ -4,13 +4,13 @@ fullmark 1.0 is a TypeScript rewrite: Markdown quizzes in, one offline HTML page
 
 ## Start here
 
-1. Read the **Handoff** at the top of the current step's plan, [docs/plans/STEP6.md](docs/plans/STEP6.md). It says what is done, what waits for the owner and what comes next, and a session needs nothing else to pick up.
+1. Read the **Handoff** at the top of the current step's plan in `docs/plans/`. Steps 1 to 6 are done and archived, and fullmark `1.0.0` is installed; no step is open. The last one, [docs/plans/archive/STEP6.md](docs/plans/archive/STEP6.md), says on top where new work starts (a proposal, then `STEP7.md` for the owner to approve).
 2. The design docs in `docs/design/` say what 1.0 is; the plans say how it is built. Where they disagree, the design docs win. [docs/README.md](docs/README.md) maps them.
 
 ## How the work runs
 
 - **Slices, briefs, reviews.** Each step is cut into slices. The planner writes a slice's full brief in the plan, the owner approves it, and one implementing agent builds it from the brief alone. The planner then reviews it, running the tests and trying it by hand, and brings every gap to the owner with a recommendation. The owner decides, the decision goes into `docs/design/` as plain statements, with no "(owner, date)" marker (the plan and git record who decided what, and when), and it becomes the next brief's first tasks.
-- **Never decide a gap yourself.** If the design leaves something open, write it as a numbered gap (`G38`, …) in the plan's "Gaps" list, with a recommendation, and ask. Once decided, it moves to the step's gaps file (`docs/plans/STEP6-GAPS.md` for step 6). Each step numbers its gaps from G1; outside its plan a gap is cited with its step ("step 4, G3"). A choice made while implementing is reported under "done differently" in the review, never left silent.
+- **Never decide a gap yourself.** If the design leaves something open, write it as a numbered gap (`G38`, …) in the plan's "Gaps" list, with a recommendation, and ask. Once decided, it moves to the step's gaps file (`docs/plans/STEP7-GAPS.md` for step 7). Each step numbers its gaps from G1; outside its plan a gap is cited with its step ("step 4, G3"). A choice made while implementing is reported under "done differently" in the review, never left silent.
 - **Record as you go.** Update the Handoff's status table after every round, write each slice's review at the end of its section, and commit after each round.
 
 ## Rules

@@ -1,12 +1,18 @@
 # Step 6: Windows, then moving the 0.x history in
 
+> **Archived (2026-11-20).** Step 6 is closed, and with it the order of work in TECHNICAL_DESIGN.md, section 12. The suite passes on Windows (slices 6a and 6b; the last full check is 6d's, 19.8 min). The owner's five chosen quizzes and their four attempts were moved from the 0.x library into `D:/studying/fullmark-library-1.0` by a throwaway script kept outside the product (`D:/coding-projects/fullmark-0x-migration/`), and `compare.mjs` reports no unexplained difference in `stats` or `--missed` (slice 6c, "The real run"). The loose ends found after it, G23 and G24, were built in 6d. The version became `1.0.0` (`69677ade`: 29 goldens changed only in the version, the byte count and a commit hash; checked by the goldens, the CLI test, typecheck and Biome, not by a second full run), and fullmark was installed on the owner's laptop from a packed tarball. Its decided gaps, G1 to G24 (G18 left as it is), are in [STEP6-GAPS.md](STEP6-GAPS.md); the decisions live in `docs/design/`, which wins over anything here. The cloud checks of 6a to 6d were not run. The rest is kept below as it was.
+>
+> **After step 6** no step is planned. New work starts from a proposal in `docs/design/proposals/` (the proposals check of 2026-11-20 found none blocking 1.0, and suggested `library-query` and `cli-integration` next) and a new plan, `docs/plans/STEP7.md`, written by the planner for the owner to approve.
+>
+> **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
+
 ## Handoff (2026-11-20): start here
 
 A new session picks up from this section alone; it needs no earlier chat.
 
 ### How the work runs
 
-As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits (never pushes) and reports; the planner reviews and brings every gap to the owner with a recommendation; the owner decides; decisions go into `docs/design/` as plain statements. Commit after every round. Gaps are numbered from **G1**; decided ones move to [STEP6-GAPS.md](STEP6-GAPS.md).
+As in step 5 ([archive/STEP5.md](STEP5.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet); the agent implements and commits (never pushes) and reports; the planner reviews and brings every gap to the owner with a recommendation; the owner decides; decisions go into `docs/design/` as plain statements. Commit after every round. Gaps are numbered from **G1**; decided ones move to [STEP6-GAPS.md](STEP6-GAPS.md).
 
 **Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
 
@@ -24,7 +30,7 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 1. **Done:** the migration (2026-11-20). G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The cloud checks of 6a to 6c were not run (no cloud environment from the laptop).
 2. **Done:** 6d reviewed (2026-11-20); see its review.
-3. Then (owner's yes, 2026-11-20): step 6 is archived, branch `1.0` fast-forwarded, and fullmark installed as `1.0.0` from a packed tarball.
+3. **Done** (owner's yes, 2026-11-20): step 6 is archived, branch `1.0` fast-forwarded, and fullmark installed as `1.0.0` from a packed tarball.
 
 ## Goal
 
@@ -48,7 +54,7 @@ Each has one version; none has grades; every source file still exists. Whether u
 
 ## Rules for every slice
 
-Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slice", extending step 4's and step 3's). Added for step 6:
+Step 5's rules hold ([archive/STEP5.md](STEP5.md), "Rules for every slice", extending step 4's and step 3's). Added for step 6:
 
 - **Windows counts.** A slice is checked on the owner's Windows laptop as well as in the cloud. A failure seen only on Windows is a bug or a gap like any other, never "environmental" without its cause shown.
 - **Never run a second Vitest while one is running** in the same checkout: Vitest's global setup runs `npm run build`, which cleans `dist/` under the running suite (G7).
