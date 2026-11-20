@@ -21,8 +21,8 @@ export default defineConfig({
   workers: process.env.FULLMARK_SCREENS ? 1 : undefined,
   reporter: [["list"]],
   projects: [
-    // the page budget test measures the page, not the machine (G97): it runs first, alone (Firefox's after Chromium's),
-    // and every other project depends on it
+    // the page budget test measures the page, not the machine (G97): Firefox's runs after Chromium's. No other project
+    // depends on them: a budget that fails (Firefox's, on a slow laptop) must not skip the rest of the suite (step 6, G6)
     { name: "budget-chromium", testMatch: "**/budget.spec.ts", use: { browserName: "chromium" } },
     {
       name: "budget-firefox",
@@ -34,7 +34,6 @@ export default defineConfig({
     {
       name: "chromium",
       testIgnore: "**/budget.spec.ts",
-      dependencies: ["budget-chromium", "budget-firefox"],
       use: { browserName: "chromium", ...screens },
     },
     // axe is slow in Firefox under parallel load: it gets 60 s a test; no retries
@@ -42,7 +41,6 @@ export default defineConfig({
       name: "firefox",
       testIgnore: "**/budget.spec.ts",
       timeout: 60_000,
-      dependencies: ["budget-chromium", "budget-firefox"],
       use: { browserName: "firefox" },
     },
   ],

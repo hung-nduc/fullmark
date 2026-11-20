@@ -9,7 +9,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
  * small quiz is under its limit below (a command loads only what it uses: test/cli-graph.test.ts). The share is the median of the CLI's time minus the median of a bare `node -e ""`, both
  * timed in this run the same number of times, so a slow moment of the laptop moves both. `npm test` runs this file on
  * its own, after the others. A share over the limit is measured once more (the best of the two counts). All three
- * numbers are printed with --silent=false.
+ * numbers are printed with --silent=false. Each command is run once, untimed, before its rounds: right after a build
+ * the first run reads the files from a cold disk cache (step 6, G6).
  */
 /**
  * Set from three runs on 2026-10-30 (2h2): the best of each run's two rounds was 35, 16 and 1 ms for `--version` and
@@ -48,8 +49,12 @@ afterAll(() => {
   rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
 });
 
-function median(args: string[], quiz: boolean): number {
-  const times: number[] = [];
+/** One run that is not timed: it warms the disk cache. */
+function warm(args: string[]): void {
+  spawnSync(process.execPath, args, { cwd: dir, env: startupEnv(), stdio: "ignore" });
+}
+
+function startupEnv(): Record<string, string | undefined> {
   const env: Record<string, string | undefined> = {
     ...process.env,
     NO_COLOR: "1",
@@ -59,6 +64,12 @@ function median(args: string[], quiz: boolean): number {
     XDG_CONFIG_HOME: dir,
   };
   delete env.FULLMARK_CONFIG;
+  return env;
+}
+
+function median(args: string[], quiz: boolean): number {
+  const times: number[] = [];
+  const env = startupEnv();
   for (let i = 0; i < RUNS; i++) {
     const start = process.hrtime.bigint();
     const r = spawnSync(process.execPath, args, { cwd: dir, env, stdio: "ignore" });
@@ -72,6 +83,8 @@ function median(args: string[], quiz: boolean): number {
 /** The median of the CLI's time minus the median of bare Node's, measured together so the two see the same load. */
 function share(label: string, args: string[], limit: number): number {
   const rounds: number[] = [];
+  warm(["-e", ""]);
+  warm([cli, ...args]);
   for (let round = 0; round < ROUNDS; round++) {
     const bare = median(["-e", ""], false);
     const cliTime = median([cli, ...args], true);
