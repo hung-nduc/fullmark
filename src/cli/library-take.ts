@@ -24,15 +24,19 @@ import {
   openLibrary,
   painterFor,
 } from "./library-common";
-import { missedFor } from "./library-missed";
-import { findSection, localStamp, type ServeIo, serveLoaded } from "./serve";
+import { missedFor, missedScanFor } from "./library-missed";
+import { findSection } from "./sections";
+import type { ServeIo } from "./serve";
 import { plural } from "./table";
+import { localStamp } from "./time";
 
 export type LibraryTakeOptions = {
   section: string | null;
   /** only the questions wrong or partly right in earlier attempts and not answered fully right since */
   missed: boolean;
   focus: boolean;
+  /** print the plan the take would serve and stop: no server, no lock, no write, no filing */
+  dryRun: boolean;
   open: boolean;
   /** seconds, as given; null: 0 (no limit) */
   timeout: string | null;
@@ -266,7 +270,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
   };
 
   // one take at a time per quiz (G9): a serving file whose process is alive refuses this one, a dead one is removed
-  for (const s of servingFiles(paths)) {
+  for (const s of opts.dryRun ? [] : servingFiles(paths)) {
     if (s.pid > 0 && alive(s.pid)) {
       const message = `${quiz.name} is already open in another take (pid ${s.pid})`;
       if (opts.json) io.out(JSON.stringify({ status: "error", message, fix: `open: ${s.url}`, url: s.url }));
@@ -308,7 +312,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     });
 
   // a submit that was written and not filed (the lock was busy, or the command died) is filed before anything else
-  const leftover = submittedFiles(paths, quiz)[0];
+  const leftover = opts.dryRun ? undefined : submittedFiles(paths, quiz)[0];
   if (leftover !== undefined) {
     out(`${p.cyan("note")} filing the answers an earlier take left in progress/${leftover.hash}.submitted.json`);
     try {
@@ -340,7 +344,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     sectionId = found.id;
   }
   // `--missed`: the plan the library chooses from the attempts (nothing is served when none is missed)
-  const missed = opts.missed ? missedFor(root, quiz, served, sectionId) : null;
+  const missed = opts.missed ? missedScanFor(root, quiz, served, sectionId) : null;
   // a saved attempt of missed questions resumes as one: the "changed since you missed it" marks are worked out again (G25)
   const resumedChanged =
     saved !== null && saved.attempt.plan.source === "missed"
@@ -375,7 +379,6 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
   // the progress file of this attempt; a saved attempt of the version is never overwritten by a new one
   const progressFile = paths.progressFile(hash);
   const autosave = saved !== null || !existsSync(progressFile);
-  await mkdir(paths.progress, { recursive: true });
 
   const heading = [quiz.name, quiz.title, `version ${short(hash)}`];
   if (saved !== null) {
@@ -383,7 +386,7 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
     const answered = saved.attempt.plan.questions.filter((id) => saved.attempt.state.answers[id] != null).length;
     const when = started === null ? "an earlier day" : `${shortDate(started)} ${started.slice(11, 16)}`;
     heading.push(
-      `resuming your attempt of ${when} (${answered} of ${saved.attempt.plan.questions.length} answered)${
+      `${opts.dryRun ? "would resume" : "resuming"} your attempt of ${when} (${answered} of ${saved.attempt.plan.questions.length} answered)${
         hash === quiz.current ? "" : `; the quiz has been updated since (now ${short(quiz.current)})`
       }`,
     );
@@ -401,10 +404,44 @@ export async function runLibraryTake(name: string, opts: LibraryTakeOptions, io:
   }
   out(heading.join(" · "));
 
+  if (opts.dryRun) {
+    // the plan as the real take would build it, in source order: a shuffle or a bank draw is the page's, at start
+    const plan =
+      missed !== null
+        ? { source: "missed" as const, questions: missed.questions }
+        : saved !== null
+          ? { source: saved.attempt.plan.source, questions: saved.attempt.plan.questions }
+          : {
+              source: sectionId === null ? ("full" as const) : ("section" as const),
+              questions: served.sections
+                .filter((s) => sectionId === null || s.id === sectionId)
+                .flatMap((s) => s.questions.map((q) => q.id)),
+            };
+    const changedIds = missed?.changed ?? resumedChanged ?? [];
+    const goneIds = missed?.goneIds ?? [];
+    if (opts.json) {
+      io.out(
+        JSON.stringify({
+          status: "plan",
+          plan,
+          changed: changedIds,
+          gone: goneIds,
+          resume: saved === null ? null : (saved.attempt.state.startedAt ?? null),
+        }),
+      );
+    }
+    out(plan.questions.map((id) => (changedIds.includes(id) ? `${id} (changed)` : id)).join("  "));
+    if (goneIds.length > 0) out(`gone      ${goneIds.join("  ")}`);
+    return EXIT.done;
+  }
+  await mkdir(paths.progress, { recursive: true });
+
   const servingFile = paths.servingFile(hash);
   const submittedFile = paths.submittedFile(hash);
-  let result: Awaited<ReturnType<typeof serveLoaded>>;
+  let result: Awaited<ReturnType<typeof import("./serve").serveLoaded>>;
   try {
+    // the server and the page builder load here and nowhere earlier: `--dry-run` never gets this far
+    const { serveLoaded } = await import("./serve");
     result = await serveLoaded(
       loaded,
       loaded.file,

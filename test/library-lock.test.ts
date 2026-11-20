@@ -131,6 +131,7 @@ describe("a library command that changes the library waits for the lock, fails b
       section: null,
       missed: false,
       focus: false,
+      dryRun: false,
       open: false,
       timeout: null,
       port: null,

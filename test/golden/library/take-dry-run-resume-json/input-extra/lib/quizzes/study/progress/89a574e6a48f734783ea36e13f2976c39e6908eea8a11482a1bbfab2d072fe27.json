@@ -1,0 +1,17 @@
+{
+  "format": "fullmark-results",
+  "version": 2,
+  "quizHash": "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27",
+  "plan": { "source": "full", "questions": ["prime", "even", "syll", "late", "add", "ielts", "ratio"] },
+  "state": {
+    "answers": { "prime": { "choice": 0 }, "even": { "value": true }, "syll": { "choice": 0 } },
+    "startedAt": "2026-11-18T14:02:00",
+    "submittedAt": null,
+    "timeUsed": 120,
+    "sectionTime": {},
+    "flagged": [],
+    "checked": [],
+    "timedOut": false
+  },
+  "phase": "answering"
+}

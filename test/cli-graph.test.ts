@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
  * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
- * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server; `library import` loads neither the page builder nor the server.
+ * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server only when it serves, never for `--dry-run`; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server; `library import` loads neither the page builder nor the server.
  */
 const dist = resolve(import.meta.dirname, "..", "dist");
 const files = readdirSync(dist).filter((f) => f.endsWith(".js"));
@@ -210,11 +210,18 @@ describe("what each command loads", () => {
     });
   }
 
-  it("library take is a chunk of its own with the page builder, the server and the library, reached by a dynamic import() from main", () => {
+  it("library take is a chunk of its own with the library, reached by a dynamic import() from main, and loads the server and the page builder only by a dynamic import() when it serves (so --dry-run never loads them)", () => {
     const chunk = chunkWith("// src/cli/library-take.ts");
     const text = textOf(closure(chunk));
-    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, "// src/library/"]) expect(text, m).toContain(m);
-    for (const m of CLACK) expect(text, m).not.toContain(m);
+    expect(text).toContain("// src/library/");
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...CLACK]) expect(text, m).not.toContain(m);
+    // the server and the page builder are `serve`'s chunk, which `take` imports when it is about to serve
+    const serve = chunkWith("// src/cli/serve.ts");
+    expect(serve).not.toBe(chunk);
+    expect(closure(chunk)).not.toContain(serve);
+    expect(readFileSync(join(dist, chunk), "utf8")).toContain(`import("./${serve}")`);
+    const served = textOf(closure(serve));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY]) expect(served, m).toContain(m);
     expect(closure(entry("main"))).not.toContain(chunk);
     expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
     // the commands that only read the library never reach it

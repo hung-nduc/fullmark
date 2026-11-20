@@ -598,6 +598,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--section <s>", "only this section (its slug or title)")
     .option("--missed", "only the questions you got wrong or partly right and have not answered right since")
     .option("--focus", "tick Focus mode on the start screen")
+    .option("--dry-run", "print the plan the take would serve and serve nothing")
     .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
     .option("--no-open", "do not open the page in the browser")
     .option("--timeout <seconds>", "how long to wait for a submit; 0 waits forever (default 0)")
@@ -612,6 +613,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
           section: text("section"),
           missed: Boolean(options.missed),
           focus: Boolean(options.focus),
+          dryRun: Boolean(options.dryRun),
           open: options.open !== false,
           timeout: text("timeout"),
           port: text("port"),

@@ -38,6 +38,7 @@ const options = (extra: Partial<LibraryTakeOptions> = {}): LibraryTakeOptions =>
   section: null,
   missed: false,
   focus: false,
+  dryRun: false,
   open: false,
   timeout: null,
   port: null,
@@ -504,5 +505,84 @@ describe("library take --missed", () => {
     expect(await again.done).toBe(0);
     expect(again.out).toEqual(['{"status":"nothing_missed"}']);
     expect(again.err).toEqual(["nothing missed: every question you got wrong has been answered right since"]);
+  });
+});
+
+describe("library take --dry-run", () => {
+  it("prints the plan and writes nothing: no progress folder, no lock, no commit, no server", async () => {
+    const t = await library();
+    const before = (await git(t.lib, t.env, "log", "--format=%H")).trim();
+    const run = take(t, "signals", { dryRun: true, json: false });
+    expect(await run.done).toBe(0);
+    expect(run.out).toEqual([
+      "signals · Signals · version " + quizOf(t).current.slice(0, 4) + " · 2 questions · no time limit",
+      "q1  q2",
+    ]);
+    expect(run.opened).toEqual([]);
+    expect(existsSync(progressDir(t))).toBe(false);
+    expect(existsSync(join(t.lib, ".fullmark.lock"))).toBe(false);
+    expect((await git(t.lib, t.env, "log", "--format=%H")).trim()).toBe(before);
+    expect((await git(t.lib, t.env, "status", "--porcelain")).trim()).toBe("");
+  });
+
+  it("is not refused by a take that is serving, and files nothing left in progress/", async () => {
+    const t = await library();
+    const hash = quizOf(t).current;
+    const dir = progressDir(t);
+    mkdirSync(dir, { recursive: true });
+    const serving = `${JSON.stringify({ pid: process.pid, url: "http://127.0.0.1:1/?t=x" })}\n`;
+    const submitted = `${JSON.stringify(attemptOf(hash))}\n`;
+    writeFileSync(join(dir, `${hash}.serving.json`), serving);
+    writeFileSync(join(dir, `${hash}.submitted.json`), submitted);
+    const run = take(t, "signals", { dryRun: true });
+    expect(await run.done).toBe(0);
+    expect(JSON.parse(run.out[0] ?? "")).toEqual({
+      status: "plan",
+      plan: { source: "full", questions: ["q1", "q2"] },
+      changed: [],
+      gone: [],
+      resume: null,
+    });
+    expect(readFileSync(join(dir, `${hash}.serving.json`), "utf8")).toBe(serving);
+    expect(readFileSync(join(dir, `${hash}.submitted.json`), "utf8")).toBe(submitted);
+    expect(existsSync(join(t.lib, "quizzes", "signals", "results"))).toBe(false);
+  });
+
+  it("says would resume, with the attempt's time, when a progress file waits ", async () => {
+    const t = await library();
+    const hash = quizOf(t).current;
+    mkdirSync(progressDir(t), { recursive: true });
+    const saved = {
+      format: "fullmark-results",
+      version: 2,
+      quizHash: hash,
+      plan: { source: "full", questions: ["q1", "q2"] },
+      state: {
+        answers: { q1: { choice: 0 } },
+        startedAt: "2026-11-18T14:00:00",
+        submittedAt: null,
+        timeUsed: 60,
+        sectionTime: {},
+        flagged: [],
+        checked: [],
+        timedOut: false,
+      },
+      phase: "answering",
+    };
+    writeFileSync(join(progressDir(t), `${hash}.json`), JSON.stringify(saved));
+    const run = take(t, "signals", { dryRun: true });
+    expect(await run.done).toBe(0);
+    expect(run.err[0]).toContain("would resume your attempt of 18 Nov 14:00 (1 of 2 answered)");
+    expect(JSON.parse(run.out[0] ?? "")).toMatchObject({ resume: "2026-11-18T14:00:00" });
+    // a missed take starts its own attempt: nothing to resume
+    const own = take(t, "signals", { dryRun: true, missed: true });
+    expect(await own.done).toBe(0);
+    expect(own.err.join(" ")).not.toContain("resume");
+  });
+
+  it("exits 2 for an unknown quiz, as without --dry-run", async () => {
+    const t = await library();
+    const run = take(t, "signls", { dryRun: true });
+    expect(await run.done).toBe(2);
   });
 });

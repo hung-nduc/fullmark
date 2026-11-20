@@ -29,6 +29,16 @@ type Seen = { hash: string; section: string };
  * `current` is the current version's quiz; `section` (a section's id) keeps only the missed questions of that section.
  */
 export function missedOf(current: Quiz, history: QuizHistory, section: string | null = null): Missed {
+  const { goneIds: _ids, ...missed } = missedScan(current, history, section);
+  return missed;
+}
+
+/** `missedOf` with the ids of the questions counted as gone, which `take --dry-run` lists. */
+function missedScan(
+  current: Quiz,
+  history: QuizHistory,
+  section: string | null = null,
+): Missed & { goneIds: string[] } {
   const missed = new Map<string, Seen>();
   for (const attempt of history.attempts) {
     if (attempt.report === null) continue;
@@ -52,12 +62,22 @@ export function missedOf(current: Quiz, history: QuizHistory, section: string | 
       if (seen.hash !== q.hash) changed.push(q.id);
     }
   }
-  let gone = 0;
+  const goneIds: string[] = [];
   for (const [id, seen] of missed) {
     if (present.has(id)) continue;
-    if (section === null || seen.section === section) gone++;
+    if (section === null || seen.section === section) goneIds.push(id);
   }
-  return { questions, changed, gone, attempts: history.attempts.length };
+  return { questions, changed, gone: goneIds.length, goneIds, attempts: history.attempts.length };
+}
+
+/** The same as `missedScan` for a library quiz. */
+export function missedScanFor(
+  root: string,
+  quiz: IndexQuiz,
+  current: Quiz,
+  section: string | null = null,
+): Missed & { goneIds: string[] } {
+  return missedScan(current, readHistory(root, quiz), section);
 }
 
 /** The same for a library quiz, reading its attempts. */
