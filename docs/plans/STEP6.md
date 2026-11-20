@@ -21,9 +21,9 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 ### Next
 
-1. **The migration is done (2026-11-20).** G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The owner then accepts step 6. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
-2. The owner reads the rehearsal's `compare.log` and says yes; the planner then runs the real migration (the one command 6c's report gives).
-3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
+1. **Done:** the migration (2026-11-20). G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The cloud checks of 6a to 6c were not run (no cloud environment from the laptop).
+2. 6d (G23, G24) is built and reviewed.
+3. Then (owner's yes, 2026-11-20): step 6 is archived, branch `1.0` fast-forwarded, and fullmark installed as `1.0.0` from a packed tarball.
 
 ## Goal
 
@@ -62,6 +62,7 @@ G1 to G24 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, 
 |---|---|---|
 | **6a** | G1 to G7: the suite passes on Windows | G1 to G7 |
 | **6b** | G8 to G12: `source` relative to the library, the lock's host and boot, the budget run alone, the last paths | 6a, G8 to G12 |
+| **6d** | Loose ends before install: G23 (`core.longpaths`), G24 (`take --dry-run`) | 6c, G23, G24 |
 | **6c** | G19; the migration script (outside the repository), rehearsed on copies of the five quizzes; `stats` and `--missed` compared with 0.x; the real run after the owner's yes | 6b, G13 to G17, G19 |
 
 ## Slice 6a: the suite on Windows
@@ -223,3 +224,16 @@ Run by the planner after the owner's yes, from the worktree's `dist/` (built wit
 - `D:/studying/fullmark-library-1.0`: seven commits (`init`, five `register`, `move 4 attempts from 0.x`); every `source` is `../lectures/2026.1/...`; `library status` healthy, 5 of 5 hashes match; `list` shows exams A and B at 81% and 71%, the two empty attempts at 0%, the midterm practice never taken.
 - The 0.x library is untouched (`cdb5ee2`, clean).
 - `compare.mjs`: per question 73/73, 69/69, 52/52, 51/51 agree; every tag agrees; `--missed` gives 0, 0, 0, 7 and 12 questions as in 0.x. UNEXPLAINED differences: 0. Logs in `D:/coding-projects/fullmark-0x-migration/` (`migration.log`, `compare.log`, git-ignored).
+
+## Slice 6d: `core.longpaths` and `take --dry-run`
+
+**Briefed on 2026-11-20 from G23 and G24, decided by the owner as recommended.** Written in COMMANDS.md: "Git" (the long-paths sentence) and `quiz library take` (`--dry-run`, its `--json` and the Output example).
+
+### Tasks
+
+1. **G23.** The git runner (`src/library/git.ts`) passes `-c core.longpaths=true` before every git command when the platform is `win32` (the platform injected, as 6b's helpers take it, so a unit test checks both). Nothing else changes; goldens do not.
+2. **G24.** `quiz library take NAME [--section S] [--missed] --dry-run [--json]`, exactly as COMMANDS.md now says: it computes the plan the real take would serve (the same code path up to serving, so the two cannot drift), prints it, and stops before the server, the lock, any write or any filing. Golden cases for: a plain take (all questions), `--section`, `--missed` with a changed and a gone question, `--missed` with nothing missed, a quiz with a progress file (`would resume`), and each in `--json`. Use the library history fixture the `take` tests already use. The command graph: `--dry-run` must not load `src/serve/` (extend `test/cli-graph.test.ts` if it can tell; say so if it cannot).
+
+### Done when
+
+`npm run build`, then `npm run check` passes on Windows, nothing else running. The new goldens are listed; no other golden changes. One commit per task; explicit paths; the model's `Co-Authored-By` line; no push.

@@ -663,7 +663,7 @@ quizzes/<id>/
 
 - **The repository is the library's root**, always (`git -C ROOT`), ROOT coming from `FULLMARK_LIBRARY` or `library` in `config.toml`. The library is its own repository: `init` runs `git init` there (unless `--no-git`), writes `.gitignore` and makes the first commit, `fullmark: init`. An existing repository is adopted only when the folder is its root; a folder inside another repository gets its own, with a note that the outer one should ignore it.
 - **Which `git`:** the one on the path, or `git = "PATH"` in `config.toml` when set (Git installed off the path, as GitHub Desktop does on Windows). Never in `library.toml`, which travels with the repository to machines where the path differs. fullmark runs it through one small runner (`src/library/git.ts`), passing names after `--`. With no `git` found, `init` makes the folder without a repository, as `--no-git` does, with a warning; `rm` then needs `--force`.
-- **One commit per changing command**, message `fullmark: <command> <name>` (`fullmark: take signals`; several names for a batch), holding **only the paths it wrote** (`git commit -- PATHS`), so the user's own staged or unstaged changes in the library are never swept in. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes.
+- **One commit per changing command**, message `fullmark: <command> <name>` (`fullmark: take signals`; several names for a batch), holding **only the paths it wrote** (`git commit -- PATHS`), so the user's own staged or unstaged changes in the library are never swept in. On Windows fullmark runs git with `-c core.longpaths=true`, so a library deep in the folder tree does not fail on paths over 260 characters. A failed commit is a **warning**, not a failure: the files are written, the exit code is the command's, and `status` lists the uncommitted changes.
 - **Identity:** the user's own git identity. fullmark never asks for one and never writes git's config. When git has none for the library, `init` prints a note with the commands to set one (`git -C ROOT config user.name "…"` and `user.email`), each commit passes `fullmark <fullmark@localhost>` for that commit only (`-c user.name=… -c user.email=…`), and `status` shows which identity commits use, as a note.
 - **Nothing more:** fullmark never pushes, pulls, fetches, branches, rebases or rewrites history. Remotes, sync between machines and their conflicts are the user's own git. `status` reads the repository and changes nothing.
 
@@ -935,7 +935,7 @@ Exit: `0`, `2` unknown quiz or version, or no library.
 
 ```text
 quiz library take NAME [--section S] [--missed] [--focus] [--no-open]
-                       [--timeout SECONDS] [--port N] [--json]
+                       [--timeout SECONDS] [--port N] [--dry-run] [--json]
 ```
 
 Builds the current version with the installed fullmark, serves it, files the result next to that version and commits. Progress is autosaved, so closing the tab or the server resumes the attempt.
@@ -950,7 +950,8 @@ Builds the current version with the installed fullmark, serves it, files the res
 | `--missed` | Only questions that are wrong or partly right in an earlier attempt and not answered fully right since, across all attempts and versions. Questions changed since they were missed are included and marked. Ungraded essays and code are skipped. With `--section`, the missed questions in that section |
 | `--focus` | Tick **Focus mode** on the start screen, as for `serve` |
 | `--timeout SECONDS` | Default `0` (no limit) |
-| `--json` | `{"status", "results", "score", "plan": {"source", "questions"}, "gone"}` (`gone`: with `--missed`, the missed questions no longer in the current version, else `0`), or `{"status": "nothing_missed"}` |
+| `--dry-run` | Print what would be served and serve nothing: the heading line, then the plan's question ids in order, each changed one marked `(changed)`, then the ids no longer in the quiz as `gone`; with a progress file, `would resume` and its time. No lock, no write, no commit; it also files nothing left in `progress/`. Exit as without it (`0`, or `0` with nothing missed; `2` unknown quiz or section) |
+| `--json` | `{"status", "results", "score", "plan": {"source", "questions"}, "gone"}` (`gone`: with `--missed`, the missed questions no longer in the current version, else `0`), or `{"status": "nothing_missed"}`; with `--dry-run`, `{"status": "plan", "plan": {"source", "questions"}, "changed": [ids], "gone": [ids], "resume": null or the progress file's time}` |
 
 **Output.**
 
@@ -981,6 +982,11 @@ serving http://127.0.0.1:52811/?t=8f3a…  (opened in your browser)
 
 filed results/20261118-151012.json · 4 of 6 right · 67%
 committed 0e6c3b8 fullmark: take rust-basics
+
+$ quiz library take rust-basics --missed --dry-run
+rust-basics · missed questions · 6 from 17 attempts · 2 changed since you missed them · 1 no longer in the quiz
+own-move  own-borrow (changed)  col-vec  col-map (changed)  tr-dyn  tr-impl
+gone      life-static
 
 $ quiz library take signals --missed
 nothing missed: every question you got wrong has been answered right since

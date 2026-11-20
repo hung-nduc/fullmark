@@ -90,8 +90,8 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 
 **G23. Git on Windows and long paths.** In a deeply nested rehearsal folder (about 150 characters), git failed with "Filename too long"; `register` exited 0 with its "the commit failed" warning and the library stayed uncommitted. The real library's longest path is about 165 characters, under Windows' 260, so the migration is not affected. **Recommendation:** fullmark runs git with `-c core.longpaths=true` on Windows; built after the migration, as a loose end.
 
-**Decided by the owner on 2026-11-20, as recommended.** To build after the migration (loose ends); written into COMMANDS.md when built.
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, "Git"; built in 6d.
 
 **G24. `take --missed` cannot show its plan without serving.** The comparison had to derive the plan for exams A and B from `grade --json` and `stats --json` (both agree with 0.x). **Recommendation:** `quiz library take NAME --missed --dry-run` (and plain `--dry-run`) prints the plan (ids, changed, gone) and serves nothing; built after the migration, as a loose end.
 
-**Decided by the owner on 2026-11-20, as recommended.** To build after the migration (loose ends); written into COMMANDS.md when built.
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, `quiz library take`; built in 6d.
