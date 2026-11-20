@@ -14,13 +14,13 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-20); G1 to G7 decided as recommended (2026-11-20), written into COMMANDS.md, TECHNICAL_DESIGN.md and CLAUDE.md | this file |
-| 6a | briefed | |
+| plan | written (2026-11-20); G1 to G9 decided (2026-11-20), written into COMMANDS.md, TECHNICAL_DESIGN.md and CLAUDE.md | this file |
+| 6a | built and reviewed (2026-11-20): `npm run check` passes on Windows, no golden changed; G10 to G12 raised | `892a7b2a`, `51e4b319`, `f642dade`, `7af9e956`, `921b38ef`, `ab837015` |
 | 6b | brief written after 6a's review | |
 
 ### Next
 
-1. 6a is built and reviewed: the whole suite passes on Windows (and still in the cloud).
+1. The owner decides G10 to G12 (raised in 6a's review); they join G8 and G9 as 6b's first tasks. The cloud check of 6a was not run (no cloud environment from the laptop).
 2. 6b's brief: the migration script, for the five quizzes the owner chose (below).
 3. After 6b: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
@@ -54,6 +54,12 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 ## Gaps
 
 G1 to G9 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 (`source` relative to the library) and G9 (the lock records its host and boot) are 6b's first tasks. New ones are added here from G10.
+
+**G10. The page budget runs under load.** With G6, no project depends on the budget projects, so Playwright runs them beside the other 1,420 tests, and TECHNICAL_DESIGN.md's "the budget tests run first" is no longer true: the budget is measured on a busy machine (first tries in the review run: Chromium 1161 ms, Firefox 1662 ms; the retries 543 and 669 ms). **Recommendation:** `npm run test:e2e` runs the two budget projects in one `playwright test` call, then the rest in a second call that runs whatever the first gave, and the run fails if either failed. The budget is again measured alone, and a failure still skips nothing.
+
+**G11. `info --json`'s `path` keeps `\` on Windows.** The quiz folder's `path` is the native path, while `source.path` and every printed path use `/`. **Recommendation:** `path` uses `/` too, as every path fullmark prints or writes (COMMANDS.md, "Paths in output"); the goldens, made on Linux, do not change.
+
+**G12. A Windows path read on Linux.** G2's `storedPath` keeps a Linux path unchanged on Windows, but a stored `D:/studying/quiz.md` read on Linux goes through `shownPath` and prints as `<cwd>/D:/studying/quiz.md`. COMMANDS.md says an absolute path from another system is printed as stored, whichever the system. **Recommendation:** a stored path that starts with a drive letter (`X:/`) or `//` is absolute on every system and printed as stored; a unit test covers both directions. It goes with G8, which changes how `source` is read.
 
 ## Slices
 
@@ -92,3 +98,22 @@ What fullmark does is written in COMMANDS.md ("Paths in output") and TECHNICAL_D
 ### Report
 
 What was done per task, anything done differently and why, the counts and times, and any new gap (from G8) with a recommendation.
+
+### Review (2026-11-20)
+
+Built by one agent (Sonnet) from the brief; reviewed by the planner on Windows.
+
+**Checked by the planner.** `npm run build`, then `npm run check` with nothing else running: typecheck, Biome, knip pass; the startup test 2 of 2 (4.3 s); Vitest 3,778 passed, 3 skipped, 0 failed (333 s); Playwright 863 passed, 559 skipped by design, 0 failed (10.8 min; both budgets passed on their retry, see G10); exit 0 in 16.6 minutes. **No expected golden changed:** the only changes under `test/golden/` are the runner's `input-extra/` hook and three files under `input-extra/`. The source diff (51 lines added, 19 removed, in 9 files) was read in full.
+
+**Per task.**
+- **G1:** `slashed()` in `src/library/layout.ts`, applied where values are written (`renderIndex`, both config writers including the inline `shelves` table, `Git.outerRepository()`). The first full run found a real bug it caused: `register` matched a quiz by `q.source === job.abs`, which failed once the stored source had `/` (a false `library.id-taken`); it now compares both slashed. Ten test files now expect `/`.
+- **G2:** `storedPath()` in `src/cli/paths.ts`, used by `info`; `info --json`'s `source.path` slashed; `test/stored-path.test.ts`. Covers a Linux path on Windows only (G12).
+- **G3:** `EEXIST`, `EPERM` and `EBUSY` count as taken; `withLock` takes an injected `create`. **Done differently, accepted:** an `EPERM` or `EBUSY` with no lock to read waits `pollMs` and, once `waitMs` is up, is rethrown, so a real permission refusal cannot loop forever. Two unit tests.
+- **G4:** the golden runner copies an optional `input-extra/` over `input/`. **Found while building, accepted:** `library/register-update` and `register-update-json` had the same fault as G4 (their `progress/` file hidden by the fixture's `.gitignore`), so they failed on any fresh clone; their file is now in `input-extra/`, expected output unchanged.
+- **G5:** `gitHeavy()` in `test/helpers/git-timeout.ts` sets 120 s a test on Windows, called by every library and shelf test file, `library/git.test.ts` and `terminal-style.test.ts` (whose slowness is git too: its setup builds the history library twice).
+- **G6:** the startup test warms bare Node and the CLI once; `chromium` and `firefox` no longer depend on the budget projects (which raised G10).
+- **G7:** nothing to build.
+
+**Not run:** `npm run check` in the cloud environment.
+
+**Gaps raised:** G10, G11 (the agent's), G12 (the planner's, from reading the diff).
