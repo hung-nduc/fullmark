@@ -21,14 +21,15 @@ export default defineConfig({
   workers: process.env.FULLMARK_SCREENS ? 1 : undefined,
   reporter: [["list"]],
   projects: [
-    // the page budget test measures the page, not the machine (G97): Firefox's runs after Chromium's. No other project
-    // depends on them: a budget that fails (Firefox's, on a slow laptop) must not skip the rest of the suite (step 6, G6)
+    // the page budget test measures the page, not the machine (G97), so `npm run test:e2e` (scripts/test-e2e.mjs) runs
+    // the two budget projects alone in one call with one worker, so Firefox's runs after Chromium's, then the other
+    // projects in a second call. No project depends on another: a budget that fails (Firefox's, on a slow laptop) must
+    // skip nothing (step 6, G6 and G10)
     { name: "budget-chromium", testMatch: "**/budget.spec.ts", use: { browserName: "chromium" } },
     {
       name: "budget-firefox",
       testMatch: "**/budget.spec.ts",
       timeout: 60_000,
-      dependencies: ["budget-chromium"],
       use: { browserName: "firefox" },
     },
     {

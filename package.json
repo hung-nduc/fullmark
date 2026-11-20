@@ -26,7 +26,7 @@
     "schemas": "node scripts/schemas.mjs",
     "golden:update": "node scripts/golden-update.mjs",
     "check": "npm run typecheck && npm run lint && npm run knip && npm run test && npm run test:e2e",
-    "test:e2e": "npm run build && playwright test"
+    "test:e2e": "node scripts/test-e2e.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
