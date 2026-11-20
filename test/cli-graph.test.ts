@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 /**
  * A command loads only what it uses (TECHNICAL_DESIGN.md, section 7, "CLI startup"). tsup splits `dist/` into chunks
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
- * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template` and `stats` never reach the page builder, the
+ * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template`, `stats`, `guide` and `agent-guide` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
  * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server only when it serves, never for `--dry-run`; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server; `library import` loads neither the page builder nor the server.
  */
@@ -191,6 +191,7 @@ describe("what each command loads", () => {
     "new",
     "template",
     "stats",
+    "guide",
   ]) {
     it(`${name} never loads the one-shot server`, () => {
       const text = textOf(closure(entry(name)));
@@ -209,6 +210,18 @@ describe("what each command loads", () => {
       for (const marker of BUILD_ONLY) expect(text, marker).not.toContain(marker);
     });
   }
+
+  it("guide and agent-guide are one chunk of their own, reached by a dynamic import() from main, and load no page builder, server, library or prompts (they read a file of the package)", () => {
+    const chunk = chunkWith("// src/cli/guide.ts");
+    const text = textOf(closure(chunk));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...LIBRARY_ONLY, ...CLACK]) expect(text, m).not.toContain(m);
+    expect(closure(chunk).some((f) => f.startsWith("build-"))).toBe(false);
+    expect(closure(entry("main"))).not.toContain(chunk);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
+    // and the commands that do not print a guide never reach it
+    for (const name of ["check", "grade", "inspect", "stats", "build"])
+      expect(closure(entry(name))).not.toContain(chunk);
+  });
 
   it("library take is a chunk of its own with the library, reached by a dynamic import() from main, and loads the server and the page builder only by a dynamic import() when it serves (so --dry-run never loads them)", () => {
     const chunk = chunkWith("// src/cli/library-take.ts");

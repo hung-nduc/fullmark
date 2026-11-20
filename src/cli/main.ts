@@ -1,9 +1,10 @@
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import type { BriefOptions } from "./brief";
 import type { BuildOptions } from "./build";
 import type { CheckOptions } from "./check";
 import { EXIT, type ExitCode } from "./exit-codes";
 import type { GradeOptions } from "./grade";
+import type { GuideOptions } from "./guide";
 import type { IdsOptions, Io } from "./ids";
 import type { InspectOptions } from "./inspect";
 import type { NewOptions } from "./new";
@@ -272,6 +273,31 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
         version: VERSION,
       };
       outcome.exit = await (await import("./replay-command")).runReplay(results, opts, io);
+    });
+
+  program
+    .command("guide")
+    .description("print the authoring guide: how a quiz is written in Markdown")
+    .addOption(new Option("--lang <lang>", "the guide's language").choices(["en", "vi"]).default("en"))
+    .option("--plain", "the Markdown source, even in a terminal")
+    .option("--no-pager", "styled, but printed straight to the terminal")
+    .action(async (options: Record<string, unknown>) => {
+      const opts: GuideOptions = {
+        lang: options.lang as string,
+        plain: Boolean(options.plain) || noColor(),
+        noPager: options.pager === false,
+      };
+      outcome.exit = (await import("./guide")).runGuide(opts, io);
+    });
+
+  program
+    .command("agent-guide")
+    .description("print the instructions for AI agents (AGENTS.md)")
+    .option("--plain", "the Markdown source, even in a terminal")
+    .option("--no-pager", "styled, but printed straight to the terminal")
+    .action(async (options: Record<string, unknown>) => {
+      const opts: GuideOptions = { plain: Boolean(options.plain) || noColor(), noPager: options.pager === false };
+      outcome.exit = (await import("./guide")).runAgentGuide(opts, io);
     });
 
   program

@@ -16,6 +16,8 @@ export type IdsOptions = { dryRun: boolean; json: boolean; plain: boolean };
 /** Where a command's output goes, and the few things that vary between runs, so tests can control them. */
 export type Io = {
   out(text: string): void;
+  /** raw text to stdout, without a newline added: the guides, which print a file byte for byte */
+  outRaw?(text: string): void;
   err(text: string): void;
   /** raw text to stderr, without a newline: the progress line */
   errRaw(text: string): void;
