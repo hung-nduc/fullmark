@@ -80,7 +80,14 @@ async function readHolder(file: string): Promise<{ holder: LockHolder | null; te
   return { holder: null, text };
 }
 
-const isExists = (error: unknown): boolean => (error as NodeJS.ErrnoException).code === "EEXIST";
+/**
+ * The exclusive create found the lock taken. On Windows a create made while its holder is still deleting the file fails
+ * with `EPERM` or `EBUSY` instead of `EEXIST` (STEP6-GAPS.md, G3); all three mean "taken, look again".
+ */
+const isTaken = (error: unknown): boolean => {
+  const code = (error as NodeJS.ErrnoException).code;
+  return code === "EEXIST" || code === "EPERM" || code === "EBUSY";
+};
 
 /**
  * Runs `fn` holding the library's lock (TECHNICAL_DESIGN.md, section 7): `.fullmark.lock` in `root`, made with an
@@ -93,21 +100,32 @@ export async function withLock<T>(
   env: LockEnv,
   hooks: LockHooks,
   fn: () => Promise<T>,
+  /** the exclusive create, injected so that a test makes it fail as Windows does */
+  create: (file: string, text: string) => Promise<void> = (f, text) => writeFile(f, text, { flag: "wx" }),
 ): Promise<T> {
   const file = join(root, LOCK_FILE);
   const mine: LockHolder = { pid: env.pid, command, started: env.now().toISOString() };
   const began = env.now().getTime();
   let told = false;
   for (;;) {
+    let refused: unknown = null;
     try {
-      await writeFile(file, `${JSON.stringify(mine)}\n`, { flag: "wx" });
+      await create(file, `${JSON.stringify(mine)}\n`);
       break;
     } catch (error) {
-      if (!isExists(error)) throw error;
+      if (!isTaken(error)) throw error;
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") refused = error;
     }
     const { holder, text } = await readHolder(file);
     const waited = env.now().getTime() - began;
-    if (text === null) continue; // it went away between the two calls
+    if (text === null) {
+      // it went away between the two calls; but an EPERM or EBUSY with no lock to read is a real refusal once the wait is up
+      if (refused !== null) {
+        if (waited >= env.waitMs) throw refused;
+        await env.sleep(env.pollMs);
+      }
+      continue;
+    }
     if (holder !== null && !env.alive(holder.pid)) {
       // stale: remove it only if it is still the lock we read, so a lock made since is not swept away
       if ((await readHolder(file)).text === text) {

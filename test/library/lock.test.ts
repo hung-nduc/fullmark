@@ -139,6 +139,49 @@ describe("the library lock", () => {
     expect(order).toHaveLength(4);
   });
 
+  it("treats an EPERM or EBUSY on the create as a taken lock and tries again (Windows, while the holder deletes it)", async () => {
+    const root = tempDir();
+    const f = fakeEnv();
+    for (const code of ["EPERM", "EBUSY"]) {
+      let creates = 0;
+      let ran = false;
+      await withLock(
+        root,
+        "me",
+        f.env,
+        {},
+        async () => {
+          ran = true;
+        },
+        async (file, text) => {
+          if (creates++ === 0) throw Object.assign(new Error(code), { code });
+          writeFileSync(file, text, { flag: "wx" });
+        },
+      );
+      expect(ran).toBe(true);
+      expect(creates).toBe(2);
+    }
+    expect(f.sleeps).toEqual([100, 100]);
+  });
+
+  it("gives up with the error when an EPERM create finds no lock to wait for, once the wait is up", async () => {
+    const root = tempDir();
+    const f = fakeEnv();
+    await expect(
+      withLock(
+        root,
+        "me",
+        f.env,
+        {},
+        async () => undefined,
+        async () => {
+          throw Object.assign(new Error("denied"), { code: "EPERM" });
+        },
+      ),
+    ).rejects.toThrow("denied");
+    expect(f.sleeps.reduce((a, b) => a + b, 0)).toBe(10_000);
+  });
+
   it("asks the operating system whether a process is running", () => {
     expect(processAlive(process.pid)).toBe(true);
     expect(processAlive(999_999_999)).toBe(false);
