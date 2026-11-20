@@ -17,11 +17,11 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 | plan | written (2026-11-20); G1 to G9 decided (2026-11-20), written into COMMANDS.md, TECHNICAL_DESIGN.md and CLAUDE.md | this file |
 | 6a | built and reviewed (2026-11-20): `npm run check` passes on Windows, no golden changed; G10 to G12 raised | `892a7b2a`, `51e4b319`, `f642dade`, `7af9e956`, `921b38ef`, `ab837015` |
 | 6b | built and reviewed (2026-11-20): `npm run check` passes on Windows; 17 goldens changed, only `source` values; G19 raised and decided | `db5128d8`, `29e77fad`, `c0b94133` |
-| 6c | briefed (2026-11-20): G19, then the migration rehearsed on copies; the real run waits for the owner | |
+| 6c | G19 built; the migration rehearsed on copies and reviewed (2026-11-20): `compare.log` shows no unexplained difference; G20 to G24 raised; the real run waits for the owner | `5e4a96ee`; the script's repository `28b0dfc`, `d4ee72b` |
 
 ### Next
 
-1. 6c is built: G19, then the migration rehearsed on copies, with `compare.log`. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
+1. The owner decides G20 to G24 (6c's review) and reads the rehearsal's `D:/coding-projects/fullmark-0x-migration/logs/rehearsal/compare.log`. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
 2. The owner reads the rehearsal's `compare.log` and says yes; the planner then runs the real migration (the one command 6c's report gives).
 3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
@@ -55,6 +55,16 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 ## Gaps
 
 G1 to G19 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 and G19 slice 6c; G18 (the agent's, about `register --update` not following a moved file) is left as it is, by the agent's recommendation, and not decided separately. New ones are added here from G20.
+
+**G20. A 0.x question id that 1.0 refuses.** `dr-aSe` (ch10) has a capital letter (`question.id-format`). **Recommendation:** the migration renames it `dr-ase`, in the quiz and in its one attempt (every question of which is unanswered).
+
+**G21. `on_timeout: warn` has no 1.0 form.** `biosignal-circuits` (midterm practice) has `time_limit: 60m` with `on_timeout: warn`; in 1.0 a time limit always submits. **Recommendation:** drop both lines: the practice quiz becomes untimed, so no hard cut-off surprises the owner. (The other choice, keeping 60 min as a hard limit, is `--on-timeout-warn keep`.)
+
+**G22. Two of the four attempts are empty.** ch10 (19 s) and the sensors quiz (55 s): every question unanswered, 0%; moved, they show LAST and BEST 0%. **Recommendation:** move them, as G16 decided: they are in 0.x's stats, and step 6 is done when the stats agree.
+
+**G23. Git on Windows and long paths.** In a deeply nested rehearsal folder (about 150 characters), git failed with "Filename too long"; `register` exited 0 with its "the commit failed" warning and the library stayed uncommitted. The real library's longest path is about 165 characters, under Windows' 260, so the migration is not affected. **Recommendation:** fullmark runs git with `-c core.longpaths=true` on Windows; built after the migration, as a loose end.
+
+**G24. `take --missed` cannot show its plan without serving.** The comparison had to derive the plan for exams A and B from `grade --json` and `stats --json` (both agree with 0.x). **Recommendation:** `quiz library take NAME --missed --dry-run` (and plain `--dry-run`) prints the plan (ids, changed, gone) and serves nothing; built after the migration, as a loose end.
 
 ## Slices
 
@@ -199,3 +209,17 @@ The script takes the places it works on as arguments (the 0.x library, the five 
 ### Report
 
 What the script does, step by step; every conversion choice; the `compare.log` summary per quiz; every gap (from G18) with a recommendation; what you could not check.
+
+### Review (2026-11-20)
+
+Built by one agent (Sonnet); reviewed by the planner.
+
+**Checked by the planner.** The owner's data is untouched: `git -C D:/studying/fullmark-library status` clean at `cdb5ee20`, the same commit; `%APPDATA%ullmark\config.toml` the same SHA-256 (`573df8a7…`) and alone in its folder; no `.0x.md`, no candidate file and no `fullmark-library-1.0` under `D:/studying/`. The script's repository holds `migrate.mjs`, `compare.mjs`, `rehearse.mjs`, `lib/` and the rehearsal's logs, in two commits. `compare.log` read: for each quiz, the attempts, scores and percents agree; per question 73/73, 69/69, 52/52 and 51/51 agree on status, earned and points; every tag agrees; `--missed` gives the same 0, 0, 0, 7 and 12 questions as 0.x's wrong or partly right ones. **G19:** one golden line changed (`register-update-unchanged-json`: `"source_rewritten":false` added); the agent made the field always present, accepted and written into COMMANDS.md.
+
+**Explained differences, accepted.** ch10's `possible` is 112 in 0.x and 126 in 1.0: 0.x leaves unanswered essay and code points out as pending, 1.0 counts them as 0; earned is 0 in both. 0.x's Retry missed also took unanswered questions; 1.0's `--missed` leaves them out by design (COMMANDS.md, `quiz library take`).
+
+**Conversion, accepted.** Every heading gets the `type` 0.x inferred (checked against each attempt's recorded type); `> [!explanation]` and `> [!hint]` become `:::` containers; `on_timeout: submit` and `show_sample: true` are dropped (1.0 behaves so); ids kept, but for G20; quiz names kept with `-n`; results-v2 from each 0.x results file (responses, times, flags; the score is graded again by 1.0; what has no 1.0 place is listed per file in `migration.log`).
+
+**Not checked:** the converted quizzes in a browser; answer types other than `single` (none in the four attempts; any other stops the script); `take --missed` itself for exams A and B (derived, G24); `npm run check` after G19 (its tests, the register goldens, typecheck and Biome pass); the real run.
+
+**Gaps raised:** G20 to G24.
