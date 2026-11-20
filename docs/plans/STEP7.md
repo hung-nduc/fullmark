@@ -15,11 +15,11 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
-| 7a | briefed (2026-11-20); waits for the owner's approval | |
+| 7a | approved by the owner (2026-11-20); handed to one agent | |
 
 ### Next
 
-1. The owner approves 7a's brief; the planner hands it to one agent.
+1. **Approved (2026-11-20):** 7a is with its agent; next, the planner reviews it.
 2. After 7a's review: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 
 ## Goal
