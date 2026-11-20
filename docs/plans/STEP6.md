@@ -20,7 +20,7 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 ### Next
 
-1. The owner decides G10 to G12 (raised in 6a's review); they join G8 and G9 as 6b's first tasks. The cloud check of 6a was not run (no cloud environment from the laptop).
+1. G10 to G12 are decided as recommended (2026-11-20) and join G8 and G9 as 6b's first tasks; 6b's brief is written once its own questions are decided. The cloud check of 6a was not run (no cloud environment from the laptop).
 2. 6b's brief: the migration script, for the five quizzes the owner chose (below).
 3. After 6b: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
@@ -53,13 +53,7 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G9 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 (`source` relative to the library) and G9 (the lock records its host and boot) are 6b's first tasks. New ones are added here from G10.
-
-**G10. The page budget runs under load.** With G6, no project depends on the budget projects, so Playwright runs them beside the other 1,420 tests, and TECHNICAL_DESIGN.md's "the budget tests run first" is no longer true: the budget is measured on a busy machine (first tries in the review run: Chromium 1161 ms, Firefox 1662 ms; the retries 543 and 669 ms). **Recommendation:** `npm run test:e2e` runs the two budget projects in one `playwright test` call, then the rest in a second call that runs whatever the first gave, and the run fails if either failed. The budget is again measured alone, and a failure still skips nothing.
-
-**G11. `info --json`'s `path` keeps `\` on Windows.** The quiz folder's `path` is the native path, while `source.path` and every printed path use `/`. **Recommendation:** `path` uses `/` too, as every path fullmark prints or writes (COMMANDS.md, "Paths in output"); the goldens, made on Linux, do not change.
-
-**G12. A Windows path read on Linux.** G2's `storedPath` keeps a Linux path unchanged on Windows, but a stored `D:/studying/quiz.md` read on Linux goes through `shownPath` and prints as `<cwd>/D:/studying/quiz.md`. COMMANDS.md says an absolute path from another system is printed as stored, whichever the system. **Recommendation:** a stored path that starts with a drive letter (`X:/`) or `//` is absolute on every system and printed as stored; a unit test covers both directions. It goes with G8, which changes how `source` is read.
+G1 to G12 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 to G12 are 6b's first tasks. New ones are added here from G13.
 
 ## Slices
 

@@ -39,3 +39,15 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 **G9. A lock left on another system or an earlier boot.** The lock held only a process id, so after a reboot mid-command, or on the other OS of a dual-boot disk, an unrelated process with the same id kept the lock "alive": every command waited 10 s and exited 2 until the lock was deleted by hand. **Recommendation:** the lock records `host` and `boot`; a lock from another host or an earlier boot (more than a minute apart) is stale and removed with a note; otherwise the process id decides, as before; a lock without them is judged by its process. Two machines at once on one shared folder is declared unsupported.
 
 **Decided by the owner on 2026-11-20, as recommended** (the planner had first called it a stretch; the owner chose to build it, the cost being small). Written into TECHNICAL_DESIGN.md, foundation "Library and shelf writes take a lock". Built in 6b, after G8.
+
+**G10. The page budget runs under load.** With G6, no project depends on the budget projects, so Playwright runs them beside the other 1,420 tests, and TECHNICAL_DESIGN.md's "the budget tests run first" is no longer true: the budget is measured on a busy machine (first tries in the review run: Chromium 1161 ms, Firefox 1662 ms; the retries 543 and 669 ms). **Recommendation:** `npm run test:e2e` runs the two budget projects in one `playwright test` call, then the rest in a second call that runs whatever the first gave, and the run fails if either failed. The budget is again measured alone, and a failure still skips nothing.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written into TECHNICAL_DESIGN.md, section 11 "Budgets". Built in 6b.
+
+**G11. `info --json`'s `path` keeps `\` on Windows.** The quiz folder's `path` is the native path, while `source.path` and every printed path use `/`. **Recommendation:** `path` uses `/` too, as every path fullmark prints or writes (COMMANDS.md, "Paths in output"); the goldens, made on Linux, do not change.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, "Paths in output". Built in 6b.
+
+**G12. A Windows path read on Linux.** G2's `storedPath` keeps a Linux path unchanged on Windows, but a stored `D:/studying/quiz.md` read on Linux goes through `shownPath` and prints as `<cwd>/D:/studying/quiz.md`. COMMANDS.md says an absolute path from another system is printed as stored, whichever the system. **Recommendation:** a stored path that starts with a drive letter (`X:/`) or `//` is absolute on every system and printed as stored; a unit test covers both directions. It goes with G8, which changes how `source` is read.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, "Paths in output". Built in 6b.
