@@ -14,14 +14,13 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 
 | Slice | State | Commits |
 |---|---|---|
-| plan | written (2026-11-20); G1 decided as recommended (2026-11-20) and written into COMMANDS.md; G2 and G3 wait for the owner | this file |
-| 7a | brief written; waits for G2, G3 and the owner's approval | |
+| plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
+| 7a | briefed (2026-11-20); waits for the owner's approval | |
 
 ### Next
 
-1. The owner decides G2 and G3 (below).
-2. The owner approves 7a's brief; the planner hands it to one agent.
-3. After 7a's review: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
+1. The owner approves 7a's brief; the planner hands it to one agent.
+2. After 7a's review: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 
 ## Goal
 
@@ -33,11 +32,7 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 is decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open:
-
-**G2. A Vietnamese authoring guide in 7a?** COMMANDS.md gives `quiz guide --lang vi`. Writing the guide twice doubles the slice and the review, and the English text will change during 7a's review. **Recommendation:** 7a writes English only; `--lang vi` prints the English guide with one line on stderr saying the Vietnamese guide is not written yet, and exits 0; the Vietnamese guide is its own slice once the English one is settled.
-
-**G3. The version after 7a.** Two new commands is more than a fix. **Recommendation:** `1.1.0`. As with `1.0.0`, every built page names the version, so about 29 goldens change only in the version string, the byte count and a commit hash that follows from them, and are counted in the review.
+G1 to G3 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G4.
 
 ## Slices
 
@@ -47,7 +42,7 @@ G1 is decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open:
 
 ## Slice 7a: the guides and the skill
 
-**Briefed on 2026-11-20 from G1, decided by the owner as recommended; G2 and G3 as the owner decides them.** What the commands do is written in COMMANDS.md (`quiz guide`, `quiz agent-guide`, and its "First form" paragraph); what the agent rules say is in USER_DESIGN.md ("Rules in `AGENTS.md`") and TECHNICAL_DESIGN.md (section 5, "Rules for agents"; section 6, grader identity; section 7, "Seams for later features", the `quiz-example` blocks).
+**Briefed on 2026-11-20 from G1 to G3, decided by the owner as recommended.** What the commands do is written in COMMANDS.md (`quiz guide`, `quiz agent-guide`, and its "First form" paragraph); what the agent rules say is in USER_DESIGN.md ("Rules in `AGENTS.md`") and TECHNICAL_DESIGN.md (section 5, "Rules for agents"; section 6, grader identity; section 7, "Seams for later features", the `quiz-example` blocks).
 
 ### Read first
 
@@ -57,12 +52,12 @@ G1 is decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open:
 
 ### Tasks
 
-1. **The authoring guide** (`guide/GUIDE.md`, English; see G2). Written for an author, not a designer: from QUIZ_SYNTAX.md, every question type with a minimal example, the front matter, sections, banks, materials, assets, maths and code, and how `check` and profiles hold a quiz to rules. Every syntax example is a fenced `quiz-example` block holding a valid quiz or quiz fragment, as TECHNICAL_DESIGN.md section 7 says. Where QUIZ_SYNTAX.md and the parser disagree, the parser is not changed: report it as a gap.
+1. **The authoring guide** (`guide/GUIDE.md`, English only: G2). Written for an author, not a designer: from QUIZ_SYNTAX.md, every question type with a minimal example, the front matter, sections, banks, materials, assets, maths and code, and how `check` and profiles hold a quiz to rules. Every syntax example is a fenced `quiz-example` block holding a valid quiz or quiz fragment, as TECHNICAL_DESIGN.md section 7 says. Where QUIZ_SYNTAX.md and the parser disagree, the parser is not changed: report it as a gap.
 2. **`AGENTS.md`** (English): the rules of USER_DESIGN.md's table, each with its one-line why; the grading contract (fill only the questions you were given, leave the rest `null`, `grader` and `reviewed` as TECHNICAL_DESIGN.md section 6 says); the JSON formats by name with their schema files; exit codes (3 means ask the user). It refers to `quiz guide` for the syntax and never repeats it.
-3. **The commands.** `quiz guide [--lang en|vi] [--plain] [--no-pager]` and `quiz agent-guide [--plain] [--no-pager]` print their file as it is (COMMANDS.md, "First form"), read from the installed package (both files added to `package.json`'s `files`; resolved from `dist/`, so they work from any folder after `npm install -g` of the tarball). Each is its own chunk and loads nothing of the page builder, the server or the library: extend `test/cli-graph.test.ts`. Goldens for both, with `--plain`, `--no-pager` and (per G2) `--lang vi`.
+3. **The commands.** `quiz guide [--lang en|vi] [--plain] [--no-pager]` and `quiz agent-guide [--plain] [--no-pager]` print their file as it is (COMMANDS.md, "First form"), read from the installed package (both files added to `package.json`'s `files`; resolved from `dist/`, so they work from any folder after `npm install -g` of the tarball). Each is its own chunk and loads nothing of the page builder, the server or the library: extend `test/cli-graph.test.ts`. Goldens for both, with `--plain`, `--no-pager`, and `--lang vi` (the English guide, a note on stderr, exit 0: COMMANDS.md, G2).
 4. **The guide's examples pass.** A test extracts every `quiz-example` block from `guide/GUIDE.md` and runs it through the same `check` as the CLI; any failure names the block's line. A fragment that is not a whole quiz is wrapped the same way for every block (say how).
 5. **The skill** (`skill/SKILL.md`): the 0.x skill's workflow redone for 1.0. Front matter `name: quiz` and a description of when to use it. It sends the agent to `quiz agent-guide` and `quiz guide` before writing or grading, and covers: the brief (`quiz brief`, exit 3 means ask, `--web` for the form), make (template or `new --from`, write, `check --strict`, `inspect`), review (`quiz review`, then `check --review`), the library (`library status --json`, `register --json`, never `init` unasked, end with the `quiz library take NAME` line), take and retry (`library take`, `--missed`, `--dry-run`), and grading (`grade` / `library grade` with `--json`, then `--grades`). Every command and flag in it is one that `quiz --help` lists: a test checks the skill's commands against the CLI's own help, so the skill cannot drift from the tool.
-6. **The version** (per G3), then `npm run golden:update`: list every changed golden and show that each differs only in the version, the byte count and the commit hash that follows from them.
+6. **The version becomes `1.1.0`** (G3), then `npm run golden:update`: list every changed golden and show that each differs only in the version, the byte count and the commit hash that follows from them.
 
 ### Done when
 
