@@ -30,15 +30,15 @@ describe("recording the library in config.toml", () => {
     expect(withLibraryKey("", "/lib")).toBe('library = "/lib"\n');
   });
 
-  it("escapes a Windows path and keeps CRLF line endings", () => {
+  it("writes a Windows path with `/` and keeps CRLF line endings", () => {
     const after = withLibraryKey(
       'fonts = "all"\r\n\r\n[terminal]\r\nstyle = "boxed"\r\n',
       "C:\\Users\\minh\\quiz library",
     );
     expect(after).toBe(
-      'fonts = "all"\r\n\r\nlibrary = "C:\\\\Users\\\\minh\\\\quiz library"\r\n\r\n[terminal]\r\nstyle = "boxed"\r\n',
+      'fonts = "all"\r\n\r\nlibrary = "C:/Users/minh/quiz library"\r\n\r\n[terminal]\r\nstyle = "boxed"\r\n',
     );
-    expect(parseConfig(after, "c", "user").data?.library).toBe("C:\\Users\\minh\\quiz library");
+    expect(parseConfig(after, "c", "user").data?.library).toBe("C:/Users/minh/quiz library");
   });
 
   it("writes the file atomically, making it and its folder when missing", async () => {
@@ -100,13 +100,13 @@ describe("recording a shelf's folder in config.toml (step 5, G4)", () => {
     );
   });
 
-  it("writes an inline table again, escapes a Windows path, keeps CRLF, and writes atomically", async () => {
+  it("writes an inline table again, writes a Windows path with `/`, keeps CRLF, and writes atomically", async () => {
     expect(withShelfKey('shelves = { other = "/o" }\n', "public", "/p")).toBe(
       'shelves = { other = "/o", public = "/p" }\n',
     );
     const crlf = withShelfKey('library = "/l"\r\n', "public", "C:\\sites\\q");
-    expect(crlf).toBe('library = "/l"\r\n\r\n[shelves]\r\npublic = "C:\\\\sites\\\\q"\r\n');
-    expect(parseConfig(crlf, "c", "user").data?.shelves.public).toBe("C:\\sites\\q");
+    expect(crlf).toBe('library = "/l"\r\n\r\n[shelves]\r\npublic = "C:/sites/q"\r\n');
+    expect(parseConfig(crlf, "c", "user").data?.shelves.public).toBe("C:/sites/q");
     const dir = tempDir();
     const file = join(dir, "x", "config.toml");
     await recordShelf(file, "public", "/s");

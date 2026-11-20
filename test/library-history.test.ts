@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { slashed } from "../src/library/layout";
 import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
@@ -26,7 +27,9 @@ describe("the history helper", () => {
   it("builds the library the list and info goldens run over (test/fixtures/library-history/lib)", async () => {
     const h = await buildHistory();
     const here = (rel: string): string =>
-      readFileSync(join(h.lib, rel), "utf8").replaceAll(join(h.dir, "notes"), "/home/minh/notes");
+      readFileSync(join(h.lib, rel), "utf8")
+        .replaceAll(join(h.dir, "notes"), "/home/minh/notes")
+        .replaceAll(slashed(join(h.dir, "notes")), "/home/minh/notes");
     const files = walk(h.lib);
     if (UPDATE) {
       rmSync(join(FIXTURE, "lib"), { recursive: true, force: true });

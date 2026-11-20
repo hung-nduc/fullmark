@@ -6,7 +6,7 @@ import type { ParseTex } from "../core/parse/tex";
 import { shortDate } from "../core/review/counts";
 import { ID_FORMAT } from "../core/slug";
 import type { IndexQuiz, LibraryIndex } from "../library/index-file";
-import { libraryPaths, shortHash } from "../library/layout";
+import { libraryPaths, shortHash, slashed } from "../library/layout";
 import { LockBusy, withLock } from "../library/lock";
 import { diffVersions, questionHashes, removeVersionTemps } from "../library/versions";
 import type { BuildOptions } from "./build";
@@ -303,7 +303,8 @@ export async function runLibraryRegister(
       const idLine = fm.keyLines.id ?? 1;
 
       // 2 to 4: what the file is, against the library
-      const bySource = opts.update === null ? index.quizzes.find((q) => q.source === job.abs) : undefined;
+      const bySource =
+        opts.update === null ? index.quizzes.find((q) => slashed(q.source) === slashed(job.abs)) : undefined;
       if (bySource !== undefined) {
         if (bySource.current === hash) {
           plans.push({ what: "unchanged", file: job.file, quiz: bySource, hash });

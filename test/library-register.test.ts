@@ -7,6 +7,7 @@ import { loadQuiz } from "../src/cli/load";
 import { localIso } from "../src/cli/time";
 import { readCheck } from "../src/library/check-file";
 import { readIndex } from "../src/library/index-file";
+import { slashed } from "../src/library/layout";
 import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
@@ -59,7 +60,7 @@ describe("library register: one file", () => {
         name: "rust-basics",
         id: "rust",
         title: "Rust basics",
-        source: join(t.dir, "notes", "rust.md"),
+        source: slashed(join(t.dir, "notes", "rust.md")),
         current: hash,
         versions: [{ hash, added: localIso(new Date(NOW)), file: "rust.md" }],
         shelves: [],

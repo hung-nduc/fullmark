@@ -5,6 +5,7 @@ import { writeFileAtomic } from "../src/cli/atomic";
 import { type BuildOptions, runBuild } from "../src/cli/build";
 import { checkFile } from "../src/cli/check";
 import { readIndex } from "../src/library/index-file";
+import { slashed } from "../src/library/layout";
 import { realLockEnv } from "../src/library/lock";
 import { manifestPaths, readManifest } from "../src/library/shelf";
 import { gitHeavy } from "./helpers/git-timeout";
@@ -64,7 +65,7 @@ describe("library publish DIR: the first sync", () => {
     expect(m.quizzes[1]?.added).toBe(addedOf(t.lib, "rust-basics"));
     expect(readFileSync(join(dir, "rust", "rust.md"), "utf8")).toBe(read(t.dir, "notes/rust.md"));
     expect(existsSync(join(dir, ".fullmark.lock"))).toBe(false);
-    expect(read(t.dir, "config.toml")).toContain(`[shelves]\npublic = ${JSON.stringify(dir)}`);
+    expect(read(t.dir, "config.toml")).toContain(`[shelves]\npublic = ${JSON.stringify(slashed(dir))}`);
   });
 
   it("a shelf page is byte-identical to quiz build of the version's source with the same --built-at and --fonts", async () => {
@@ -278,8 +279,8 @@ describe("library publish DIR: where the shelf is (G4)", () => {
     expect(bare.out).toEqual([`unchanged: ${a} already matches the library (2 quizzes)`]);
     const other = await t.sync("b");
     expect(other.out).toContain(`remembered ${b} as the public shelf`);
-    expect(read(t.dir, "config.toml")).toContain(`public = ${JSON.stringify(b)}`);
-    expect(read(t.dir, "config.toml")).not.toContain(JSON.stringify(a));
+    expect(read(t.dir, "config.toml")).toContain(`public = ${JSON.stringify(slashed(b))}`);
+    expect(read(t.dir, "config.toml")).not.toContain(JSON.stringify(slashed(a)));
     // the same DIR again says nothing about remembering
     await t.publish("limits", { off: true });
     expect((await t.sync("b")).out.some((l) => l.startsWith("remembered"))).toBe(false);
