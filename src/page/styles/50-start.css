@@ -1,5 +1,49 @@
 /* The start screen (docs/mockup, Start board): one column, tiles, the part picker, the rules, Start. */
 @layer components {
+  /* the start screen's bar (the Start board's header): the version left, A- / A+ and Appearance right; it scrolls with the page */
+  .fm-startbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 28px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .fm-startbar-line {
+    flex: 1 1 8rem;
+    min-width: 0;
+    font-size: 0.85em;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  .fm-startbar-actions {
+    display: flex;
+    flex: none;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .fm-startbar .fm-button {
+    height: 44px;
+  }
+
+  .fm-look-button.fm-look-named {
+    gap: 8px;
+    width: auto;
+    padding: 0 14px;
+  }
+
+  /* a phone: the same 16 px gutter and 44 px targets as the top bar; the line wraps, the controls never leave the screen */
+  @media (max-width: 759px) {
+    .fm-startbar {
+      padding: 10px 16px;
+    }
+  }
+
   .fm-header {
     display: flex;
     flex-direction: column;

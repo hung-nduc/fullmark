@@ -500,3 +500,35 @@ describe("the font", () => {
     expect(render(openFont(new Memory(), { look: "locked" }).store)).not.toContain("data-font-pick");
   });
 });
+
+describe("the start screen's bar", () => {
+  const html = (look: "free" | "locked") => {
+    const { store } = open(new Memory(), "paper", look);
+    store.restore();
+    return renderToString(h(App, { store }));
+  };
+
+  it("has the version, A- / A+ and Appearance under look: free", () => {
+    const text = html("free");
+    expect(text).toContain("data-startbar");
+    expect(text).toContain('data-action="smaller"');
+    expect(text).toContain('data-action="larger"');
+    expect(text).toContain('data-action="appearance"');
+    expect(text).toMatch(/version <code>[0-9a-f]{4}<\/code>/);
+  });
+
+  it("keeps A- / A+ and drops Appearance under look: locked", () => {
+    const text = html("locked");
+    expect(text).toContain('data-action="larger"');
+    expect(text).not.toContain('data-action="appearance"');
+  });
+
+  it("is one look with the top bar: a size chosen before Start is the size after it", () => {
+    const { store } = open(new Memory(), "paper");
+    store.restore();
+    store.look.step(1);
+    store.start(store.quizzes.keys().next().value as string, {});
+    expect(store.look.size.value).toBe(19);
+    expect(renderToString(h(App, { store }))).not.toContain("data-startbar");
+  });
+});

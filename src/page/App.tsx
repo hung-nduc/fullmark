@@ -373,6 +373,29 @@ function StatusLine({ t, state, store }: { t: PageMessages; state: QuizState; st
   );
 }
 
+/**
+ * The start screen's bar (the Start board's `<header>`): the version on the left, A− / A+ and Appearance on the right.
+ * The same controls and menu as the docked top bar, on the same look. Under `look: locked` there is no Appearance
+ * and no menu; A− / A+ stay. It scrolls with the page: it is not docked. The board's "Practice quiz" is not carried
+ * by the page, so the line holds only the version.
+ */
+function StartBar({ t, state, store }: { t: PageMessages; state: QuizState; store: Store }) {
+  return (
+    <div class="fm-startbar-wrap">
+      <div class="fm-startbar" data-startbar>
+        <span class="fm-startbar-line">
+          {t.replayVersion} <code>{state.page.hash.slice(0, 4)}</code>
+        </span>
+        <div class="fm-startbar-actions">
+          <TextSize t={t} store={store} />
+          {store.look.locked ? null : <AppearanceButton t={t} store={store} labelled />}
+        </div>
+      </div>
+      {store.look.locked ? null : <AppearanceMenu t={t} store={store} size={false} />}
+    </div>
+  );
+}
+
 /** Focus mode's button: fullscreen through the browser, labelled and pressed as the page really is. */
 function FocusButton({ t, store }: { t: PageMessages; store: Store }) {
   const { available, fullscreen } = store.screen;
@@ -567,7 +590,19 @@ function Filter({ t, state, missed, flagged }: { t: PageMessages; state: QuizSta
   );
 }
 
-function QuizView({ state, api, store, last }: { state: QuizState; api: Api; store: Store; last: boolean }) {
+function QuizView({
+  state,
+  api,
+  store,
+  first,
+  last,
+}: {
+  state: QuizState;
+  api: Api;
+  store: Store;
+  first: boolean;
+  last: boolean;
+}) {
   const { page } = state;
   const t = messagesFor(page);
   const attempt = state.attempt.value;
@@ -605,6 +640,7 @@ function QuizView({ state, api, store, last }: { state: QuizState; api: Api; sto
           ) : null}
         </Dock>
       ) : null}
+      {!started && first ? <StartBar t={t} state={state} store={store} /> : null}
       <div class="fm-body" data-side={started && sidebarOpen ? "open" : "closed"} data-wide={wide ? "true" : undefined}>
         <div
           class="fm-main"
@@ -733,6 +769,8 @@ export function App({ store }: { store: Store }) {
           start: () => {
             // inside the click: a browser allows fullscreen only after a gesture
             if (store.screen.wanted.value && store.screen.available.value) store.fullscreen(true);
+            // the start bar's menu stays behind: the docked bar opens without it
+            store.look.menu.value = false;
             store.start(id, { part: state.part.value });
           },
           submit: () => store.submit(id),
@@ -740,7 +778,16 @@ export function App({ store }: { store: Store }) {
           check: (questionId) => store.check(id, questionId),
           focus: (questionId) => store.focus(id, questionId),
         };
-        return <QuizView key={id} state={state} api={api} store={store} last={index === all.length - 1} />;
+        return (
+          <QuizView
+            key={id}
+            state={state}
+            api={api}
+            store={store}
+            first={index === 0}
+            last={index === all.length - 1}
+          />
+        );
       })}
     </main>
   );

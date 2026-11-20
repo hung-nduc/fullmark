@@ -15,13 +15,25 @@ export const focusLookButton = (): void => {
   document.querySelector<HTMLElement>("[data-action=appearance]")?.focus();
 };
 
-/** The top bar's Appearance button (the board's ◐, `hdrBtnIcon`): after Focus mode, before Submit, in both phases. */
-export function AppearanceButton({ t, store }: { t: PageMessages; store: LookStore }) {
+/**
+ * The Appearance button (the board's ◐, `hdrBtnIcon`): after Focus mode, before Submit, in both phases. On the start
+ * screen's bar (`labelled`) it carries its name beside the icon, as the Start board draws it, unless the window is a phone's.
+ */
+export function AppearanceButton({
+  t,
+  store,
+  labelled = false,
+}: {
+  t: PageMessages;
+  store: LookStore;
+  labelled?: boolean;
+}) {
   const open = store.look.menu.value;
+  const named = labelled && !store.screen.phone.value;
   return (
     <button
       type="button"
-      class="fm-button fm-icon-button fm-look-button"
+      class={named ? "fm-button fm-look-button fm-look-named" : "fm-button fm-icon-button fm-look-button"}
       data-action="appearance"
       aria-expanded={open}
       aria-label={t.appearance}
@@ -31,6 +43,7 @@ export function AppearanceButton({ t, store }: { t: PageMessages; store: LookSto
       }}
     >
       <Icon name="appearance" size={18} />
+      {named ? t.appearance : null}
     </button>
   );
 }
@@ -87,8 +100,12 @@ export function TextSize({ t, store }: { t: PageMessages; store: LookStore }) {
 
 const CHOICES: readonly Choice[] = ["auto", ...THEME_NAMES];
 
-/** The menu strip under the docked block: the Theme row and Reset. A click outside closes it; Esc is in `keys.ts`. */
-export function AppearanceMenu({ t, store }: { t: PageMessages; store: LookStore }) {
+/**
+ * The menu strip under the docked block (or the start screen's bar): the Theme row and Reset. A click outside closes
+ * it; Esc is in `keys.ts`. On a phone the strip also holds A− / A+ (the top bar has no room for them); the start
+ * screen's bar keeps them in the bar, so it passes `size={false}`.
+ */
+export function AppearanceMenu({ t, store, size }: { t: PageMessages; store: LookStore; size?: boolean }) {
   const { look } = store;
   const open = look.menu.value;
   useEffect(() => {
@@ -103,14 +120,14 @@ export function AppearanceMenu({ t, store }: { t: PageMessages; store: LookStore
   }, [open, look]);
   if (!open) return null;
   const current = look.chosen.value ?? look.quiz;
-  const phone = store.screen.phone.value;
+  const withSize = size ?? store.screen.phone.value;
   const changed =
     (look.chosen.value !== null && look.chosen.value !== look.quiz) ||
     look.chosenFont.value !== null ||
     look.size.value !== DEFAULT_SIZE;
   return (
     <div class="fm-look-menu" data-look-menu>
-      {phone ? (
+      {withSize ? (
         <div class="fm-look-row">
           <span class="fm-look-label">{t.textSizeLabel}</span>
           <TextSize t={t} store={store} />
