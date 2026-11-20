@@ -17,7 +17,7 @@ You write a quiz in Markdown. `quiz build` checks it and writes a single self-co
 | Start a quiz | `new`, `template`, `brief` (through flags, `--tui` or `--web`) |
 | Learn the syntax | `guide` (the authoring guide), `agent-guide` (the rules for AI agents); the Claude Code skill is `skill/SKILL.md` |
 
-Step 3 is done (its plan: [docs/plans/archive/STEP3.md](docs/plans/archive/STEP3.md)). Next is step 4, the library.
+Steps 1 to 6 are done, the library and the move from 0.x included (the plans: [docs/plans/archive/](docs/plans/archive/)); step 7, the guides, is in [docs/plans/STEP7.md](docs/plans/STEP7.md).
 
 ## Try it from source
 

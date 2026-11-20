@@ -114,6 +114,44 @@ test("the menu picks a theme, keeps it across a reload, resets to the quiz's, an
   await expect(page.locator("[data-look-menu]")).toHaveCount(0);
 });
 
+/** The docked block's height, and the `--dock-h` the sidebar is placed by. */
+const dockHeight = (page: Page) =>
+  page.evaluate(() => {
+    const dock = document.querySelector<HTMLElement>("[data-dock]") as HTMLElement;
+    const kept = (dock.parentElement as HTMLElement).style.getPropertyValue("--dock-h");
+    return { height: Math.round(dock.getBoundingClientRect().height), kept };
+  });
+
+test("the docked block shrinks back when the menu closes, and after A+ then A− (the step 7 dock bug)", async ({
+  page,
+}) => {
+  const quiz = open([], "dock");
+  await page.goto(quiz.url);
+  await start(page);
+  const slim = await dockHeight(page);
+  expect(slim.kept).toBe(`${slim.height}px`);
+  for (const close of ["outside", "button", "Escape"] as const) {
+    await button(page).click();
+    await expect.poll(async () => (await dockHeight(page)).height).toBeGreaterThan(slim.height);
+    if (close === "outside")
+      await page
+        .locator(".fm-question")
+        .first()
+        .click({ position: { x: 5, y: 5 } });
+    else if (close === "button") await button(page).click();
+    else await page.keyboard.press("Escape");
+    await expect(page.locator("[data-look-menu]")).toHaveCount(0);
+    await expect.poll(() => dockHeight(page), { message: `closed by ${close}` }).toEqual(slim);
+  }
+  // a larger text size grows the bar; a smaller one must shrink it back
+  await page.locator("[data-action=larger]").click();
+  await page.locator("[data-action=larger]").click();
+  await expect.poll(async () => (await dockHeight(page)).height).toBeGreaterThan(slim.height);
+  await page.locator("[data-action=smaller]").click();
+  await page.locator("[data-action=smaller]").click();
+  await expect.poll(() => dockHeight(page)).toEqual(slim);
+});
+
 test("Auto is a pill of its own: it follows the device after the learner picks it", async ({ page }) => {
   const quiz = open(["theme: paper"], "menu-auto");
   await page.emulateMedia({ colorScheme: "dark" });
