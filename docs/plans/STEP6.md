@@ -18,11 +18,12 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 | 6a | built and reviewed (2026-11-20): `npm run check` passes on Windows, no golden changed; G10 to G12 raised | `892a7b2a`, `51e4b319`, `f642dade`, `7af9e956`, `921b38ef`, `ab837015` |
 | 6b | built and reviewed (2026-11-20): `npm run check` passes on Windows; 17 goldens changed, only `source` values; G19 raised and decided | `db5128d8`, `29e77fad`, `c0b94133` |
 | 6c | G19 built; the migration rehearsed on copies and reviewed (2026-11-20): `compare.log` shows no unexplained difference; G20 to G24 raised; the real run waits for the owner | `5e4a96ee`; the script's repository `28b0dfc`, `d4ee72b` |
+| 6d | built and reviewed (2026-11-20): `npm run check` passes on Windows; 9 new goldens, none changed | `1058f8c9`, `6444fffc` |
 
 ### Next
 
 1. **Done:** the migration (2026-11-20). G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The cloud checks of 6a to 6c were not run (no cloud environment from the laptop).
-2. **Paused here by the owner (2026-11-20).** 6d is built and committed by its agent (`1058f8c9` G23, `6444fffc` G24) but **not reviewed**: the agent was stopped while its final `npm run check` ran, and that check was stopped too, so it has no result and no report. Next session: read both commits' diffs and the new goldens (`git diff e331356b..6444fffc`), check that no existing golden changed, run `npm run build` then `npm run check` once on Windows with nothing else running (about 20 minutes), and write 6d's review here.
+2. **Done:** 6d reviewed (2026-11-20); see its review.
 3. Then (owner's yes, 2026-11-20): step 6 is archived, branch `1.0` fast-forwarded, and fullmark installed as `1.0.0` from a packed tarball.
 
 ## Goal
@@ -237,3 +238,12 @@ Run by the planner after the owner's yes, from the worktree's `dist/` (built wit
 ### Done when
 
 `npm run build`, then `npm run check` passes on Windows, nothing else running. The new goldens are listed; no other golden changes. One commit per task; explicit paths; the model's `Co-Authored-By` line; no push.
+
+### Review (2026-11-20)
+
+The agent was stopped before it reported (the owner paused the step), so this review is the planner's alone, from the diffs and one full check.
+
+- **G23** (`1058f8c9`): `Git` takes an injected `platform`; on `win32` every command starts `-c core.longpaths=true -C ROOT`. Unit tests in `test/library/git.test.ts` check both platforms. No golden changed.
+- **G24** (`6444fffc`): `--dry-run` follows the real take up to the heading and returns before `mkdir progress/`, the serving-file check, the leftover filing, the lock and the server. `missedOf` became `missedScan`, which also returns the gone ids, so the dry run and the real take use one plan computation. `findSection` moved from `serve.ts` to a new `sections.ts`, and `library take` now imports `serve.ts` only when it serves; `test/cli-graph.test.ts` checks that `take`'s chunk no longer reaches the server or the page builder, and imports `serve`'s chunk dynamically. **Done differently:** this lazy import is more than the brief asked (it said "say so if it cannot tell"); it is the better form and is kept.
+- **Goldens:** 9 new cases under `test/golden/library/take-dry-run*` (plain, `--section`, `--missed` with a changed and a gone question, nothing missed, resume, the `--json` forms, and one with a leftover submit that the dry run leaves in place). No existing golden changed (`git diff --name-status e331356b..6444fffc -- test/golden` adds only).
+- **Check on Windows**, nothing else running: `npm run build`, then `npm run check`, exit 0 in 19.8 min. Startup test 2 passed; Vitest 3,817 passed, 3 skipped (160 files, 369 s); Playwright 861 passed, 559 skipped by design (13.0 min). **Budgets passed only on their retry:** Chromium 1,507 ms then 407 ms, Firefox 1,789 ms then 772 ms, against 1,000 ms. The first measurement is cold, while the machine is still busy after Vitest; 6b saw the same in Firefox. It is not a new gap: the retry is how the budget is meant to absorb a cold start (G6, G10), and the warm numbers are well inside it.
