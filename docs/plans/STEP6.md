@@ -21,7 +21,7 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 ### Next
 
-1. G20 to G24 decided as recommended and the real migration approved by the owner (2026-11-20); the planner runs it. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
+1. **The migration is done (2026-11-20).** G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The owner then accepts step 6. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
 2. The owner reads the rehearsal's `compare.log` and says yes; the planner then runs the real migration (the one command 6c's report gives).
 3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
@@ -213,3 +213,13 @@ Built by one agent (Sonnet); reviewed by the planner.
 **Not checked:** the converted quizzes in a browser; answer types other than `single` (none in the four attempts; any other stops the script); `take --missed` itself for exams A and B (derived, G24); `npm run check` after G19 (its tests, the register goldens, typecheck and Biome pass); the real run.
 
 **Gaps raised:** G20 to G24.
+
+### The real run (2026-11-20)
+
+Run by the planner after the owner's yes, from the worktree's `dist/` (built with G19): `migrate.mjs --dry-run` first (the plan matched the rehearsal), then `migrate.mjs` and `compare.mjs` on the real places (exit 0 both).
+
+- `%APPDATA%\fullmark\config.toml` renamed to `config-0x.toml`; 1.0's `library init` wrote a fresh `config.toml`.
+- The five sources converted in place, each original kept beside it as `*.0x.md`; the diffs show only the conversion's changes.
+- `D:/studying/fullmark-library-1.0`: seven commits (`init`, five `register`, `move 4 attempts from 0.x`); every `source` is `../lectures/2026.1/...`; `library status` healthy, 5 of 5 hashes match; `list` shows exams A and B at 81% and 71%, the two empty attempts at 0%, the midterm practice never taken.
+- The 0.x library is untouched (`cdb5ee2`, clean).
+- `compare.mjs`: per question 73/73, 69/69, 52/52, 51/51 agree; every tag agrees; `--missed` gives 0, 0, 0, 7 and 12 questions as in 0.x. UNEXPLAINED differences: 0. Logs in `D:/coding-projects/fullmark-0x-migration/` (`migration.log`, `compare.log`, git-ignored).
