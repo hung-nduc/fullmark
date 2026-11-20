@@ -22,7 +22,7 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 ### Next
 
 1. **Done:** the migration (2026-11-20). G20 to G24 decided as recommended; the owner approved the real run and the planner ran it: `D:/studying/fullmark-library-1.0` holds the five quizzes and four attempts, `compare.mjs` reports 0 unexplained differences (6 explained, as in the rehearsal), so step 6's "Done when" holds. The cloud checks of 6a to 6c were not run (no cloud environment from the laptop).
-2. 6d (G23, G24) is built and reviewed.
+2. **Paused here by the owner (2026-11-20).** 6d is built and committed by its agent (`1058f8c9` G23, `6444fffc` G24) but **not reviewed**: the agent was stopped while its final `npm run check` ran, and that check was stopped too, so it has no result and no report. Next session: read both commits' diffs and the new goldens (`git diff e331356b..6444fffc`), check that no existing golden changed, run `npm run build` then `npm run check` once on Windows with nothing else running (about 20 minutes), and write 6d's review here.
 3. Then (owner's yes, 2026-11-20): step 6 is archived, branch `1.0` fast-forwarded, and fullmark installed as `1.0.0` from a packed tarball.
 
 ## Goal
@@ -62,7 +62,7 @@ G1 to G24 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, 
 |---|---|---|
 | **6a** | G1 to G7: the suite passes on Windows | G1 to G7 |
 | **6b** | G8 to G12: `source` relative to the library, the lock's host and boot, the budget run alone, the last paths | 6a, G8 to G12 |
-| **6d** | Loose ends before install: G23 (`core.longpaths`), G24 (`take --dry-run`) | 6c, G23, G24 |
+| **6d** | (built, not reviewed) Loose ends before install: G23 (`core.longpaths`), G24 (`take --dry-run`) | 6c, G23, G24 |
 | **6c** | G19; the migration script (outside the repository), rehearsed on copies of the five quizzes; `stats` and `--missed` compared with 0.x; the real run after the owner's yes | 6b, G13 to G17, G19 |
 
 ## Slice 6a: the suite on Windows
