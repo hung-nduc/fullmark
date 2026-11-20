@@ -15,13 +15,13 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | Slice | State | Commits |
 |---|---|---|
 | plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
-| 7a | approved by the owner (2026-11-20); handed to one agent | |
+| 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
 
 ### Next
 
-1. **Approved (2026-11-20):** 7a is with its agent; next, the planner reviews it.
-2. **A bug the owner found (2026-11-20), fixed after 7a's review, before the release** (owner's yes): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
-3. After 7a's review and the fix: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
+1. **Done:** 7a built and reviewed (2026-11-20).
+2. **Done, `4549bb02`:** a bug the owner found (2026-11-20): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
+3. **Done (2026-11-20):** fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 
 ## Goal
 
@@ -33,7 +33,7 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G4.
+G1 to G3 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open, small and not blocking: G4 and G5, raised in 7a's review (below). New ones are added here from G6.
 
 ## Slices
 
@@ -70,3 +70,15 @@ G1 to G3 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here f
 ### Report
 
 What was done per task, anything done differently and why, every place QUIZ_SYNTAX.md and the parser disagreed, the changed goldens, the counts and times, and any new gap (from G4) with a recommendation.
+
+### Review (2026-11-20)
+
+The agent's report and the planner's review, with one full check after the dock fix (below) covering both.
+
+- **Done as briefed:** `guide/GUIDE.md` (`d671461e`; 31 `quiz-example` blocks, each checked as `quiz.md` under the `default` profile with strict on, so a warning fails too; a block that does not start with `---` gets a three-line front matter put before it, and the sandbox holds the assets the examples name); `AGENTS.md` (`cd2175fa`); the commands in `src/cli/guide.ts` (`e78158c6`, `0045cbc5`), which print the file byte for byte from the package and load nothing of the page builder, the server, the library or the prompts; `skill/SKILL.md` with `test/skill.test.ts`, which checks every `quiz ...` command and flag in it against the CLI's own help and fails on a bogus flag (`325fc8f6`); version `1.1.0` (`08bd7287`). The agent probed about 90 claims of QUIZ_SYNTAX.md against the parser and found no disagreement.
+- **Done differently:** guide examples must pass `check --strict`, not only without errors (kept: the skill tells agents to use `--strict`); `Io` gained an optional `outRaw`, so a guide is printed without an added newline; a README row for the new commands. **A nit, left:** `src/cli/brief.ts` repeats the version as a default (`"1.1.0"`) beside `VERSION` in `main.ts`; the next version bump must change both.
+- **Goldens:** 40 new files (`guide/` 6 cases, `agent-guide/` 2, `top/help-guide`, `top/help-agent-guide`). 29 changed: 26 only in the version string (the same length, so no byte count moves), 1 in a commit hash that follows from it (`library/publish-sync-git`), and `top/help` and `top/no-command`, which list the two new commands. Checked by the planner by normalising those three things: nothing else differs.
+- **The dock bug** (Next, item 2), fixed by the planner (`4549bb02`): `watchDock` observes the dock's children, and again when one comes or goes, instead of the dock, whose min-height kept it from ever shrinking. The page, the review form and the grade form share it. A Playwright test in `e2e/looks.spec.ts` closes the menu by a click outside, the button and Esc, then does A+ A+ A− A−, and checks the dock is back to its height and `--dock-h` with it; run against the old `dock.ts` it fails at the click outside, as the owner saw. 28 goldens change only in the inlined script, its CSP hash, the byte counts and one commit hash. README's status line, stale since step 3, was brought up to date in the same commit.
+- **A Windows note:** a second `npm run golden:update` right after the first failed to open 17 golden files for writing (`UNKNOWN: unknown error, open`); nothing was written, the first run had already regenerated all 776 cases, and the full check below compares every golden. A file briefly held by another process (likely the virus scanner on files just written) is the probable cause, not shown.
+- **Check on Windows**, nothing else running: `npm run build`, then `npm run check`, exit 0 in 24.5 min. Startup test 2 passed; Vitest 3,926 passed, 3 skipped (163 files, 536 s); budgets passed, Chromium 911 ms, Firefox 2,413 ms then 807 ms on its retry (limit 1,000 ms; a cold first measurement, as in step 6); Playwright 863 passed (the two dock tests new), 559 skipped by design (15.0 min).
+- **New gaps from the agent,** both small and not blocking: **G4**, `--plain` and `--no-pager` do nothing in the first form, as COMMANDS.md says: nothing to decide until the styled output is built. **G5**, `templates/blank/quiz.md` keeps a commented `on_timeout` line for a key that 1.0 dropped (`syntax.unknown-key` if uncommented); removing it changes the `new/*` goldens that copy the template. Recommendation: remove it in the next slice that touches the templates.
