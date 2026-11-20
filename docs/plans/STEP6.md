@@ -16,13 +16,14 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-20); G1 to G9 decided (2026-11-20), written into COMMANDS.md, TECHNICAL_DESIGN.md and CLAUDE.md | this file |
 | 6a | built and reviewed (2026-11-20): `npm run check` passes on Windows, no golden changed; G10 to G12 raised | `892a7b2a`, `51e4b319`, `f642dade`, `7af9e956`, `921b38ef`, `ab837015` |
-| 6b | brief written after 6a's review | |
+| 6b | briefed (2026-11-20) | |
+| 6c | brief written after 6b's review; G13 to G17 decided | |
 
 ### Next
 
-1. G10 to G12 are decided as recommended (2026-11-20) and join G8 and G9 as 6b's first tasks; 6b's brief is written once its own questions are decided. The cloud check of 6a was not run (no cloud environment from the laptop).
-2. 6b's brief: the migration script, for the five quizzes the owner chose (below).
-3. After 6b: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
+1. 6b (G8 to G12) is built and reviewed. The cloud check of 6a was not run (no cloud environment from the laptop).
+2. 6c's brief: the migration script, for the five quizzes the owner chose (below), on G13 to G17.
+3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
 ## Goal
 
@@ -53,26 +54,15 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G12 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 to G12 are 6b's first tasks. New ones are added here from G13.
-
-Slice 6b's own questions, found by looking at the 0.x library (2026-11-20):
-
-**G13. Both versions read the same config file.** 0.x and 1.0 both use `%APPDATA%\fullmark\config.toml` (and `FULLMARK_CONFIG`). 0.x's holds `[library] path = "D:/studying/fullmark-library"`; 1.0 writes `library = "..."` at the top level, and a TOML file cannot hold both, so 1.0's `library init` breaks 0.x's config or refuses it. fullmark-py is frozen apart from survey fixes and the kits use only `serve_survey`, which reads no config. **Recommendation:** the script moves 0.x's file to `%APPDATA%\fullmark\config-0x.toml` (nothing deleted) before 1.0's `library init` writes a fresh one; the six quizzes left in 0.x stay reachable with `FULLMARK_CONFIG` pointing at that file. No change to fullmark-py.
-
-**G14. Where the new library lives.** **Recommendation:** `D:/studying/fullmark-library-1.0`, beside the old one, which stays untouched as the archive of all eleven quizzes. Beside it, G8's relative sources read `../lectures/2026.1/...`.
-
-**G15. The source files.** The five sources in `D:/studying/lectures/...` are written in 0.x syntax and are in no git repository. Left as they are, 1.0's `list` shows every one `changed` and a later `register --update` fails `check` until rewritten by hand. **Recommendation:** the script converts each source in place to 1.0 syntax (the same text it registers, so `list` shows `unchanged`), after copying the original beside it as `quiz.0x.md` (or `NAME.0x.md`); the owner deletes the copies once satisfied.
-
-**G16. What is not moved.** **Recommendation:** only results move (four attempts). The unfinished attempt (`nua2si`'s `progress.json`) is dropped: a 0.x page's saved state cannot resume in a 1.0 page, and it holds no answers worth a result. The 0.x reports (`4pmi5u`, `vukyql`) are not moved: in 1.0 a report is made from an attempt's grades by `library grade`, and none of these attempts has grades, so they are derived data that 1.0 can make again. All of it stays in the 0.x library.
-
-**G17. Where the script lives, and what proves it.** "Kept outside the product" (TECHNICAL_DESIGN.md, section 12). **Recommendation:** a Node script in `D:/coding-projects/fullmark-0x-migration/`, its own small git repository, never in fullmark's; it writes a log of what it converted. It registers the converted quizzes through 1.0's own CLI (`node dist/cli.js library init` and `register`), so the library is made by the product, and writes only the results-v2 files itself, then commits them through git as `library take` would. Done when, for each of the five quizzes, `quiz library stats` matches `fullmark-py library stats` (attempts, scores, percent, per question) and `--missed` plans the same questions as 0.x's missed list; the comparison is a script too, its output kept in the log. Each question keeps its 0.x id, so results map one to one.
+G1 to G17 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 slice 6c. New ones are added here from G18.
 
 ## Slices
 
 | Slice | Content | Needs |
 |---|---|---|
 | **6a** | G1 to G7: the suite passes on Windows | G1 to G7 |
-| **6b** | G8, G9; the migration script, run on the five quizzes; `stats` and `--missed` compared with 0.x | 6a, G8, G9, its own gaps |
+| **6b** | G8 to G12: `source` relative to the library, the lock's host and boot, the budget run alone, the last paths | 6a, G8 to G12 |
+| **6c** | The migration script (outside the repository), run on the five quizzes; `stats` and `--missed` compared with 0.x | 6b, G13 to G17 |
 
 ## Slice 6a: the suite on Windows
 
@@ -123,3 +113,32 @@ Built by one agent (Sonnet) from the brief; reviewed by the planner on Windows.
 **Not run:** `npm run check` in the cloud environment.
 
 **Gaps raised:** G10, G11 (the agent's), G12 (the planner's, from reading the diff).
+
+## Slice 6b: `source` relative to the library, the lock's host and boot, the budget alone
+
+**Approved by the owner on 2026-11-20** (G8 to G12 decided as recommended). What fullmark does is written in COMMANDS.md ("Paths in output", "The library folder", `quiz library import`) and TECHNICAL_DESIGN.md (foundation "Library and shelf writes take a lock"; section 11, "Budgets"); this brief says how to build it.
+
+### Read first
+
+- This plan: "Rules for every slice", slice 6a and its review; [STEP6-GAPS.md](STEP6-GAPS.md), G8 to G12.
+- COMMANDS.md: "Paths in output", "The library folder" (`library.toml`), `quiz library register`, `quiz library import`, `quiz library info`, `quiz library status`. TECHNICAL_DESIGN.md: foundation "Library and shelf writes take a lock", section 11 "Budgets".
+- `src/library/layout.ts` (`slashed`), `src/cli/paths.ts` (`shownPath`, `storedPath`), `src/library/index-file.ts`, `src/cli/library-row.ts` (`sourceOf`), `src/cli/library-register.ts`, `src/cli/library-import.ts`, `src/cli/library-info.ts`, `src/library/lock.ts`, `src/cli/library-status.ts` (its stale check), `package.json`, `playwright.config.ts`.
+
+### Tasks
+
+1. **G12 first, a stored absolute path on any system.** One helper says whether a stored path is absolute on *some* system: after `slashed`, it starts with `/`, `//` or a drive letter and `:/` (`D:/`). `storedPath` prints such a path as stored on every system, never `resolve`d; a relative stored path is resolved against the folder it is relative to (G8) and shown with `shownPath`. Unit tests for both directions on both platforms (the platform passed in or injected, since the suite runs on one system at a time).
+2. **G8, `source` relative to the library.** Where a `source` is made (`register`, `register --update`, `import`), it is written relative to the library folder with `/` when the file and the library are on the same drive (on Windows the same root, compared case-insensitively; elsewhere always), and absolute with `/` only across Windows drives. Where it is read (`list`'s and `info`'s `changed` flag through `sourceOf`, `register`'s match by source, `info`'s Source row and `--json` `source.path`, and any other reader you find), a relative one is resolved against the library folder and an absolute one is used as it is; one absolute on another system (G12) is simply not found. `register --update`, and a plain `register` that finds the quiz by its source, rewrite an absolute `source` relative. `info --json`'s `source.path` is the stored text, slashed. **Goldens:** this changes every golden whose `library.toml` (or JSON output) holds a `source`. Run `npm run golden:update`, then read every changed file: the only differences allowed are `source` values. List each changed golden in the report with what changed; any other difference is a bug to fix or a gap to report, and is reverted before committing.
+3. **G9, the lock's host and boot.** `LockHolder` gains `host` (`os.hostname()`) and `boot` (the ISO time this machine started: now minus `os.uptime()`), both from `LockEnv` so tests inject them. A lock is stale when its `host` is not this machine's, or its `boot` is more than 60 s from this machine's; otherwise when its process is not running, as now. A lock without `host` or `boot` is judged by its process alone (so `library/status-stale-lock`'s fixture works unchanged). `library status`'s stale check uses the same rule: one shared function for `lock.ts` and `library-status.ts`, not two. The note on removing a lock says why: "left by pid 4120 on another machine (HOST)", "left before this machine last started", or as now. Unit tests: another host; an earlier boot; the same boot within 60 s with a dead and with a live process; no host or boot. A golden whose output shows a lock's content may change only by the new fields; list it.
+4. **G10, the budget alone.** `npm run test:e2e` builds, then runs the two budget projects in one `playwright test --project=budget-chromium --project=budget-firefox --workers=1` call, then the rest (`--project=chromium --project=firefox`) in a second call whatever the first gave, and exits non-zero if either did. Write it as a small Node script in `scripts/` (cross-platform, no shell `||` tricks), called from `package.json`; knip must accept it. `budget-firefox` no longer depends on `budget-chromium` (with one worker they run one after the other anyway), so a Chromium budget failure does not skip Firefox's. Update `playwright.config.ts`'s comment.
+5. **G11, `info --json`'s `path`.** The quiz folder's `path` uses `/`, matching what the text output prints. Goldens made on Linux do not change.
+
+### Done when
+
+- On Windows, with nothing else running: `npm run build`, then `npm run check` passes: typecheck, Biome, knip, Vitest with the startup test first, Playwright through the new `test:e2e` in both browsers. Report each part's counts and times, and both budgets' measurements.
+- Every changed golden is listed with its change (tasks 2 and 3); no other golden changes.
+- By hand, in a temporary folder: a library made by `register` on Windows holds a `source = "../notes/quiz.md"`-style line (quote it in the report), and `list` shows the quiz `unchanged`; after moving the folder that holds both the library and the notes (and pointing `FULLMARK_CONFIG` at a config naming the new place), `list` still shows it `unchanged`.
+- One commit per task or a few; explicit paths; the `Co-Authored-By` line of the model; no push. The cloud check is not run (say so).
+
+### Report
+
+What was done per task, anything done differently and why, the changed goldens, the counts and times, and any new gap (from G18) with a recommendation.

@@ -51,3 +51,23 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 **G12. A Windows path read on Linux.** G2's `storedPath` keeps a Linux path unchanged on Windows, but a stored `D:/studying/quiz.md` read on Linux goes through `shownPath` and prints as `<cwd>/D:/studying/quiz.md`. COMMANDS.md says an absolute path from another system is printed as stored, whichever the system. **Recommendation:** a stored path that starts with a drive letter (`X:/`) or `//` is absolute on every system and printed as stored; a unit test covers both directions. It goes with G8, which changes how `source` is read.
 
 **Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, "Paths in output". Built in 6b.
+
+**G13. Both versions read the same config file.** 0.x and 1.0 both use `%APPDATA%\fullmark\config.toml` (and `FULLMARK_CONFIG`). 0.x's holds `[library] path = "D:/studying/fullmark-library"`; 1.0 writes `library = "..."` at the top level, and a TOML file cannot hold both, so 1.0's `library init` breaks 0.x's config or refuses it. fullmark-py is frozen apart from survey fixes and the kits use only `serve_survey`, which reads no config. **Recommendation:** the script moves 0.x's file to `%APPDATA%\fullmark\config-0x.toml` (nothing deleted) before 1.0's `library init` writes a fresh one; the six quizzes left in 0.x stay reachable with `FULLMARK_CONFIG` pointing at that file. No change to fullmark-py.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
+
+**G14. Where the new library lives.** **Recommendation:** `D:/studying/fullmark-library-1.0`, beside the old one, which stays untouched as the archive of all eleven quizzes. Beside it, G8's relative sources read `../lectures/2026.1/...`.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
+
+**G15. The source files.** The five sources in `D:/studying/lectures/...` are written in 0.x syntax and are in no git repository. Left as they are, 1.0's `list` shows every one `changed` and a later `register --update` fails `check` until rewritten by hand. **Recommendation:** the script converts each source in place to 1.0 syntax (the same text it registers, so `list` shows `unchanged`), after copying the original beside it as `quiz.0x.md` (or `NAME.0x.md`); the owner deletes the copies once satisfied.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
+
+**G16. What is not moved.** **Recommendation:** only results move (four attempts). The unfinished attempt (`nua2si`'s `progress.json`) is dropped: a 0.x page's saved state cannot resume in a 1.0 page, and it holds no answers worth a result. The 0.x reports (`4pmi5u`, `vukyql`) are not moved: in 1.0 a report is made from an attempt's grades by `library grade`, and none of these attempts has grades, so they are derived data that 1.0 can make again. All of it stays in the 0.x library.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
+
+**G17. Where the script lives, and what proves it.** "Kept outside the product" (TECHNICAL_DESIGN.md, section 12). **Recommendation:** a Node script in `D:/coding-projects/fullmark-0x-migration/`, its own small git repository, never in fullmark's; it writes a log of what it converted. It registers the converted quizzes through 1.0's own CLI (`node dist/cli.js library init` and `register`), so the library is made by the product, and writes only the results-v2 files itself, then commits them through git as `library take` would. Done when, for each of the five quizzes, `quiz library stats` matches `fullmark-py library stats` (attempts, scores, percent, per question) and `--missed` plans the same questions as 0.x's missed list; the comparison is a script too, its output kept in the log. Each question keeps its 0.x id, so results map one to one.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
