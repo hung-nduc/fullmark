@@ -1,4 +1,9 @@
 * text=auto eol=lf
 
-# golden files are compared byte for byte: no line-ending conversion, so a CRLF input stays CRLF
-test/golden/** -text
+# golden files are compared byte for byte: no line-ending conversion, so a CRLF input stays CRLF;
+# they are written by `npm run golden:update`, so GitHub counts them as generated (left out of the
+# language bar, folded in diffs)
+test/golden/** -text linguist-generated
+
+# the UI mockups are design documents, not code: left out of GitHub's language bar
+docs/mockup/** linguist-documentation
