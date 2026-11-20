@@ -18,7 +18,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
 | 7b | briefed (2026-11-20); waits for G10 and the owner's approval | |
 | CI and licence | CI runs on `main`; typos clean; the grade key row and the shelf phone card hold with Linux's wider fonts; the copyright holder is `hung-nduc` | `97f41a85`, `613e0809`, `f472c391` |
-| 7c | briefed (2026-11-20) from G12 and G13; approved by the owner and handed to one agent (2026-11-20) | |
+| 7c | **part built, not reviewed** (2026-11-20): the agent was stopped at the session's end, during `npm run golden:update`; tasks 1 to 5 and 7 committed, task 6's goldens not, `npm run check` not run | `2e75de00`, `b62efff9`, `8202c302` |
 
 ### Next
 
@@ -26,8 +26,10 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 2. **Done, `4549bb02`:** a bug the owner found (2026-11-20): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
 3. **Done (2026-11-20):** fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 4. **Done (2026-11-20):** the CI fix (the trigger, typos, the two layouts that failed on Linux's wider fonts) and the licence holder; the owner's shelf published as `biomed-quizzes`, linked from the README. CI on Linux confirms the layouts after the owner pushes.
-5. **Now:** slice 7c, the start screen's Appearance bar (G12 and G13 decided 2026-11-20), approved and handed to one agent; then the planner's review. It is small and touches the page, not the CLI, so it can go before 7b.
-6. **Then:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief.
+5. **Now: finish and review 7c.** The branch has the agent's three commits (the bar, `docs/screens/7c/`, the version `1.1.1`). The worktree also holds about 100 **uncommitted, half-written goldens** from the interrupted `golden:update` (deleted page files, changed `exit.txt` in library goldens 7c does not touch): do not commit them. With nothing else running: `npm run build`, `npm run golden:update`, then check that every changed golden differs only in the bundle and the version string (as in 7a's review) and that none of those library goldens still differs; then `npm run check`, the by-hand check of the brief's "Done when", and the review written under 7c. `main` stays at `e5d79276` until the review; this branch is ahead of it by the G13 commit and 7c.
+   The agent left no report: it was stopped. Read its commits' messages and diffs instead. It is small and touches the page, not the CLI, so it can go before 7b.
+6. **Waiting on the owner:** pushing `main` and the tag `v1.1.0` (`git -C D:\coding-projectsullmark push origin main v1.1.0`), and the shelf (`git -C D:\studyingiomed-quizzes push`), whose last commit republishes with every font and exams A and B under the `exam` profile; after 7c is installed, `quiz library publish` again so the shelf gets the start screen's bar. G11 is open.
+7. **Then:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief.
 
 ## Goal
 
