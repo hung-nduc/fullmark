@@ -1,6 +1,6 @@
 {
   "name": "fullmark",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Markdown in, one offline HTML quiz out.",
   "license": "MIT",
   "type": "module",
@@ -13,6 +13,8 @@
   },
   "files": [
     "dist",
+    "guide/GUIDE.md",
+    "AGENTS.md",
     "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {

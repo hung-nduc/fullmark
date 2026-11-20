@@ -9,7 +9,7 @@ const cli = resolve(root, "dist", "cli.js");
 describe("the CLI bundle", () => {
   it("prints the version", () => {
     const out = execFileSync("node", [cli, "--version"], { encoding: "utf8" });
-    expect(out.trim()).toBe("fullmark 1.0.0");
+    expect(out.trim()).toBe("fullmark 1.1.0");
   });
 
   it("lists the commands in --help", () => {
