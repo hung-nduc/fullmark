@@ -13,3 +13,11 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 **G3. The version after 7a.** Two new commands is more than a fix. **Recommendation:** `1.1.0`. As with `1.0.0`, every built page names the version, so about 29 goldens change only in the version string, the byte count and a commit hash that follows from them, and are counted in the review.
 
 **Decided by the owner on 2026-11-20, as recommended.** A release matter: written in slice 7a's brief.
+
+**G6. Tab completion's shells** (the owner, after step 6's proposals check suggested `proposals/cli-integration.md`). The proposal covers PowerShell, bash, zsh, fish and nushell, a Starship segment and a tldr page in the repository. **Recommendation:** the smaller option, completion only, for PowerShell and Git Bash.
+
+**Decided by the owner on 2026-11-20:** completion for **PowerShell, bash (Git Bash), zsh and fish**, as the proposal designs it (`quiz __complete` holds the logic once; `quiz shell-init SHELL` prints a short shim per shell, zsh and fish with descriptions). Not nushell, and not the tldr page's move. The Starship segment is G9. Written into COMMANDS.md with slice 7b's brief.
+
+**G8. Which branch is fullmark.** Until now `main` held the Python prototype and was not touched, and 1.0 was built on `1.0`. `main` was an ancestor of `1.0` (nothing on `main` that `1.0` lacked), so moving it was a fast-forward; document-kit and presentation-kit depend on the separate `fullmark-py` repository, not on this `main`. **Recommendation:** fast-forward `main` to 1.0 and work on `main`; 0.x stays at the tag `v0.10.2`; delete `1.0` later.
+
+**Decided by the owner on 2026-11-20, as recommended:** the owner fast-forwarded `main` and pushed `main` and `1.0` (GitHub now names the repository `hung-nduc/fullmark`; `origin` was pointed there). Written into CLAUDE.md, README.md and STEP7.md's Handoff.

@@ -1,6 +1,6 @@
 # fullmark: notes for Claude
 
-fullmark 1.0 is a TypeScript rewrite: Markdown quizzes in, one offline HTML page out. Development happens on branch `1.0`; `main` holds the Python prototype (0.x) and is not touched from here.
+fullmark 1.0 is a TypeScript rewrite: Markdown quizzes in, one offline HTML page out. Development happens on `main`, which became 1.0 on 2026-11-20 (step 7, G8); the Python prototype (0.x) is at the tag `v0.10.2` here and lives on in its own repository, `fullmark-py`.
 
 ## Start here
 
@@ -23,7 +23,7 @@ The full list is under "Rules for every slice" in the plan (and [docs/plans/arch
 - **No real network or real timers in unit tests:** the server binds 127.0.0.1 on port 0, and the clock, the timeout and the file watcher are injected.
 - **A command loads only what it uses.** `check` must never load `src/serve/`, and `@clack/prompts` loads only for `brief --tui`. `test/cli-graph.test.ts` and the startup tests guard this.
 - **Shared pages carry no server code.** A `build` page is byte-identical with and without the server features (TECHNICAL_DESIGN.md, foundation 9).
-- **Commit on `1.0`.** An implementing agent never pushes; the reviewer pushes after the review.
+- **Commit on `main`.** Work happens on a branch built on `main` (a worktree's branch) and is fast-forwarded into `main` after the review. Nobody pushes from this laptop: it has no GitHub credentials, and the owner pushes.
 
 ## Commands
 

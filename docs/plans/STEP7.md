@@ -8,7 +8,7 @@ A new session picks up from this section alone; it needs no earlier chat.
 
 As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes a slice's full brief here, commits it, and hands it to **one implementing agent** (on Sonnet) once the owner approves it; the agent implements and commits (never pushes) and reports; the planner reviews and brings every gap to the owner with a recommendation; the owner decides; decisions go into `docs/design/` as plain statements. Commit after every round. Gaps are numbered from **G1**; decided ones move to [STEP7-GAPS.md](STEP7-GAPS.md).
 
-**Nothing is pushed:** this machine has no GitHub credentials; the owner pushes `1.0`.
+**Branches:** since G8 (2026-11-20) `main` is 1.0: work is fast-forwarded into `main`, and the old `1.0` branch is kept until the owner deletes it. This machine has no GitHub credentials; the owner pushes `main`.
 
 ### Where it stands
 
@@ -33,7 +33,11 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open, small and not blocking: G4 and G5, raised in 7a's review (below). New ones are added here from G6.
+G1 to G3, G6 and G8 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below); G7 and G9, for slice 7b. New ones are added here from G10.
+
+**G7. Where zsh and fish get a real Tab test.** This laptop has PowerShell and Git Bash only. **Recommendation:** the agent tests the zsh and fish shims' text and every `__complete` answer here; the real Tab test runs once on a lab workstation (`ibmelabc05` or `ibmelab-pc`) over SSH, if zsh and fish are there, with the owner's yes at the time. Not installing them on Windows (MSYS2) only for a test.
+
+**G9. The Starship segment.** The proposal (`proposals/cli-integration.md`, section 4) shows `📚 FOLDER` anywhere inside a library "so it is clear where `quiz library ...` will act", but library commands never look at the current folder: they act on the configured library, or on `FULLMARK_LIBRARY` (COMMANDS.md, "Git"). Inside another library's folder the segment would mislead. **Recommendation:** leave the walk-up hook out of 7b and correct the proposal's sentence; the case worth showing, `FULLMARK_LIBRARY` set in this shell, needs no fullmark code (Starship's `env_var` module, three lines in `starship.toml`, which the owner adds or not).
 
 ## Slices
 
