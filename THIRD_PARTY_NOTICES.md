@@ -8,7 +8,7 @@ and in the pages it writes, each under the licence shown; their licence texts fo
 ```text
 MIT License
 
-Copyright (c) 2026 Hung-nd233960
+Copyright (c) 2026 hung-nduc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
