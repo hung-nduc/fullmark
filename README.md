@@ -4,7 +4,7 @@ Markdown in, one offline HTML quiz out.
 
 You write a quiz in Markdown. `quiz build` checks it and writes a single self-contained HTML page that runs offline, from a USB stick or an email attachment. The learner takes it and downloads their results, and `quiz grade` scores them. The same source also prints as an exam paper with its answer key. Quizzes can be in English or Vietnamese.
 
-**This branch is fullmark 1.0, a rewrite in TypeScript. It's an alpha (`1.0.0-alpha.0`) and isn't published yet.** The working release is still the Python prototype, fullmark 0.x, on `main` (tag `v0.10.2`). 1.0 isn't compatible with it: [docs/design/fullmark-migration.md](docs/design/fullmark-migration.md) explains why.
+**This branch is fullmark 1.0 (`1.0.0`), a rewrite in TypeScript.** It isn't published to npm: it's installed from a packed tarball (`npm pack`, then `npm install -g` on the file). The Python prototype, fullmark 0.x, is on `main` (tag `v0.10.2`) and lives on as `fullmark-py`. 1.0 isn't compatible with it: [docs/design/fullmark-migration.md](docs/design/fullmark-migration.md) explains why.
 
 ## What works today
 
