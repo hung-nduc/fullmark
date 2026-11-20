@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { absoluteHere, isStoredAbsolute, resolveSource, sameFile, sourceToStore } from "../../src/library/source-path";
+import { absoluteHere, isStoredAbsolute, resolveSource, sameFile, sourceToStore } from "../src/cli/source-path";
 
 describe("a library's source paths (STEP6-GAPS.md, G8 and G12)", () => {
   it("knows an absolute path of any system by its text", () => {

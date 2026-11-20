@@ -7,7 +7,6 @@ import { type IndexQuiz, isPublished, PUBLIC_SHELF, QUIZ_KIND } from "../library
 import { shortHash } from "../library/layout";
 import { LockBusy, staleNote, withLock } from "../library/lock";
 import { MANIFEST_FILE, readManifest } from "../library/shelf";
-import { sourceToStore } from "../library/source-path";
 import { type CheckOptions, checkFile, clearProgress, showProgress } from "./check";
 import { loadUserConfig } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
@@ -35,6 +34,7 @@ import {
   refusal,
 } from "./library-common";
 import { shownPath } from "./paths";
+import { sourceToStore } from "./source-path";
 import { plural } from "./table";
 import { localIso } from "./time";
 

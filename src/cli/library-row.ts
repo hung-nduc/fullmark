@@ -6,10 +6,10 @@ import { reviewFindings } from "../core/rules/review";
 import { CHECK_FILE, readCheck } from "../library/check-file";
 import { type IndexQuiz, shelfNames } from "../library/index-file";
 import { libraryPaths } from "../library/layout";
-import { resolveSource } from "../library/source-path";
 import { loadStored } from "./library-common";
 import { type QuizHistory, readHistory } from "./library-history";
 import { loadQuiz } from "./load";
+import { resolveSource } from "./source-path";
 
 /** One row of `quiz library list --json`: every field always present (COMMANDS.md). */
 export type ListRow = {

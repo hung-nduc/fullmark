@@ -204,8 +204,9 @@ describe("library info", () => {
       [],
     ]);
     expect(body.first_taken).toBe("2026-10-03");
-    expect(body.source).toEqual({ path: slashed(join(t.dir, "notes", "study.md")), exists: true });
-    expect(body.path).toBe(join(t.lib, "quizzes", "study"));
+    // the stored text (relative to the library, G8), and the folder with `/` (G11)
+    expect(body.source).toEqual({ path: "../notes/study.md", exists: true });
+    expect(body.path).toBe(slashed(join(t.lib, "quizzes", "study")));
   });
 
   it("--version describes that version's content, and takes a prefix of 4 or more characters", async () => {

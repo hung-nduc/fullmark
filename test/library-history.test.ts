@@ -29,7 +29,9 @@ describe("the history helper", () => {
     const here = (rel: string): string =>
       readFileSync(join(h.lib, rel), "utf8")
         .replaceAll(join(h.dir, "notes"), "/home/minh/notes")
-        .replaceAll(slashed(join(h.dir, "notes")), "/home/minh/notes");
+        .replaceAll(slashed(join(h.dir, "notes")), "/home/minh/notes")
+        // the fixture keeps the absolute sources an older library holds; a new library writes them relative (G8)
+        .replaceAll('source = "../notes/', 'source = "/home/minh/notes/');
     const files = walk(h.lib);
     if (UPDATE) {
       rmSync(join(FIXTURE, "lib"), { recursive: true, force: true });

@@ -8,7 +8,6 @@ import { ID_FORMAT } from "../core/slug";
 import type { IndexQuiz, LibraryIndex } from "../library/index-file";
 import { libraryPaths, shortHash, slashed } from "../library/layout";
 import { LockBusy, staleNote, withLock } from "../library/lock";
-import { resolveSource, sameFile, sourceToStore } from "../library/source-path";
 import { diffVersions, questionHashes, removeVersionTemps } from "../library/versions";
 import type { BuildOptions } from "./build";
 import { planBuildFile } from "./build-file";
@@ -41,6 +40,7 @@ import {
   painterFor,
 } from "./library-common";
 import { shownPath } from "./paths";
+import { resolveSource, sameFile, sourceToStore } from "./source-path";
 import { plural } from "./table";
 import { localIso } from "./time";
 

@@ -1,5 +1,5 @@
 import { isAbsolute, relative, resolve } from "node:path";
-import { resolveSource } from "../library/source-path";
+import { resolveSource } from "./source-path";
 
 /**
  * How every command prints a path (COMMANDS.md, "Paths in output"): relative to the working directory when the

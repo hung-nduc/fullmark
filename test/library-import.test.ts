@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryImport } from "../src/cli/library-import";
 import { runLibraryRename } from "../src/cli/library-rename";
@@ -38,7 +38,8 @@ describe("library import: a shelf into a library (G7)", () => {
     for (const q of quizzes) {
       expect(q.shelves).toEqual([{ shelf: "public", kind: "quiz" }]);
       expect(at(q.versions[0]?.added)).toBe(at(NOW)); // the manifest's time, not the importing clock's
-      expect(q.source).toBe(slashed(join(w.shelf, q.id, q.versions[0]?.file as string)));
+      // relative to the importing library (G8)
+      expect(q.source).toBe(slashed(relative(w.b.lib, join(w.shelf, q.id, q.versions[0]?.file as string))));
     }
     expect(await w.commits(w.b.lib, w.b.env)).toBe(before + 1);
     expect(r.out.slice(0, 1)).toEqual(["imported 2 quizzes: limits, rust-basics (on the public shelf)"]);

@@ -1,5 +1,7 @@
 import { posix, win32 } from "node:path";
-import { slashed } from "./layout";
+
+/** `/` for `\`, as `slashed` in the library layout does; kept here so that `check` never loads `src/library/` (test/cli-graph.test.ts). */
+const slashed = (path: string): string => path.replaceAll("\\", "/");
 
 /** The pathname rules of a system, so that a test checks both on one machine. */
 const rulesOf = (platform: NodeJS.Platform) => (platform === "win32" ? win32 : posix);
