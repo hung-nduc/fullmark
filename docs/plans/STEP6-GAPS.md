@@ -31,3 +31,7 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 **G7. A second Vitest run beside a running one breaks it.** Vitest's global setup runs `npm run build`, which cleans `dist/`; a second run started during the full one deleted `dist/cli.js` under it (15 "Cannot find module" failures, caused by the planner). **Recommendation:** a line in CLAUDE.md.
 
 **Decided by the owner on 2026-11-20, as recommended.** Written into CLAUDE.md and this step's "Rules for every slice".
+
+**G8. `source` relative to the library.** `library.toml`'s `source` was the absolute path a quiz was registered from, so a library cloned onto another machine, or a folder above it moved or renamed, reported every source gone (stats and `take` still work, only the `changed` flag is lost). Raised while discussing a dual-boot setup; the migration (6b) writes every source anyway. **Recommendation:** `source` is relative to the library folder when both are on the same drive, absolute only across Windows drives; an absolute one is still read, and `register --update` rewrites it relative.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, "Paths in output", "The library folder" and `quiz library import`. Built as 6b's first task; 6b's script writes the five quizzes' sources relative. A lock that records its machine (G9 in discussion) was dropped by the owner as a stretch.
