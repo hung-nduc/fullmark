@@ -1,6 +1,7 @@
 import { parse as parseToml } from "smol-toml";
 import { z } from "zod";
 import { TomlIndex } from "../core/config/toml-index";
+import { slashed } from "./layout";
 
 /** `library.toml`: the index of a library's quizzes (COMMANDS.md, "The library folder"). */
 export const FORMAT = "fullmark-library";
@@ -204,7 +205,7 @@ export function renderIndex(index: LibraryIndex): string {
       `[quizzes.${q.name}]`,
       `id = ${str(q.id)}`,
       `title = ${str(q.title)}`,
-      `source = ${str(q.source)}`,
+      `source = ${str(slashed(q.source))}`,
       `current = ${str(q.current)}`,
       `versions = [${q.versions.map((v) => `{ hash = ${str(v.hash)}, added = ${str(v.added)}, file = ${str(v.file)} }`).join(", ")}]`,
       `shelves = [${q.shelves.map(renderEntry).join(", ")}]`,

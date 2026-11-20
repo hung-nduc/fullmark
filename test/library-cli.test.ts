@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryInit } from "../src/cli/library-init";
 import { realGitExec } from "../src/library/git";
+import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
 import { cleanTemps, git, libraryEnv, NOW, quizCli, tempDir, writeTree } from "./helpers/library";
 
@@ -38,7 +39,7 @@ describe("library init and status, with git", () => {
     expect(readFileSync(join(lib, "library.toml"), "utf8")).toBe(
       `format = "fullmark-library"\nversion = 2\ncreated = "${NOW}"\n`,
     );
-    expect(readFileSync(join(dir, "config.toml"), "utf8")).toBe(`library = ${JSON.stringify(lib)}\n`);
+    expect(readFileSync(join(dir, "config.toml"), "utf8")).toBe(`library = ${JSON.stringify(slashed(lib))}\n`);
     expect(existsSync(join(lib, ".fullmark.lock"))).toBe(false);
 
     const status = await run("library", "status");
@@ -145,7 +146,7 @@ describe("library init and status, with git", () => {
       "note outer/lib is inside the repository at outer and has its own: add it to that repository's .gitignore\n",
     );
     const lib = join(outer, "lib");
-    expect((await git(lib, env, "rev-parse", "--show-toplevel")).trim()).toBe(lib);
+    expect((await git(lib, env, "rev-parse", "--show-toplevel")).trim()).toBe(slashed(lib));
     expect((await git(lib, env, "log", "--format=%s")).trim()).toBe("fullmark: init");
     expect((await git(outer, env, "log", "--format=%s")).trim()).toBe("outer");
     // the outer repository did not take the library's files
@@ -179,7 +180,9 @@ describe("library init and status, with git", () => {
     expect(refused.stderr).toBe("error: a library is already set: one\n    fix: add --force to switch\n");
     expect(existsSync(join(dir, "two"))).toBe(false);
     expect((await run("library", "init", "two", "--force")).exit).toBe(0);
-    expect(readFileSync(join(dir, "config.toml"), "utf8")).toBe(`library = ${JSON.stringify(join(dir, "two"))}\n`);
+    expect(readFileSync(join(dir, "config.toml"), "utf8")).toBe(
+      `library = ${JSON.stringify(slashed(join(dir, "two")))}\n`,
+    );
     expect((await run("library", "path")).stdout).toBe(`${join(dir, "two")}\n`);
   });
 

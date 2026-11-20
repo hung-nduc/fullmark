@@ -3,7 +3,7 @@ import { formatDuration, summarise, summaryLines } from "../core/inspect";
 import { reviewCounts, reviewRow } from "../core/review/counts";
 import { readReview } from "../core/review/read";
 import { type IndexQuiz, shelfNames } from "../library/index-file";
-import { libraryPaths, shortHash } from "../library/layout";
+import { libraryPaths, shortHash, slashed } from "../library/layout";
 import { diffVersions, questionHashes } from "../library/versions";
 import { EXIT, type ExitCode } from "./exit-codes";
 import {
@@ -18,7 +18,7 @@ import {
 } from "./library-common";
 import { readHistory } from "./library-history";
 import { contentOf, flaggedOf, isoDate, listRow, percentText, shortDay, sourceOf } from "./library-row";
-import { shownPath } from "./paths";
+import { shownPath, storedPath } from "./paths";
 import { plural, renderFacts } from "./table";
 
 export type LibraryInfoOptions = { version: string | null; json: boolean; plain: boolean };
@@ -94,7 +94,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
       JSON.stringify({
         ...base,
         generated_by: content.loaded?.frontMatter.generatedBy ?? null,
-        source: { path: quiz.source, exists: source.exists },
+        source: { path: slashed(quiz.source), exists: source.exists },
         sections,
         banks,
         history: history2.map((h) => ({
@@ -136,7 +136,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   facts.push(
     row(
       "Source",
-      `${shownPath(quiz.source, cwd)} · ${
+      `${storedPath(quiz.source, cwd)} · ${
         !source.exists ? "the file is gone" : source.changed ? `changed since ${short(quiz.current)}` : "unchanged"
       }`,
     ),

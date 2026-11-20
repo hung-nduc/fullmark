@@ -1,5 +1,8 @@
 import { join } from "node:path";
 
+/** A path as fullmark writes it into a file: `/` on every system (COMMANDS.md, "Paths in output"). */
+export const slashed = (path: string): string => path.replaceAll("\\", "/");
+
 /** The library's top-level names (COMMANDS.md, "The library folder"). */
 export const INDEX_FILE = "library.toml";
 export const GITIGNORE_FILE = ".gitignore";

@@ -104,7 +104,7 @@ describe("the git runner, against real git", () => {
     const inner = join(outer, "lib");
     writeTree(inner, { "y.txt": "y\n" });
     const runner = new Git(inner, { env });
-    expect(await runner.outerRepository()).toBe(outer);
+    expect(await runner.outerRepository()).toBe(outer.replaceAll("\\", "/")); // shown with `/` on Windows too (G1)
     expect(runner.hasRepository()).toBe(false);
     // no repository of its own: a commit never lands in the outer one
     expect(await runner.commit(["y.txt"], "m")).toEqual({ status: "no-repository" });

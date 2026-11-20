@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryImport } from "../src/cli/library-import";
 import { runLibraryRename } from "../src/cli/library-rename";
+import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { importOptions, importWorld, indexOf, LATER } from "./helpers/library-import";
@@ -34,7 +35,7 @@ describe("library import: a shelf into a library (G7)", () => {
     for (const q of quizzes) {
       expect(q.shelves).toEqual([{ shelf: "public", kind: "quiz" }]);
       expect(at(q.versions[0]?.added)).toBe(at(NOW)); // the manifest's time, not the importing clock's
-      expect(q.source).toBe(join(w.shelf, q.id, q.versions[0]?.file as string));
+      expect(q.source).toBe(slashed(join(w.shelf, q.id, q.versions[0]?.file as string)));
     }
     expect(await w.commits(w.b.lib, w.b.env)).toBe(before + 1);
     expect(r.out.slice(0, 1)).toEqual(["imported 2 quizzes: limits, rust-basics (on the public shelf)"]);
@@ -120,7 +121,7 @@ describe("library import: a shelf into a library (G7)", () => {
     const r = await w.importing(w.shelf);
     expect(r.exit).toBe(0);
     expect(r.out.join("\n")).toContain(
-      `warning ${file} was edited after it was published, so it is added with the time of now`,
+      `warning ${slashed(file)} was edited after it was published, so it is added with the time of now`,
     );
     const limits = indexOf(w.b.lib).quizzes.find((q) => q.name === "limits");
     expect(at(limits?.versions[0]?.added)).toBe(at(LATER));
@@ -300,7 +301,7 @@ describe("library import --into (G11)", () => {
     expect(r.exit).toBe(0);
     expect(r.out[0]).toMatch(/^library ready .*lib2 \(new folder, git repository\)$/);
     expect(r.out[1]).toBe("imported 2 quizzes: limits, rust-basics (on the public shelf)");
-    expect(read(m.dir, "config.toml")).toContain(`library = ${JSON.stringify(join(m.dir, "lib2"))}`);
+    expect(read(m.dir, "config.toml")).toContain(`library = ${JSON.stringify(slashed(join(m.dir, "lib2")))}`);
     expect(indexOf(join(m.dir, "lib2")).quizzes).toHaveLength(2);
     const log = (await git(join(m.dir, "lib2"), m.env, "log", "--format=%s")).trim().split("\n");
     expect(log).toEqual(["fullmark: import limits rust-basics", "fullmark: init"]);

@@ -6,6 +6,7 @@ import { readHistory } from "../src/cli/library-history";
 import { runLibraryInfo } from "../src/cli/library-info";
 import { runLibraryList } from "../src/cli/library-list";
 import { readIndex } from "../src/library/index-file";
+import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
 import { cleanTemps, NOW } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
@@ -200,7 +201,7 @@ describe("library info", () => {
       [],
     ]);
     expect(body.first_taken).toBe("2026-10-03");
-    expect(body.source).toEqual({ path: join(t.dir, "notes", "study.md"), exists: true });
+    expect(body.source).toEqual({ path: slashed(join(t.dir, "notes", "study.md")), exists: true });
     expect(body.path).toBe(join(t.lib, "quizzes", "study"));
   });
 

@@ -12,6 +12,16 @@ export function shownPath(path: string, cwd: string): string {
 }
 
 /**
+ * A path read from a file, as it is shown (COMMANDS.md, "Paths in output"): as stored, with `/`. A path that is
+ * absolute on another system (`/home/minh/quiz.md` on Windows) is never resolved against the current drive.
+ */
+export function storedPath(path: string, cwd: string): string {
+  const text = path.replaceAll("\\", "/");
+  if (process.platform === "win32" && text.startsWith("/") && !text.startsWith("//")) return text;
+  return shownPath(path, cwd);
+}
+
+/**
  * Why a file could not be read or written, in plain words: the operating system's own message carries a path of
  * its own, and that path is absolute with `\` on Windows.
  */

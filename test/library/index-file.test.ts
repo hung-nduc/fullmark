@@ -37,7 +37,7 @@ const index: LibraryIndex = {
       name: "rust-basics",
       id: "rust",
       title: "Rust basics",
-      source: "C:\\quizzes\\rust.md",
+      source: "C:/quizzes/rust.md",
       current: H1,
       versions: [{ hash: H1, added: "2026-11-17T09:00:00+07:00", file: "rust.md" }],
       shelves: [{ shelf: "public", kind: "quiz" }],
@@ -56,6 +56,15 @@ describe("library.toml", () => {
     );
   });
 
+  it("writes a source with `/`, also when it was made with a backslash (G1)", () => {
+    const [first] = index.quizzes;
+    const text = renderIndex({
+      ...index,
+      quizzes: [{ ...(first as (typeof index.quizzes)[number]), source: "C:\\quizzes\\rust.md" }],
+    });
+    expect(text).toContain('source = "C:/quizzes/rust.md"');
+  });
+
   it("round-trips: what is read renders to the same bytes", () => {
     const text = renderIndex(index);
     const read = readIndex(text);
@@ -63,7 +72,7 @@ describe("library.toml", () => {
     if (!read.ok) return;
     expect(read.index.quizzes.map((q) => q.name)).toEqual(["rust-basics", "signals"]);
     expect(read.index.quizzes[1]?.title).toBe('Signals "and" systems');
-    expect(read.index.quizzes[0]?.source).toBe("C:\\quizzes\\rust.md");
+    expect(read.index.quizzes[0]?.source).toBe("C:/quizzes/rust.md");
     expect(read.index.quizzes[0]?.shelves).toEqual([{ shelf: "public", kind: "quiz" }]);
     expect(renderIndex(read.index)).toBe(text);
   });

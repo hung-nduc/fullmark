@@ -72,7 +72,7 @@ export class Git {
   async outerRepository(): Promise<string | null> {
     const r = await this.run(["rev-parse", "--show-toplevel"]);
     if (r.code !== 0) return null;
-    const top = r.stdout.trim();
+    const top = r.stdout.trim().replaceAll("\\", "/");
     if (top === "") return null;
     const same = (a: string, b: string): boolean => {
       try {

@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type LibraryRmIo, type LibraryRmOptions, runLibraryRm } from "../src/cli/library-rm";
 import { runLibraryStatus } from "../src/cli/library-status";
 import { readIndex } from "../src/library/index-file";
+import { slashed } from "../src/library/layout";
 import { realLockEnv } from "../src/library/lock";
 import { cleanTemps, git } from "./helpers/library";
 import { fileAttempt, grade, quizOf, type T, writingLibrary } from "./helpers/library-grade";
@@ -63,7 +64,7 @@ describe("library rm", () => {
     expect(r.exit).toBe(0);
     expect(r.asked).toEqual(["delete writing (Writing): 1 version, 2 attempts, 1 report? [y/N] "]);
     const head = (await git(t.lib, t.env, "rev-parse", "--short", "HEAD")).trim();
-    expect(r.out).toEqual(["deleted writing", `undo: git -C ${t.lib} revert ${head}`]);
+    expect(r.out).toEqual(["deleted writing", `undo: git -C ${slashed(t.lib)} revert ${head}`]);
     expect(existsSync(dir(t))).toBe(false);
     expect(quizzesOf(t.lib)).toEqual([]);
     const after = await subjects(t);

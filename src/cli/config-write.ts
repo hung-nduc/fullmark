@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { parse as parseToml } from "smol-toml";
 import { TomlIndex } from "../core/config/toml-index";
+import { slashed } from "../library/layout";
 import { writeFileAtomic } from "./atomic";
 
 /**
@@ -10,7 +11,7 @@ import { writeFileAtomic } from "./atomic";
  */
 export function withLibraryKey(text: string, path: string): string {
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
-  const value = JSON.stringify(path);
+  const value = JSON.stringify(slashed(path));
   const doc = text.trim() === "" ? {} : (parseToml(text) as Record<string, unknown>);
   const index = new TomlIndex(text);
   const lines = text.split(/\r?\n/);
@@ -51,7 +52,7 @@ export async function recordLibrary(configPath: string, library: string): Promis
  */
 export function withShelfKey(text: string, shelf: string, path: string): string {
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
-  const value = JSON.stringify(path);
+  const value = JSON.stringify(slashed(path));
   const doc = text.trim() === "" ? {} : (parseToml(text) as Record<string, unknown>);
   const table = doc.shelves;
   if (typeof table !== "object" || table === null || Array.isArray(table)) {
@@ -64,7 +65,7 @@ export function withShelfKey(text: string, shelf: string, path: string): string 
   const header = index.lineOf(["shelves"]) - 1;
   if (/^\s*shelves\s*=/.test(lines[header] ?? "")) {
     // an inline table: the line is written again from what it holds
-    const entries = Object.entries({ ...(table as Record<string, unknown>), [shelf]: path })
+    const entries = Object.entries({ ...(table as Record<string, unknown>), [shelf]: slashed(path) })
       .map(([k, v]) => `${/^[A-Za-z0-9_-]+$/.test(k) ? k : JSON.stringify(k)} = ${JSON.stringify(v)}`)
       .join(", ");
     lines[header] = `shelves = { ${entries} }`;
