@@ -18,7 +18,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
 | 7b | briefed (2026-11-20); waits for G10 and the owner's approval | |
 | CI and licence | CI runs on `main`; typos clean; the grade key row and the shelf phone card hold with Linux's wider fonts; the copyright holder is `hung-nduc` | `97f41a85`, `613e0809`, `f472c391` |
-| 7c | briefed (2026-11-20) from G12; waits for G13 and the owner's approval | |
+| 7c | briefed (2026-11-20) from G12 and G13; approved by the owner and handed to one agent (2026-11-20) | |
 
 ### Next
 
@@ -26,7 +26,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 2. **Done, `4549bb02`:** a bug the owner found (2026-11-20): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
 3. **Done (2026-11-20):** fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 4. **Done (2026-11-20):** the CI fix (the trigger, typos, the two layouts that failed on Linux's wider fonts) and the licence holder; the owner's shelf published as `biomed-quizzes`, linked from the README. CI on Linux confirms the layouts after the owner pushes.
-5. **Next:** slice 7c, the start screen's Appearance bar (G12, decided 2026-11-20): the owner decides G13 and approves the brief; then one agent builds it. It is small and touches the page, not the CLI, so it can go before 7b.
+5. **Now:** slice 7c, the start screen's Appearance bar (G12 and G13 decided 2026-11-20), approved and handed to one agent; then the planner's review. It is small and touches the page, not the CLI, so it can go before 7b.
 6. **Then:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief.
 
 ## Goal
@@ -39,13 +39,11 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10, G11 and G13; G12 is decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G14.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10 and G11; G12 and G13 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G14.
 
 **G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
 
 **G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
-
-**G13. The version after 7c.** 7c fixes a slip (the board drew the bar; no slice built it) and adds no command or key. **Recommendation:** `1.1.1` if 7c ships before 7b, so 7b stays `1.2.0` (G10); every page golden changes anyway with the bundle, and the version string adds only to those already changing.
 
 ## Slices
 
@@ -130,7 +128,7 @@ What was done per task, anything done differently and why, the library choice (t
 
 ## Slice 7c: the start screen's Appearance bar
 
-**Briefed on 2026-11-20 from G12, decided by the owner, and G13.** What the page does is written in TECHNICAL_DESIGN.md, section 8, "The look", under **Where they are**. The owner found it on the published shelf: the Font row exists only after Start, so on a timed quiz the choice costs exam time.
+**Briefed on 2026-11-20 from G12 and G13, decided by the owner (version `1.1.1`).** What the page does is written in TECHNICAL_DESIGN.md, section 8, "The look", under **Where they are**. The owner found it on the published shelf: the Font row exists only after Start, so on a timed quiz the choice costs exam time.
 
 ### Read first
 
