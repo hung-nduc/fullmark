@@ -75,7 +75,7 @@ const CSS =
   ".box{overflow:visible;background:none;border:0;border-radius:0;box-shadow:none}" +
   "table,tbody{display:block}" +
   "thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}" +
-  "tbody tr{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr) minmax(0,1.4fr) minmax(0,.8fr);gap:6px 12px;margin-bottom:10px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow)}" +
+  "tbody tr{display:grid;grid-template-columns:minmax(min-content,1.1fr) minmax(min-content,.9fr) minmax(min-content,1.4fr) minmax(min-content,.8fr);gap:6px 12px;margin-bottom:10px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow)}" +
   "tbody th,tbody td{padding:0;width:auto;text-align:left;white-space:normal}" +
   "tbody th,tbody td.type{grid-column:1/-1}" +
   ".top{justify-content:space-between;flex-wrap:nowrap}" +

@@ -673,16 +673,16 @@
   .fm-grade-keys {
     display: flex;
     flex-wrap: nowrap;
-    gap: 4px 6px;
+    gap: 4px;
     white-space: nowrap;
     margin: 0;
-    font-size: 0.72em;
+    font-size: 0.7em;
     color: var(--muted);
   }
 
   /* a key: the monospace font, the thicker lower edge (the Grade board's `kbd`, G101) */
   .fm-grade-keys kbd {
-    padding: 0 5px;
+    padding: 0 4px;
     font-family: var(--mono);
     font-size: 0.95em;
     color: var(--text);

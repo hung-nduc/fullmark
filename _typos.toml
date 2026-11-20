@@ -15,20 +15,45 @@ extend-ignore-re = [
 ]
 
 [default.extend-words]
-# Vietnamese words (thi: exam, thay: instead, ba: three)
+# Vietnamese words (thi: exam, thay: instead, ba: three, tich: "giải tích" (calculus) in slugs, gam: grams)
 thi = "thi"
 thay = "thay"
 ba = "ba"
+tich = "tich"
+gam = "gam"
+# the grade form's name for the fill-in kind (src/grade-form/data.ts)
+fillin = "fillin"
+# the naive plural that library-status.ts replaces
+quizs = "quizs"
 # OpenType table tags read by the font tests
 loca = "loca"
 trak = "trak"
 # deliberate typos and cut strings in tests
 minuts = "minuts"
 afte = "afte"
+# a quiz name mistyped on purpose, for "did you mean" (library rm, grade, register)
+writting = "writting"
+writng = "writng"
+alph = "alph"
+# a rule id mistyped on purpose, for config.unknown-rule (COMMANDS.md, the mockups, a golden)
+posiiton = "posiiton"
 
 [default.extend-identifiers]
 # deliberate example of a typo caught by validation (fullmark SPEC)
 time_limt = "time_limt"
 
 [files]
-extend-exclude = ["*.lock", "*.min.js", "*.min.css", "*.svg", "*.pdf", "vendor/", "test/golden/", "test/fixtures/", "test/data/", "package-lock.json", "src/build/notices-data.ts", "THIRD_PARTY_NOTICES.md"]
+extend-exclude = [
+  "*.lock",
+  "*.min.js",
+  "*.min.css",
+  "*.svg",
+  "*.pdf",
+  "vendor/",
+  "test/golden/",
+  "test/fixtures/",
+  "test/data/",
+  "package-lock.json",
+  "src/build/notices-data.ts",
+  "THIRD_PARTY_NOTICES.md",
+]
