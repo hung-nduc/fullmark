@@ -20,7 +20,8 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 ### Next
 
 1. **Approved (2026-11-20):** 7a is with its agent; next, the planner reviews it.
-2. After 7a's review: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
+2. **A bug the owner found (2026-11-20), fixed after 7a's review, before the release** (owner's yes): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
+3. After 7a's review and the fix: fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
 
 ## Goal
 
