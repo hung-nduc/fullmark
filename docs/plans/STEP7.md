@@ -35,11 +35,13 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10 and G11. New ones are added here from G12.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10 to G12. New ones are added here from G13.
 
 **G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
 
 **G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
+
+**G12. The start screen has no Appearance menu.** The `Start` board draws a header bar on the start screen ("Practice quiz · version a3f9" on the left, A− / A+ and **Appearance** on the right), but slice 2g's brief said to ignore them there (archive/STEP2.md, its "Read first"), and the slice that built the menu put it only in the top bar shown after Start. Nothing decided to leave it out: it slipped. It matters most for a timed quiz, where the clock starts at Start, so a learner who needs Readable or a bigger size spends exam time on it. **Recommendation:** the start screen gets the same Appearance menu and A− / A+ as the top bar, where the board draws them, under the same `look` rules (none of it under `locked`, A− / A+ always), sharing the stored choice, so a choice made before Start holds after it. A small slice (7c), with a test that a font picked on the start screen is the one used after Start; the screenshots go in `docs/screens/7c/`.
 
 ## Slices
 
