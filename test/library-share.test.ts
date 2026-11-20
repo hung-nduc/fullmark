@@ -5,8 +5,11 @@ import { type BuildOptions, runBuild } from "../src/cli/build";
 import { checkFile } from "../src/cli/check";
 import { type LibraryShareOptions, runLibraryShare, type ShareIo } from "../src/cli/library-share";
 import { readCheck } from "../src/library/check-file";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library share`, in-process with real git in a temp folder (STEP4.md, slice 4f; G35, G36). The page is `quiz build`'s

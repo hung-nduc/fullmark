@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import {
   fileAttempt,
@@ -13,6 +14,8 @@ import {
   WRITING,
   writingLibrary,
 } from "./helpers/library-grade";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library grade`, in-process, with real git in a temp folder, the fixed clock and a lock that never waits. The

@@ -3,9 +3,12 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryPublish } from "../src/cli/library-publish";
 import { readIndex } from "../src/library/index-file";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
 import { folderBytes, publishOptions } from "./helpers/library-publish";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * What goes out is checked by bytes, not by eye (STEP5.md, "Rules for every slice"): the history library has results,

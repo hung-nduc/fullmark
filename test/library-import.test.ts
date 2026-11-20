@@ -5,9 +5,12 @@ import { runLibraryImport } from "../src/cli/library-import";
 import { runLibraryRename } from "../src/cli/library-rename";
 import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { importOptions, importWorld, indexOf, LATER } from "./helpers/library-import";
 import { quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library import DIR [--into PATH]` (STEP5.md, slice 5b; COMMANDS.md, `quiz library import`; STEP5-GAPS.md, G7, G8,

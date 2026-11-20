@@ -2,7 +2,10 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { Git, type GitExec } from "../../src/library/git";
+import { gitHeavy } from "../helpers/git-timeout";
 import { cleanTemps, git, libraryEnv, tempDir, writeTree } from "../helpers/library";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

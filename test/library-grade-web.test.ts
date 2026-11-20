@@ -6,6 +6,7 @@ import { runLibraryGrade } from "../src/cli/library-grade";
 import { gradeEn, gradeVi } from "../src/core/i18n/grade";
 import type { GradeData } from "../src/grade-form/data";
 import { realLockEnv } from "../src/library/lock";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import {
   fileAttempt,
@@ -17,6 +18,8 @@ import {
   type T,
   writingLibrary,
 } from "./helpers/library-grade";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library grade --web`, in-process: the server binds 127.0.0.1 on port 0 and is driven with `fetch`; the clock, the

@@ -4,8 +4,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import { type LibraryRenameOptions, runLibraryRename } from "../src/cli/library-rename";
 import { readIndex } from "../src/library/index-file";
 import { realLockEnv } from "../src/library/lock";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /** `library rename`, in-process with real git in a temp folder (STEP4.md, slice 4f; G13). The goldens are in test/golden/library/rename-*. */
 afterEach(cleanTemps);

@@ -1,8 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, quizCli } from "./helpers/library";
 import { fileAttempt, filledGrades, quizOf, writingLibrary } from "./helpers/library-grade";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /** `library grade` as a program with `--json`, with real git in a temporary folder (the contract of COMMANDS.md). */
 afterEach(cleanTemps);

@@ -6,8 +6,11 @@ import { type QuizHistory, readHistory } from "../src/cli/library-history";
 import { missedFor, missedOf } from "../src/cli/library-missed";
 import type { Quiz } from "../src/core/ir";
 import { readIndex } from "../src/library/index-file";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

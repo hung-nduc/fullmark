@@ -2,8 +2,11 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFile
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { type LibraryReplayOptions, type ReplayIo, runLibraryReplay } from "../src/cli/library-replay";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW, tempDir } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

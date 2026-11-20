@@ -1,7 +1,10 @@
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, libraryEnv, quizCli, tempDir, writeTree } from "./helpers/library";
 import { quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

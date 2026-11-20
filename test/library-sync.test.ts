@@ -7,9 +7,12 @@ import { checkFile } from "../src/cli/check";
 import { readIndex } from "../src/library/index-file";
 import { realLockEnv } from "../src/library/lock";
 import { manifestPaths, readManifest } from "../src/library/shelf";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW } from "./helpers/library";
 import { folderBytes, shelfLibrary } from "./helpers/library-publish";
 import { quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * The sync of `library publish [DIR]` (STEP5.md, slice 5a), in-process with real git in temp folders. The goldens of the

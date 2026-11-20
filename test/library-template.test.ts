@@ -3,8 +3,11 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import type { CheckIo } from "../src/cli/check";
 import { type LibraryTemplateAddOptions, runLibraryTemplateAdd } from "../src/cli/library-template";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library template add`, in-process with real git in a temp folder (STEP4.md, slice 4f): the version's source and assets

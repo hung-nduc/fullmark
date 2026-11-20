@@ -6,8 +6,11 @@ import { runLibraryStatus } from "../src/cli/library-status";
 import { readIndex } from "../src/library/index-file";
 import { slashed } from "../src/library/layout";
 import { realLockEnv } from "../src/library/lock";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import { fileAttempt, grade, quizOf, type T, writingLibrary } from "./helpers/library-grade";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library rm`, in-process with real git in a temp folder (STEP4.md, slice 4f; G10, G37). The prompt, the lock's wait and

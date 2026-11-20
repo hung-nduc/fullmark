@@ -3,10 +3,13 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { reviewEn, reviewVi } from "../src/core/i18n/review";
 import { readReview } from "../src/core/review/read";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import { quizOf, type T } from "./helpers/library-grade";
 import { newLibrary, quizText } from "./helpers/library-register";
 import { DROP, FIX, finish, KEEP, reviewDataOf, webReview } from "./helpers/library-review";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * `library review`, in-process: the server binds 127.0.0.1 on port 0 and is driven with `fetch`; the clock, the timer,

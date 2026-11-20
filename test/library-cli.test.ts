@@ -5,7 +5,10 @@ import { runLibraryInit } from "../src/cli/library-init";
 import { realGitExec } from "../src/library/git";
 import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, libraryEnv, NOW, quizCli, tempDir, writeTree } from "./helpers/library";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

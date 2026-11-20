@@ -11,8 +11,11 @@ import { runLibraryStatus } from "../src/cli/library-status";
 import { runStats } from "../src/cli/stats";
 import { painter, renderFacts, renderTable } from "../src/cli/table";
 import { capture } from "./helpers/cli";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, NOW } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * The terminal styles (STEP4.md, slice 4f; COMMANDS.md, "Terminal style"): `simple` and `boxed` on a terminal, for every

@@ -1,6 +1,9 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { gitHeavy } from "./helpers/git-timeout";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * Every library command has a contract test (STEP4.md, step 4's "Done when"): a test that runs it as a subprocess with

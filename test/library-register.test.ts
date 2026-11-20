@@ -7,8 +7,11 @@ import { loadQuiz } from "../src/cli/load";
 import { localIso } from "../src/cli/time";
 import { readCheck } from "../src/library/check-file";
 import { readIndex } from "../src/library/index-file";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

@@ -10,12 +10,15 @@ import { runLibraryRm } from "../src/cli/library-rm";
 import { runLibraryTake, type TakeIo } from "../src/cli/library-take";
 import type { LockEnv } from "../src/library/lock";
 import { capture } from "./helpers/cli";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, libraryEnv, NOW, tempDir } from "./helpers/library";
 import { fileAttempt, gradeOptions, quizOf, type T, writingLibrary } from "./helpers/library-grade";
 import { importOptions, importWorld } from "./helpers/library-import";
 import { publishOptions, shelfLibrary } from "./helpers/library-publish";
 import { quizText } from "./helpers/library-register";
 import { finish, KEEP, webReview } from "./helpers/library-review";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * Every command that changes the library takes the lock and commits once (STEP4.md, step 4's "Done when"; TECHNICAL_DESIGN.md,

@@ -2,9 +2,12 @@ import { mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { runLibraryPublish } from "../src/cli/library-publish";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
 import { folderBytes, publishOptions } from "./helpers/library-publish";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * The same library state always gives the same shelf, byte for byte (STEP5.md, Goal: "Determinism"; TECHNICAL_DESIGN.md,

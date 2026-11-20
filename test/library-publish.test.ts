@@ -6,9 +6,12 @@ import { runLibraryList } from "../src/cli/library-list";
 import { type LibraryPublishOptions, type PublishIo, runLibraryPublish } from "../src/cli/library-publish";
 import { readIndex } from "../src/library/index-file";
 import { realLockEnv } from "../src/library/lock";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, git, NOW } from "./helpers/library";
 import { publishOptions } from "./helpers/library-publish";
 import { newLibrary, quizText } from "./helpers/library-register";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /** `library publish NAME --on | --off`, in-process with real git in a temp folder (STEP5.md, slice 5a). The goldens are in test/golden/library/publish-*. */
 afterEach(cleanTemps);

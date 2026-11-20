@@ -8,8 +8,11 @@ import { runLibraryList } from "../src/cli/library-list";
 import { readIndex } from "../src/library/index-file";
 import { slashed } from "../src/library/layout";
 import { capture } from "./helpers/cli";
+import { gitHeavy } from "./helpers/git-timeout";
 import { cleanTemps, NOW } from "./helpers/library";
 import { buildHistory } from "./helpers/library-history";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 afterEach(cleanTemps);
 

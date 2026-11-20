@@ -1,6 +1,9 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { gitHeavy } from "./helpers/git-timeout";
+
+gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
 
 /**
  * The library's boundary (TECHNICAL_DESIGN.md, section 7; STEP4.md, "Rules for every slice"): `src/library/` uses
