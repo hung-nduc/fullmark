@@ -723,6 +723,8 @@ look: free      # free (default) | locked
 
 The font-size control stays in both, since it is an accessibility need, not a taste.
 
+**Where they are.** The start screen has a bar along its top, as the `Start` board draws it: a status line on the left ("Practice quiz · version a3f9"), and A− / A+ and **Appearance** on the right, under the same `free` and `locked` rules as the top bar after Start. It is one look: a theme, font or size chosen before Start is the one in use after it, and both places show the same choice.
+
 Templates set a fitting look, so most authors never touch these keys: `quiz new ielts` uses `white` with `system`, locked; `exam` uses `paper` with `serif`, locked; the others keep the defaults.
 
 #### Which fonts a page carries

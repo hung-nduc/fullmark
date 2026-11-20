@@ -17,13 +17,17 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
 | 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
 | 7b | briefed (2026-11-20); waits for G10 and the owner's approval | |
+| CI and licence | CI runs on `main`; typos clean; the grade key row and the shelf phone card hold with Linux's wider fonts; the copyright holder is `hung-nduc` | `97f41a85`, `613e0809`, `f472c391` |
+| 7c | briefed (2026-11-20) from G12; waits for G13 and the owner's approval | |
 
 ### Next
 
 1. **Done:** 7a built and reviewed (2026-11-20).
 2. **Done, `4549bb02`:** a bug the owner found (2026-11-20): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
 3. **Done (2026-11-20):** fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
-4. **Next:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief; then one agent builds it.
+4. **Done (2026-11-20):** the CI fix (the trigger, typos, the two layouts that failed on Linux's wider fonts) and the licence holder; the owner's shelf published as `biomed-quizzes`, linked from the README. CI on Linux confirms the layouts after the owner pushes.
+5. **Next:** slice 7c, the start screen's Appearance bar (G12, decided 2026-11-20): the owner decides G13 and approves the brief; then one agent builds it. It is small and touches the page, not the CLI, so it can go before 7b.
+6. **Then:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief.
 
 ## Goal
 
@@ -35,13 +39,13 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10 to G12. New ones are added here from G13.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10, G11 and G13; G12 is decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G14.
 
 **G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
 
 **G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
 
-**G12. The start screen has no Appearance menu.** The `Start` board draws a header bar on the start screen ("Practice quiz · version a3f9" on the left, A− / A+ and **Appearance** on the right), but slice 2g's brief said to ignore them there (archive/STEP2.md, its "Read first"), and the slice that built the menu put it only in the top bar shown after Start. Nothing decided to leave it out: it slipped. It matters most for a timed quiz, where the clock starts at Start, so a learner who needs Readable or a bigger size spends exam time on it. **Recommendation:** the start screen gets the same Appearance menu and A− / A+ as the top bar, where the board draws them, under the same `look` rules (none of it under `locked`, A− / A+ always), sharing the stored choice, so a choice made before Start holds after it. A small slice (7c), with a test that a font picked on the start screen is the one used after Start; the screenshots go in `docs/screens/7c/`.
+**G13. The version after 7c.** 7c fixes a slip (the board drew the bar; no slice built it) and adds no command or key. **Recommendation:** `1.1.1` if 7c ships before 7b, so 7b stays `1.2.0` (G10); every page golden changes anyway with the bundle, and the version string adds only to those already changing.
 
 ## Slices
 
@@ -49,6 +53,7 @@ G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and
 |---|---|---|
 | **7a** | `quiz guide`, `quiz agent-guide`, the authoring guide, `AGENTS.md`, `skill/SKILL.md` | G1 to G3 |
 | **7b** | Tab completion: `quiz shell-init` for PowerShell, bash, zsh and fish, and the hidden `quiz __complete` | 7a, G6, G7, G9, G10 |
+| **7c** | The start screen's bar: A− / A+ and Appearance before Start, one look with the top bar | G12, G13 |
 
 ## Slice 7a: the guides and the skill
 
@@ -122,3 +127,34 @@ The agent's report and the planner's review, with one full check after the dock 
 ### Report
 
 What was done per task, anything done differently and why, the library choice (task 4), the changed goldens, the counts, times and measurements, what could not be checked here, and any new gap (from G11) with a recommendation.
+
+## Slice 7c: the start screen's Appearance bar
+
+**Briefed on 2026-11-20 from G12, decided by the owner, and G13.** What the page does is written in TECHNICAL_DESIGN.md, section 8, "The look", under **Where they are**. The owner found it on the published shelf: the Font row exists only after Start, so on a timed quiz the choice costs exam time.
+
+### Read first
+
+- This plan: "Rules for every slice"; [STEP7-GAPS.md](STEP7-GAPS.md), G12.
+- TECHNICAL_DESIGN.md, section 8: "The look" (all of it, **Where they are** included), the rows "Start screen and part picker" and "Focus mode", and the phone sizes ("Where pages work").
+- The board `docs/mockup/boards/Start.dc.html`: the `<header>` (its status line, A− / A+ and the Appearance button) and the menu it opens; `Quiz.dc.html`'s Appearance button (line 49) and the menu it opens, which the top bar already follows. Archive/STEP2.md, slice 2g's "Read first", which left these out, and the slices that built the look (`src/page/Appearance.tsx`, `src/page/look.ts`).
+- `src/page/App.tsx` (the start screen, around `fm-start`; the top bar), `src/page/dock.ts` and its test in `e2e/looks.spec.ts` (the step 7 dock bug), `e2e/textsize.spec.ts`.
+
+### Tasks
+
+1. **The bar.** The start screen gets the board's header: the status line on the left, A− / A+ and **Appearance** on the right. The status line shows what the board shows from what the page already carries; if the page does not carry something the board shows (whether the quiz is an exam, say), leave it out and report it rather than adding it to the page data. The bar scrolls with the start screen unless the board says otherwise; it is not the docked top bar.
+2. **The same controls, not copies.** A− / A+ and the Appearance menu are the components the top bar uses, with the same accessible names, keys and closing (outside click, the button, Escape) and the same rules: under `look: locked` no Appearance and no light/dark toggle, A− / A+ always; the Font row lists only the embedded fonts (`--fonts`).
+3. **One look.** A theme, font or size chosen on the start screen is the one in use after Start, and after Continue on a resumed attempt; both places show the current choice, and **Default look** resets it in both. Storage stays as it is (per quiz); when storage is blocked, the choice still holds for this page's life.
+4. **Phones** (under 520 px): the bar keeps all its controls inside the screen, with 44 px targets, as the top bar does on a phone; the status line may wrap or shorten, the controls never leave the screen. If the board gives no answer for something here, take the top bar's phone rule and report it.
+5. **Tests.** Playwright, both browsers: the bar is on the start screen; Readable and A+ chosen before Start are the font and size after Start (computed style, not only the pill's state), and after a reload on the start screen; `look: locked` shows A− / A+ and no Appearance; the menu closes three ways; no axe violations on the start screen with the menu open; at 360 px nothing overflows the screen. A unit test where the look logic is pure.
+6. **The version** (G13), then `npm run golden:update`: list every changed golden and show that each differs only in the bundle and the version string, or explain it.
+7. **Screenshots** in `docs/screens/7c/`: the start screen with the menu open in light and dark, the `locked` page, and a phone at 360 px.
+
+### Done when
+
+- On Windows, nothing else running: `npm run build`, then `npm run check` passes. Report each part's counts and times.
+- By hand, from a build in a temporary prefix (never over the owner's install): `quiz build` a quiz with `--fonts all`, pick Readable and A+ on the start screen, press Start and see them hold; a `locked` quiz shows no Appearance. Quote what you saw.
+- No golden changes except those listed and explained; one commit per task or a few; explicit paths; the model's `Co-Authored-By` line; no push.
+
+### Report
+
+What was done per task, anything done differently and why (task 1's status line, task 4's phone layout), the changed goldens, the counts and times, and any new gap (from G14) with a recommendation.
