@@ -71,3 +71,8 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 **G17. Where the script lives, and what proves it.** "Kept outside the product" (TECHNICAL_DESIGN.md, section 12). **Recommendation:** a Node script in `D:/coding-projects/fullmark-0x-migration/`, its own small git repository, never in fullmark's; it writes a log of what it converted. It registers the converted quizzes through 1.0's own CLI (`node dist/cli.js library init` and `register`), so the library is made by the product, and writes only the results-v2 files itself, then commits them through git as `library take` would. Done when, for each of the five quizzes, `quiz library stats` matches `fullmark-py library stats` (attempts, scores, percent, per question) and `--missed` plans the same questions as 0.x's missed list; the comparison is a script too, its output kept in the log. Each question keeps its 0.x id, so results map one to one.
 
 **Decided by the owner on 2026-11-20, as recommended.** A matter of the migration, not of the product: written here and in slice 6c's brief.
+
+**G19. A quiet write under `unchanged`.** With G8, a `register` that finds an unchanged quiz whose stored `source` is absolute rewrites it relative and commits (`fullmark: register NAME (source made relative)`), but printed only `unchanged`: a write the output did not mention. Raised in 6b's review. **Recommendation:** the line says `unchanged (source made relative)`, and `--json`'s `unchanged` entry gains `"source_rewritten": true`.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, `quiz library register`. Built as slice 6c's first task, in fullmark's repository.
+

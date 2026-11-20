@@ -820,7 +820,7 @@ Exit: `0` registered or unchanged, `1` check errors, name taken (the output sugg
 
 - **All or nothing, like `import`.** Every file is checked and every name resolved first; if any file has check errors or a taken name (including two files in the batch slugging to the same name), nothing is registered, every problem is listed, and the exit is 1. Otherwise one commit holds them all.
 - Each quiz gets its slugged title as its name. `-n` and `--update` name one quiz, so with several files they exit 2.
-- A file whose content is already the current version of the quiz registered from it is skipped as `unchanged`, so re-running the same command after adding one quiz registers only the new one. A file registered before and since edited is refused with the `--update NAME` command to run.
+- A file whose content is already the current version of the quiz registered from it is skipped as `unchanged`, so re-running the same command after adding one quiz registers only the new one. If its stored `source` is absolute and could be written relative to the library (an older library), it is rewritten and committed, and the line says so: `unchanged (source made relative)`; `--json` lists it under `unchanged` with `"source_rewritten": true`. A file registered before and since edited is refused with the `--update NAME` command to run.
 - Progress on a terminal as for `build`: `[3/12] signals.md`.
 - Updating several quizzes in one go (matching each file to the quiz registered from it) is left out until a need shows; `list` already flags changed sources.
 

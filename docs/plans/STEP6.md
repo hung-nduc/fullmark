@@ -16,13 +16,13 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-20); G1 to G9 decided (2026-11-20), written into COMMANDS.md, TECHNICAL_DESIGN.md and CLAUDE.md | this file |
 | 6a | built and reviewed (2026-11-20): `npm run check` passes on Windows, no golden changed; G10 to G12 raised | `892a7b2a`, `51e4b319`, `f642dade`, `7af9e956`, `921b38ef`, `ab837015` |
-| 6b | briefed (2026-11-20) | |
-| 6c | brief written after 6b's review; G13 to G17 decided | |
+| 6b | built and reviewed (2026-11-20): `npm run check` passes on Windows; 17 goldens changed, only `source` values; G19 raised and decided | `db5128d8`, `29e77fad`, `c0b94133` |
+| 6c | briefed (2026-11-20): G19, then the migration rehearsed on copies; the real run waits for the owner | |
 
 ### Next
 
-1. 6b (G8 to G12) is built and reviewed. The cloud check of 6a was not run (no cloud environment from the laptop).
-2. 6c's brief: the migration script, for the five quizzes the owner chose (below), on G13 to G17.
+1. 6c is built: G19, then the migration rehearsed on copies, with `compare.log`. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
+2. The owner reads the rehearsal's `compare.log` and says yes; the planner then runs the real migration (the one command 6c's report gives).
 3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
 ## Goal
@@ -54,7 +54,7 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G17 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 slice 6c. New ones are added here from G18.
+G1 to G19 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 and G19 slice 6c; G18 (the agent's, about `register --update` not following a moved file) is left as it is, by the agent's recommendation, and not decided separately. New ones are added here from G20.
 
 ## Slices
 
@@ -62,7 +62,7 @@ G1 to G17 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, 
 |---|---|---|
 | **6a** | G1 to G7: the suite passes on Windows | G1 to G7 |
 | **6b** | G8 to G12: `source` relative to the library, the lock's host and boot, the budget run alone, the last paths | 6a, G8 to G12 |
-| **6c** | The migration script (outside the repository), run on the five quizzes; `stats` and `--missed` compared with 0.x | 6b, G13 to G17 |
+| **6c** | G19; the migration script (outside the repository), rehearsed on copies of the five quizzes; `stats` and `--missed` compared with 0.x; the real run after the owner's yes | 6b, G13 to G17, G19 |
 
 ## Slice 6a: the suite on Windows
 
@@ -142,3 +142,60 @@ Built by one agent (Sonnet) from the brief; reviewed by the planner on Windows.
 ### Report
 
 What was done per task, anything done differently and why, the changed goldens, the counts and times, and any new gap (from G18) with a recommendation.
+
+### Review (2026-11-20)
+
+Built by one agent (Sonnet) from the brief; reviewed by the planner on Windows.
+
+**Checked by the planner.** `npm run build`, then `npm run check` with nothing else running: typecheck, Biome, knip pass; the startup test 2 of 2; Vitest 3,795 passed, 3 skipped, 0 failed (363 s); Playwright through the new `test:e2e`: the budget call 2 passed (Chromium 944 ms; Firefox 1706 ms, then 665 ms on its retry), the rest 861 passed, 559 skipped by design, 0 failed (13.3 min); exit 0 in 19.8 minutes. **Goldens:** 17 `library.toml` files changed, and the only changed lines are 25 `source` values, each from `<dir>/X` to `../X` (checked by value with `git diff`). The source diff was read in full.
+
+**Per task.** G12 and G8: `src/cli/source-path.ts` (`isStoredAbsolute`, `absoluteHere`, `sourceToStore`, `resolveSource`, `sameFile`, each taking the platform so both systems are tested on one); `storedPath` shows a path absolute on another system as stored and resolves a relative one against the library. G9: `staleReason` and `staleNote` in `lock.ts`, used by `withLock` and `library status`. G10: `scripts/test-e2e.mjs`. G11: `info --json`'s `path` slashed.
+
+**Done differently, accepted.** The helpers live in `src/cli/`, since `check` loads `paths.ts` and must never load `src/library/` (the command-graph test caught the first placement). `storedPath` still shortens a path of this system under the working directory, as `shownPath` always did. The history fixture keeps its absolute `/home/minh/...` sources, as an older library holds them. A plain `register` of an unchanged quiz with an absolute source rewrites it relative and commits (which raised G19).
+
+**Noted, no gap.** G9's `boot` comes from `os.uptime()`. With Windows Fast Startup on, a shutdown does not reset it, so a lock left before a Linux session may count as the same boot and fall back to the process-id check, as before G9. Fast Startup must be off on a dual-boot disk anyway (it leaves NTFS in use).
+
+**Not run:** the cloud check.
+
+**Gaps raised:** G18 (the agent's: `register --update` on an unchanged quiz does not follow a file that moved; left as it is) and G19 (the planner's: the rewrite is a quiet write under `unchanged`; decided).
+
+## Slice 6c: moving the five quizzes in
+
+**Briefed on 2026-11-20 from G13 to G17 and G19, decided by the owner as recommended.** Apart from G19 (task 0), this slice writes no product code: the script lives outside the repository (TECHNICAL_DESIGN.md, section 12, step 6; G17). What a 1.0 library holds is written in COMMANDS.md ("The library folder", `quiz library register`, `quiz library stats`, `quiz library take`); the quiz syntax in QUIZ_SYNTAX.md (section 11 lists every change from 0.10.2); the results format in `schemas/results-v2.schema.json` and TECHNICAL_DESIGN.md.
+
+### What is moved
+
+Five quizzes of the 0.x library at `D:/studying/fullmark-library` (format `fullmark-library` version 1): `5wanzo` ch10-digital-radiography, `4pmi5u` biomedical-sensors-and, `nua2si` biosignal-circuits, `vukyql` biosignal-exam-a, `xkpbyf` biosignal-exam-b. Their sources are the `source` paths in its `library.toml` (all under `D:/studying/lectures/2026.1/`). Only their results move (four attempts; `nua2si` has none). Not moved (G16): `nua2si`'s `progress.json`, the 0.x reports, and the six quizzes of `radiation-and-electrical-safety`. **The 0.x library is read, never written.**
+
+### Read first
+
+- This plan: "Goal", "What is moved", "Rules for every slice", slice 6b and its review; [STEP6-GAPS.md](STEP6-GAPS.md), G8, G13 to G17, G19.
+- QUIZ_SYNTAX.md (all; section 11 above all), COMMANDS.md (`quiz library init`, `register`, `stats`, `take` with `--missed` and `--dry-run` if it has one, "The library folder", "Git"), `schemas/results-v2.schema.json`, TECHNICAL_DESIGN.md (the results format and "Hashes survive machines").
+- 0.x: `D:/coding-projects/fullmark-py` (read only), its results format (`fullmark-results` version 1), how its `library stats` computes what it prints, and how it picks a question as missed.
+
+### Rehearsal first, then the real run
+
+The script takes the places it works on as arguments (the 0.x library, the five sources' root, the config file, the new library's folder), so the same script runs twice. **The agent runs only the rehearsal:** it copies the five sources (with their folders' assets) and the 0.x config into a temporary folder, points every path there (`FULLMARK_CONFIG` for both CLIs, the new library in the temporary folder), runs the whole migration and `compare`, and reports. It never writes under `D:/studying/` or `%APPDATA%`. **The real run** is one command, given in the report, which the planner runs only after the owner has seen the rehearsal's `compare.log` and said yes.
+
+### Tasks
+
+0. **G19, in fullmark's repository.** `quiz library register`'s line for an unchanged quiz whose `source` it rewrote relative reads `unchanged (source made relative)`, and `--json`'s `unchanged` entry gains `"source_rewritten": true` (false or absent otherwise: follow how the other `--json` fields are written, and say which). Test it in `test/library-register.test.ts` (6b added the rewrite's test there), and run the register goldens and that file. Commit on the branch, as in 6a and 6b. Then `npm run build`: the script uses this `dist/`.
+
+1. **The script's home (G17).** A new folder `D:/coding-projects/fullmark-0x-migration/`, its own git repository (`git init`, a README of a few lines saying what it is and that it is thrown away after step 6), never inside fullmark's. Node, no dependencies beyond what Node has, unless one is needed (say why). It calls fullmark 1.0 as `node D:/coding-projects/fullmark/.claude/worktrees/fullmark-1-0-migration-b09951/dist/cli.js` (build it first) and 0.x as `fullmark-py`. It has a `--dry-run` that writes nothing and prints the plan, and writes a log (`migration.log`, kept in its folder) of every file read, converted and written.
+2. **The config (G13).** Rename `%APPDATA%\fullmark\config.toml` to `config-0x.toml` in the same folder (refuse if `config-0x.toml` exists). Nothing is deleted. Then check that `FULLMARK_CONFIG=%APPDATA%\fullmark\config-0x.toml fullmark-py library list` still lists the eleven quizzes.
+3. **The quizzes (G15).** For each of the five: convert its source from 0.10.2 syntax to 1.0 syntax, by the rules of QUIZ_SYNTAX.md section 11, keeping every question's id exactly (where 0.x gave a question no id, it had the default `q1`, `q2`...; write those ids explicitly, so the results map one to one), and keeping the text otherwise as it is. Run `quiz check` on each converted file until it passes; anything the conversion cannot decide (a type that 0.x inferred ambiguously, a feature with no 1.0 form) is a gap (from G18) brought to the planner, never guessed. Then write it over the source in place, after copying the original beside it as `NAME.0x.md` (`quiz.0x.md` for `quiz.md`). Assets the quiz references stay where they are.
+4. **The library (G14, G8).** `quiz library init D:/studying/fullmark-library-1.0`, then `quiz library register` each converted source (one call for all five is fine). Its `library.toml` then holds `source = "../lectures/2026.1/..."` lines (G8): check that it does.
+5. **The results.** For each 0.x results file of the five: write a results-v2 file into the new library as `library take` would file it (the same folder, file name from the attempt's start, the version hash of the registered quiz), converted field by field: the attempt's times, mode, bank, time limit and elapsed time; each question's response and status; the score. Validate every file against `schemas/results-v2.schema.json`. Where a 0.x field has no 1.0 place, or a 1.0 field has no 0.x value, say what you did in the log and the report. Then commit them in the library's git, one commit, message `fullmark: move 4 attempts from 0.x`, paths explicit.
+6. **The proof (G17).** A second script, `compare`, prints for each of the five quizzes, side by side: `fullmark-py library stats` (with `FULLMARK_CONFIG` on the old config) and `quiz library stats` on the new library (attempts, each attempt's score and percent, per-question results), and the questions 1.0's `quiz library take NAME --missed` would ask (from `--dry-run` or `--json` if it has one; otherwise from what the command prints before serving, without serving a page) against the questions not answered correctly in the newest 0.x attempt. Every difference is listed; a difference is a bug in the conversion or a gap, never left unexplained. Its output goes into `compare.log`.
+7. **Check the new library.** `quiz library status` on it says healthy; `quiz library list` shows the five, `unchanged`, with their attempts.
+
+### Done when
+
+- In the rehearsal, `compare.log` shows no unexplained difference for any of the five quizzes: the same attempts, scores and percents, the same per-question results, and `--missed` asking the questions missed in the newest attempt (for `nua2si`, with no attempt, `--missed` says there is nothing to retry, as COMMANDS.md says).
+- In the rehearsal: `quiz library status` healthy; `list` shows the five `unchanged`; `fullmark-py library list` on the renamed config still shows the eleven; each converted source has its `.0x.md` copy.
+- Nothing under `D:/studying/` or in `%APPDATA%\fullmark\` changed (`git -C D:/studying/fullmark-library status` clean with the same last commit; the config's bytes the same).
+- The migration folder is committed in its own repository; in fullmark's, only G19's commit. `npm run check` is not needed for G19 alone: the register goldens, `test/library-register.test.ts`, typecheck and Biome pass. The report gives the real run's command.
+
+### Report
+
+What the script does, step by step; every conversion choice; the `compare.log` summary per quiz; every gap (from G18) with a recommendation; what you could not check.
