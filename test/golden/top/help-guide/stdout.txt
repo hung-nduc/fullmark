@@ -1,0 +1,9 @@
+Usage: quiz guide [options]
+
+print the authoring guide: how a quiz is written in Markdown
+
+Options:
+  --lang <lang>  the guide's language (choices: "en", "vi", default: "en")
+  --plain        the Markdown source, even in a terminal
+  --no-pager     styled, but printed straight to the terminal
+  -h, --help     help for the command

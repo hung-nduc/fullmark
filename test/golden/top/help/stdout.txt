@@ -23,6 +23,10 @@ Commands:
                                  page
   replay [options] <results...>  write an attempt as a page already submitted:
                                  the answers, the explanations and the grades
+  guide [options]                print the authoring guide: how a quiz is
+                                 written in Markdown
+  agent-guide [options]          print the instructions for AI agents
+                                 (AGENTS.md)
   inspect [options] <file>       summarise a quiz: question types, points,
                                  sections, tags, banks and where the right
                                  answers sit

@@ -1,0 +1,5 @@
+guide
+--lang
+vi
+--plain
+--no-pager

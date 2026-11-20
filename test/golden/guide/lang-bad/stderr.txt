@@ -1,0 +1,1 @@
+error: option '--lang <lang>' argument 'fr' is invalid. Allowed choices are en, vi.
