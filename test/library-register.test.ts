@@ -88,13 +88,47 @@ describe("library register: source relative to the library (STEP6-GAPS.md, G8)",
     expect((await listed(t.dir, t.env)).map((q) => q.changed)).toEqual([false]);
     const r = await t.register(["notes/a.md"]);
     expect(r.exit).toBe(0);
-    expect(r.out[0]).toMatch(/^unchanged alpha · version [0-9a-f]{4}$/);
+    expect(r.out[0]).toMatch(/^unchanged alpha · version [0-9a-f]{4} \(source made relative\)$/);
     expect(index(t.lib).quizzes[0]?.source).toBe("../notes/a.md");
     expect((await log(t.lib, t.env))[0]).toBe("fullmark: register alpha (source made relative)");
     // and once it is relative, a second register changes nothing
     const before = await log(t.lib, t.env);
-    await t.register(["notes/a.md"]);
+    const again = await t.register(["notes/a.md"]);
+    expect(again.out[0]).toMatch(/^unchanged alpha · version [0-9a-f]{4}$/);
     expect(await log(t.lib, t.env)).toEqual(before);
+  });
+
+  it("says so in --json: source_rewritten is true for a rewrite and false (always present) otherwise", async () => {
+    const t = await newLibrary();
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", A) });
+    await t.register(["notes/a.md"]);
+    const toml = join(t.lib, "library.toml");
+    writeFileSync(
+      toml,
+      readFileSync(toml, "utf8").replace('"../notes/a.md"', `"${slashed(join(t.dir, "notes", "a.md"))}"`),
+    );
+    await git(t.lib, t.env, "commit", "-a", "-m", "an absolute source, as an older library holds it");
+    const json = async () => {
+      const r = await t.register(["notes/a.md"], { json: true });
+      expect(r.exit).toBe(0);
+      return JSON.parse(r.out[0] as string) as { unchanged: { name: string; source_rewritten: boolean }[] };
+    };
+    expect((await json()).unchanged).toMatchObject([{ name: "alpha", source_rewritten: true }]);
+    expect((await json()).unchanged).toMatchObject([{ name: "alpha", source_rewritten: false }]);
+  });
+
+  it("marks the rewritten names in a batch", async () => {
+    const t = await newLibrary();
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", A), "notes/b.md": quizText("bravo", "Bravo", A) });
+    await t.register(["notes/a.md", "notes/b.md"]);
+    const toml = join(t.lib, "library.toml");
+    writeFileSync(
+      toml,
+      readFileSync(toml, "utf8").replace('"../notes/a.md"', `"${slashed(join(t.dir, "notes", "a.md"))}"`),
+    );
+    await git(t.lib, t.env, "commit", "-a", "-m", "an absolute source, as an older library holds it");
+    const r = await t.register(["notes/a.md", "notes/b.md"]);
+    expect(r.out[0]).toBe("unchanged 2  alpha (source made relative), bravo");
   });
 });
 

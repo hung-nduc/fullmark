@@ -513,10 +513,15 @@ export async function runLibraryRegister(
     const shortOf = (q: IndexQuiz, hash: string): string =>
       shortHash(hash, quizzes.get(q.name)?.versions.map((v) => v.hash) ?? [q.current]);
     const registered: { file: string; name: string; version: string }[] = [];
-    const unchanged: { file: string; name: string; version: string }[] = [];
+    const unchanged: { file: string; name: string; version: string; source_rewritten: boolean }[] = [];
     for (const w of plans) {
       if (w.what === "unchanged") {
-        unchanged.push({ file: w.file, name: w.quiz.name, version: w.hash });
+        unchanged.push({
+          file: w.file,
+          name: w.quiz.name,
+          version: w.hash,
+          source_rewritten: w.resource !== undefined,
+        });
         continue;
       }
       const name = w.what === "new" ? w.name : w.quiz.name;
@@ -528,7 +533,9 @@ export async function runLibraryRegister(
     if (!several && plans.length === 1) {
       const w = plans[0] as Plan;
       if (w.what === "unchanged") {
-        lines.push(`${p.green("unchanged")} ${w.quiz.name} · version ${shortOf(w.quiz, w.hash)}`);
+        lines.push(
+          `${p.green("unchanged")} ${w.quiz.name} · version ${shortOf(w.quiz, w.hash)}${w.resource !== undefined ? " (source made relative)" : ""}`,
+        );
       } else if (w.what === "new") {
         const n = summarise(quizOf(w.checked), w.hash).questions;
         lines.push(
@@ -570,7 +577,11 @@ export async function runLibraryRegister(
       if (same.length > 0)
         lines.push(
           `${p.green("unchanged")} ${same.length}  ${same
-            .map((w) => (w as { quiz: IndexQuiz }).quiz.name)
+            .map(
+              (w) =>
+                (w as { quiz: IndexQuiz }).quiz.name +
+                ((w as { resource?: string }).resource !== undefined ? " (source made relative)" : ""),
+            )
             .sort()
             .join(", ")}`,
         );
