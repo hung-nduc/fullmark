@@ -53,14 +53,14 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G8 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 (`source` relative to the library) is 6b's first task. New ones are added here from G9.
+G1 to G9 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)); G8 (`source` relative to the library) and G9 (the lock records its host and boot) are 6b's first tasks. New ones are added here from G10.
 
 ## Slices
 
 | Slice | Content | Needs |
 |---|---|---|
 | **6a** | G1 to G7: the suite passes on Windows | G1 to G7 |
-| **6b** | G8; the migration script, run on the five quizzes; `stats` and `--missed` compared with 0.x | 6a, G8, its own gaps |
+| **6b** | G8, G9; the migration script, run on the five quizzes; `stats` and `--missed` compared with 0.x | 6a, G8, G9, its own gaps |
 
 ## Slice 6a: the suite on Windows
 
