@@ -63,7 +63,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   const base = listRow(root, quiz, history, at);
   const summary = content.quiz === null ? null : summarise(content.quiz, at);
   const cwd = machineOf(io).cwd;
-  const source = sourceOf(quiz);
+  const source = sourceOf(root, quiz);
   const paths = libraryPaths(root).quiz(quiz.id);
 
   // each version against the one before it, newest first
@@ -105,7 +105,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
           changed_questions: h.diff?.changed ?? [],
         })),
         first_taken: history.firstTaken === null ? null : isoDate(history.firstTaken),
-        path: paths.dir,
+        path: slashed(paths.dir),
       }),
     );
     return EXIT.done;
@@ -136,7 +136,7 @@ export function runLibraryInfo(name: string, opts: LibraryInfoOptions, io: Libra
   facts.push(
     row(
       "Source",
-      `${storedPath(quiz.source, cwd)} · ${
+      `${storedPath(quiz.source, cwd, root)} · ${
         !source.exists ? "the file is gone" : source.changed ? `changed since ${short(quiz.current)}` : "unchanged"
       }`,
     ),

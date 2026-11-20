@@ -16,6 +16,8 @@ const lock = () => ({
   sleep: () => new Promise<void>((done) => setImmediate(done)),
   alive: () => true,
   pid: process.pid,
+  host: "TEST-PC",
+  boot: "2026-11-18T08:00:00.000Z",
   waitMs: 120_000,
   pollMs: 1,
 });

@@ -5,7 +5,7 @@ created = "2026-11-18T14:22:10+00:00"
 [quizzes.study-fixture]
 id = "study"
 title = "Study fixture"
-source = "<dir>/shelf/study/study.md"
+source = "../shelf/study/study.md"
 current = "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27"
 versions = [{ hash = "89a574e6a48f734783ea36e13f2976c39e6908eea8a11482a1bbfab2d072fe27", added = "2026-11-10T09:00:00+00:00", file = "study.md" }]
 shelves = [{ shelf = "public", kind = "quiz" }]
@@ -13,7 +13,7 @@ shelves = [{ shelf = "public", kind = "quiz" }]
 [quizzes.tidy]
 id = "tidy"
 title = "Tidy notes"
-source = "<dir>/shelf/tidy/tidy.md"
+source = "../shelf/tidy/tidy.md"
 current = "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce"
 versions = [{ hash = "54d10676494a4f51d68f2e3f7f786e29b4c3ccdc5fdb3b4d208bf5039cf2b5ce", added = "2026-11-13T09:00:00+00:00", file = "tidy.md" }]
 shelves = [{ shelf = "public", kind = "quiz" }]

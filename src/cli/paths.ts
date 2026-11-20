@@ -1,4 +1,5 @@
 import { isAbsolute, relative, resolve } from "node:path";
+import { resolveSource } from "../library/source-path";
 
 /**
  * How every command prints a path (COMMANDS.md, "Paths in output"): relative to the working directory when the
@@ -12,13 +13,20 @@ export function shownPath(path: string, cwd: string): string {
 }
 
 /**
- * A path read from a file, as it is shown (COMMANDS.md, "Paths in output"): as stored, with `/`. A path that is
- * absolute on another system (`/home/minh/quiz.md` on Windows) is never resolved against the current drive.
+ * A path read from a file, as it is shown (COMMANDS.md, "Paths in output"), with `/`. A relative one is resolved against
+ * `base`, the folder it is relative to (the library's, for a `source`). One that is absolute on another system
+ * (`/home/minh/quiz.md` on Windows, `D:/studying/quiz.md` on Linux) is printed as stored, never resolved against the
+ * current drive or folder.
  */
-export function storedPath(path: string, cwd: string): string {
+export function storedPath(
+  path: string,
+  cwd: string,
+  base: string = cwd,
+  platform: NodeJS.Platform = process.platform,
+): string {
   const text = path.replaceAll("\\", "/");
-  if (process.platform === "win32" && text.startsWith("/") && !text.startsWith("//")) return text;
-  return shownPath(path, cwd);
+  const here = resolveSource(text, base, platform);
+  return here === null ? text : shownPath(here, cwd);
 }
 
 /**

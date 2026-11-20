@@ -4,7 +4,7 @@ import { parseConfig } from "../core/config/parse";
 import { FALLBACK_IDENTITY } from "../library/git";
 import type { LibraryIndex } from "../library/index-file";
 import { INDEX_FILE, libraryPaths, QUIZZES_DIR, ROOT_FILES, shortHash } from "../library/layout";
-import { processAlive } from "../library/lock";
+import { readHolder, realLockEnv, staleNote, staleReason } from "../library/lock";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { type LibraryIo, locate, machineOf, openIndex, painterFor, refusal } from "./library-common";
 import { loadQuiz } from "./load";
@@ -250,20 +250,13 @@ export async function runLibraryStatus(opts: LibraryStatusOptions, io: LibraryIo
       });
     }
   }
-  // a lock left by a process that is gone: removed, and said
+  // a stale lock (another machine, an earlier boot, or a process that is gone): removed, and said
   if (existsSync(paths.lock)) {
-    try {
-      const holder = JSON.parse(readFileSync(paths.lock, "utf8")) as { pid?: number; command?: string };
-      if (typeof holder.pid === "number" && !(io.lock?.alive ?? processAlive)(holder.pid)) {
-        rmSync(paths.lock, { force: true });
-        notes.push({
-          code: "lock.stale",
-          path: null,
-          message: `removed a lock left by pid ${holder.pid} (${holder.command ?? "unknown command"})`,
-        });
-      }
-    } catch {
-      // not ours, or half written: left alone
+    const { holder } = await readHolder(paths.lock);
+    const why = holder === null ? null : staleReason(holder, io.lock ?? realLockEnv());
+    if (holder !== null && why !== null) {
+      rmSync(paths.lock, { force: true });
+      notes.push({ code: "lock.stale", path: null, message: staleNote(holder, why) });
     }
   }
 

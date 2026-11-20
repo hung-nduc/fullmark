@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { FALLBACK_IDENTITY } from "../library/git";
 import { emptyIndex, writeIndex } from "../library/index-file";
 import { GITIGNORE_FILE, GITIGNORE_TEXT, INDEX_FILE, LOCK_FILE, QUIZZES_DIR } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { writeFileAtomic } from "./atomic";
 import { loadUserConfig } from "./config";
 import { recordLibrary } from "./config-write";
@@ -146,7 +146,7 @@ export async function runLibraryInit(
         lockEnvOf(io),
         {
           waiting: (h) => io.err(p.dim(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`)),
-          stale: (h) => stale.push(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+          stale: (h, why) => stale.push(`${p.cyan("note")} ${staleNote(h, why)}`),
         },
         setUp,
       );

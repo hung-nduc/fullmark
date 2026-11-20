@@ -5,7 +5,7 @@ import { createInterface } from "node:readline/promises";
 import { attemptOf, parseResults } from "../core/attempt";
 import { type IndexQuiz, writeIndex } from "../library/index-file";
 import { libraryPaths, QUIZZES_DIR, type QuizPaths } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { writeFileAtomic } from "./atomic";
 import { EXIT, type ExitCode } from "./exit-codes";
 import {
@@ -167,7 +167,7 @@ export async function runLibraryRm(name: string, opts: LibraryRmOptions, io: Lib
       lockEnvOf(io),
       {
         waiting: (h) => io.err(p.dim(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`)),
-        stale: (h) => out(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+        stale: (h, why) => out(`${p.cyan("note")} ${staleNote(h, why)}`),
       },
       async () => {
         // the index as it is now that the lock is ours

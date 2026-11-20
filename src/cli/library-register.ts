@@ -7,7 +7,8 @@ import { shortDate } from "../core/review/counts";
 import { ID_FORMAT } from "../core/slug";
 import type { IndexQuiz, LibraryIndex } from "../library/index-file";
 import { libraryPaths, shortHash, slashed } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
+import { resolveSource, sameFile, sourceToStore } from "../library/source-path";
 import { diffVersions, questionHashes, removeVersionTemps } from "../library/versions";
 import type { BuildOptions } from "./build";
 import { planBuildFile } from "./build-file";
@@ -62,7 +63,8 @@ type Plan =
   | { what: "new"; file: string; abs: string; checked: Checked; name: string; hash: string }
   | { what: "version"; file: string; abs: string; checked: Checked; quiz: IndexQuiz; hash: string }
   | { what: "again"; file: string; abs: string; checked: Checked; quiz: IndexQuiz; hash: string }
-  | { what: "unchanged"; file: string; quiz: IndexQuiz; hash: string };
+  /** `resource`: the stored `source` was absolute and is written relative now (COMMANDS.md, `library.toml`) */
+  | { what: "unchanged"; file: string; quiz: IndexQuiz; hash: string; resource?: string };
 
 /** `2 added, 1 removed, 3 changed`, leaving out what is zero; `no question changed` when all are. */
 function diffText(d: { added: string[]; removed: string[]; changed: string[] }): string {
@@ -230,7 +232,7 @@ export async function runLibraryRegister(
       lockEnvOf(io),
       {
         waiting: (h) => io.err(p.dim(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`)),
-        stale: (h) => notes.push(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+        stale: (h, why) => notes.push(`${p.cyan("note")} ${staleNote(h, why)}`),
       },
       () => run(),
     );
@@ -258,6 +260,14 @@ export async function runLibraryRegister(
           ? libraryConfig
           : job.opts.config;
       return { ...job.opts, config, review: review ?? job.opts.review };
+    };
+
+    // an unchanged quiz whose stored source is this file, spelt absolute: it is rewritten relative (G8)
+    const relativeSource = (quiz: IndexQuiz, abs: string): { resource?: string } => {
+      const stored = resolveSource(quiz.source, root);
+      if (stored === null || !sameFile(stored, abs)) return {};
+      const wanted = sourceToStore(abs, root);
+      return wanted === slashed(quiz.source) ? {} : { resource: wanted };
     };
 
     const plans: Plan[] = [];
@@ -304,10 +314,15 @@ export async function runLibraryRegister(
 
       // 2 to 4: what the file is, against the library
       const bySource =
-        opts.update === null ? index.quizzes.find((q) => slashed(q.source) === slashed(job.abs)) : undefined;
+        opts.update === null
+          ? index.quizzes.find((q) => {
+              const stored = resolveSource(q.source, root);
+              return stored !== null && sameFile(stored, job.abs);
+            })
+          : undefined;
       if (bySource !== undefined) {
         if (bySource.current === hash) {
-          plans.push({ what: "unchanged", file: job.file, quiz: bySource, hash });
+          plans.push({ what: "unchanged", file: job.file, quiz: bySource, hash, ...relativeSource(bySource, job.abs) });
           continue;
         }
         refuse({
@@ -332,7 +347,7 @@ export async function runLibraryRegister(
           continue;
         }
         if (target.current === hash) {
-          plans.push({ what: "unchanged", file: job.file, quiz: target, hash });
+          plans.push({ what: "unchanged", file: job.file, quiz: target, hash, ...relativeSource(target, job.abs) });
           continue;
         }
         note();
@@ -445,7 +460,7 @@ export async function runLibraryRegister(
           name: w.name,
           id: fm.id,
           title: fm.title,
-          source: w.abs,
+          source: sourceToStore(w.abs, root),
           current: w.hash,
           versions: [{ hash: w.hash, added: now, file: basename(w.abs) }],
           shelves: [],
@@ -455,7 +470,7 @@ export async function runLibraryRegister(
         quizzes.set(old.name, {
           ...old,
           title: fm.title,
-          source: w.abs,
+          source: sourceToStore(w.abs, root),
           current: w.hash,
           versions:
             w.what === "version"
@@ -464,14 +479,24 @@ export async function runLibraryRegister(
         });
       }
     }
+    for (const w of plans) {
+      if (w.what === "unchanged" && w.resource !== undefined)
+        quizzes.set(w.quiz.name, { ...(quizzes.get(w.quiz.name) as IndexQuiz), source: w.resource });
+    }
     const names = writes.map((w) => (w.what === "new" ? w.name : w.quiz.name)).sort();
+    const rewritten = plans.flatMap((w) => (w.what === "unchanged" && w.resource !== undefined ? [w.quiz.name] : []));
     const batch = await writeBatch({
       root,
       git,
       index,
       versions,
       quizzes: [...quizzes.values()],
-      message: writes.length > 0 ? `fullmark: register ${names.join(", ")}` : null,
+      message:
+        writes.length > 0
+          ? `fullmark: register ${names.join(", ")}`
+          : rewritten.length > 0
+            ? `fullmark: register ${rewritten.sort().join(", ")} (source made relative)`
+            : null,
       ...(io.atomic ? { atomic: io.atomic } : {}),
     });
     if (!batch.ok)

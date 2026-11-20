@@ -10,7 +10,7 @@ import { shortDate } from "../core/review/counts";
 import type { Git } from "../library/git";
 import type { IndexQuiz } from "../library/index-file";
 import { type LibraryPaths, libraryPaths, type QuizPaths, shortHash } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
 import {
@@ -188,7 +188,7 @@ async function fileSubmitted(
     lockEnvOf(io),
     {
       waiting: (h) => hooks.waiting(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`),
-      stale: (h) => hooks.stale(`removed a lock left by pid ${h.pid} (${h.command})`),
+      stale: (h, why) => hooks.stale(staleNote(h, why)),
     },
     async () => {
       const text = await readFile(submitted.file, "utf8");

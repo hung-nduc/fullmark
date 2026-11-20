@@ -1,15 +1,18 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { loadStored } from "../src/cli/library-common";
+import { runLibraryList } from "../src/cli/library-list";
 import { runLibraryStatus } from "../src/cli/library-status";
 import { loadQuiz } from "../src/cli/load";
 import { localIso } from "../src/cli/time";
 import { readCheck } from "../src/library/check-file";
 import { readIndex } from "../src/library/index-file";
 import { slashed } from "../src/library/layout";
+import { realLockEnv } from "../src/library/lock";
+import { capture } from "./helpers/cli";
 import { gitHeavy } from "./helpers/git-timeout";
-import { cleanTemps, git, NOW } from "./helpers/library";
+import { cleanTemps, git, libraryEnv, NOW } from "./helpers/library";
 import { newLibrary, quizText } from "./helpers/library-register";
 
 gitHeavy(); // a git call costs about 225 ms on Windows: see test/helpers/git-timeout.ts
@@ -39,6 +42,77 @@ const A: [string, string][] = [
   ["q3", "Third question"],
 ];
 
+describe("library register: source relative to the library (STEP6-GAPS.md, G8)", () => {
+  const listed = async (dir: string, env: Record<string, string>) => {
+    const c = capture(dir, env);
+    const exit = await runLibraryList({ json: true, plain: true }, { ...c.io, now: () => new Date(NOW) });
+    expect(exit).toBe(0);
+    return (JSON.parse(c.out[0] as string) as { quizzes: { name: string; changed: boolean }[] }).quizzes;
+  };
+
+  it("writes the source relative, and the quiz is unchanged until the file is edited", async () => {
+    const t = await newLibrary();
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", A) });
+    await t.register(["notes/a.md"]);
+    expect(index(t.lib).quizzes[0]?.source).toBe("../notes/a.md");
+    expect((await listed(t.dir, t.env)).map((q) => q.changed)).toEqual([false]);
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", [...A, ["q4", "Fourth question"]]) });
+    expect((await listed(t.dir, t.env)).map((q) => q.changed)).toEqual([true]);
+  });
+
+  it("still finds its source after the folder above the library and the notes is copied elsewhere", async () => {
+    const t = await newLibrary();
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", A) });
+    await t.register(["notes/a.md"]);
+    const moved = `${t.dir}-moved`;
+    cpSync(t.dir, moved, { recursive: true });
+    const env = { ...libraryEnv(moved), FULLMARK_LIBRARY: join(moved, "lib") };
+    expect((await listed(moved, env)).map((q) => q.changed)).toEqual([false]);
+    rmSync(join(moved, "notes", "a.md"));
+    writeFileSync(join(moved, "notes", "a.md"), quizText("alpha", "Alpha", [...A, ["q4", "Fourth question"]]));
+    expect((await listed(moved, env)).map((q) => q.changed)).toEqual([true]);
+    rmSync(moved, { recursive: true, force: true });
+  });
+
+  it("rewrites an absolute source relative when it registers a file found by its source, with one commit", async () => {
+    const t = await newLibrary();
+    t.write({ "notes/a.md": quizText("alpha", "Alpha", A) });
+    await t.register(["notes/a.md"]);
+    const toml = join(t.lib, "library.toml");
+    writeFileSync(
+      toml,
+      readFileSync(toml, "utf8").replace('"../notes/a.md"', `"${slashed(join(t.dir, "notes", "a.md"))}"`),
+    );
+    await git(t.lib, t.env, "commit", "-a", "-m", "an absolute source, as an older library holds it");
+    // an absolute source still names its file
+    expect((await listed(t.dir, t.env)).map((q) => q.changed)).toEqual([false]);
+    const r = await t.register(["notes/a.md"]);
+    expect(r.exit).toBe(0);
+    expect(r.out[0]).toMatch(/^unchanged alpha · version [0-9a-f]{4}$/);
+    expect(index(t.lib).quizzes[0]?.source).toBe("../notes/a.md");
+    expect((await log(t.lib, t.env))[0]).toBe("fullmark: register alpha (source made relative)");
+    // and once it is relative, a second register changes nothing
+    const before = await log(t.lib, t.env);
+    await t.register(["notes/a.md"]);
+    expect(await log(t.lib, t.env)).toEqual(before);
+  });
+});
+
+describe("library status: a lock from another machine or boot (STEP6-GAPS.md, G9)", () => {
+  it("removes a lock left on another machine, by the same rule as every command", async () => {
+    const t = await newLibrary();
+    writeFileSync(
+      join(t.lib, ".fullmark.lock"),
+      `${JSON.stringify({ pid: process.pid, command: "quiz library take x", started: NOW, host: "OTHER-PC", boot: NOW })}\n`,
+    );
+    const c = t.at();
+    const lock = { ...realLockEnv(), host: "THIS-PC", boot: NOW };
+    expect(await runLibraryStatus({ json: false, plain: true }, { ...c.io, lock })).toBe(0);
+    expect(c.out.join("\n")).toContain(`removed a lock left by pid ${process.pid} on another machine (OTHER-PC)`);
+    expect(existsSync(join(t.lib, ".fullmark.lock"))).toBe(false);
+  });
+});
+
 describe("library register: one file", () => {
   it("registers a new quiz: the files of the version, the index and one commit", async () => {
     const t = await newLibrary();
@@ -60,7 +134,7 @@ describe("library register: one file", () => {
         name: "rust-basics",
         id: "rust",
         title: "Rust basics",
-        source: slashed(join(t.dir, "notes", "rust.md")),
+        source: "../notes/rust.md",
         current: hash,
         versions: [{ hash, added: localIso(new Date(NOW)), file: "rust.md" }],
         shelves: [],
@@ -509,6 +583,8 @@ describe("library register: the library's lock and git", () => {
           },
           alive: () => true,
           pid: 1,
+          host: "TEST-PC",
+          boot: "2026-11-18T08:00:00.000Z",
           waitMs: 10_000,
           pollMs: 100,
         },

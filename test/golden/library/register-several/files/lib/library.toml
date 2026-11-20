@@ -5,7 +5,7 @@ created = "2026-11-18T14:22:10+00:00"
 [quizzes.chemical-bonding]
 id = "chem-bonds"
 title = "Chemical bonding"
-source = "<dir>/notes/chem.md"
+source = "../notes/chem.md"
 current = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20"
 versions = [{ hash = "c8dd04180e491fa8ac4c1564a9b274b286112ea87b099771e1bca3c42d0bcb20", added = "2026-11-18T14:22:10+00:00", file = "chem.md" }]
 shelves = []
@@ -13,7 +13,7 @@ shelves = []
 [quizzes.rust-basics]
 id = "rust-basics"
 title = "Rust basics"
-source = "<dir>/notes/rust.md"
+source = "../notes/rust.md"
 current = "f9d8a0d4e000b25d7b80857d526312c5ee77165b70b4b7279abbcc903b5be744"
 versions = [{ hash = "f9d8a0d4e000b25d7b80857d526312c5ee77165b70b4b7279abbcc903b5be744", added = "2026-11-18T14:22:10+00:00", file = "rust.md" }]
 shelves = []
@@ -21,7 +21,7 @@ shelves = []
 [quizzes.signals-and-systems]
 id = "signals"
 title = "Signals and systems"
-source = "<dir>/notes/signals.md"
+source = "../notes/signals.md"
 current = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678"
 versions = [{ hash = "7111f95646fa393bc8c8fd4b8484b5c92f1015e27ce26132f379aab3df572678", added = "2026-11-18T14:22:10+00:00", file = "signals.md" }]
 shelves = []

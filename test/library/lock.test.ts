@@ -1,7 +1,16 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { LockBusy, type LockEnv, type LockHolder, processAlive, withLock } from "../../src/library/lock";
+import {
+  LockBusy,
+  type LockEnv,
+  type LockHolder,
+  processAlive,
+  type StaleReason,
+  staleNote,
+  staleReason,
+  withLock,
+} from "../../src/library/lock";
 import { cleanTemps, tempDir } from "../helpers/library";
 
 afterEach(cleanTemps);
@@ -18,6 +27,8 @@ function fakeEnv(start = "2026-11-18T14:00:00.000Z", alive: (pid: number) => boo
     },
     alive,
     pid: 4242,
+    host: "TEST-PC",
+    boot: "2026-11-18T08:00:00.000Z",
     waitMs: 10_000,
     pollMs: 100,
   };
@@ -37,7 +48,13 @@ describe("the library lock", () => {
       return 7;
     });
     expect(result).toBe(7);
-    expect(inside).toEqual({ pid: 4242, command: "quiz library register a.md", started: "2026-11-18T14:00:00.000Z" });
+    expect(inside).toEqual({
+      pid: 4242,
+      command: "quiz library register a.md",
+      started: "2026-11-18T14:00:00.000Z",
+      host: "TEST-PC",
+      boot: "2026-11-18T08:00:00.000Z",
+    });
     expect(existsSync(join(root, ".fullmark.lock"))).toBe(false);
   });
 
@@ -180,6 +197,82 @@ describe("the library lock", () => {
       ),
     ).rejects.toThrow("denied");
     expect(f.sleeps.reduce((a, b) => a + b, 0)).toBe(10_000);
+  });
+
+  describe("a lock from another machine or an earlier boot (STEP6-GAPS.md, G9)", () => {
+    /** A lock held by the live process 4242 (alive for the fake env), written with the given host and boot. */
+    async function run(extra: Partial<LockHolder>) {
+      const root = tempDir();
+      const f = fakeEnv();
+      holderFile(root, {
+        pid: 4242,
+        command: "quiz library take signals",
+        started: "2026-11-18T09:00:00.000Z",
+        ...extra,
+      });
+      const stale: { why: StaleReason; note: string }[] = [];
+      let ran = false;
+      let busy: unknown = null;
+      try {
+        await withLock(
+          root,
+          "me",
+          { ...f.env, pid: 1 },
+          {
+            stale: (h, why) => stale.push({ why, note: staleNote(h, why) }),
+          },
+          async () => {
+            ran = true;
+          },
+        );
+      } catch (error) {
+        busy = error;
+      }
+      return { ran, stale, busy };
+    }
+
+    it("is stale when its host is not this machine's, even if a process with that id runs here", async () => {
+      const r = await run({ host: "OTHER-PC", boot: "2026-11-18T08:00:00.000Z" });
+      expect(r.ran).toBe(true);
+      expect(r.stale).toEqual([{ why: "host", note: "removed a lock left by pid 4242 on another machine (OTHER-PC)" }]);
+    });
+
+    it("is stale when its boot is an earlier one", async () => {
+      const r = await run({ host: "TEST-PC", boot: "2026-11-17T20:00:00.000Z" });
+      expect(r.ran).toBe(true);
+      expect(r.stale).toEqual([
+        { why: "boot", note: "removed a lock left by pid 4242 before this machine last started" },
+      ]);
+    });
+
+    it("is judged by its process when the boot is within a minute: a live one keeps the lock", async () => {
+      const r = await run({ host: "TEST-PC", boot: "2026-11-18T08:00:40.000Z" });
+      expect(r.ran).toBe(false);
+      expect(r.busy).toBeInstanceOf(LockBusy);
+      expect(r.stale).toEqual([]);
+    });
+
+    it("is judged by its process when the boot is within a minute: a dead one is removed as before", async () => {
+      const root = tempDir();
+      const f = fakeEnv(undefined, () => false);
+      holderFile(root, {
+        pid: 4242,
+        command: "quiz library take signals",
+        started: "2026-11-18T09:00:00.000Z",
+        host: "TEST-PC",
+        boot: "2026-11-18T07:59:30.000Z",
+      });
+      const stale: string[] = [];
+      await withLock(root, "me", f.env, { stale: (h, why) => stale.push(staleNote(h, why)) }, async () => undefined);
+      expect(stale).toEqual(["removed a lock left by pid 4242 (quiz library take signals)"]);
+    });
+
+    it("without host or boot is judged by its process alone", () => {
+      const holder = { pid: 4242, command: "x", started: "2026-11-18T09:00:00.000Z" };
+      const env = { host: "TEST-PC", boot: "2026-11-18T08:00:00.000Z" };
+      expect(staleReason(holder, { ...env, alive: () => true })).toBeNull();
+      expect(staleReason(holder, { ...env, alive: () => false })).toBe("dead");
+    });
   });
 
   it("asks the operating system whether a process is running", () => {

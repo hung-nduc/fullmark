@@ -6,6 +6,7 @@ import { reviewFindings } from "../core/rules/review";
 import { CHECK_FILE, readCheck } from "../library/check-file";
 import { type IndexQuiz, shelfNames } from "../library/index-file";
 import { libraryPaths } from "../library/layout";
+import { resolveSource } from "../library/source-path";
 import { loadStored } from "./library-common";
 import { type QuizHistory, readHistory } from "./library-history";
 import { loadQuiz } from "./load";
@@ -86,10 +87,11 @@ export function flaggedOf(root: string, quiz: IndexQuiz, version: Quiz | null): 
 }
 
 /** Whether the file the quiz was registered from still exists, and whether it differs from the current version. */
-export function sourceOf(quiz: IndexQuiz): { exists: boolean; changed: boolean } {
-  if (!existsSync(quiz.source)) return { exists: false, changed: false };
+export function sourceOf(root: string, quiz: IndexQuiz): { exists: boolean; changed: boolean } {
+  const file = resolveSource(quiz.source, root);
+  if (file === null || !existsSync(file)) return { exists: false, changed: false };
   try {
-    return { exists: true, changed: loadQuiz(quiz.source).hash !== quiz.current };
+    return { exists: true, changed: loadQuiz(file).hash !== quiz.current };
   } catch {
     return { exists: false, changed: false };
   }
@@ -126,7 +128,7 @@ export function listRow(
     added: isoDate(quiz.versions[0]?.added ?? ""),
     updated: isoDate(current?.added ?? ""),
     taken: history.taken === null ? null : isoDate(history.taken),
-    changed: sourceOf(quiz).changed,
+    changed: sourceOf(root, quiz).changed,
     ungraded: history.ungraded.length > 0,
     flagged: flaggedOf(root, quiz, currentQuiz),
   };

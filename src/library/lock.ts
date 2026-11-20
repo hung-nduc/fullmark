@@ -1,9 +1,17 @@
 import { readFile, rm, writeFile } from "node:fs/promises";
+import { hostname, uptime } from "node:os";
 import { join } from "node:path";
 import { LOCK_FILE } from "./layout";
 
-/** What `.fullmark.lock` holds, as JSON: who has the library, and since when. */
-export type LockHolder = { pid: number; command: string; started: string };
+/**
+ * What `.fullmark.lock` holds, as JSON: who has the library, and since when. `host` and `boot` (the ISO time that
+ * machine started) tell a lock left on another system, or before a reboot, from one a running process holds
+ * (STEP6-GAPS.md, G9); a lock without them is judged by its process alone.
+ */
+export type LockHolder = { pid: number; command: string; started: string; host?: string; boot?: string };
+
+/** How far two boot times may differ and still be one boot: `os.uptime()` and the clock are not exact. */
+export const BOOT_TOLERANCE_MS = 60_000;
 
 /**
  * What the lock needs from the machine, so that a test never waits 10 real seconds: the clock, a sleep, and whether a
@@ -14,6 +22,10 @@ export type LockEnv = {
   sleep(ms: number): Promise<void>;
   alive(pid: number): boolean;
   pid: number;
+  /** this machine's name (`os.hostname()`) */
+  host: string;
+  /** the ISO time this machine started: now minus `os.uptime()` */
+  boot: string;
   /** how long a second writer waits before giving up (default 10 s) */
   waitMs: number;
   /** how often it looks again (default 100 ms) */
@@ -26,6 +38,8 @@ export function realLockEnv(): LockEnv {
     sleep: (ms) => new Promise((done) => setTimeout(done, ms)),
     alive: processAlive,
     pid: process.pid,
+    host: hostname(),
+    boot: new Date(Date.now() - uptime() * 1000).toISOString(),
     waitMs: 10_000,
     pollMs: 100,
   };
@@ -56,14 +70,38 @@ export class LockBusy extends Error {
   }
 }
 
+/** Why a lock is stale: left on another machine, left before this machine last started, or its process is gone. */
+export type StaleReason = "host" | "boot" | "dead";
+
+/**
+ * Whether a lock is stale, and why, by one rule for every reader (`withLock` and `library status`): its `host` is not
+ * this machine's, or its `boot` is more than a minute from this machine's; otherwise when its process is not running.
+ */
+export function staleReason(holder: LockHolder, env: Pick<LockEnv, "host" | "boot" | "alive">): StaleReason | null {
+  if (holder.host !== undefined && holder.host !== env.host) return "host";
+  if (holder.boot !== undefined) {
+    const apart = Math.abs(Date.parse(holder.boot) - Date.parse(env.boot));
+    if (!(apart <= BOOT_TOLERANCE_MS)) return "boot";
+  }
+  return env.alive(holder.pid) ? null : "dead";
+}
+
+/** What is said when a stale lock is removed (after "note"). */
+export function staleNote(holder: LockHolder, why: StaleReason): string {
+  if (why === "host")
+    return `removed a lock left by pid ${holder.pid} on another machine (${holder.host ?? "unknown"})`;
+  if (why === "boot") return `removed a lock left by pid ${holder.pid} before this machine last started`;
+  return `removed a lock left by pid ${holder.pid} (${holder.command})`;
+}
+
 export type LockHooks = {
   /** called once, when the library is held by a running command and the wait begins */
   waiting?(holder: LockHolder): void;
   /** called when a lock left by a process that is gone was removed */
-  stale?(holder: LockHolder): void;
+  stale?(holder: LockHolder, why: StaleReason): void;
 };
 
-async function readHolder(file: string): Promise<{ holder: LockHolder | null; text: string | null }> {
+export async function readHolder(file: string): Promise<{ holder: LockHolder | null; text: string | null }> {
   let text: string;
   try {
     text = await readFile(file, "utf8");
@@ -73,7 +111,16 @@ async function readHolder(file: string): Promise<{ holder: LockHolder | null; te
   try {
     const value = JSON.parse(text) as Partial<LockHolder>;
     if (typeof value.pid === "number" && typeof value.command === "string" && typeof value.started === "string")
-      return { holder: { pid: value.pid, command: value.command, started: value.started }, text };
+      return {
+        holder: {
+          pid: value.pid,
+          command: value.command,
+          started: value.started,
+          ...(typeof value.host === "string" ? { host: value.host } : {}),
+          ...(typeof value.boot === "string" ? { boot: value.boot } : {}),
+        },
+        text,
+      };
   } catch {
     // half-written, or not ours
   }
@@ -91,8 +138,8 @@ const isTaken = (error: unknown): boolean => {
 
 /**
  * Runs `fn` holding the library's lock (TECHNICAL_DESIGN.md, section 7): `.fullmark.lock` in `root`, made with an
- * exclusive create. A second writer looks again every `pollMs` for up to `waitMs`, then throws `LockBusy`; a lock whose
- * process is no longer running is removed (`hooks.stale`) and the command goes ahead. Released in a `finally`.
+ * exclusive create. A second writer looks again every `pollMs` for up to `waitMs`, then throws `LockBusy`; a lock that is
+ * stale (`staleReason`) is removed (`hooks.stale`) and the command goes ahead. Released in a `finally`.
  */
 export async function withLock<T>(
   root: string,
@@ -104,7 +151,13 @@ export async function withLock<T>(
   create: (file: string, text: string) => Promise<void> = (f, text) => writeFile(f, text, { flag: "wx" }),
 ): Promise<T> {
   const file = join(root, LOCK_FILE);
-  const mine: LockHolder = { pid: env.pid, command, started: env.now().toISOString() };
+  const mine: LockHolder = {
+    pid: env.pid,
+    command,
+    started: env.now().toISOString(),
+    host: env.host,
+    boot: env.boot,
+  };
   const began = env.now().getTime();
   let told = false;
   for (;;) {
@@ -126,11 +179,12 @@ export async function withLock<T>(
       }
       continue;
     }
-    if (holder !== null && !env.alive(holder.pid)) {
+    const why = holder === null ? null : staleReason(holder, env);
+    if (holder !== null && why !== null) {
       // stale: remove it only if it is still the lock we read, so a lock made since is not swept away
       if ((await readHolder(file)).text === text) {
         await rm(file, { force: true });
-        hooks.stale?.(holder);
+        hooks.stale?.(holder, why);
       }
       continue;
     }

@@ -8,7 +8,7 @@ import type { QuestionType, ShelfManifest } from "../core/ir";
 import { SHELF_FORMAT, SHELF_VERSION } from "../core/ir";
 import type { Git } from "../library/git";
 import { type IndexQuiz, isPublished, PUBLIC_SHELF } from "../library/index-file";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { profileToml } from "../library/profile-toml";
 import {
   filesUnder,
@@ -316,7 +316,7 @@ export async function runLibrarySync(
       lockEnvOf(io),
       {
         waiting: (h) => io.err(p.dim(`waiting for the shelf: ${h.command} (pid ${h.pid}) holds the lock`)),
-        stale: (h) => out(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+        stale: (h, why) => out(`${p.cyan("note")} ${staleNote(h, why)}`),
       },
       async () => {
         const again = readOld();

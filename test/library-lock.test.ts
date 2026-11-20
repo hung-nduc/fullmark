@@ -44,6 +44,8 @@ function held() {
     },
     alive: (pid) => pid === 4242,
     pid: 1,
+    host: "TEST-PC",
+    boot: "2026-11-18T08:00:00.000Z",
     waitMs: 10_000,
     pollMs: 100,
   };

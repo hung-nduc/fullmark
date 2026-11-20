@@ -1,7 +1,7 @@
 import { ID_FORMAT } from "../core/slug";
 import { type IndexQuiz, writeIndex } from "../library/index-file";
 import { libraryPaths } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { writeFileAtomic } from "./atomic";
 import { EXIT, type ExitCode } from "./exit-codes";
 import {
@@ -51,7 +51,7 @@ export async function runLibraryRename(
       lockEnvOf(io),
       {
         waiting: (h) => io.err(p.dim(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`)),
-        stale: (h) => out(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+        stale: (h, why) => out(`${p.cyan("note")} ${staleNote(h, why)}`),
       },
       async () => {
         // the index as it is now that the lock is ours

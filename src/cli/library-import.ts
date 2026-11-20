@@ -5,8 +5,9 @@ import { findFrontMatter, splitLines } from "../core/parse/lines";
 import type { ParseTex } from "../core/parse/tex";
 import { type IndexQuiz, isPublished, PUBLIC_SHELF, QUIZ_KIND } from "../library/index-file";
 import { shortHash } from "../library/layout";
-import { LockBusy, withLock } from "../library/lock";
+import { LockBusy, staleNote, withLock } from "../library/lock";
 import { MANIFEST_FILE, readManifest } from "../library/shelf";
+import { sourceToStore } from "../library/source-path";
 import { type CheckOptions, checkFile, clearProgress, showProgress } from "./check";
 import { loadUserConfig } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
@@ -174,7 +175,7 @@ export async function runLibraryImport(dirArg: string, opts: LibraryImportOption
       lockEnvOf(io),
       {
         waiting: (h) => io.err(p.dim(`waiting for the library: ${h.command} (pid ${h.pid}) holds the lock`)),
-        stale: (h) => notes.push(`${p.cyan("note")} removed a lock left by pid ${h.pid} (${h.command})`),
+        stale: (h, why) => notes.push(`${p.cyan("note")} ${staleNote(h, why)}`),
       },
       () => run(),
     );
@@ -406,7 +407,7 @@ export async function runLibraryImport(dirArg: string, opts: LibraryImportOption
           name: w.name,
           id: w.id,
           title: w.title,
-          source: w.c.abs,
+          source: sourceToStore(w.c.abs, root),
           current: w.hash,
           versions: [{ hash: w.hash, added: w.added, file: basename(w.c.abs) }],
           shelves: w.c.listed !== null ? [onShelf] : [],
@@ -417,7 +418,7 @@ export async function runLibraryImport(dirArg: string, opts: LibraryImportOption
         quizzes.set(w.quiz.name, {
           ...w.quiz,
           title: fm.title,
-          source: w.c.abs,
+          source: sourceToStore(w.c.abs, root),
           current: w.hash,
           versions: [...w.quiz.versions, { hash: w.hash, added: w.added, file: basename(w.c.abs) }],
           shelves: isPublished(w.quiz) || w.c.listed === null ? w.quiz.shelves : [...w.quiz.shelves, onShelf],
