@@ -18,6 +18,14 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 
 **Decided by the owner on 2026-11-20:** completion for **PowerShell, bash (Git Bash), zsh and fish**, as the proposal designs it (`quiz __complete` holds the logic once; `quiz shell-init SHELL` prints a short shim per shell, zsh and fish with descriptions). Not nushell, and not the tldr page's move. The Starship segment is G9. Written into COMMANDS.md with slice 7b's brief.
 
+**G7. Where zsh and fish get a real Tab test.** This laptop has PowerShell and Git Bash only. **Recommendation:** the agent tests the zsh and fish scripts' text and every `__complete` answer here; the real Tab test runs once on a lab workstation (`ibmelabc05` or `ibmelab-pc`) over SSH, if zsh and fish are there, with the owner's yes at the time. Not installing them on Windows (MSYS2) only for a test.
+
+**Decided by the owner on 2026-11-20, as recommended.** Written in slice 7b's brief.
+
 **G8. Which branch is fullmark.** Until now `main` held the Python prototype and was not touched, and 1.0 was built on `1.0`. `main` was an ancestor of `1.0` (nothing on `main` that `1.0` lacked), so moving it was a fast-forward; document-kit and presentation-kit depend on the separate `fullmark-py` repository, not on this `main`. **Recommendation:** fast-forward `main` to 1.0 and work on `main`; 0.x stays at the tag `v0.10.2`; delete `1.0` later.
 
 **Decided by the owner on 2026-11-20, as recommended:** the owner fast-forwarded `main` and pushed `main` and `1.0` (GitHub now names the repository `hung-nduc/fullmark`; `origin` was pointed there). Written into CLAUDE.md, README.md and STEP7.md's Handoff.
+
+**G9. The Starship segment.** The proposal (`proposals/cli-integration.md`, section 4) shows `📚 FOLDER` anywhere inside a library "so it is clear where `quiz library ...` will act", but library commands never look at the current folder: they act on the configured library, or on `FULLMARK_LIBRARY`. Inside another library's folder the segment would mislead. **Recommendation:** leave the walk-up hook out and correct the proposal; the case worth showing, `FULLMARK_LIBRARY` set in this shell, needs no fullmark code (Starship's `env_var` module).
+
+**Decided by the owner on 2026-11-20, as recommended.** The proposal's status and section 4 corrected.

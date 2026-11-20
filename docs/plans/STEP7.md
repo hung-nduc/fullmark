@@ -16,12 +16,14 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
 | 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
+| 7b | briefed (2026-11-20); waits for G10 and the owner's approval | |
 
 ### Next
 
 1. **Done:** 7a built and reviewed (2026-11-20).
 2. **Done, `4549bb02`:** a bug the owner found (2026-11-20): the docked top bar stays tall after the Appearance menu closes. `src/page/dock.ts` sets the measured height as the dock's inline `min-height`, so when its content shrinks the box does not, and the `ResizeObserver` on the dock never fires again (reproduced on the owner's quiz: 99 px, 160 px with the menu open, still 160 px after it closed while the content needed 98 px). Anything that shrinks the dock sticks the same way (A−, a wider window). The fix measures the dock's content (each child observed, and again when a child comes or goes: the menu, the dialog, the review bar); a Playwright test opens and closes the menu, and A+ then A−, and checks the dock is back to its content's height. The menu keeps closing on a click outside, as now.
 3. **Done (2026-11-20):** fast-forward `1.0`, pack and reinstall from the tarball as in step 6, and check that the `/quiz` skill loads again.
+4. **Next:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief; then one agent builds it.
 
 ## Goal
 
@@ -33,17 +35,16 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3, G6 and G8 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below); G7 and G9, for slice 7b. New ones are added here from G10.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), and G10. New ones are added here from G11.
 
-**G7. Where zsh and fish get a real Tab test.** This laptop has PowerShell and Git Bash only. **Recommendation:** the agent tests the zsh and fish shims' text and every `__complete` answer here; the real Tab test runs once on a lab workstation (`ibmelabc05` or `ibmelab-pc`) over SSH, if zsh and fish are there, with the owner's yes at the time. Not installing them on Windows (MSYS2) only for a test.
-
-**G9. The Starship segment.** The proposal (`proposals/cli-integration.md`, section 4) shows `📚 FOLDER` anywhere inside a library "so it is clear where `quiz library ...` will act", but library commands never look at the current folder: they act on the configured library, or on `FULLMARK_LIBRARY` (COMMANDS.md, "Git"). Inside another library's folder the segment would mislead. **Recommendation:** leave the walk-up hook out of 7b and correct the proposal's sentence; the case worth showing, `FULLMARK_LIBRARY` set in this shell, needs no fullmark code (Starship's `env_var` module, three lines in `starship.toml`, which the owner adds or not).
+**G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
 
 ## Slices
 
 | Slice | Content | Needs |
 |---|---|---|
 | **7a** | `quiz guide`, `quiz agent-guide`, the authoring guide, `AGENTS.md`, `skill/SKILL.md` | G1 to G3 |
+| **7b** | Tab completion: `quiz shell-init` for PowerShell, bash, zsh and fish, and the hidden `quiz __complete` | 7a, G6, G7, G9, G10 |
 
 ## Slice 7a: the guides and the skill
 
@@ -86,3 +87,34 @@ The agent's report and the planner's review, with one full check after the dock 
 - **A Windows note:** a second `npm run golden:update` right after the first failed to open 17 golden files for writing (`UNKNOWN: unknown error, open`); nothing was written, the first run had already regenerated all 776 cases, and the full check below compares every golden. A file briefly held by another process (likely the virus scanner on files just written) is the probable cause, not shown.
 - **Check on Windows**, nothing else running: `npm run build`, then `npm run check`, exit 0 in 24.5 min. Startup test 2 passed; Vitest 3,926 passed, 3 skipped (163 files, 536 s); budgets passed, Chromium 911 ms, Firefox 2,413 ms then 807 ms on its retry (limit 1,000 ms; a cold first measurement, as in step 6); Playwright 863 passed (the two dock tests new), 559 skipped by design (15.0 min).
 - **New gaps from the agent,** both small and not blocking: **G4**, `--plain` and `--no-pager` do nothing in the first form, as COMMANDS.md says: nothing to decide until the styled output is built. **G5**, `templates/blank/quiz.md` keeps a commented `on_timeout` line for a key that 1.0 dropped (`syntax.unknown-key` if uncommented); removing it changes the `new/*` goldens that copy the template. Recommendation: remove it in the next slice that touches the templates.
+
+## Slice 7b: Tab completion
+
+**Briefed on 2026-11-20 from G6, G7 and G9, decided by the owner, and G10.** What the commands do is written in COMMANDS.md (`quiz shell-init`, with the hidden `quiz __complete`); `proposals/cli-integration.md`, section 1, is the background and the reasons, and COMMANDS.md wins where they differ. The prompt segment (its section 4) is not part of this slice (G9).
+
+### Read first
+
+- This plan: "Rules for every slice", 7a's review; [STEP7-GAPS.md](STEP7-GAPS.md), G6, G7, G9.
+- COMMANDS.md: `quiz shell-init` (all of it), "Conventions" (exit codes, environment), `quiz template`, `quiz rules`, the `--profile` and `--section` options, and every library command the table of library values lists. `proposals/cli-integration.md`, sections 1 and "The seam to keep in v1".
+- `src/cli/main.ts` (how commands, options and choices are declared), the startup test and `test/cli-graph.test.ts` (what a command may load), and where the library index, the templates, the profiles and the rule ids are read today: reuse those readers, never a second parser.
+
+### Tasks
+
+1. **The definitions are the source.** Every fixed set of values a flag takes is a declared choice in commander (`.choices()`), not a check inside an action, so help and completion read the same list. Change the declarations that are not yet; a declared choice must give the same message and exit code as the check it replaces, or the change is reported. Goldens whose help text changes are listed.
+2. **`quiz __complete WORDS...`**, hidden, exactly as COMMANDS.md says: the candidates, the descriptions, the directive line, the rules (read-only, quiet, no lock, every error giving no candidates, `:default` and exit `0`). It walks the commander tree to find the position, then asks the value source the table names. Each value source is a small function with unit tests (an empty library, no library, a broken index, no config, a user template, a quiz with and without sections). It must not load the page builder, the renderer, the server, the highlighter or `@clack/prompts`: extend `test/cli-graph.test.ts`.
+3. **Its budget.** A test in the startup tests' style times `__complete` for a subcommand and for a library quiz name on the history fixture: within the startup budget, and a library value within 100 ms on this laptop (report the measurements).
+4. **The four scripts**, printed by `quiz shell-init powershell|bash|zsh|fish`, each registering `quiz` and `fullmark`, each a few dozen lines at most, kept as files in the package and printed as they are. PowerShell: `Register-ArgumentCompleter -Native`, with the descriptions as tooltips; bash: a `complete -F` function that works with and without the `bash-completion` package, and in Git Bash; zsh: a `compdef` function using `_describe`, so the descriptions show; fish: `complete -c` with the descriptions. Each honours the directive (files of a kind, no files, the shell's default). An unknown shell exits `2` naming the four. `quiz shell-init --help` gives the four start-up lines of COMMANDS.md. Before writing them, look at `@bomb.sh/tab` and `tabtab`; use one only if it fits COMMANDS.md's protocol and adds nothing to the startup path, and say why either way. A new dependency is named in the report with its size and licence.
+5. **Real Tab tests where the shell is here** (G7). PowerShell and Git Bash: a smoke test that loads the script into a real shell and completes `quiz lib`, `quiz library take ` on the history fixture (with `FULLMARK_CONFIG` pointing at a test config, never the owner's), a `--fonts ` value and a `.md` file. For zsh and fish, which this laptop lacks: tests of the scripts' text and of every `__complete` answer they rely on, and a small script that runs the same smoke test, to be run once on a Linux workstation with zsh and fish (skipped here, and the skip says so). Do not install a shell.
+6. **The guides.** `guide/GUIDE.md` gains a short section on setting completion up (the four lines); `skill/SKILL.md` and `AGENTS.md` say nothing about it (completion is for people). The skill test still passes.
+7. **The version** (G10), then `npm run golden:update`: list every changed golden and show that each differs only in the version string and what follows from it, or explain it (task 1's help text).
+
+### Done when
+
+- On Windows, nothing else running: `npm run build`, then `npm run check` passes. Report each part's counts and times, the budgets, and `__complete`'s measurements.
+- By hand in PowerShell and Git Bash, with the scripts loaded from a build in a temporary prefix (as in 7a, never over the owner's install): Tab completes a subcommand, a flag, a fixed value, a library quiz name with its title, and a quiz file. Quote what you saw.
+- The zsh and fish smoke script exists, runs its tests when the shells are there, and is named in the report for the planner to run on the workstation.
+- No golden changes except those listed and explained; one commit per task or a few; explicit paths; the model's `Co-Authored-By` line; no push.
+
+### Report
+
+What was done per task, anything done differently and why, the library choice (task 4), the changed goldens, the counts, times and measurements, what could not be checked here, and any new gap (from G11) with a recommendation.

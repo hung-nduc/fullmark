@@ -621,6 +621,47 @@ In a terminal, the Markdown is rendered: headings, lists, tables, wrapping to th
 | `--plain` | The Markdown source, even in a terminal |
 | `--no-pager` | Styled, but printed straight to the terminal |
 
+### quiz shell-init
+
+**New**: Tab completion in the shell.
+
+```text
+quiz shell-init powershell|bash|zsh|fish
+```
+
+Prints a short script for that shell which makes Tab complete `quiz` and `fullmark`: subcommands, flags, the values of flags with a fixed set, and live values read from the user's own files. It changes nothing: the user adds one line to their shell's start-up file, as `quiz shell-init --help` shows, and fullmark never edits a profile.
+
+| Shell | Line in the start-up file |
+|---|---|
+| PowerShell (`$PROFILE`) | `quiz shell-init powershell \| Out-String \| Invoke-Expression` |
+| bash, Git Bash included (`~/.bashrc`) | `eval "$(quiz shell-init bash)"` |
+| zsh (`~/.zshrc`, after `compinit`) | `eval "$(quiz shell-init zsh)"` |
+| fish (`~/.config/fish/config.fish`) | `quiz shell-init fish \| source` |
+
+PowerShell, zsh and fish show a description next to each value; bash shows the values only. The script asks `quiz` on each Tab (below), so it never goes stale after an upgrade. An unknown shell exits `2` and names the four.
+
+**What Tab completes:**
+
+| Position | Candidates |
+|---|---|
+| Subcommands and flags | every command and flag, from the CLI's own definitions, the hidden ones left out |
+| A flag's fixed values | its declared choices (`--fonts` quiz, all, none; `--lang` en, vi; `--answers`, `--mode` and the like) |
+| A template (`new`, `template rm`) | the built-in templates and the user's own; `template rm` only the user's |
+| A profile (`--profile`) | the built-in profiles and those in `config.toml` and the nearest `fullmark.toml` |
+| A library quiz (`library take`, `info`, `stats`, `grade`, `review`, `share`, `replay`, `rename`, `rm`, `register --update`, `publish`) | its names, from the library's index, with the title as the description |
+| An attempt (`--attempt`) | that quiz's attempt stamps, newest first |
+| A section (`--section`) | the quiz's section slugs, with their titles |
+| A rule (`quiz rules RULE`) | the rule ids |
+| A file | left to the shell, filtered by kind: `.md` for a quiz, `.json` for results and grades |
+
+Values are completed as written in this file, never translated.
+
+**`quiz __complete WORDS...`** is the hidden command the scripts call: `WORDS` are the command line so far, the last one the word being completed (empty after a space). It prints one candidate per line, `value`, a tab and a description (or the value alone), then a last line that is a directive: `:nofile` (no file fallback), `:files:md` or `:files:json` (complete files of that kind) or `:default` (the shell's own completion). Rules:
+
+- **Read-only and quiet.** It never writes, never takes the library lock, never prompts, and prints nothing but candidates. Any error (no library, a broken index, an unknown command) gives no candidates, `:default` and exit `0`, so nothing is ever printed into the prompt.
+- **Fast.** It loads only the command definitions, the config, the library index and, for `--section`, the one quiz asked about: no page builder, renderer, server or highlighter. It answers within the startup budget (TECHNICAL_DESIGN.md, section 8), and a library value within 100 ms on the owner's laptop.
+- **Hidden** from `--help`, the guides and `AGENTS.md`; the names `__complete` and `shell-init` are reserved.
+
 ## Library commands
 
 All under `quiz library`. A library is one folder under git that holds each quiz's versions (sources, `materials` sheets and assets, never HTML), results and reports. fullmark commits after every command that changes it and **never pushes**. Every library command exits `2` when no library is set (neither `FULLMARK_LIBRARY` nor `library` in `config.toml`), with "no library: run `quiz library init PATH`".

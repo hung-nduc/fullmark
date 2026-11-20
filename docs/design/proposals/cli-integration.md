@@ -1,6 +1,6 @@
 # Proposal: shell integration (completion, prediction, tldr page, Starship)
 
-**Status: proposal, cherry on top.** [TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN.md) and [COMMANDS.md](../COMMANDS.md) do not include it. It fits late in 1.0 or in a 1.x release; nothing here changes a file format. One seam is worth keeping in v1 (below), so adding it later is cheap.
+**Status: completion adopted (2026-11-20, step 7, G6), the rest still a proposal.** Section 1 is now in [COMMANDS.md](../COMMANDS.md) (`quiz shell-init`, for PowerShell, bash, zsh and fish; nushell left out). Section 4's prompt segment is not adopted (step 7, G9): library commands act on the configured library, never on the current folder, so the segment would mislead. [TECHNICAL_DESIGN.md](../TECHNICAL_DESIGN.md) does not include the rest. It fits late in 1.0 or in a 1.x release; nothing here changes a file format. One seam is worth keeping in v1 (below), so adding it later is cheap.
 
 ## The idea
 
@@ -98,7 +98,7 @@ Today the page lives outside the project, in the owner's dotfiles. Move it here 
 
 ## 4. Prompt segment (Starship)
 
-A prompt segment such as `📚 my-library` anywhere inside a library, subfolders included, and `🗂 public` inside a shelf, so it is clear where `quiz library ...` will act. It must be exact and free: right in every folder, and no process started per prompt.
+A prompt segment such as `📚 my-library` anywhere inside a library, subfolders included, and `🗂 public` inside a shelf. **Not adopted (step 7, G9):** this section first said the segment makes it clear where `quiz library ...` will act, but library commands never look at the current folder: they act on the library in `config.toml`, or on `FULLMARK_LIBRARY`. The case worth showing is `FULLMARK_LIBRARY` set in this shell, and Starship's `env_var` module shows it with no fullmark code. It must be exact and free: right in every folder, and no process started per prompt.
 
 ### Why not a Starship custom module
 
