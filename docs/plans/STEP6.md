@@ -21,7 +21,7 @@ As in step 5 ([archive/STEP5.md](archive/STEP5.md), Handoff): the planner writes
 
 ### Next
 
-1. The owner decides G20 to G24 (6c's review) and reads the rehearsal's `D:/coding-projects/fullmark-0x-migration/logs/rehearsal/compare.log`. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
+1. G20 to G24 decided as recommended and the real migration approved by the owner (2026-11-20); the planner runs it. The cloud checks of 6a and 6b were not run (no cloud environment from the laptop).
 2. The owner reads the rehearsal's `compare.log` and says yes; the planner then runs the real migration (the one command 6c's report gives).
 3. After 6c: the planner lists loose ends, does a quick pass over `docs/design/proposals/` for the owner, and fullmark 1.0 is installed on the owner's laptop.
 
@@ -54,17 +54,7 @@ Step 5's rules hold ([archive/STEP5.md](archive/STEP5.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G19 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 and G19 slice 6c; G18 (the agent's, about `register --update` not following a moved file) is left as it is, by the agent's recommendation, and not decided separately. New ones are added here from G20.
-
-**G20. A 0.x question id that 1.0 refuses.** `dr-aSe` (ch10) has a capital letter (`question.id-format`). **Recommendation:** the migration renames it `dr-ase`, in the quiz and in its one attempt (every question of which is unanswered).
-
-**G21. `on_timeout: warn` has no 1.0 form.** `biosignal-circuits` (midterm practice) has `time_limit: 60m` with `on_timeout: warn`; in 1.0 a time limit always submits. **Recommendation:** drop both lines: the practice quiz becomes untimed, so no hard cut-off surprises the owner. (The other choice, keeping 60 min as a hard limit, is `--on-timeout-warn keep`.)
-
-**G22. Two of the four attempts are empty.** ch10 (19 s) and the sensors quiz (55 s): every question unanswered, 0%; moved, they show LAST and BEST 0%. **Recommendation:** move them, as G16 decided: they are in 0.x's stats, and step 6 is done when the stats agree.
-
-**G23. Git on Windows and long paths.** In a deeply nested rehearsal folder (about 150 characters), git failed with "Filename too long"; `register` exited 0 with its "the commit failed" warning and the library stayed uncommitted. The real library's longest path is about 165 characters, under Windows' 260, so the migration is not affected. **Recommendation:** fullmark runs git with `-c core.longpaths=true` on Windows; built after the migration, as a loose end.
-
-**G24. `take --missed` cannot show its plan without serving.** The comparison had to derive the plan for exams A and B from `grade --json` and `stats --json` (both agree with 0.x). **Recommendation:** `quiz library take NAME --missed --dry-run` (and plain `--dry-run`) prints the plan (ids, changed, gone) and serves nothing; built after the migration, as a loose end.
+G1 to G24 are decided ([STEP6-GAPS.md](STEP6-GAPS.md)): G8 to G12 are slice 6b, G13 to G17 and G19 to G22 slice 6c, G23 and G24 loose ends after the migration; G18 (the agent's, about `register --update` not following a moved file) is left as it is, by the agent's recommendation, and not decided separately. New ones are added here from G25.
 
 ## Slices
 

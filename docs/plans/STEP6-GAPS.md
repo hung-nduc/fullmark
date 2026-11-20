@@ -76,3 +76,22 @@ All seven come from the first full run of the suite on Windows (2026-11-20).
 
 **Decided by the owner on 2026-11-20, as recommended.** Written into COMMANDS.md, `quiz library register`. Built as slice 6c's first task, in fullmark's repository.
 
+**G20. A 0.x question id that 1.0 refuses.** `dr-aSe` (ch10) has a capital letter (`question.id-format`). **Recommendation:** the migration renames it `dr-ase`, in the quiz and in its one attempt (every question of which is unanswered).
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration: the script's rename table.
+
+**G21. `on_timeout: warn` has no 1.0 form.** `biosignal-circuits` (midterm practice) has `time_limit: 60m` with `on_timeout: warn`; in 1.0 a time limit always submits. **Recommendation:** drop both lines: the practice quiz becomes untimed, so no hard cut-off surprises the owner. (The other choice, keeping 60 min as a hard limit, is `--on-timeout-warn keep`.)
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration: `--on-timeout-warn drop`, the default.
+
+**G22. Two of the four attempts are empty.** ch10 (19 s) and the sensors quiz (55 s): every question unanswered, 0%; moved, they show LAST and BEST 0%. **Recommendation:** move them, as G16 decided: they are in 0.x's stats, and step 6 is done when the stats agree.
+
+**Decided by the owner on 2026-11-20, as recommended.** A matter of the migration: all four attempts move.
+
+**G23. Git on Windows and long paths.** In a deeply nested rehearsal folder (about 150 characters), git failed with "Filename too long"; `register` exited 0 with its "the commit failed" warning and the library stayed uncommitted. The real library's longest path is about 165 characters, under Windows' 260, so the migration is not affected. **Recommendation:** fullmark runs git with `-c core.longpaths=true` on Windows; built after the migration, as a loose end.
+
+**Decided by the owner on 2026-11-20, as recommended.** To build after the migration (loose ends); written into COMMANDS.md when built.
+
+**G24. `take --missed` cannot show its plan without serving.** The comparison had to derive the plan for exams A and B from `grade --json` and `stats --json` (both agree with 0.x). **Recommendation:** `quiz library take NAME --missed --dry-run` (and plain `--dry-run`) prints the plan (ids, changed, gone) and serves nothing; built after the migration, as a loose end.
+
+**Decided by the owner on 2026-11-20, as recommended.** To build after the migration (loose ends); written into COMMANDS.md when built.
