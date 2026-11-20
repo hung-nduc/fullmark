@@ -19,6 +19,8 @@ import { dirname, join, relative, resolve } from "node:path";
  *
  * - `cmd.txt`      the arguments, one per line, paths relative to the working directory
  * - `input/`       files copied into the working directory (optional)
+ * - `input-extra/` files copied over `input/` (optional): what a fixture cannot keep in git, such as a lock file that
+ *                  the fixture's own `.gitignore` ignores
  * - `copy.txt`     `repo/path => dest` lines: a file or folder of the repository copied in (optional)
  * - `env.txt`      `KEY=VALUE` lines added to the environment; `<dir>` is the working directory (optional)
  * - `git.txt`      folders (relative to the working directory) made a git repository with one commit of everything in
@@ -89,6 +91,7 @@ export async function runCase(c: Case): Promise<Run> {
   const tmp = realpathSync(mkdtempSync(join(tmpdir(), "fm-golden-")));
   try {
     if (existsSync(join(c.dir, "input"))) cpSync(join(c.dir, "input"), tmp, { recursive: true });
+    if (existsSync(join(c.dir, "input-extra"))) cpSync(join(c.dir, "input-extra"), tmp, { recursive: true });
     for (const l of lines(join(c.dir, "copy.txt"))) {
       const [from, to] = l.split(" => ");
       if (!from || !to) throw new Error(`${c.name}: bad copy.txt line: ${l}`);
