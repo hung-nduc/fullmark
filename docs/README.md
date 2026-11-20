@@ -4,7 +4,7 @@ The design of fullmark 1.0 (the TypeScript rewrite) and the plans it is built fr
 
 ## Where to start
 
-- **Working on the code:** read the Handoff at the top of the current step's plan ([plans/archive/STEP5.md](plans/archive/STEP5.md), whose note on top says where step 6 starts, until `plans/STEP6.md` is written) first. It says what is done, what waits for the owner and what comes next.
+- **Working on the code:** read the Handoff at the top of the current step's plan ([plans/STEP6.md](plans/STEP6.md)) first. It says what is done, what waits for the owner and what comes next.
 - **Learning the design:** [USER_DESIGN.md](design/USER_DESIGN.md) (why), then [TECHNICAL_DESIGN.md](design/TECHNICAL_DESIGN.md) (how), then [COMMANDS.md](design/COMMANDS.md) and [QUIZ_SYNTAX.md](design/QUIZ_SYNTAX.md) as references.
 
 ## Design (`design/`)
@@ -31,7 +31,7 @@ The full table, with what each step contains and when it is done, is [TECHNICAL_
 | 3 | `serve`, `review`, `grade --web`, `brief`, `stats`, `inspect`, `new`, `template`, `build --watch` | done, archived: [plans/archive/STEP3.md](plans/archive/STEP3.md), its decided gaps in [plans/archive/STEP3-GAPS.md](plans/archive/STEP3-GAPS.md) |
 | 4 | The library | done, archived: [plans/archive/STEP4.md](plans/archive/STEP4.md), its decided gaps in [plans/archive/STEP4-GAPS.md](plans/archive/STEP4-GAPS.md) |
 | 5 | `publish` and `import` | done, archived: [plans/archive/STEP5.md](plans/archive/STEP5.md), its decided gaps in [plans/archive/STEP5-GAPS.md](plans/archive/STEP5-GAPS.md) |
-| 6 | Moving the owner's 0.x history into a 1.0 library | not written yet |
+| 6 | The suite on Windows, then moving the owner's 0.x history into a 1.0 library | in progress: [plans/STEP6.md](plans/STEP6.md), its decided gaps in [plans/STEP6-GAPS.md](plans/STEP6-GAPS.md) |
 
 ## Plans (`plans/`)
 

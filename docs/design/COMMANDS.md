@@ -63,7 +63,7 @@ Commands that handle each input on its own take `FILE...`: `check`, `build`, `id
 
 ### Paths in output
 
-A path is printed relative to the working directory when it lies under it, else absolute, and always with `/`, on Windows too. A file that cannot be read or written is reported in plain words ("no such file", "is a folder", "permission denied"), not with the operating system's message.
+A path is printed relative to the working directory when it lies under it, else absolute, and always with `/`, on Windows too. Every path fullmark writes into a file (`library.toml`'s `source`, the config's `library` and `[shelves]`, a shelf's manifest) is written with `/` as well, on Windows too, so a library or config reads the same on every system. A stored path is shown as stored: one that is absolute on another system (`/home/minh/notes/quiz.md` read on Windows) is printed unchanged, never resolved against the current drive, and a file it names is simply reported missing. A file that cannot be read or written is reported in plain words ("no such file", "is a folder", "permission denied"), not with the operating system's message.
 
 ### Names, ids and stamps
 

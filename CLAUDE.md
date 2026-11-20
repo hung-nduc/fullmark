@@ -4,7 +4,7 @@ fullmark 1.0 is a TypeScript rewrite: Markdown quizzes in, one offline HTML page
 
 ## Start here
 
-1. Read the **Handoff** at the top of the current step's plan. Step 5 is closed and step 6's plan is not written yet: start from the note on top of [docs/plans/archive/STEP5.md](docs/plans/archive/STEP5.md). It says what is done, what waits for the owner and what comes next, and a session needs nothing else to pick up.
+1. Read the **Handoff** at the top of the current step's plan, [docs/plans/STEP6.md](docs/plans/STEP6.md). It says what is done, what waits for the owner and what comes next, and a session needs nothing else to pick up.
 2. The design docs in `docs/design/` say what 1.0 is; the plans say how it is built. Where they disagree, the design docs win. [docs/README.md](docs/README.md) maps them.
 
 ## How the work runs
@@ -19,6 +19,7 @@ The full list is under "Rules for every slice" in the plan (and [docs/plans/arch
 
 - **Goldens are the contract.** Expected outputs are in `test/golden/`; `npm run golden:update` rewrites them. Never regenerate or revert a golden to hide a difference. Explain and count every one that changes.
 - **A failure is environmental only when its cause is shown.**
+- **Never run a second Vitest beside a running one** in the same checkout: the global setup runs `npm run build`, which cleans `dist/` under the running suite.
 - **No real network or real timers in unit tests:** the server binds 127.0.0.1 on port 0, and the clock, the timeout and the file watcher are injected.
 - **A command loads only what it uses.** `check` must never load `src/serve/`, and `@clack/prompts` loads only for `brief --tui`. `test/cli-graph.test.ts` and the startup tests guard this.
 - **Shared pages carry no server code.** A `build` page is byte-identical with and without the server features (TECHNICAL_DESIGN.md, foundation 9).
