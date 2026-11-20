@@ -116,7 +116,7 @@ Built by one agent (Sonnet) from the brief; reviewed by the planner on Windows.
 
 ## Slice 6b: `source` relative to the library, the lock's host and boot, the budget alone
 
-**Approved by the owner on 2026-11-20** (G8 to G12 decided as recommended). What fullmark does is written in COMMANDS.md ("Paths in output", "The library folder", `quiz library import`) and TECHNICAL_DESIGN.md (foundation "Library and shelf writes take a lock"; section 11, "Budgets"); this brief says how to build it.
+**Briefed on 2026-11-20 from G8 to G12, decided by the owner as recommended.** What fullmark does is written in COMMANDS.md ("Paths in output", "The library folder", `quiz library import`) and TECHNICAL_DESIGN.md (foundation "Library and shelf writes take a lock"; section 11, "Budgets"); this brief says how to build it.
 
 ### Read first
 
