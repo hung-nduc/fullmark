@@ -35,6 +35,8 @@ test("the start screen has the bar: the version, A- / A+ and Appearance; the bar
   expect(await bar(page).evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   await start(page);
   await expect(bar(page)).toHaveCount(0);
+  // the questions open at the top, whatever the start screen's scroll was
+  expect(await page.evaluate(() => scrollY)).toBe(0);
   await expect(page.locator("[data-dock]")).toBeVisible();
   expect(seen.problems).toEqual([]);
 });

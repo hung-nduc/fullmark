@@ -771,6 +771,8 @@ export function App({ store }: { store: Store }) {
             if (store.screen.wanted.value && store.screen.available.value) store.fullscreen(true);
             // the start bar's menu stays behind: the docked bar opens without it
             store.look.menu.value = false;
+            // the questions open at the top: the page does not keep the start screen's scroll (Start sits at its end)
+            window.scrollTo(0, 0);
             store.start(id, { part: state.part.value });
           },
           submit: () => store.submit(id),
