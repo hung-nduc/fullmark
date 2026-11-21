@@ -40,13 +40,11 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10, G11 and G14; G12 and G13 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G15.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10 and G11; G12 to G14 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G15.
 
 **G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
 
 **G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
-
-**G14. The start bar makes the start screen scroll at 390 × 844** (7c's review, below). `e2e/foot.spec.ts` fails in both browsers: a short quiz's start screen is 865 px tall at 390 × 844 (800 px before; the bar is 65 px). The design asks only that the ⓘ button be at the foot, never over content, which holds; fitting the window was the test's assumption, and making the bar fit is not enough (−12 px and −20 px still leave 1 px over). The bar also sits 12 px below the window's top, where the board draws it flush. **Recommendation:** a phone's start screen may scroll: the test keeps "fits the window" for desktop and checks the button at the page's end on the three phones; and the bar goes flush with the top (no `.fm-quiz` top padding before Start), one goldens round for it.
 
 ## Slices
 

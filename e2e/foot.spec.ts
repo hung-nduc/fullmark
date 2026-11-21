@@ -22,10 +22,10 @@ for (const size of [{ width: 1280, height: 940 }, ...PHONES]) {
         await page.getByRole("button", { name: "Start" }).boundingBox(),
       ];
       if (b === null || start === null) throw new Error("no box");
-      // the page is not taller than the window, and the button's bottom is within 24 px of it; on the narrowest phone
-      // the text wraps and the start screen is taller than the window: then the button is at the page's end
+      // on a desktop the page is not taller than the window, and the button's bottom is within 24 px of it; on a phone
+      // the start screen, with its bar, may be taller than the window: then the button is at the page's end (step 7, G14)
       const total = await page.evaluate(() => document.documentElement.scrollHeight);
-      if (size.width >= 390) expect(total).toBeLessThanOrEqual(size.height);
+      if (!("name" in size)) expect(total).toBeLessThanOrEqual(size.height);
       const bottom = Math.max(total, size.height);
       expect(bottom - (b.y + b.height)).toBeLessThanOrEqual(24);
       expect(bottom - (b.y + b.height)).toBeGreaterThanOrEqual(0);

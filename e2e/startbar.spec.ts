@@ -31,6 +31,8 @@ test("the start screen has the bar: the version, A- / A+ and Appearance; the bar
   await expect(bar(page).getByRole("button", { name: "Larger text" })).toBeVisible();
   await expect(bar(page).getByRole("button", { name: "Appearance" })).toBeVisible();
   expect(await bar(page).evaluate((el) => getComputedStyle(el).position)).toBe("static");
+  // flush with the window's top, as the board draws it (step 7, G14)
+  expect(await bar(page).evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   await start(page);
   await expect(bar(page)).toHaveCount(0);
   await expect(page.locator("[data-dock]")).toBeVisible();

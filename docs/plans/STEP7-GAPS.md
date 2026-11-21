@@ -37,3 +37,7 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 **G13. The version after 7c.** 7c fixes a slip (the board drew the bar; no slice built it) and adds no command or key. **Recommendation:** `1.1.1` if 7c ships before 7b, so 7b stays `1.2.0` (G10); every page golden changes anyway with the bundle, and the version string adds only to those already changing.
 
 **Decided by the owner on 2026-11-20, as recommended:** 7c is `1.1.1`. Written in slice 7c's brief.
+
+**G14. The start bar makes the start screen scroll at 390 × 844** (7c's review, below). `e2e/foot.spec.ts` fails in both browsers: a short quiz's start screen is 865 px tall at 390 × 844 (800 px before; the bar is 65 px). The design asks only that the ⓘ button be at the foot, never over content, which holds; fitting the window was the test's assumption, and making the bar fit is not enough (−12 px and −20 px still leave 1 px over). The bar also sits 12 px below the window's top, where the board draws it flush. **Recommendation:** a phone's start screen may scroll: the test keeps "fits the window" for desktop and checks the button at the page's end on the three phones; and the bar goes flush with the top (no `.fm-quiz` top padding before Start), one goldens round for it.
+
+**Decided by the owner on 2026-11-21, as recommended.** Written into TECHNICAL_DESIGN.md, section 8, "The look" (**Where they are**); built in 7c's follow-up.

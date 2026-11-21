@@ -71,10 +71,6 @@
     margin-bottom: 0;
   }
 
-  .fm-quiz[data-phase="start"] {
-    padding-top: 12px;
-  }
-
   .fm-quiz[data-phase="start"] .fm-main {
     display: flex;
     flex-direction: column;
