@@ -780,3 +780,16 @@ Run `quiz check quiz.md --strict`, fix every finding, and run it again until it 
 ## 14. Where the answer key lives
 
 The answer key is inside the page, only obfuscated. It stops a learner from seeing answers by accident, not someone who reads the page source, so never describe a quiz as secure. A printed paper made with `quiz build --print` carries no key unless you ask for one with `--answers`.
+
+## 15. Tab completion in your shell
+
+This is for the person at the keyboard. With one line in your shell's start-up file, Tab completes `quiz` and `fullmark`: the commands, the flags, the values of a flag that has a fixed set, your templates and profiles, the quizzes of your library by name, and quiz files. Nothing is changed by `quiz shell-init`; it only prints a script, and fullmark never edits a start-up file.
+
+| Shell | Line for its start-up file |
+|---|---|
+| PowerShell (`$PROFILE`) | `quiz shell-init powershell \| Out-String \| Invoke-Expression` |
+| bash, Git Bash included (`~/.bashrc`) | `eval "$(quiz shell-init bash)"` |
+| zsh (`~/.zshrc`, after `compinit`) | `eval "$(quiz shell-init zsh)"` |
+| fish (`~/.config/fish/config.fish`) | `quiz shell-init fish \| source` |
+
+Open a new shell, then try `quiz lib` and Tab. PowerShell, zsh and fish show a description beside each value; bash shows the values.

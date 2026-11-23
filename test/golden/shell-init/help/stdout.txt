@@ -1,0 +1,20 @@
+Usage: quiz shell-init [options] <shell>
+
+print the script that makes Tab complete quiz and fullmark in a shell
+
+Arguments:
+  shell       the shell the script is for (choices: "powershell", "bash", "zsh",
+              "fish")
+
+Options:
+  -h, --help  help for the command
+
+Prints the script; nothing is changed, and fullmark never edits a profile. With one line in your shell's
+start-up file, Tab completes subcommands, flags, their values, the library's quizzes and your templates.
+
+The line for each shell:
+  PowerShell ($PROFILE)              quiz shell-init powershell | Out-String | Invoke-Expression
+  bash, Git Bash (~/.bashrc)         eval "$(quiz shell-init bash)"
+  zsh (~/.zshrc, after compinit)     eval "$(quiz shell-init zsh)"
+  fish (~/.config/fish/config.fish)  quiz shell-init fish | source
+

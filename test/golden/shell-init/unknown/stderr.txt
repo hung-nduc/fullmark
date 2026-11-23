@@ -1,0 +1,1 @@
+error: command-argument value 'nushell' is invalid for argument 'shell'. Allowed choices are powershell, bash, zsh, fish.

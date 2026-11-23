@@ -1,0 +1,2 @@
+study-fixture	Study fixture
+:nofile

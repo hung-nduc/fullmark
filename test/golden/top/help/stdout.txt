@@ -27,6 +27,8 @@ Commands:
                                  written in Markdown
   agent-guide [options]          print the instructions for AI agents
                                  (AGENTS.md)
+  shell-init <shell>             print the script that makes Tab complete quiz
+                                 and fullmark in a shell
   inspect [options] <file>       summarise a quiz: question types, points,
                                  sections, tags, banks and where the right
                                  answers sit

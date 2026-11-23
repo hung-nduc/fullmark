@@ -1,0 +1,2 @@
+timed-exam	A time limit and a locked page, like the real exam.
+:nofile

@@ -26,12 +26,15 @@ Options:
   --answer-sheet        with --print: a grid of boxes for the single-choice and
                         true/false answers
   --answers <mode>      with --print: none (an exam paper), key (the answer key
-                        on a new page) or inline (a study sheet)
+                        on a new page) or inline (a study sheet) (choices:
+                        "none", "key", "inline")
   --materials <which>   with --print: none leaves the materials page out
+                        (choices: "none")
   --ui-lang <lang>      the page's language for this build, en or vi (default:
-                        the quiz's ui_lang)
+                        the quiz's ui_lang) (choices: "en", "vi")
   --fonts <which>       which fonts the page embeds: quiz (the quiz's own), all
                         or none (default: fonts in config.toml, else quiz)
+                        (choices: "quiz", "all", "none")
   --plain               no colours and no progress line, even in a terminal
   --watch               rebuild when the quiz, the files it uses or the build
                         file change; Ctrl+C stops (exit 0)
