@@ -1,2 +1,2 @@
---fonts	which fonts the page embeds: quiz (the quiz's own), all or none (default: fonts in config.toml, else quiz)
+--fonts	which fonts the page embeds (quiz: the quiz's own; default: fonts in config.toml, else quiz)
 :nofile

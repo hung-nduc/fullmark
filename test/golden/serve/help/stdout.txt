@@ -17,8 +17,8 @@ Options:
   --profile <name>       the check profile; overrides the quiz's profile
   --config <toml>        use this config file instead of the nearest
                          fullmark.toml
-  --fonts <which>        which fonts the page embeds: quiz (the quiz's own), all
-                         or none (choices: "quiz", "all", "none")
+  --fonts <which>        which fonts the page embeds (quiz: the quiz's own)
+                         (choices: "quiz", "all", "none")
   --focus                tick Focus mode on the start screen
   --section <s>          serve only this section (its slug or title)
   --autosave <progress>  keep the attempt in progress in this file, so it
