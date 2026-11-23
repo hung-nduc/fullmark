@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -18,9 +18,16 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
  */
 const LIMIT_VERSION_MS = 60;
 const LIMIT_CHECK_MS = 180;
+/**
+ * `quiz __complete` (the shells' Tab, COMMANDS.md): a subcommand or a flag is a start like `--version`'s, so it has its limit;
+ * a value read from the library (a quiz name) has the 100 ms COMMANDS.md gives it. Measured on 2026-11-23: about 25 and 65 ms.
+ */
+const LIMIT_COMPLETE_MS = LIMIT_VERSION_MS;
+const LIMIT_COMPLETE_LIBRARY_MS = 100;
 const RUNS = 7;
 const ROUNDS = 2;
 const cli = resolve(import.meta.dirname, "..", "dist", "cli.js");
+const HISTORY = resolve(import.meta.dirname, "fixtures", "library-history", "lib");
 
 const QUIZ = [
   "---",
@@ -44,6 +51,7 @@ beforeAll(() => {
   dir = mkdtempSync(join(tmpdir(), "fullmark-startup-"));
   mkdirSync(join(dir, ".git"));
   writeFileSync(join(dir, "quiz.md"), QUIZ);
+  cpSync(HISTORY, join(dir, "lib"), { recursive: true });
 });
 afterAll(() => {
   rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
@@ -64,6 +72,8 @@ function startupEnv(): Record<string, string | undefined> {
     XDG_CONFIG_HOME: dir,
   };
   delete env.FULLMARK_CONFIG;
+  // the library a completion reads: a copy of the history fixture, never the owner's
+  env.FULLMARK_LIBRARY = join(dir, "lib");
   return env;
 }
 
@@ -104,5 +114,15 @@ describe("startup budget", () => {
 
   it("quiz check on a small quiz costs under its limit beyond bare Node", () => {
     expect(share("quiz check", ["check", "quiz.md"], LIMIT_CHECK_MS)).toBeLessThan(LIMIT_CHECK_MS);
+  }, 60_000);
+
+  it("quiz __complete for a subcommand costs under its limit beyond bare Node", () => {
+    const limit = LIMIT_COMPLETE_MS;
+    expect(share("quiz __complete lib", ["__complete", "lib"], limit)).toBeLessThan(limit);
+  }, 60_000);
+
+  it("quiz __complete for a library quiz name costs under 100 ms beyond bare Node", () => {
+    const limit = LIMIT_COMPLETE_LIBRARY_MS;
+    expect(share("quiz __complete library take", ["__complete", "library", "take", "t"], limit)).toBeLessThan(limit);
   }, 60_000);
 });

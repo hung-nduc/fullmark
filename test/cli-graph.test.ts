@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 /**
  * A command loads only what it uses (TECHNICAL_DESIGN.md, section 7, "CLI startup"). tsup splits `dist/` into chunks
  * with the commands' lazy `import()` as the boundaries; this reads the chunks' static `import` lines (the ones Node
- * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template`, `stats`, `guide` and `agent-guide` never reach the page builder, the
+ * runs at load) and checks that `--version`, `--acknowledgements`, `check`, `rules`, `ids`, `grade`, `inspect`, `new`, `template`, `stats`, `guide`, `agent-guide`, `shell-init` and `__complete` never reach the page builder, the
  * page renderer (Preact and the components) or the Markdown-to-HTML path of `build`, and never reach the library
  * (`src/library/`); `library init`, `status`, `path`, `register`, `list`, `info`, `stats`, `grade` (without `--web`), `rename`, `rm` and `template add` reach neither the page builder, the renderer nor the server; `library take` loads the server only when it serves, never for `--dry-run`; `library share` loads the page builder and no server; `library review` loads the form's server and page builder through `quiz review`'s chunk only; `library publish NAME --on` loads neither, and its sync loads the page builder and no server; `library import` loads neither the page builder nor the server.
  */
@@ -31,6 +31,9 @@ const LIBRARY_ONLY = ["// src/library/", "// src/cli/library-"];
 
 /** The terminal form's prompts (`@clack/prompts`): only `brief --tui` loads them. */
 const CLACK = ["// node_modules/@clack/", "// node_modules/sisteransi/", "// node_modules/fast-wrap-ansi/"];
+
+/** The code blocks highlighter and the maths: loaded from node_modules, only by a command that builds a page. */
+const HIGHLIGHT = ["// src/build/highlight.ts", 'from "shiki', 'from "katex', 'from "@shikijs/'];
 
 /** The chunk that holds a source file, found by esbuild's `// path` comment. */
 function chunkWith(marker: string): string {
@@ -219,6 +222,49 @@ describe("what each command loads", () => {
     expect(closure(entry("main"))).not.toContain(chunk);
     expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
     // and the commands that do not print a guide never reach it
+    for (const name of ["check", "grade", "inspect", "stats", "build"])
+      expect(closure(entry(name))).not.toContain(chunk);
+  });
+
+  it("__complete is a chunk of its own, reached by a dynamic import() from main, and loads nothing but the command tree: its sources are a second chunk, loaded only for a value, and neither reaches the page builder, the renderer, the server, the highlighter or the prompts", () => {
+    const chunk = chunkWith("// src/cli/complete.ts");
+    const sources = chunkWith("// src/cli/complete-sources.ts");
+    expect(sources).not.toBe(chunk);
+    // the walk itself reads no file of the user's and loads no parser: only a value does
+    const walk = textOf(closure(chunk));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...LIBRARY_ONLY, ...CLACK, ...HIGHLIGHT])
+      expect(walk, m).not.toContain(m);
+    for (const m of ["// src/core/rules/", "// src/core/parse/", "// node_modules/zod/", "// node_modules/smol-toml/"])
+      expect(walk, m).not.toContain(m);
+    expect(closure(chunk)).not.toContain(sources);
+    expect(readFileSync(join(dist, chunk), "utf8")).toContain(`import("./${sources}")`);
+    // the sources read the library's index, the config, the templates, the rules and one quiz: no page, no server
+    const values = textOf(closure(sources));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...CLACK, ...HIGHLIGHT]) expect(values, m).not.toContain(m);
+    expect(values).toContain("// src/library/index-file.ts");
+    expect(closure(sources).some((f) => f.startsWith("build-"))).toBe(false);
+    // the brief flags' values come from the question file through a dynamic import() of brief's help chunk
+    const help = chunkWith("// src/cli/brief-help.ts");
+    expect(closure(chunk)).not.toContain(help);
+    expect(readFileSync(join(dist, chunk), "utf8")).toContain(`import("./${help}")`);
+    // main reaches it by a dynamic import() only, and the commands that do not complete never reach it
+    expect(closure(entry("main"))).not.toContain(chunk);
+    expect(closure(entry("main"))).not.toContain(sources);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
+    for (const name of ["check", "grade", "inspect", "stats", "build"]) {
+      expect(closure(entry(name))).not.toContain(chunk);
+      expect(closure(entry(name))).not.toContain(sources);
+    }
+  });
+
+  it("shell-init is a chunk of its own, reached by a dynamic import() from main, and loads no page builder, server, library or prompts (it prints a file of the package)", () => {
+    const chunk = chunkWith("// src/cli/shell-init.ts");
+    const text = textOf(closure(chunk));
+    for (const m of [...BUILD_ONLY, ...SERVE_ONLY, ...LIBRARY_ONLY, ...CLACK, ...HIGHLIGHT])
+      expect(text, m).not.toContain(m);
+    expect(closure(chunk).some((f) => f.startsWith("build-"))).toBe(false);
+    expect(closure(entry("main"))).not.toContain(chunk);
+    expect(readFileSync(join(dist, entry("main")), "utf8")).toContain(`import("./${chunk}")`);
     for (const name of ["check", "grade", "inspect", "stats", "build"])
       expect(closure(entry(name))).not.toContain(chunk);
   });
