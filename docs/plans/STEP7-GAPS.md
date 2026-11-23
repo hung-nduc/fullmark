@@ -45,3 +45,11 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 **G16. zsh and fish in CI, not on a lab workstation** (replaces G7; raised by the planner on 2026-11-23 when the owner asked how 7b runs on two machines). The CI job already runs on Linux (`ubuntu-24.04`); installing zsh and fish there takes seconds, and every push to `main` then tests all four shells, where a workstation run over SSH happens once, depends on what is installed there, and keeps nothing tested afterwards. The cost: zsh and fish results arrive only after the owner pushes, so a failure there is fixed in a push round. **Recommendation:** CI.
 
 **Decided by the owner on 2026-11-23, as recommended.** Written in slice 7b's brief (task 5 and "Done when").
+
+**G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
+
+**Decided by the owner on 2026-11-23, as recommended:** 7b is `1.2.0`. Written in slice 7b's brief (task 7).
+
+**G17. How deep zsh's test goes** (from G16). PowerShell (`TabExpansion2`), bash (the function called with `COMP_WORDS` and `COMP_CWORD` set) and fish (`complete -C`) can run their real completer from a script, with no terminal. zsh's completion system runs only inside an interactive line editor, so a real Tab needs a pseudo-terminal driven through the `zsh/zpty` module, which is fiddly and slow to get right. **Recommendation:** zsh is tested lighter: under `zsh -f` with `compinit`, the script loads without an error, `quiz` and `fullmark` are registered (`$_comps`), and the `__complete` answers it relies on are unit-tested as for the other shells; no `zpty`. The rest of zsh's risk is in `_describe`'s input, which those tests cover.
+
+**Decided by the owner on 2026-11-23, as recommended.** Written in slice 7b's brief (task 5).
