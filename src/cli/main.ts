@@ -16,7 +16,7 @@ import type { RulesOptions } from "./rules";
 import { seededIds } from "./seed";
 import type { ServeOptions } from "./serve";
 
-export const VERSION = "1.1.1";
+export const VERSION = "1.2.0";
 
 /** The exit code a command asked for; an action sets it and `main` returns it. */
 type Outcome = { exit: ExitCode };

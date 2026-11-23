@@ -132,7 +132,7 @@ function argumentAt(cmd: Command, index: number): { name: string; choices: reado
   return argument ? { name: argument.name(), choices: argument.argChoices } : null;
 }
 
-/** The value sources read the user's files, and load their parsers only when asked: `lib` and `--fo` need none of them. */
+/** The value sources read the user's files, and load their parsers only when asked: `lib` and `--fonts` need none of them. */
 const sources = () => import("./complete-sources");
 
 /** The first typed argument as a path from the working directory: the quiz file a `--section` asks about. */
