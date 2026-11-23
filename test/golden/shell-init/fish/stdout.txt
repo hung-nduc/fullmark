@@ -26,5 +26,6 @@ function __fullmark_complete
             test (count $out) -eq 0; and __fish_complete_path $current
     end
 end
-complete -c quiz -f -a '(__fullmark_complete)'
-complete -c fullmark -f -a '(__fullmark_complete)'
+# -k: keep fullmark's order (a flag's values as declared, attempts newest first); fish would sort them
+complete -c quiz -f -k -a '(__fullmark_complete)'
+complete -c fullmark -f -k -a '(__fullmark_complete)'

@@ -221,9 +221,18 @@ describe(suiteName("fish"), () => {
       writeFileSync(join(dir, "probe.fish"), FISH_PROBE);
       writeFileSync(join(dir, "lines.txt"), `${LINES.join("\n")}\n`);
       const r = run(BINS.fish as string, ["--no-config", join(dir, "probe.fish")]);
-      expect(r.stderr).toBe("");
-      expect(r.status).toBe(0);
-      expectCandidates(blocks(r.stdout), true);
+      // fish runs only in CI: a failure carries all fish said, so one run shows every difference, not the first
+      try {
+        expect(r.stderr).toBe("");
+        expect(r.status).toBe(0);
+        expectCandidates(blocks(r.stdout), true);
+      } catch (e) {
+        throw new Error(`${(e as Error).message}
+--- fish's stdout:
+${r.stdout}
+--- fish's stderr:
+${r.stderr}`);
+      }
     },
     120_000,
   );

@@ -1,4 +1,4 @@
 published 2 quizzes to <dir>/shelf: 2 added
 remembered <dir>/shelf as the public shelf
-committed 444ffce fullmark: publish (in <dir>/shelf)
+committed 47dc3d0 fullmark: publish (in <dir>/shelf)
 next: git -C <dir>/shelf push   (fullmark never pushes)
