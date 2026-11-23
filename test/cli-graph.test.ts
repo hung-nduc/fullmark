@@ -42,8 +42,13 @@ function chunkWith(marker: string): string {
   return name;
 }
 
+/**
+ * A command's chunk, `<prefix>-<HASH>.js`, else `<prefix>.js`. The hash is matched exactly: a prefix match took
+ * `grade-web-*.js` for `grade` when the hash sorted after "web" (NTFS lists names case-insensitively).
+ */
 function entry(prefix: string): string {
-  const name = files.find((f) => f === `${prefix}.js` || (f.startsWith(`${prefix}-`) && f.endsWith(".js")));
+  const hashed = new RegExp(`^${prefix}-[A-Z0-9]{8}\\.js$`);
+  const name = files.find((f) => hashed.test(f)) ?? files.find((f) => f === `${prefix}.js`);
   if (!name) throw new Error(`dist/${prefix}*.js not found: run npm run build`);
   return name;
 }
