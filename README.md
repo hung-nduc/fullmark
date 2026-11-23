@@ -18,6 +18,7 @@ An example: [biomed-quizzes](https://hung-nduc.github.io/biomed-quizzes/), a she
 | Grade and look back | `grade` (with `--web` and `--web --grades`), `replay`, `stats` |
 | Start a quiz | `new`, `template`, `brief` (through flags, `--tui` or `--web`) |
 | Learn the syntax | `guide` (the authoring guide), `agent-guide` (the rules for AI agents); the Claude Code skill is `skill/SKILL.md` |
+| Complete with Tab | `shell-init SHELL` prints the script for PowerShell, bash, zsh or fish; one line in the shell's start-up file, and Tab completes commands, flags, values and the library's quiz names |
 
 Steps 1 to 6 are done, the library and the move from 0.x included (the plans: [docs/plans/archive/](docs/plans/archive/)); step 7, the guides, is in [docs/plans/STEP7.md](docs/plans/STEP7.md).
 

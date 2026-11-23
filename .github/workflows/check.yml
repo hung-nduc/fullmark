@@ -28,6 +28,10 @@ jobs:
       - run: npm ci
       - name: Install Chromium and Firefox for Playwright
         run: npx playwright install --with-deps chromium firefox
+      # the shell tests (test/shell-completion.test.ts) run bash, fish and zsh here, and PowerShell too when the runner has pwsh;
+      # a shell that is missing skips its tests, so the install is what makes all four run on every push
+      - name: Install zsh and fish for the Tab completion tests
+        run: sudo apt-get install -y zsh fish
       - run: npm run check
       - name: Keep the Playwright report when something failed
         if: failure()
