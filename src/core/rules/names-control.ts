@@ -39,6 +39,13 @@ export function withoutCode(text: string): string {
     .replace(/(?<![\\$])\$(?=\S)(?:\\.|[^$\\\n])*?(?<=\S)\$(?![\d$])/g, blank);
 }
 
+/** What comes before an instruction word that opens a sentence, a line or a list item (`- `, `1. `, `> `). */
+const OPENS = /(?:^|\n)[ \t]*(?:(?:[-*+>]|\d+[.)])[ \t]+)?$|[.!?]["'’”)\]]*\s+$/u;
+/** The words after an instruction word that make it one: "the", "on", "a", "an", "here", "this", "it", "to". */
+const FOLLOWER = new RegExp(`^\\s+(?:the|on|an?|here|this|it|to)(?!${LETTER})`, "iu");
+/** A capitalised word after it: a key or a label ("press Enter", "click Submit"). */
+const CAPITAL = /^\s+\p{Lu}/u;
+
 /** The first place `text` names a control, as an index and the word found; null when it names none. */
 export function findControl(
   source: string,
@@ -60,11 +67,15 @@ export function findControl(
     const m = whole(lang === "en" ? enForms(w) : spaced(w)).exec(rest);
     if (m) take(m.index, m[0]);
   }
-  // a word that names a control only as an instruction: "tap the button", never "the tap" or "a press"
+  // a word that names a control only as an instruction: "Press Enter", "then tap the button", never "the tap" or "a press"
   for (const w of words.instruction) {
-    const forms = lang === "en" ? enForms(w) : spaced(w);
-    const m = whole(`(${forms})\\s+(?:the|on|an?|here|this)`).exec(rest);
-    if (m) take(m.index, m[1] ?? m[0]);
+    for (const m of rest.matchAll(whole(lang === "en" ? enForms(w) : spaced(w)))) {
+      const after = rest.slice(m.index + m[0].length);
+      if (OPENS.test(rest.slice(0, m.index)) || FOLLOWER.test(after) || CAPITAL.test(after)) {
+        take(m.index, m[0]);
+        break;
+      }
+    }
   }
 
   const labels = words.labels.map((l) => l.normalize("NFC").toLowerCase());

@@ -115,8 +115,40 @@ describe("content.names-control: screen words", () => {
       expect(flags(s, "en"), s).toBe(false);
     }
     // a word that only starts with an instruction's follower does not count
-    expect(flags("Tap theory is old.", "en")).toBe(false);
-    expect(flags("Press another one.", "en")).toBe(false);
+    expect(flags("Some tap theory is old.", "en")).toBe(false);
+    expect(flags("We press another one.", "en")).toBe(false);
+    expect(flags("They pressed it.", "en")).toBe(true);
+    expect(flags("the hint, press to see it", "en")).toBe(true);
+  });
+
+  it("en click, tap and press flag where they open a sentence, a line or a list item (G21)", () => {
+    for (const s of [
+      "Press Enter to submit.",
+      "Click to see the hint.",
+      "Press it to continue.",
+      "press it",
+      "Done. Tap to go on.",
+      "It works.\nclick twice",
+      "- click twice",
+      "1. tap twice",
+      "> press twice",
+      'He said "yes." Tap twice.',
+      "then press Enter",
+      "and click Submit",
+    ]) {
+      expect(flags(s, "en"), s).toBe(true);
+    }
+    expect(found("Done. Tap to go on.", "en")).toBe("Tap");
+    for (const s of [
+      "The valve has a tap. A tap changer sits on the transformer.",
+      "We used a press, then a drill.",
+      "e.g. a hydraulic press works",
+      "With a tap twice a day.",
+    ]) {
+      expect(flags(s, "en"), s).toBe(false);
+    }
+    // a sentence opening with one as a noun is flagged: rare, and only a warning
+    expect(flags("Tap water is safe.", "en")).toBe(true);
     // button, sidebar and scroll stay as they are
     expect(flags("The red button.", "en")).toBe(true);
     expect(flags("Scroll.", "en")).toBe(true);

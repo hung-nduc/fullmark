@@ -19,7 +19,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 | 7b | built and reviewed (2026-11-23): `npm run check` passes on Windows; `main` fast-forwarded, tagged `v1.2.0`; the first CI run failed fish's order, fixed in **1.2.1** (shipped, installed); fish's descriptions wait for the next CI run | `3d3e7a1e`, `bd2243cb`, `634a2e57`, `09b3ec8e`, `8a7e0d2a` and the review |
 | CI and licence | CI runs on `main`; typos clean; the grade key row and the shelf phone card hold with Linux's wider fonts; the copyright holder is `hung-nduc` | `97f41a85`, `613e0809`, `f472c391` |
 | 7c | built and reviewed (2026-11-21), G14 built: `npm run check` passes on Windows; `main` fast-forwarded, 1.1.1 installed | `2e75de00`, `b62efff9`, `8202c302`, `d07ef96e`, `10c759e7`, `fd2dec97` and the review |
-| 7d | built and reviewed (2026-11-23): `npm run check` passes on Windows; waits for G21 before `1.2.2` ships | `ccd7b4ee` to `001856fc` and the review |
+| 7d | built and reviewed (2026-11-23), G21 fixed: `npm run check` passes on Windows; `1.2.2` ships | `ccd7b4ee` to `001856fc` and the review |
 
 ### Next
 
@@ -30,7 +30,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 5. **Done (2026-11-21):** 7c finished and reviewed, G14 built, a scroll regression on Start fixed, `npm run check` exit 0; `main` fast-forwarded and 1.1.1 installed from the tarball.
 6. **Waiting on the owner:** pushing `main` and the tags `v1.1.0`, `v1.1.1`, `v1.2.0` and `v1.2.1` (`git -C D:/coding-projects/fullmark push origin main v1.1.0 v1.1.1 v1.2.0 v1.2.1`; the first three may be pushed already), and the shelf (`git -C D:/studying/biomed-quizzes push`), whose last commit republishes with every font and exams A and B under the `exam` profile; after 7c is installed, `quiz library publish` again so the shelf gets the start screen's bar.
 7. **Done (2026-11-23):** 7b (Tab completion; G6, G9, G10, G16, G17) built, reviewed and shipped as `1.2.0` on the owner's yes; the first CI run failed fish's order, fixed and shipped as **1.2.1** (7b's review). zsh and fish run only in CI (G16): after the owner pushes, the planner reads the next run for fish's descriptions and file completion, and Playwright on Linux on this code.
-8. **Now:** slice 7d, the cleanup release `1.2.2` (briefed 2026-11-23 from G5, G11, G15, G18 and G20), is built and reviewed (below). G21 waits for the owner; then `1.2.2` ships (`main` fast-forwarded, tagged, installed).
+8. **Now:** slice 7d, the cleanup release `1.2.2` (briefed 2026-11-23 from G5, G11, G15, G18 and G20), is built and reviewed (below). G21 is decided and fixed (below); then `1.2.2` ships (`main` fast-forwarded, tagged, installed).
 9. **Then:** step 7's Goal is checked and the step closed; 1.3 is chosen (the multi-quiz bundle, `guide --web` and `--background` are the candidates whose seams are in v1).
 
 ## Goal
@@ -43,7 +43,7 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 (nothing to decide until the styled output is built); G5, G11, G15, G18 and G20 are decided for 7d, G19 for no change now, and G10 and G12 to G17 before them; G21 is open (7d's review, below); the decided ones are ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G21.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 (nothing to decide until the styled output is built); G5, G11, G15, G18 and G20 are decided for 7d, G19 for no change now, and G10 and G12 to G17 before them; G21 is decided and fixed (7d's review, below); the decided ones are ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G22.
 
 ## Slices
 

@@ -15,7 +15,7 @@ export type ControlWords = {
   labels: readonly string[];
   /** words about working a screen */
   screen: readonly string[];
-  /** words that name a control only as an instruction: followed by "the", "on", "a", "an", "here" or "this" (English only) */
+  /** words that name a control only as an instruction: opening a sentence, a line or a list item, or before "the", "on", "a", "an", "here", "this", "it", "to" or a capitalised word (English only) */
   instruction: readonly string[];
   /** phrases left alone, because they are ordinary words in the language */
   leave: readonly string[];
