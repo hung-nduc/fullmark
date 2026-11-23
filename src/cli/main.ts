@@ -213,10 +213,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       ),
     )
     .addOption(
-      declared(
-        new Option("--materials <which>", "with --print: leave the materials page out"),
-        MATERIALS_CHOICES,
-      ),
+      declared(new Option("--materials <which>", "with --print: leave the materials page out"), MATERIALS_CHOICES),
     )
     .addOption(
       declared(
@@ -274,14 +271,9 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       "the page to write (default: RESULTS with -replay.html); with several files, a folder",
     )
     .option("--built-at <iso>", "pin the build time, so a page is byte-identical across runs (default: now)")
+    .addOption(declared(new Option("--ui-lang <lang>", "the page's language (default: the quiz's ui_lang)"), UI_LANGS))
     .addOption(
-      declared(new Option("--ui-lang <lang>", "the page's language (default: the quiz's ui_lang)"), UI_LANGS),
-    )
-    .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--open", "open the page after writing it (the default for one file)")
     .option("--no-open", "do not open the page")
@@ -520,10 +512,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--profile <name>", "the check profile; overrides the quiz's profile")
     .option("--config <toml>", "use this config file instead of the nearest fullmark.toml")
     .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--focus", "tick Focus mode on the start screen")
     .option("--section <s>", "serve only this section (its slug or title)")
@@ -683,10 +672,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--focus", "tick Focus mode on the start screen")
     .option("--dry-run", "print the plan the take would serve and serve nothing")
     .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--no-open", "do not open the page in the browser")
     .option("--timeout <seconds>", "how long to wait for a submit; 0 waits forever (default 0)")
@@ -797,10 +783,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--version <hash>", "this version (a hash, or a prefix of at least 4 characters); default: the current one")
     .option("--source", "write the editable folder NAME/ (the source, its assets and a fullmark.toml when needed)")
     .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--json", "print the outcome as one JSON object")
     .option("--plain", "no colours, even in a terminal")
@@ -831,14 +814,9 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--off", "take the quiz off the public shelf")
     .option("--with-brief", "copy each quiz's brief.yaml too")
     .option("--no-brief", "copy no brief.yaml (the default)")
+    .addOption(declared(new Option("--ui-lang <lang>", "the index page's interface language (default: en)"), UI_LANGS))
     .addOption(
-      declared(new Option("--ui-lang <lang>", "the index page's interface language (default: en)"), UI_LANGS),
-    )
-    .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the pages embed (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the pages embed (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--dry-run", "print what would be added, updated and removed, and write nothing")
     .option("--json", "print the outcome as one JSON object")
@@ -948,10 +926,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--attempt <stamp>", "the attempt (a stamp or a prefix of 4 or more characters; default: the newest)")
     .option("-o, --output <dir>", "write the page into this folder instead of the temp folder")
     .addOption(
-      declared(
-        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
-        FONT_CHOICES,
-      ),
+      declared(new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"), FONT_CHOICES),
     )
     .option("--no-open", "do not open the page in the browser")
     .option("--json", "print the outcome as one JSON object")
