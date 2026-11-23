@@ -207,20 +207,20 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       declared(
         new Option(
           "--answers <mode>",
-          "with --print: none (an exam paper), key (the answer key on a new page) or inline (a study sheet)",
+          "with --print: how the answers print (none: an exam paper; key: on a new page; inline: a study sheet)",
         ),
         ANSWER_MODES,
       ),
     )
     .addOption(
       declared(
-        new Option("--materials <which>", "with --print: none leaves the materials page out"),
+        new Option("--materials <which>", "with --print: leave the materials page out"),
         MATERIALS_CHOICES,
       ),
     )
     .addOption(
       declared(
-        new Option("--ui-lang <lang>", "the page's language for this build, en or vi (default: the quiz's ui_lang)"),
+        new Option("--ui-lang <lang>", "the page's language for this build (default: the quiz's ui_lang)"),
         UI_LANGS,
       ),
     )
@@ -228,7 +228,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       declared(
         new Option(
           "--fonts <which>",
-          "which fonts the page embeds: quiz (the quiz's own), all or none (default: fonts in config.toml, else quiz)",
+          "which fonts the page embeds (quiz: the quiz's own; default: fonts in config.toml, else quiz)",
         ),
         FONT_CHOICES,
       ),
@@ -275,11 +275,11 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     )
     .option("--built-at <iso>", "pin the build time, so a page is byte-identical across runs (default: now)")
     .addOption(
-      declared(new Option("--ui-lang <lang>", "the page's language, en or vi (default: the quiz's ui_lang)"), UI_LANGS),
+      declared(new Option("--ui-lang <lang>", "the page's language (default: the quiz's ui_lang)"), UI_LANGS),
     )
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
@@ -521,7 +521,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--config <toml>", "use this config file instead of the nearest fullmark.toml")
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
@@ -684,7 +684,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--dry-run", "print the plan the take would serve and serve nothing")
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
@@ -798,7 +798,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--source", "write the editable folder NAME/ (the source, its assets and a fullmark.toml when needed)")
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
@@ -832,11 +832,11 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--with-brief", "copy each quiz's brief.yaml too")
     .option("--no-brief", "copy no brief.yaml (the default)")
     .addOption(
-      declared(new Option("--ui-lang <lang>", "the index page's interface language: en or vi (default: en)"), UI_LANGS),
+      declared(new Option("--ui-lang <lang>", "the index page's interface language (default: en)"), UI_LANGS),
     )
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the pages embed: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the pages embed (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
@@ -949,7 +949,7 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("-o, --output <dir>", "write the page into this folder instead of the temp folder")
     .addOption(
       declared(
-        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        new Option("--fonts <which>", "which fonts the page embeds (quiz: the quiz's own)"),
         FONT_CHOICES,
       ),
     )
