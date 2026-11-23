@@ -55,10 +55,16 @@ export function findControl(
   // the phrases that are ordinary words are set aside before the screen words are looked for
   let rest = text;
   for (const phrase of words.leave) rest = rest.replace(whole(spaced(phrase)), blank);
+  const enForms = (w: string) => `${escapeRe(w)}(?:e?s|ed|ing|${escapeRe(w.slice(-1))}(?:ed|ing))?`;
   for (const w of words.screen) {
-    const forms = lang === "en" ? `${escapeRe(w)}(?:e?s|ed|ing|${escapeRe(w.slice(-1))}(?:ed|ing))?` : spaced(w);
-    const m = whole(forms).exec(rest);
+    const m = whole(lang === "en" ? enForms(w) : spaced(w)).exec(rest);
     if (m) take(m.index, m[0]);
+  }
+  // a word that names a control only as an instruction: "tap the button", never "the tap" or "a press"
+  for (const w of words.instruction) {
+    const forms = lang === "en" ? enForms(w) : spaced(w);
+    const m = whole(`(${forms})\\s+(?:the|on|an?|here|this)`).exec(rest);
+    if (m) take(m.index, m[1] ?? m[0]);
   }
 
   const labels = words.labels.map((l) => l.normalize("NFC").toLowerCase());

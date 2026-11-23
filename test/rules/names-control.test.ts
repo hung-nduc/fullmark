@@ -88,7 +88,38 @@ describe("content.names-control: screen words", () => {
     ]) {
       expect(flags(`word ${s} here`, "en"), s).toBe(true);
     }
-    expect(found("She tapped it", "en")).toBe("tapped");
+    expect(found("She tapped the screen", "en")).toBe("tapped");
+  });
+
+  it("en click, tap and press flag only as an instruction (G11)", () => {
+    for (const s of [
+      "Tap the button.",
+      "Press here.",
+      "Click on Submit.",
+      "Then tap a choice.",
+      "Press an arrow key.",
+      "Pressing this opens it.",
+      "Tapped the screen twice.",
+      "Click\nthe diagram.",
+    ]) {
+      expect(flags(s, "en"), s).toBe(true);
+    }
+    expect(found("Click on Submit.", "en")).toBe("Click");
+    expect(found("Pressing this opens it.", "en")).toBe("Pressing");
+    for (const s of [
+      "A bypass capacitor at the tap.",
+      "A hydraulic press.",
+      "The press release came out.",
+      "A tap changer sits on the transformer.",
+    ]) {
+      expect(flags(s, "en"), s).toBe(false);
+    }
+    // a word that only starts with an instruction's follower does not count
+    expect(flags("Tap theory is old.", "en")).toBe(false);
+    expect(flags("Press another one.", "en")).toBe(false);
+    // button, sidebar and scroll stay as they are
+    expect(flags("The red button.", "en")).toBe(true);
+    expect(flags("Scroll.", "en")).toBe(true);
   });
 
   it("vi screen words match as a whole sequence of syllables", () => {
@@ -155,7 +186,7 @@ describe("content.names-control: what is read", () => {
     expect(rule.level).toBe("warning");
     expect(Object.keys(rule.options.shape)).toEqual([]);
     const f = rule.run(
-      one("Click **Check** to see the answer."),
+      one("Click on **Check** to see the answer."),
       { brief: null, contentFiles: null, review: null },
       {},
     );
@@ -171,14 +202,14 @@ describe("content.names-control: what is read", () => {
 
   it("flags each kind of text once", () => {
     const cases: [string, string, string?][] = [
-      ["description", "## Q {type=single id=q}\n\n- [x] a\n- [ ] b", "title: T\ndescription: Click to begin."],
+      ["description", "## Q {type=single id=q}\n\n- [x] a\n- [ ] b", "title: T\ndescription: Click here to begin."],
       ["section intro", "# Part\n\nClick here first.\n\n## Q {type=single id=q}\n\n- [x] a\n- [ ] b"],
       ["prompt", "## Click the right one. {type=single id=q}\n\n- [x] a\n- [ ] b"],
-      ["choice", "## Q {type=single id=q}\n\n- [x] a\n- [ ] press it"],
+      ["choice", "## Q {type=single id=q}\n\n- [x] a\n- [ ] press the key"],
       ["hint", "## Q {type=single id=q}\n\n- [x] a\n- [ ] b\n\n::: hint\nScroll up.\n:::"],
       ["explanation", "## Q {type=single id=q}\n\n- [x] a\n- [ ] b\n\n::: explanation\nThe button is wrong.\n:::"],
-      ["ordering item", "## Q {type=ordering id=q}\n\n1. first\n2. click second"],
-      ["matching item", "## Q {type=matching id=q}\n\n- a :: click\n- b :: y"],
+      ["ordering item", "## Q {type=ordering id=q}\n\n1. first\n2. click the second"],
+      ["matching item", "## Q {type=matching id=q}\n\n- a :: click here\n- b :: y"],
       [
         "rubric criterion",
         "## Q {type=essay id=q}\n\n```answer\nrubric:\n  - Says what the sidebar holds\n  - Is clear\n```",
@@ -198,7 +229,7 @@ describe("content.names-control: what is read", () => {
 
   it("does not read titles, ids or the sample answer", () => {
     const q = quiz(
-      "# Click part {id=press}\n\n## Q {type=essay id=click}\n\n```answer\nsample_answer: |\n  Click the button.\nrubric:\n  - Fine\n  - Good\n```",
+      "# Click on part {id=press}\n\n## Q {type=essay id=click}\n\n```answer\nsample_answer: |\n  Click the button.\nrubric:\n  - Fine\n  - Good\n```",
       "title: Press the button",
     );
     expect(lines(q)).toEqual([]);
@@ -219,7 +250,7 @@ describe("content.names-control: what is read", () => {
       "",
       "::: hint",
       "First line.",
-      "Click it.",
+      "Click the item.",
       ":::",
     ].join("\n");
     const r = parse(src, "t.md");
@@ -233,7 +264,7 @@ describe("content.names-control: what is read", () => {
       lines(body("```python\npress = 1\nclick = 2\n```\n\nWhat is press?".replace("What is press?", "What is it?"))),
     ).toEqual([]);
     expect(lines(body("Let $press = 2$ and $$click + tap$$ hold."))).toEqual([]);
-    expect(lines(body("It costs $5 and $6; click it."))).toHaveLength(1);
+    expect(lines(body("It costs $5 and $6; click the item."))).toHaveLength(1);
     expect(lines(body("Then ``a ` click`` ends."))).toEqual([]);
   });
 
@@ -252,14 +283,14 @@ describe("content.names-control: what is read", () => {
   });
 
   it("gives one finding for three matches in one text, on the first match's line", () => {
-    const q = one("Fine.\nClick it, click it, click it.");
+    const q = one("Fine.\nClick the item, click the item, click the item.");
     expect(lines(q)).toHaveLength(1);
-    expect(lines(one("Fine.\nClick it."))[0]).toBe((lines(one("Click it."))[0] ?? 0) + 1);
+    expect(lines(one("Fine.\nClick the item."))[0]).toBe((lines(one("Click the item."))[0] ?? 0) + 1);
   });
 
   it("is silenced by check-ignore with a reason, and reported as ignored", () => {
     const text = (extra: string) =>
-      `---\ntitle: T\n---\n\n## Q {type=single id=q${extra}}\n\n- [x] a\n- [ ] b\n\n::: hint\nClick it.\n:::\n`;
+      `---\ntitle: T\n---\n\n## Q {type=single id=q${extra}}\n\n- [x] a\n- [ ] b\n\n::: hint\nClick the item.\n:::\n`;
     const run = (src: string) => {
       const parsed = parse(src, "quiz.md");
       const resolved = resolveProfile("default", { user: null, project: null }).profile;
@@ -283,7 +314,7 @@ describe("content.names-control: what is read", () => {
 
 describe("content.names-control: a catalog label in a test double", () => {
   it("is matched through the lists given", () => {
-    const q = one("Press **Verify**.");
+    const q = one("Press the **Verify**.");
     expect(namesControl(q)).toHaveLength(1);
     const lists = buildControls({ en: { page: { ...en.page, check: "Verify" } }, vi });
     expect(findControl("The **Verify** word.", "en")).toBeNull();

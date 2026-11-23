@@ -15,15 +15,21 @@ export type ControlWords = {
   labels: readonly string[];
   /** words about working a screen */
   screen: readonly string[];
+  /** words that name a control only as an instruction: followed by "the", "on", "a", "an", "here" or "this" (English only) */
+  instruction: readonly string[];
   /** phrases left alone, because they are ordinary words in the language */
   leave: readonly string[];
 };
 
 /** The words about working a screen, and the phrases left alone. They are not catalog text: they are about the page. */
 const SCREEN = {
-  en: { screen: ["button", "click", "tap", "press", "sidebar", "scroll"], leave: [] },
-  vi: { screen: ["nút", "bấm", "nhấn", "thanh bên", "cuộn"], leave: ["nhấn mạnh", "cuộn dây", "cuộn cảm"] },
-} satisfies Record<Lang, Pick<ControlWords, "screen" | "leave">>;
+  en: { screen: ["button", "sidebar", "scroll"], instruction: ["click", "tap", "press"], leave: [] },
+  vi: {
+    screen: ["nút", "bấm", "nhấn", "thanh bên", "cuộn"],
+    instruction: [],
+    leave: ["nhấn mạnh", "cuộn dây", "cuộn cảm"],
+  },
+} satisfies Record<Lang, Pick<ControlWords, "screen" | "instruction" | "leave">>;
 
 type Catalog = Pick<Messages, "page">;
 
