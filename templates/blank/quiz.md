@@ -4,7 +4,6 @@ title: My quiz
 # id: my-quiz                  # default: the file name
 # lang: en                     # en | vi: the language the quiz is written in
 # time_limit: 30m              # 90s, 45m, 1h, 1h30m; leave out for untimed
-# on_timeout: submit           # submit | warn
 # feedback: end                # end | instant
 # shuffle_questions: false
 # shuffle_choices: false
