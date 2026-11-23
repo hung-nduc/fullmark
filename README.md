@@ -6,7 +6,7 @@ You write a quiz in Markdown. `quiz build` checks it and writes a single self-co
 
 An example: [biomed-quizzes](https://hung-nduc.github.io/biomed-quizzes/), a shelf of practice quizzes for biomedical engineering courses, published with `quiz library publish`. Each quiz opens in the browser and grades itself.
 
-**This is fullmark 1.0 (now `1.2.1`), a rewrite in TypeScript.** It isn't published to npm: it's installed from a packed tarball (`npm pack`, then `npm install -g` on the file). The Python prototype, fullmark 0.x, is at the tag `v0.10.2` and lives on as `fullmark-py` (<https://github.com/hung-nduc/fullmark-py>). 1.0 isn't compatible with it: [docs/design/fullmark-migration.md](docs/design/fullmark-migration.md) explains why.
+**This is fullmark 1.0 (now `1.2.2`), a rewrite in TypeScript.** It isn't published to npm: it's installed from a packed tarball (`npm pack`, then `npm install -g` on the file). The Python prototype, fullmark 0.x, is at the tag `v0.10.2` and lives on as `fullmark-py` (<https://github.com/hung-nduc/fullmark-py>). 1.0 isn't compatible with it: [docs/design/fullmark-migration.md](docs/design/fullmark-migration.md) explains why.
 
 ## What works today
 

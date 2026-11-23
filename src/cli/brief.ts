@@ -401,7 +401,7 @@ export async function runBrief(dir: string, opts: BriefOptions, io: BriefIo): Pr
       dir: basename(folder),
       target: shownPath(target, io.cwd),
       command: restartCommand(dir, opts),
-      version: opts.version ?? "1.2.1",
+      version: opts.version ?? "1.2.2",
       parse: (flags) => {
         try {
           return parseFlags(flags);

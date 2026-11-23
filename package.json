@@ -1,6 +1,6 @@
 {
   "name": "fullmark",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Markdown in, one offline HTML quiz out.",
   "license": "MIT",
   "type": "module",
