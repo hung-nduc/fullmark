@@ -545,52 +545,61 @@ describe("library publish DIR: a sync killed half way (foundation: library and s
     return t;
   }
 
-  it("a clean sync after a kill repairs the folder, whichever write was the last: the same bytes as a fresh shelf", async () => {
-    const calls = await (async () => {
-      const t = await scenario();
-      let n = 0;
-      await t.sync(
+  /** How many atomic writes the scenario's last sync makes: one kill point each. */
+  const WRITES = 6;
+
+  /** One kill point: the sync dies at write `limit`, then a clean sync repairs the folder. */
+  async function killedAt(limit: number) {
+    const t = await scenario();
+    const dir = join(t.dir, "shelf");
+    let n = 0;
+    await expect(
+      t.sync(
         "shelf",
         { withBrief: true },
         {
           atomic: async (file, data) => {
-            n++;
+            if (++n > limit) throw new Error("killed");
             await writeFileAtomic(file, data);
           },
         },
-      );
-      return n;
-    })();
-    expect(calls).toBeGreaterThan(3);
-    for (let limit = 0; limit < calls; limit++) {
-      const t = await scenario();
-      const dir = join(t.dir, "shelf");
-      let n = 0;
-      await expect(
-        t.sync(
-          "shelf",
-          { withBrief: true },
-          {
-            atomic: async (file, data) => {
-              if (++n > limit) throw new Error("killed");
-              await writeFileAtomic(file, data);
-            },
-          },
-        ),
-      ).rejects.toThrow("killed");
-      expect(existsSync(join(dir, ".fullmark.lock")), `lock after kill at ${limit}`).toBe(false);
-      // the manifest on disk lists everything the sync may have written (the old paths and the new)
-      const manifest = manifestOf(dir);
-      const listed = new Set(manifestPaths(manifest));
-      for (const f of listing(dir))
-        if (f !== "fullmark-shelf.json") expect(listed.has(f), `${f} after kill at ${limit}`).toBe(true);
-      // the next sync refuses nothing and ends where a fresh shelf would
-      const repaired = await t.sync("shelf", { withBrief: true });
-      expect(repaired.exit, `repair after kill at ${limit}: ${repaired.err.join(" | ")}`).toBe(0);
-      const fresh = await t.sync("fresh/shelf", { withBrief: true });
-      expect(fresh.exit).toBe(0);
-      expect(folderBytes(dir), `after kill at ${limit}`).toEqual(folderBytes(join(t.dir, "fresh", "shelf")));
-      expect((await t.sync("shelf", { withBrief: true })).out[0]).toMatch(/^unchanged:/);
-    }
+      ),
+    ).rejects.toThrow("killed");
+    expect(existsSync(join(dir, ".fullmark.lock")), `lock after kill at ${limit}`).toBe(false);
+    // the manifest on disk lists everything the sync may have written (the old paths and the new)
+    const manifest = manifestOf(dir);
+    const listed = new Set(manifestPaths(manifest));
+    for (const f of listing(dir))
+      if (f !== "fullmark-shelf.json") expect(listed.has(f), `${f} after kill at ${limit}`).toBe(true);
+    // the next sync refuses nothing and ends where a fresh shelf would
+    const repaired = await t.sync("shelf", { withBrief: true });
+    expect(repaired.exit, `repair after kill at ${limit}: ${repaired.err.join(" | ")}`).toBe(0);
+    const fresh = await t.sync("fresh/shelf", { withBrief: true });
+    expect(fresh.exit).toBe(0);
+    expect(folderBytes(dir), `after kill at ${limit}`).toEqual(folderBytes(join(t.dir, "fresh", "shelf")));
+    expect((await t.sync("shelf", { withBrief: true })).out[0]).toMatch(/^unchanged:/);
+  }
+
+  it(`the scenario's sync makes ${WRITES} atomic writes; the kill points below follow from it`, async () => {
+    const t = await scenario();
+    let n = 0;
+    await t.sync(
+      "shelf",
+      { withBrief: true },
+      {
+        atomic: async (file, data) => {
+          n++;
+          await writeFileAtomic(file, data);
+        },
+      },
+    );
+    expect(n).toBe(WRITES);
   });
+
+  // a clean sync after a kill repairs the folder, whichever write was the last: the same bytes as a fresh shelf
+  for (let limit = 0; limit < WRITES; limit++) {
+    it(`a clean sync after a kill repairs the folder, killed at write ${limit}: the same bytes as a fresh shelf`, async () => {
+      await killedAt(limit);
+    });
+  }
 });
