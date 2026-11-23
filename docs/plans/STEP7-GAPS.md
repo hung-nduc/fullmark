@@ -20,7 +20,7 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 
 **G7. Where zsh and fish get a real Tab test.** This laptop has PowerShell and Git Bash only. **Recommendation:** the agent tests the zsh and fish scripts' text and every `__complete` answer here; the real Tab test runs once on a lab workstation (`ibmelabc05` or `ibmelab-pc`) over SSH, if zsh and fish are there, with the owner's yes at the time. Not installing them on Windows (MSYS2) only for a test.
 
-**Decided by the owner on 2026-11-20, as recommended.** Written in slice 7b's brief.
+**Decided by the owner on 2026-11-20, as recommended.** Written in slice 7b's brief. **Replaced by G16 on 2026-11-23**, before 7b was built.
 
 **G8. Which branch is fullmark.** Until now `main` held the Python prototype and was not touched, and 1.0 was built on `1.0`. `main` was an ancestor of `1.0` (nothing on `main` that `1.0` lacked), so moving it was a fast-forward; document-kit and presentation-kit depend on the separate `fullmark-py` repository, not on this `main`. **Recommendation:** fast-forward `main` to 1.0 and work on `main`; 0.x stays at the tag `v0.10.2`; delete `1.0` later.
 
@@ -41,3 +41,7 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 **G14. The start bar makes the start screen scroll at 390 × 844** (7c's review, below). `e2e/foot.spec.ts` fails in both browsers: a short quiz's start screen is 865 px tall at 390 × 844 (800 px before; the bar is 65 px). The design asks only that the ⓘ button be at the foot, never over content, which holds; fitting the window was the test's assumption, and making the bar fit is not enough (−12 px and −20 px still leave 1 px over). The bar also sits 12 px below the window's top, where the board draws it flush. **Recommendation:** a phone's start screen may scroll: the test keeps "fits the window" for desktop and checks the button at the page's end on the three phones; and the bar goes flush with the top (no `.fm-quiz` top padding before Start), one goldens round for it.
 
 **Decided by the owner on 2026-11-21, as recommended.** Written into TECHNICAL_DESIGN.md, section 8, "The look" (**Where they are**); built in 7c's follow-up.
+
+**G16. zsh and fish in CI, not on a lab workstation** (replaces G7; raised by the planner on 2026-11-23 when the owner asked how 7b runs on two machines). The CI job already runs on Linux (`ubuntu-24.04`); installing zsh and fish there takes seconds, and every push to `main` then tests all four shells, where a workstation run over SSH happens once, depends on what is installed there, and keeps nothing tested afterwards. The cost: zsh and fish results arrive only after the owner pushes, so a failure there is fixed in a push round. **Recommendation:** CI.
+
+**Decided by the owner on 2026-11-23, as recommended.** Written in slice 7b's brief (task 5 and "Done when").

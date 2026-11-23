@@ -16,7 +16,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 |---|---|---|
 | plan | written (2026-11-20); G1 to G3 decided as recommended (2026-11-20), G1 and G2 written into COMMANDS.md | this file |
 | 7a | built and reviewed (2026-11-20): `npm run check` passes on Windows; with the dock bug fixed | `d671461e`, `cd2175fa`, `e78158c6`, `0045cbc5`, `325fc8f6`, `08bd7287`, `4549bb02` |
-| 7b | briefed (2026-11-20); waits for G10 and the owner's approval | |
+| 7b | briefed (2026-11-20), task 5 rebriefed for G16 (2026-11-23); waits for G10, G17 and the owner's approval | |
 | CI and licence | CI runs on `main`; typos clean; the grade key row and the shelf phone card hold with Linux's wider fonts; the copyright holder is `hung-nduc` | `97f41a85`, `613e0809`, `f472c391` |
 | 7c | built and reviewed (2026-11-21), G14 built: `npm run check` passes on Windows; `main` fast-forwarded, 1.1.1 installed | `2e75de00`, `b62efff9`, `8202c302`, `d07ef96e`, `10c759e7`, `fd2dec97` and the review |
 
@@ -28,7 +28,7 @@ As in step 6 ([archive/STEP6.md](archive/STEP6.md), Handoff): the planner writes
 4. **Done (2026-11-20):** the CI fix (the trigger, typos, the two layouts that failed on Linux's wider fonts) and the licence holder; the owner's shelf published as `biomed-quizzes`, linked from the README. CI on Linux confirms the layouts after the owner pushes.
 5. **Done (2026-11-21):** 7c finished and reviewed, G14 built, a scroll regression on Start fixed, `npm run check` exit 0; `main` fast-forwarded and 1.1.1 installed from the tarball.
 6. **Waiting on the owner:** pushing `main` and the tags `v1.1.0` and `v1.1.1` (`git -C D:/coding-projects/fullmark push origin main v1.1.0 v1.1.1`), and the shelf (`git -C D:/studying/biomed-quizzes push`), whose last commit republishes with every font and exams A and B under the `exam` profile; after 7c is installed, `quiz library publish` again so the shelf gets the start screen's bar. G11 is open.
-7. **Then:** slice 7b, Tab completion (G6, G7, G9 decided 2026-11-20): the owner decides G10 and approves the brief.
+7. **Then:** slice 7b, Tab completion (G6, G9 decided 2026-11-20; G16, which replaces G7, decided 2026-11-23: zsh and fish are tested in CI): the owner decides G10 and G17 and approves the brief. zsh and fish results come only from CI, after the owner pushes: the planner reads the run and brings any failure back as a fix.
 
 ## Goal
 
@@ -40,9 +40,11 @@ Step 6's rules hold ([archive/STEP6.md](archive/STEP6.md), "Rules for every slic
 
 ## Gaps
 
-G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10, G11 and G15 (7c's review, below); G12 to G14 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G16.
+G1 to G3 and G6 to G9 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). Open: G4 and G5, small and not blocking (7a's review, below), G10, G11, G15 (7c's review, below) and G17; G12 to G14 and G16 are decided ([STEP7-GAPS.md](STEP7-GAPS.md)). New ones are added here from G18.
 
 **G10. The version after 7b.** A new command (`shell-init`) is more than a fix, as with G3. **Recommendation:** `1.2.0`; about 29 goldens change only in the version string and what follows from it, as in 7a, and are counted in the review.
+
+**G17. How deep zsh's test goes** (from G16). PowerShell (`TabExpansion2`), bash (the function called with `COMP_WORDS` and `COMP_CWORD` set) and fish (`complete -C`) can run their real completer from a script, with no terminal. zsh's completion system runs only inside an interactive line editor, so a real Tab needs a pseudo-terminal driven through the `zsh/zpty` module, which is fiddly and slow to get right. **Recommendation:** zsh is tested lighter: under `zsh -f` with `compinit`, the script loads without an error, `quiz` and `fullmark` are registered (`$_comps`), and the `__complete` answers it relies on are unit-tested as for the other shells; no `zpty`. The rest of zsh's risk is in `_describe`'s input, which those tests cover.
 
 **G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
 
@@ -102,7 +104,8 @@ The agent's report and the planner's review, with one full check after the dock 
 
 ### Read first
 
-- This plan: "Rules for every slice", 7a's review; [STEP7-GAPS.md](STEP7-GAPS.md), G6, G7, G9.
+- This plan: "Rules for every slice", 7a's review; [STEP7-GAPS.md](STEP7-GAPS.md), G6, G9 and G16 (which replaces G7); G17 here.
+- `.github/workflows/check.yml`: the Linux job task 5 extends.
 - COMMANDS.md: `quiz shell-init` (all of it), "Conventions" (exit codes, environment), `quiz template`, `quiz rules`, the `--profile` and `--section` options, and every library command the table of library values lists. `proposals/cli-integration.md`, sections 1 and "The seam to keep in v1".
 - `src/cli/main.ts` (how commands, options and choices are declared), the startup test and `test/cli-graph.test.ts` (what a command may load), and where the library index, the templates, the profiles and the rule ids are read today: reuse those readers, never a second parser.
 
@@ -112,7 +115,7 @@ The agent's report and the planner's review, with one full check after the dock 
 2. **`quiz __complete WORDS...`**, hidden, exactly as COMMANDS.md says: the candidates, the descriptions, the directive line, the rules (read-only, quiet, no lock, every error giving no candidates, `:default` and exit `0`). It walks the commander tree to find the position, then asks the value source the table names. Each value source is a small function with unit tests (an empty library, no library, a broken index, no config, a user template, a quiz with and without sections). It must not load the page builder, the renderer, the server, the highlighter or `@clack/prompts`: extend `test/cli-graph.test.ts`.
 3. **Its budget.** A test in the startup tests' style times `__complete` for a subcommand and for a library quiz name on the history fixture: within the startup budget, and a library value within 100 ms on this laptop (report the measurements).
 4. **The four scripts**, printed by `quiz shell-init powershell|bash|zsh|fish`, each registering `quiz` and `fullmark`, each a few dozen lines at most, kept as files in the package and printed as they are. PowerShell: `Register-ArgumentCompleter -Native`, with the descriptions as tooltips; bash: a `complete -F` function that works with and without the `bash-completion` package, and in Git Bash; zsh: a `compdef` function using `_describe`, so the descriptions show; fish: `complete -c` with the descriptions. Each honours the directive (files of a kind, no files, the shell's default). An unknown shell exits `2` naming the four. `quiz shell-init --help` gives the four start-up lines of COMMANDS.md. Before writing them, look at `@bomb.sh/tab` and `tabtab`; use one only if it fits COMMANDS.md's protocol and adds nothing to the startup path, and say why either way. A new dependency is named in the report with its size and licence.
-5. **Real Tab tests where the shell is here** (G7). PowerShell and Git Bash: a smoke test that loads the script into a real shell and completes `quiz lib`, `quiz library take ` on the history fixture (with `FULLMARK_CONFIG` pointing at a test config, never the owner's), a `--fonts ` value and a `.md` file. For zsh and fish, which this laptop lacks: tests of the scripts' text and of every `__complete` answer they rely on, and a small script that runs the same smoke test, to be run once on a Linux workstation with zsh and fish (skipped here, and the skip says so). Do not install a shell.
+5. **Real completion tests in every shell, zsh and fish in CI** (G16, G17). One Vitest file of shell smoke tests, each loading the printed script into the real shell and asking it for candidates without a terminal: PowerShell through `TabExpansion2`, bash (Git Bash here, bash on Linux) by calling the function with `COMP_WORDS` and `COMP_CWORD` set, fish through `complete -C`. Each completes `quiz lib`, `quiz library take ` on the history fixture (with `FULLMARK_CONFIG` pointing at a test config, never the owner's), a `--fonts ` value and a `.md` file, and checks the descriptions where the shell shows them. zsh as G17 decides. A shell that is not on the machine skips its tests, and the skip names the shell and says CI runs it; nothing else is skipped. **CI:** the `check` job in `.github/workflows/check.yml` installs zsh and fish before `npm run check` (`sudo apt-get install -y zsh fish`), so all four shells run on Linux on every push to `main`; the PowerShell tests run on Linux too if `pwsh` is on the runner, and are skipped otherwise. Do not install a shell on this laptop.
 6. **The guides.** `guide/GUIDE.md` gains a short section on setting completion up (the four lines); `skill/SKILL.md` and `AGENTS.md` say nothing about it (completion is for people). The skill test still passes.
 7. **The version** (G10), then `npm run golden:update`: list every changed golden and show that each differs only in the version string and what follows from it, or explain it (task 1's help text).
 
@@ -120,7 +123,7 @@ The agent's report and the planner's review, with one full check after the dock 
 
 - On Windows, nothing else running: `npm run build`, then `npm run check` passes. Report each part's counts and times, the budgets, and `__complete`'s measurements.
 - By hand in PowerShell and Git Bash, with the scripts loaded from a build in a temporary prefix (as in 7a, never over the owner's install): Tab completes a subcommand, a flag, a fixed value, a library quiz name with its title, and a quiz file. Quote what you saw.
-- The zsh and fish smoke script exists, runs its tests when the shells are there, and is named in the report for the planner to run on the workstation.
+- The shell smoke tests run PowerShell and Git Bash here and skip zsh and fish, saying so; the CI change is committed. zsh and fish are confirmed by the first CI run after the owner pushes, which the planner reads.
 - No golden changes except those listed and explained; one commit per task or a few; explicit paths; the model's `Co-Authored-By` line; no push.
 
 ### Report
