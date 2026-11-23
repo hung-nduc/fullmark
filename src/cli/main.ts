@@ -1,7 +1,9 @@
-import { Command, Option } from "commander";
+import { Argument, Command, Option } from "commander";
+import { FONT_CHOICES } from "../core/fonts";
 import type { BriefOptions } from "./brief";
 import type { BuildOptions } from "./build";
 import type { CheckOptions } from "./check";
+import { ANSWER_MODES, declared, MATERIALS_CHOICES, SHELLS, UI_LANGS } from "./choices";
 import { EXIT, type ExitCode } from "./exit-codes";
 import type { GradeOptions } from "./grade";
 import type { GuideOptions } from "./guide";
@@ -201,15 +203,35 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--print", "write a printable exam paper (static HTML, black on white) instead of the page")
     .option("--seed <s>", "with --print: shuffle reproducibly; 1 to 8 letters or digits, printed as the paper code")
     .option("--answer-sheet", "with --print: a grid of boxes for the single-choice and true/false answers")
-    .option(
-      "--answers <mode>",
-      "with --print: none (an exam paper), key (the answer key on a new page) or inline (a study sheet)",
+    .addOption(
+      declared(
+        new Option(
+          "--answers <mode>",
+          "with --print: none (an exam paper), key (the answer key on a new page) or inline (a study sheet)",
+        ),
+        ANSWER_MODES,
+      ),
     )
-    .option("--materials <which>", "with --print: none leaves the materials page out")
-    .option("--ui-lang <lang>", "the page's language for this build, en or vi (default: the quiz's ui_lang)")
-    .option(
-      "--fonts <which>",
-      "which fonts the page embeds: quiz (the quiz's own), all or none (default: fonts in config.toml, else quiz)",
+    .addOption(
+      declared(
+        new Option("--materials <which>", "with --print: none leaves the materials page out"),
+        MATERIALS_CHOICES,
+      ),
+    )
+    .addOption(
+      declared(
+        new Option("--ui-lang <lang>", "the page's language for this build, en or vi (default: the quiz's ui_lang)"),
+        UI_LANGS,
+      ),
+    )
+    .addOption(
+      declared(
+        new Option(
+          "--fonts <which>",
+          "which fonts the page embeds: quiz (the quiz's own), all or none (default: fonts in config.toml, else quiz)",
+        ),
+        FONT_CHOICES,
+      ),
     )
     .option("--plain", "no colours and no progress line, even in a terminal")
     .option("--watch", "rebuild when the quiz, the files it uses or the build file change; Ctrl+C stops (exit 0)")
@@ -252,8 +274,15 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
       "the page to write (default: RESULTS with -replay.html); with several files, a folder",
     )
     .option("--built-at <iso>", "pin the build time, so a page is byte-identical across runs (default: now)")
-    .option("--ui-lang <lang>", "the page's language, en or vi (default: the quiz's ui_lang)")
-    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(new Option("--ui-lang <lang>", "the page's language, en or vi (default: the quiz's ui_lang)"), UI_LANGS),
+    )
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--open", "open the page after writing it (the default for one file)")
     .option("--no-open", "do not open the page")
     .option("--json", "print one JSON object per file on stdout")
@@ -298,6 +327,29 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .action(async (options: Record<string, unknown>) => {
       const opts: GuideOptions = { plain: Boolean(options.plain) || noColor(), noPager: options.pager === false };
       outcome.exit = (await import("./guide")).runAgentGuide(opts, io);
+    });
+
+  program
+    .command("shell-init")
+    .description("print the script that makes Tab complete quiz and fullmark in a shell")
+    .addArgument(new Argument("<shell>", "the shell the script is for").choices(SHELLS))
+    .addHelpText(
+      "after",
+      [
+        "",
+        "Prints the script; nothing is changed, and fullmark never edits a profile. With one line in your shell's",
+        "start-up file, Tab completes subcommands, flags, their values, the library's quizzes and your templates.",
+        "",
+        "The line for each shell:",
+        "  PowerShell ($PROFILE)              quiz shell-init powershell | Out-String | Invoke-Expression",
+        '  bash, Git Bash (~/.bashrc)         eval "$(quiz shell-init bash)"',
+        '  zsh (~/.zshrc, after compinit)     eval "$(quiz shell-init zsh)"',
+        "  fish (~/.config/fish/config.fish)  quiz shell-init fish | source",
+        "",
+      ].join("\n"),
+    )
+    .action(async (shell: (typeof SHELLS)[number]) => {
+      outcome.exit = (await import("./shell-init")).runShellInit(shell, io);
     });
 
   program
@@ -467,7 +519,12 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--port <n>", "the port on 127.0.0.1 (default: a free one)")
     .option("--profile <name>", "the check profile; overrides the quiz's profile")
     .option("--config <toml>", "use this config file instead of the nearest fullmark.toml")
-    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--focus", "tick Focus mode on the start screen")
     .option("--section <s>", "serve only this section (its slug or title)")
     .option("--autosave <progress>", "keep the attempt in progress in this file, so it resumes after a restart")
@@ -625,7 +682,12 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--missed", "only the questions you got wrong or partly right and have not answered right since")
     .option("--focus", "tick Focus mode on the start screen")
     .option("--dry-run", "print the plan the take would serve and serve nothing")
-    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--no-open", "do not open the page in the browser")
     .option("--timeout <seconds>", "how long to wait for a submit; 0 waits forever (default 0)")
     .option("--port <n>", "the port on 127.0.0.1 (default: a free one)")
@@ -734,7 +796,12 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("-o, --output <dir>", "the folder to write into (default: here)")
     .option("--version <hash>", "this version (a hash, or a prefix of at least 4 characters); default: the current one")
     .option("--source", "write the editable folder NAME/ (the source, its assets and a fullmark.toml when needed)")
-    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--json", "print the outcome as one JSON object")
     .option("--plain", "no colours, even in a terminal")
     .action(async (name: string, options: Record<string, unknown>) => {
@@ -764,8 +831,15 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .option("--off", "take the quiz off the public shelf")
     .option("--with-brief", "copy each quiz's brief.yaml too")
     .option("--no-brief", "copy no brief.yaml (the default)")
-    .option("--ui-lang <lang>", "the index page's interface language: en or vi (default: en)")
-    .option("--fonts <which>", "which fonts the pages embed: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(new Option("--ui-lang <lang>", "the index page's interface language: en or vi (default: en)"), UI_LANGS),
+    )
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the pages embed: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--dry-run", "print what would be added, updated and removed, and write nothing")
     .option("--json", "print the outcome as one JSON object")
     .option("--plain", "no colours, even in a terminal")
@@ -873,7 +947,12 @@ export function buildProgram(outcome: Outcome = { exit: EXIT.done }, io: Io = te
     .argument("<name>", "a quiz's name or id")
     .option("--attempt <stamp>", "the attempt (a stamp or a prefix of 4 or more characters; default: the newest)")
     .option("-o, --output <dir>", "write the page into this folder instead of the temp folder")
-    .option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none")
+    .addOption(
+      declared(
+        new Option("--fonts <which>", "which fonts the page embeds: quiz (the quiz's own), all or none"),
+        FONT_CHOICES,
+      ),
+    )
     .option("--no-open", "do not open the page in the browser")
     .option("--json", "print the outcome as one JSON object")
     .option("--plain", "no colours, even in a terminal")
@@ -900,6 +979,9 @@ async function main(argv: string[]): Promise<number> {
   const outcome: Outcome = { exit: EXIT.done };
   try {
     const program = buildProgram(outcome);
+    // the hidden command the shells' Tab scripts call: it is not a commander command, so no help lists it, and it
+    // never fails (COMMANDS.md, `quiz shell-init`)
+    if (argv[2] === "__complete") return (await import("./complete")).runComplete(program, argv.slice(3), terminalIo());
     // no command: the help goes to stderr and the exit code is 2 (COMMANDS.md, Exit codes)
     // the notices sit in their own chunk, so no other command pays for them (test/cli-graph.test.ts)
     if (argv[2] === "--acknowledgements") {

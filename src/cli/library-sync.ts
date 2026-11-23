@@ -22,6 +22,7 @@ import {
 } from "../library/shelf";
 import { WriteError, writeFileAtomic } from "./atomic";
 import { type BuildOptions, buildOne, runtimeReaders } from "./build";
+import { UI_LANGS } from "./choices";
 import { loadUserConfig } from "./config";
 import { recordShelf } from "./config-write";
 import { EXIT, type ExitCode } from "./exit-codes";
@@ -102,7 +103,7 @@ export async function runLibrarySync(
   const out = opts.json ? io.err : io.out;
   if (opts.fonts !== null && !(FONT_CHOICES as readonly string[]).includes(opts.fonts))
     return libraryFail(io, opts.json, `--fonts ${opts.fonts} is not one of quiz, all, none`);
-  if (opts.uiLang !== null && opts.uiLang !== "en" && opts.uiLang !== "vi")
+  if (opts.uiLang !== null && !(UI_LANGS as readonly string[]).includes(opts.uiLang))
     return libraryFail(io, opts.json, `--ui-lang ${opts.uiLang} is not one of en, vi`);
   if (opts.withBrief && opts.noBrief)
     return libraryFail(io, opts.json, "--with-brief and --no-brief cannot be given together");

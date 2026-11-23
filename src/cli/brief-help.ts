@@ -36,3 +36,10 @@ export function describeBriefOptions(program: Command): void {
     }
   }
 }
+
+/** The values `quiz brief --FLAG` takes, from the question file, each with its hint (English); null for a free value. */
+export function briefChoices(flag: string): { value: string; hint: string; multi: boolean }[] | null {
+  const q = loadQuestions().questions.find((x) => x.flag === flag);
+  if (!q?.choices) return null;
+  return q.choices.map((c) => ({ value: c.value, hint: c.hint.en, multi: q.kind === "multi" }));
+}

@@ -24,6 +24,7 @@ import {
   showProgress,
   worst,
 } from "./check";
+import { ANSWER_MODES, MATERIALS_CHOICES, UI_LANGS } from "./choices";
 import { loadConfig, realMachine } from "./config";
 import { EXIT, type ExitCode } from "./exit-codes";
 import { fail } from "./fail";
@@ -469,11 +470,11 @@ export async function runBuild(patterns: readonly string[], opts: BuildOptions, 
       }
     }
   }
-  if (opts.answers !== null && !["none", "key", "inline"].includes(opts.answers)) {
+  if (opts.answers !== null && !(ANSWER_MODES as readonly string[]).includes(opts.answers)) {
     fail(io, opts.json, `--answers ${opts.answers} is not one of none, key, inline`);
     return EXIT.usage;
   }
-  if (opts.materials !== null && opts.materials !== "none") {
+  if (opts.materials !== null && !(MATERIALS_CHOICES as readonly string[]).includes(opts.materials)) {
     fail(io, opts.json, `--materials ${opts.materials} is not none`);
     return EXIT.usage;
   }
@@ -489,7 +490,7 @@ export async function runBuild(patterns: readonly string[], opts: BuildOptions, 
     fail(io, opts.json, `--fonts ${opts.fonts} is not one of quiz, all, none`);
     return EXIT.usage;
   }
-  if (opts.uiLang !== null && opts.uiLang !== "en" && opts.uiLang !== "vi") {
+  if (opts.uiLang !== null && !(UI_LANGS as readonly string[]).includes(opts.uiLang)) {
     fail(io, opts.json, `--ui-lang ${opts.uiLang} is not one of en, vi`);
     return EXIT.usage;
   }
