@@ -53,3 +53,27 @@ Every gap of step 7 the owner has decided, in number order, as it stood when dec
 **G17. How deep zsh's test goes** (from G16). PowerShell (`TabExpansion2`), bash (the function called with `COMP_WORDS` and `COMP_CWORD` set) and fish (`complete -C`) can run their real completer from a script, with no terminal. zsh's completion system runs only inside an interactive line editor, so a real Tab needs a pseudo-terminal driven through the `zsh/zpty` module, which is fiddly and slow to get right. **Recommendation:** zsh is tested lighter: under `zsh -f` with `compinit`, the script loads without an error, `quiz` and `fullmark` are registered (`$_comps`), and the `__complete` answers it relies on are unit-tested as for the other shells; no `zpty`. The rest of zsh's risk is in `_describe`'s input, which those tests cover.
 
 **Decided by the owner on 2026-11-23, as recommended.** Written in slice 7b's brief (task 5).
+
+**G11. `content.names-control` flags "tap" as a word of the electronics.** Found while publishing the owner's shelf: under the `exam` profile, "a bypass capacitor at the tap" (a voltage divider's tap) is an error, because `tap` is one of the English screen words (`src/core/i18n/controls.ts`), matched as a whole word anywhere. `press` has the same risk (a press, pressure). The owner's two quizzes were reworded ("at the divider's midpoint"), so nothing waits on this. **Recommendation:** match `tap`, `press` and `click` only as an instruction, followed by `the`, `on`, `a`, `an`, `here` or `this` ("tap the button"), with a unit test for "at the tap" and "a hydraulic press"; `button`, `sidebar` and `scroll` stay as they are. A small slice of its own, or a task in the next one.
+
+**Decided by the owner on 2026-11-23, as recommended,** when choosing the cleanup release `1.2.2` before any 1.3 feature. Written in slice 7d's brief.
+
+**G15. Goldens that copy another golden's output.** `publish-sync-unchanged` and `publish-sync-swap` take `test/golden/library/publish-sync/files/shelf` through `copy.txt`, so after a bundle change a single `golden:update` can write them from the stale shelf; a second run fixes it. **Recommendation:** build their shelf in the case itself (a first `publish` step, or a fixture shelf under `test/fixtures/` refreshed by the runner before the cases), so no case reads another's output; a task in the next slice that touches the runner.
+
+**Decided by the owner on 2026-11-23, as recommended,** when choosing the cleanup release `1.2.2` before any 1.3 feature. Written in slice 7d's brief.
+
+**G18. Help repeats the values.** With the choices declared, commander adds "(choices: ...)" after descriptions that already list them: `--fonts` "quiz (the quiz's own), all or none (choices: "quiz", "all", "none")", `--ui-lang` "en or vi (choices: "en", "vi")". **Recommendation:** keep commander's line and drop the hand-written "X, Y or Z" where it only lists the values, keeping what explains them ("quiz, the quiz's own"); a help-goldens task in the next slice that touches the CLI.
+
+**Decided by the owner on 2026-11-23, as recommended,** when choosing the cleanup release `1.2.2` before any 1.3 feature. Written in slice 7d's brief.
+
+**G20. A library-sync test near its timeout under load.** "A clean sync after a kill repairs the folder" publishes once for every kill point; alone it takes about 25 s, but inside the full parallel suite it passed 120 s once (2026-11-23), with no change to the library. **Recommendation:** give it its own timeout (300 s) as the other long sync tests have, or split the kill points into one test each so each stays well inside 120 s; the split is better (a failure names its kill point). A task in the next slice that touches the tests.
+
+**Decided by the owner on 2026-11-23, as recommended (the split),** when choosing the cleanup release `1.2.2` before any 1.3 feature. Written in slice 7d's brief.
+
+**G19. The Firefox budget's margin.** Its retry measured 1,035 ms and 998 ms today against 707 to 807 ms in 7a and 7c, with no change to the page but the version string; the whole Playwright run was slower too (18.0 min against 12.5 to 15.0). A slower machine today is the likely cause, not shown. **Recommendation:** no change now; if it fails on its retry once more with nothing else running, measure Firefox alone and bring the numbers back before touching the limit.
+
+**Decided by the owner on 2026-11-23, as recommended: no change now.** If the budget fails on its retry again with nothing else running, Firefox is measured alone and the numbers come back before the limit is touched.
+
+**G5. `templates/blank/quiz.md` keeps a commented `on_timeout` line** for a key 1.0 dropped (7a's review in STEP7.md). **Recommendation:** remove it in the next slice that touches the templates.
+
+**Decided by the owner on 2026-11-23, as recommended,** with the cleanup release `1.2.2`. Written in slice 7d's brief (task 5).
