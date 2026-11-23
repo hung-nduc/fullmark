@@ -1,0 +1,1 @@
+FULLMARK_LIBRARY=<dir>/lib-public library publish

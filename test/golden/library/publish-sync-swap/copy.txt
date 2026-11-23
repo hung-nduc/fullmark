@@ -1,3 +1,4 @@
 test/fixtures/library-history/lib => lib
 test/fixtures/library-history/library-public-alt.toml => lib/library.toml
-test/golden/library/publish-sync/files/shelf => shelf
+test/fixtures/library-history/lib => lib-public
+test/fixtures/library-history/library-public.toml => lib-public/library.toml

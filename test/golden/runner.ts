@@ -23,6 +23,11 @@ import { dirname, join, relative, resolve } from "node:path";
  *                  the fixture's own `.gitignore` ignores
  * - `copy.txt`     `repo/path => dest` lines: a file or folder of the repository copied in (optional)
  * - `env.txt`      `KEY=VALUE` lines added to the environment; `<dir>` is the working directory (optional)
+ * - `pre.txt`      commands run first, one per line, its arguments split at spaces (optional): `library publish` builds
+ *                  a shelf with the current build, so a case that needs a shelf never reads another case's output.
+ *                  Leading `KEY=VALUE` words are added to that command's environment (`<dir>` as in `env.txt`). They run after `copy.txt` and `env.txt`, in the case's working directory with its environment, and
+ *                  must exit 0. Their output is not recorded, and what they write is part of the case's starting state,
+ *                  so it is not in `files/`
  * - `git.txt`      folders (relative to the working directory) made a git repository with one commit of everything in
  *                  them before the command runs, with the dates of `env.txt`, so a command that commits has a repository
  *                  to commit to and its hashes are reproducible (optional)
@@ -86,6 +91,27 @@ function snapshot(dir: string): Map<string, Buffer> {
   return new Map(walk(dir).map((rel) => [rel, readFileSync(join(dir, rel))]));
 }
 
+/** `node dist/cli.js ARGS` in `cwd`: its output and exit code, whatever the code. */
+function runNode(
+  args: string[],
+  cwd: string,
+  env: Record<string, string>,
+): Promise<{ stdout: string; stderr: string; exit: number }> {
+  return new Promise((done, fail) => {
+    const child = execFile(
+      process.execPath,
+      [join(ROOT, "dist", "cli.js"), ...args],
+      { cwd, env, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+      (error, stdout, stderr) => {
+        const code = (error as { code?: unknown } | null)?.code;
+        if (error && typeof code !== "number") fail(error);
+        else done({ stdout, stderr, exit: error ? (code as number) : 0 });
+      },
+    );
+    child.stdin?.end();
+  });
+}
+
 /** Runs a case once in a fresh temporary folder. */
 export async function runCase(c: Case): Promise<Run> {
   const tmp = realpathSync(mkdtempSync(join(tmpdir(), "fm-golden-")));
@@ -117,6 +143,18 @@ export async function runCase(c: Case): Promise<Run> {
       env[l.slice(0, i)] = l.slice(i + 1).replaceAll("<dir>", tmp);
     }
 
+    // `pre.txt`: commands that make the starting state (a shelf built by the current build), run before the snapshot
+    for (const l of lines(join(c.dir, "pre.txt"))) {
+      const words = l.split(" ");
+      const own: Record<string, string> = {};
+      while (/^[A-Z_]+=/.test(words[0] ?? "")) {
+        const word = (words.shift() as string).replaceAll("<dir>", tmp);
+        own[word.slice(0, word.indexOf("="))] = word.slice(word.indexOf("=") + 1);
+      }
+      const pre = await runNode(words, tmp, { ...env, ...own });
+      if (pre.exit !== 0) throw new Error(`${c.name}: pre.txt "${l}" exited ${pre.exit}: ${pre.stderr}${pre.stdout}`);
+    }
+
     // `git.txt`: the repositories the command commits to, made before the snapshot (`.git` is not part of it)
     for (const folder of lines(join(c.dir, "git.txt"))) {
       const cwd = join(tmp, folder);
@@ -130,19 +168,7 @@ export async function runCase(c: Case): Promise<Run> {
     const before = snapshot(tmp);
 
     const args = lines(join(c.dir, "cmd.txt"));
-    const result = await new Promise<{ stdout: string; stderr: string; exit: number }>((done, fail) => {
-      const child = execFile(
-        process.execPath,
-        [join(ROOT, "dist", "cli.js"), ...args],
-        { cwd: tmp, env, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
-        (error, stdout, stderr) => {
-          const code = (error as { code?: unknown } | null)?.code;
-          if (error && typeof code !== "number") fail(error);
-          else done({ stdout, stderr, exit: error ? (code as number) : 0 });
-        },
-      );
-      child.stdin?.end();
-    });
+    const result = await runNode(args, tmp, env);
 
     const after = snapshot(tmp);
     const files = new Map<string, Buffer>();
